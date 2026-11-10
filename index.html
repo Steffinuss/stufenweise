@@ -558,7 +558,7 @@ body.np-open.np-left main{padding-right:12px;padding-left:250px}
 #fb-name{font:inherit;font-size:16px;padding:6px 10px;border-radius:8px;border:1.5px solid #ddd4c3;margin-left:8px}
 .fb-ctx{font-size:14px;margin:8px 0}.fb-ctx th{text-align:left;padding:2px 10px 2px 0;color:#6b6672;font-weight:600;vertical-align:top}.fb-ctx td{padding:2px 0}
 .fb-actions{justify-content:flex-start;gap:10px;margin-top:8px}
-a.icon-btn{text-decoration:none}a.icon-btn.disabled{opacity:.4}
+a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:var(--ink,#2b2930);border-radius:14px}a.icon-btn.disabled{opacity:.4}
 .help-ver{font-size:13px;color:#6b6672;margin-left:auto;margin-right:10px}
 .rail-guide{margin-top:auto;font-size:11px !important;opacity:.75;border:1.5px dashed #c9bfae !important;background:transparent !important}
 .rail-guide svg{width:18px;height:18px}
@@ -631,7 +631,8 @@ a.icon-btn{text-decoration:none}a.icon-btn.disabled{opacity:.4}
   <div class="dlg-head"><h2 id="set-title">Einstellungen</h2><button data-close class="icon-btn">Fertig</button></div>
   <fieldset><legend>Ergebnisse</legend>
     <label class="row cb"><input type="checkbox" data-key="allowResults"> Ergebnisse und Mengen anzeigen erlauben</label>
-    <label class="row cb"><input type="checkbox" data-key="fbOn"> Knopf „Rückmeldung“ anzeigen (Testphase)</label>
+    <label class="row cb"><input type="checkbox" data-key="fbOn"> Knopf „Rückmeldung“ anzeigen</label>
+    <label class="row">Rückmeldungen per E-Mail an <input type="email" data-key="fbMail" placeholder="leer = nur über GitHub" autocomplete="off" style="flex:1;max-width:260px"></label>
     <p class="note">Aus: Die Kinder rechnen selbst. Ergebnis, Gesamtmenge und Ziffern unter der Tafel bleiben verborgen. „Ergebnis prüfen“ geht trotzdem.</p>
     <label class="row cb"><input type="checkbox" data-key="digits"> Ziffern unter der Stellenwerttafel</label>
     <label class="row cb"><input type="checkbox" data-key="numberWords"> Zahlwort zeigen (Zahlen-Modus)</label>
@@ -722,7 +723,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'stufenweise@posteo.de', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'zahlenraum-werkstatt.v2';
 const settings = (() => { try { const st = JSON.parse(localStorage.getItem(STORE) || '{}'); if(!st.v3){ delete st.colors; st.v3 = true; } if(!st.v4){ delete st.speech; st.v4 = true; } return {...DEFAULTS, ...st}; } catch { return {...DEFAULTS}; } })();
 settings.v3 = true; settings.v4 = true;
@@ -5401,12 +5402,13 @@ document.addEventListener('change', e => { const s = e.target.closest('[data-gui
 const APP_VERSION = '0.9.1 · 10.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
-const FB_MAIL = 'hackl.s@gws-ulm.de';
+const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
+const fbMail = () => (settings.fbMail ?? 'stufenweise@posteo.de').trim();
 const FB_ART = [['fehler', 'Fehler', 'Etwas funktioniert nicht'], ['passung', 'Passt nicht', 'Aufgabe, Sprache oder Einstufung passt nicht'], ['idee', 'Idee', 'Vorschlag oder Wunsch'], ['lob', 'Gefällt mir', 'Das ist gut so']];
 const FB_SEV = [['blockiert', 'Ich komme nicht weiter'], ['stoert', 'Stört'], ['klein', 'Kleinigkeit']];
 function fbContext(){
   const p = curProfile(), d = app.diag, R = app.read, ua = navigator.userAgent;
-  let area = MODE_NAMES[app.mode] || app.mode, detail = '';
+  let area = MODE_NAMES[app.mode] || ({home:'Startseite', diag:'Test'})[app.mode] || app.mode, detail = '';
   try{
     if(app.mode === 'read'){ const info = L_INFO[R.lvl] || W_INFO[R.lvl] || U_INFO[R.lvl] || G_INFO[R.lvl]; area = /^U/.test(R.lvl) ? 'Uhr und Kalender' : /^G/.test(R.lvl) ? 'Größen' : /^W/.test(R.lvl) ? 'Schreiben' : 'Lesen'; detail = `${R.lvl} ${info?.name || ''}${R.item ? ` · Aufgabe: ${R.item.label}` : ''}`; }
     else if(app.mode === 'diag' && d){ const it = d.items?.[d.idx]; detail = `${d.kurz ? 'Kurztest' : d.warm ? 'Startrunde' : `Test ${d.subj}${d.part ? ' Teil ' + d.part : ''}`} · Aufgabe ${d.nItems + 1}${it ? ` · ${it.label}` : ''}${d.key ? ` · Stufe ${cellLabel(d.key)}` : ''}`; }
@@ -5423,7 +5425,8 @@ function fbText(){
   return `Rückmeldung zu Stufenweise\n\nArt: ${art ? art[1] : '–'}${sev && ['fehler', 'passung'].includes(f.art) ? `\nSchwere: ${sev[1]}` : ''}\nVon: ${settings.fbName || '–'}\n\nBeschreibung:\n${f.text || '–'}\n\n— automatisch ergänzt —\n${f.ctx.map(([k, v]) => `${k}: ${v}`).join('\n')}\n`;
 }
 const fbSubject = () => { const f = app.fb, art = FB_ART.find(a => a[0] === f.art); return `Stufenweise – ${art ? art[1] : 'Rückmeldung'} – ${f.ctx.find(c => c[0] === 'Bereich')[1]}`; };
-const fbHref = () => `mailto:${FB_MAIL}?subject=${encodeURIComponent(fbSubject())}&body=${encodeURIComponent(fbText())}`;
+const fbGhHref = () => `${FB_REPO}/issues/new?title=${encodeURIComponent(fbSubject())}&body=${encodeURIComponent(fbText().replace('— automatisch ergänzt —', '---\n**Automatisch ergänzt**').replace(/\n(Art|Schwere|Von|Version|Fach|Bereich|Details|Profil|Ansicht|Gerät|Zeit): /g, '\n- $1: ').replace('\nBeschreibung:\n', '\n**Beschreibung**\n\n'))}`;
+const fbHref = () => `mailto:${fbMail()}?subject=${encodeURIComponent(fbSubject())}&body=${encodeURIComponent(fbText())}`;
 function fbOpen(){ app.fb = {art:null, sev:null, text:'', ctx: fbContext()}; fbRender(); $('#dlg-fb').showModal(); }
 function fbRender(){
   const f = app.fb, needSev = ['fehler', 'passung'].includes(f.art);
@@ -5436,22 +5439,24 @@ function fbRender(){
       <label class="row">Dein Name (optional) <input id="fb-name" value="${escHtml(settings.fbName || '')}" placeholder="z. B. Frau Weber" autocomplete="name"></label>
     </fieldset>
     <details class="fb-ctx"><summary>Wird automatisch mitgeschickt</summary><table>${f.ctx.map(([k, v]) => `<tr><th>${k}</th><td>${escHtml(v)}</td></tr>`).join('')}</table></details>
-    <div class="row fb-actions"><a id="fb-mail" class="icon-btn primary${f.art ? '' : ' disabled'}" href="${f.art ? fbHref() : '#'}" target="_blank" rel="noopener">${icon('chat')}<span style="display:inline">Per E-Mail senden</span></a><button id="fb-copy" class="icon-btn" ${f.art ? '' : 'disabled'}>${icon('edit')}<span style="display:inline">Text kopieren</span></button></div>
-    <p class="note">Die E-Mail geht an ${FB_MAIL}. Öffnet sich keine Mail-App, tipp auf „Text kopieren“ und füge den Text in eine eigene E-Mail ein. Tipp: Ein Bildschirmfoto (iPad: obere Taste und Lauter-Taste gleichzeitig) kannst du in der Mail anhängen.</p>`;
+    <div class="row fb-actions">${fbMail() ? `<a id="fb-mail" class="icon-btn primary${f.art ? '' : ' disabled'}" href="${f.art ? fbHref() : '#'}" target="_blank" rel="noopener">${icon('chat')}<span style="display:inline">Per E-Mail senden</span></a>` : ''}<a id="fb-gh" class="icon-btn${fbMail() ? '' : ' primary'}${f.art ? '' : ' disabled'}" href="${f.art ? fbGhHref() : '#'}" target="_blank" rel="noopener">${icon('next')}<span style="display:inline">Auf GitHub melden</span></a><button id="fb-copy" class="icon-btn" ${f.art ? '' : 'disabled'}>${icon('edit')}<span style="display:inline">Text kopieren</span></button></div>
+    <p class="note">${fbMail() ? `Die E-Mail geht an ${escHtml(fbMail())}. ` : ''}<b>Auf GitHub</b> ist deine Meldung öffentlich sichtbar, bitte keine Namen von Kindern. Dafür brauchst du ein kostenloses GitHub-Konto. Öffnet sich nichts, tipp auf „Text kopieren“. Tipp: Ein Bildschirmfoto (iPad: obere Taste und Lauter-Taste gleichzeitig) kannst du anhängen.</p>`;
 }
 function fbSent(how){ (data.fbLog ??= []).push({date: Date.now(), art: app.fb.art, how}); data.fbLog = data.fbLog.slice(-50); saveData(); }
 $('#dlg-fb').addEventListener('click', e => {
   if(e.target.closest('[data-close]') || e.target === $('#dlg-fb')) return $('#dlg-fb').close();
   const a = e.target.closest('[data-fbart]'); if(a){ app.fb.art = a.dataset.fbart; if(!['fehler', 'passung'].includes(app.fb.art)) app.fb.sev = null; fbRender(); return; }
   const sv = e.target.closest('[data-fbsev]'); if(sv){ app.fb.sev = sv.dataset.fbsev; fbRender(); return; }
+  const g = e.target.closest('#fb-gh'); if(g){ if(!app.fb.art){ e.preventDefault(); toast('Bitte zuerst auswählen, was du melden möchtest.'); return; } fbSent('github'); setTimeout(() => { $('#dlg-fb').close(); toast('Danke! Auf GitHub musst du die Meldung nur noch absenden.'); }, 400); return; }
   const m = e.target.closest('#fb-mail'); if(m){ if(!app.fb.art){ e.preventDefault(); toast('Bitte zuerst auswählen, was du melden möchtest.'); return; } fbSent('mail'); setTimeout(() => { $('#dlg-fb').close(); toast('Danke! Deine Mail-App sollte sich geöffnet haben.'); }, 400); return; }
-  if(e.target.closest('#fb-copy')){ const t = fbText(); const done = () => { fbSent('copy'); toast(`Kopiert. Bitte in eine E-Mail an ${FB_MAIL} einfügen.`); };
+  if(e.target.closest('#fb-copy')){ const t = fbText(); const done = () => { fbSent('copy'); toast(fbMail() ? `Kopiert. Bitte in eine E-Mail an ${fbMail()} oder auf GitHub einfügen.` : 'Kopiert. Bitte auf GitHub als neue Meldung einfügen.'); };
     if(navigator.clipboard?.writeText) navigator.clipboard.writeText(t).then(done, () => { $('#fb-text').value = t; $('#fb-text').select(); document.execCommand('copy'); done(); }); else { $('#fb-text').value = t; $('#fb-text').select(); document.execCommand('copy'); done(); } }
 });
 $('#dlg-fb').addEventListener('input', e => {
   if(e.target.id === 'fb-text') app.fb.text = e.target.value;
   if(e.target.id === 'fb-name'){ settings.fbName = e.target.value; saveSettings(); }
   const m = $('#fb-mail'); if(m && app.fb.art) m.href = fbHref();
+  const g = $('#fb-gh'); if(g && app.fb.art) g.href = fbGhHref();
 });
 $('#btn-fb').innerHTML = icon('chat') + '<span>Rückmeldung</span>';
 $('#btn-fb').addEventListener('click', fbOpen);
@@ -5551,7 +5556,7 @@ $('#help-content').innerHTML = [
   ['print','Freie Inhalte','Texte, Aufgaben, Arbeitsblätter und Formulierungsvorschläge stehen unter CC&nbsp;BY-SA&nbsp;4.0: Du darfst sie nutzen, ausdrucken, anpassen und weitergeben. Bedingungen: Namensnennung („Stufenweise, Stefan Hackl, CC&nbsp;BY-SA&nbsp;4.0“) und Weitergabe unter derselben Lizenz.'],
   ['edit','Mit KI entwickelt','Stufenweise wurde mit Unterstützung der KI Claude (Anthropic) programmiert. Konzept, fachliche Entscheidungen und Prüfung: Stefan Hackl. Die Einstufungen sind begründete Vorschläge und ersetzen keine sonderpädagogische Diagnostik.'],
   ['user','Danke','__THANKS__'],
-  ['chat','Mitmachen','Fehler, Ideen und Lob über den Knopf „Rückmeldung“ oder per E-Mail an hackl.s@gws-ulm.de. Eigene Texte oder Aufgaben übernimmt Stefan nur mit deinem Einverständnis; sie stehen dann ebenfalls unter CC&nbsp;BY-SA&nbsp;4.0.']
+  ['chat','Mitmachen','Fehler, Ideen und Lob über den Knopf „Rückmeldung“ oder per E-Mail an stufenweise@posteo.de. Öffentliche Meldungen und den Quelltext findest du auf GitHub: github.com/Steffinuss/stufenweise. Eigene Texte oder Aufgaben übernimmt Stefan nur mit deinem Einverständnis; sie stehen dann ebenfalls unter CC&nbsp;BY-SA&nbsp;4.0.']
 ].map(([i,h,p]) => i === 'h' ? `<h3 class="help-group">${h}</h3>` : `<div class="help-step">${icon(i)}<div><h3>${h}</h3><p>${p === '__THANKS__' ? thanksHtml() : p}</p></div></div>`).join('');
 
 if('speechSynthesis' in window) speechSynthesis.getVoices();

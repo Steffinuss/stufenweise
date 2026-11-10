@@ -13,19 +13,21 @@ Stufenweise ist eine kostenlose Lern-App für Schülerinnen und Schüler mit Fö
 
 Die ganze App steckt in einer einzigen Datei: `index.html`. Öffne sie in Safari, Chrome oder Firefox. Auf dem iPad legt „Teilen → Zum Home-Bildschirm“ die App wie eine normale App ab.
 
+**[Anleitung mit Bildern](docs/anleitung.md)**: alle Schritte von der PIN bis zur Rückmeldung.
+
 ## Datenschutz
 
 - Alle Namen und Ergebnisse bleiben im Browser des Geräts (localStorage).
 - Es gibt keinen Server, kein Konto und kein Tracking.
 - Noch offen: Die Schrift Andika wird derzeit von Google Fonts geladen. Sie wird in einer der nächsten Versionen direkt in die App eingebunden.
-- Die Rückmeldefunktion öffnet nur das eigene Mailprogramm; ein Kindername wird nicht mitgeschickt.
+- Die Rückmeldefunktion öffnet nur das eigene Mailprogramm oder GitHub; ein Kindername wird nicht mitgeschickt.
 
 ## Lizenz
 
 | Teil | Lizenz |
 | --- | --- |
 | Programmcode | [EUPL-1.2](https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12) (European Union Public Licence), siehe `LICENSE` |
-| Texte, Aufgaben, Lesetexte, Wortlisten, Formulierungsvorschläge, Arbeitsblätter | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.de), siehe `LIZENZ-INHALTE.md` |
+| Texte, Aufgaben, Lesetexte, Wortlisten, Formulierungsvorschläge, Arbeitsblätter, Anleitung | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.de), siehe `LIZENZ-INHALTE.md` |
 
 © 2026 Stefan Hackl. Namensnennung für Inhalte: **„Stufenweise, Stefan Hackl, CC BY-SA 4.0“**.
 
@@ -37,7 +39,10 @@ Stufenweise ist ein gemeinsames Projekt, kein Produkt.
 - Eigene Texte oder Aufgaben von Testerinnen und Testern werden nur mit deren Einverständnis übernommen, dann unter derselben freien Lizenz.
 - Wer möchte, wird auf der Danke-Seite in der App genannt („Anleitung → Über Stufenweise“).
 
-Fehler, Ideen und Lob: über den Knopf „Rückmeldung“ in der App oder per E-Mail an hackl.s@gws-ulm.de.
+Fehler, Ideen und Lob:
+
+- **[Neue Meldung auf GitHub](https://github.com/Steffinuss/stufenweise/issues/new)** (kostenloses GitHub-Konto nötig, öffentlich sichtbar, bitte keine Namen von Kindern). Am einfachsten über den Knopf „Rückmeldung“ in der App, der die Meldung schon vorausfüllt.
+- Ohne GitHub-Konto: per E-Mail an stufenweise@posteo.de.
 
 ## Mit KI entwickelt
 
