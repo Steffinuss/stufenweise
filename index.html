@@ -2025,13 +2025,15 @@ function nlSet(L, span){
 }
 function nlRedraw(){ const st = $('#stage'); if(!st || !nlOn()) return; st.innerHTML = nlWrap(drawLine(task())); }
 function nlVal(svg, cx){ const m = svg.getScreenCTM(); if(!m) return 0; const x = new DOMPoint(cx, 0).matrixTransform(m.inverse()).x, {L, H} = nlWin(task()); return {x, v: L + (x - 50)/900*(H - L)}; }
+/* Finger am stabilen Rahmen festhalten: Der Zahlenstrahl wird bei jeder Bewegung neu gezeichnet; ohne Capture schickt Safari (iPad) die Bewegungen an das entfernte Bild. Capture erst bei echter Geste, damit Antippen (Sprung, Überblick) normal funktioniert. */
+const nlCap = id => { try{ $('#stage').setPointerCapture(id); }catch{} };
 function nlSnap(){ const t = task(); if(!t.lz) return; const {L, H} = t.lz; const span = Math.round(H - L), l = Math.round(L); t.lz = {L: Math.max(0, Math.min(app.range - span, l)), H: Math.max(0, Math.min(app.range - span, l)) + span}; nlRedraw(); }
 $('#stage').addEventListener('pointerdown', e => {
   if(NLZ.pts.size === 0) NLZ.moved = false;
   if(!nlOn() || !e.target.closest('.nl-svg')) return;
   NLZ.pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
   const svg = e.target.closest('.nl-svg'), {L, H} = nlWin(task()), ps = [...NLZ.pts.values()];
-  if(ps.length === 2){ const mx = (ps[0].x + ps[1].x)/2; NLZ.g = {two:true, d0: Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1, span: H - L, v: nlVal(svg, mx).v}; }
+  if(ps.length === 2){ for(const id of NLZ.pts.keys()) nlCap(id); const mx = (ps[0].x + ps[1].x)/2; NLZ.g = {two:true, d0: Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1, span: H - L, v: nlVal(svg, mx).v}; }
   else if(ps.length === 1) NLZ.g = {two:false, x0: e.clientX, L, span: H - L, w: svg.getBoundingClientRect().width};
 });
 window.addEventListener('pointermove', e => {
@@ -2042,17 +2044,36 @@ window.addEventListener('pointermove', e => {
     const d = Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1, span = NLZ.g.span*NLZ.g.d0/d, mx = (ps[0].x + ps[1].x)/2;
     const fx = (nlVal(svg, mx).x - 50)/900; NLZ.moved = true; nlSet(NLZ.g.v - fx*span, span);
   } else if(!NLZ.g.two && NLZ.g.span < app.range){
-    const dx = e.clientX - NLZ.g.x0; if(Math.abs(dx) > 8) NLZ.moved = true;
+    const dx = e.clientX - NLZ.g.x0; if(Math.abs(dx) > 8 && !NLZ.moved){ NLZ.moved = true; nlCap(e.pointerId); }
     if(NLZ.moved){ const vb = svg.viewBox.baseVal.width, scale = vb/(NLZ.g.w || vb); nlSet(NLZ.g.L - dx*scale/900*NLZ.g.span, NLZ.g.span); }
   }
 });
 const nlUp = e => { if(!NLZ.pts.delete(e.pointerId)) return; if(NLZ.pts.size === 0){ if(NLZ.moved) nlSnap(); NLZ.g = null; } else if(NLZ.pts.size === 1){ const [p] = NLZ.pts.values(), {L, H} = nlWin(task()), svg = $('#stage .nl-svg'); NLZ.g = {two:false, x0:p.x, L, span:H - L, w: svg ? svg.getBoundingClientRect().width : 1000}; } };
 window.addEventListener('pointerup', nlUp); window.addEventListener('pointercancel', nlUp);
 $('#stage').addEventListener('wheel', e => {
-  if(!nlOn() || !e.target.closest('.nl-svg') || !e.ctrlKey) return;
-  e.preventDefault(); const svg = e.target.closest('.nl-svg'), {L, H} = nlWin(task()), {x, v} = nlVal(svg, e.clientX), span = (H - L)*Math.exp(e.deltaY*.01);
-  nlSet(v - (x - 50)/900*span, span); clearTimeout(NLZ.wt); NLZ.wt = setTimeout(nlSnap, 250);
+  if(!nlOn() || !e.target.closest('.nl-svg')) return;
+  const svg = e.target.closest('.nl-svg'), {L, H} = nlWin(task()), span0 = H - L;
+  if(e.ctrlKey){ /* Pinch am Trackpad (Chrome, Firefox, Edge) */
+    e.preventDefault(); const {x, v} = nlVal(svg, e.clientX), span = span0*Math.exp(e.deltaY*.01);
+    nlSet(v - (x - 50)/900*span, span);
+  } else if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && span0 < app.range){ /* zwei Finger seitlich wischen: verschieben */
+    e.preventDefault(); const w = svg.getBoundingClientRect().width || 1, vb = svg.viewBox.baseVal.width || 1000;
+    nlSet(L + e.deltaX/(w*900/vb)*span0, span0);
+  } else return;
+  clearTimeout(NLZ.wt); NLZ.wt = setTimeout(nlSnap, 250);
 }, {passive:false});
+/* Safari: Pinch am Mac-Trackpad kommt als Gesture-Event. Auf dem iPad laufen Finger über Pointer-Events; hier nur Seitenzoom verhindern. */
+$('#stage').addEventListener('gesturestart', e => {
+  if(!nlOn() || !e.target.closest?.('.nl-svg')) return; e.preventDefault();
+  if(NLZ.pts.size) return; const svg = $('#stage .nl-svg'), {L, H} = nlWin(task());
+  NLZ.ge = {span: H - L, v: nlVal(svg, e.clientX).v, x: e.clientX};
+});
+$('#stage').addEventListener('gesturechange', e => {
+  if(!NLZ.ge) { if(nlOn()) e.preventDefault(); return; } e.preventDefault();
+  const svg = $('#stage .nl-svg'); if(!svg) return; const span = NLZ.ge.span/(e.scale || 1), fx = (nlVal(svg, NLZ.ge.x).x - 50)/900;
+  nlSet(NLZ.ge.v - fx*span, span);
+});
+$('#stage').addEventListener('gestureend', e => { if(NLZ.ge){ e.preventDefault(); NLZ.ge = null; nlSnap(); } });
 $('#stage').addEventListener('click', e => {
   if(!nlOn()) return;
   if(NLZ.moved){ NLZ.moved = false; return; }
