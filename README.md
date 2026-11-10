@@ -1,4 +1,4 @@
-# Stufenweise – Mathe und Deutsch
+# Stufenweise
 
 Stufenweise ist eine kostenlose Lern-App für Schülerinnen und Schüler mit Förderschwerpunkt geistige Entwicklung. Sie orientiert sich am Bildungsplan GENT Baden-Württemberg 2022 und läuft im Browser, vor allem auf dem iPad.
 
