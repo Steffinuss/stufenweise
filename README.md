@@ -2,6 +2,16 @@
 
 Stufenweise ist eine kostenlose Lern-App für Schülerinnen und Schüler mit Förderschwerpunkt geistige Entwicklung. Sie orientiert sich am Bildungsplan GENT Baden-Württemberg 2022 und läuft im Browser, vor allem auf dem iPad.
 
+## Warum Stufenweise?
+
+Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, also darauf, was als Nächstes dran ist. Das schafft Klarheit und Sicherheit.
+
+- **Stufen statt Klassenstufen:** Übliche Lern-Apps ordnen ihre Inhalte nach Klassenstufen. Jugendliche mit Förderschwerpunkt geistige Entwicklung arbeiten dort an Aufgaben für die 1. bis 3. Klasse, obwohl sie längst Teenager sind. Stufenweise kennt keine Klassen, nur Stufen.
+- **Klarheit statt Auswahlflut:** Nach dem Test sieht jedes Kind nur, was für es dran ist. „Heute für dich“ sagt, womit es weitergeht.
+- **Sicherheit durch Passung:** Die Aufgaben liegen knapp über dem, was das Kind sicher kann. So entstehen Erfolgserlebnisse ohne Unterforderung.
+- **Altersgerecht:** keine kindliche Spielwelt, sondern Aufgaben aus der Lebenswelt Jugendlicher wie Geld, Einkaufen, Uhr, Kalender und Maße, in respektvoller, sachlicher Sprache.
+- **Bildungsplan GENT:** Die Stufen folgen dem Bildungsplan für den Förderschwerpunkt geistige Entwicklung (Baden-Württemberg 2022) und der Fachliteratur zur Zahlbegriffsentwicklung, nicht einem Grundschul-Curriculum.
+
 ## Was die App kann
 
 - **Lernstand ermitteln:** kurze adaptive Tests in Mathe (zwei Teile), Lesen und Schreiben
