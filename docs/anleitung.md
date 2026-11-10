@@ -100,12 +100,14 @@ Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Lin
 
 1. Oben auf **Arbeitsblätter** (3) tippen.
 2. Das Kind wählen. Unter „Passend zur Förderzone“ stehen seine Stufen, zum Beispiel „Rechnen R3“.
-3. Bei Bedarf Thema, Zahlenraum, Material und Anzahl der Aufgaben anpassen. Rechts siehst du die Vorschau.
+3. Bei Bedarf Thema, Zahlenraum und Material anpassen. Bei „Aufgaben“ füllt „Blatt füllen“ die Seite mit vollen Reihen; du kannst auch eine feste Zahl wählen. Rechts siehst du die Vorschau.
 4. **Drucken** tippen. „Lösungsblatt anhängen“ legt eine Seite mit den Lösungen dazu.
 
 ![Arbeitsblatt-Generator mit Vorschau](bilder/13_arbeitsblatt.png)
 
 Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0“, du darfst es also kopieren und weitergeben.
+
+Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in Fünferreihen. Neu ist das Thema **Zahlen mit Material zeichnen**: Die Kinder zeichnen Zahlen in der Kurzschreibweise □ Hunderter, | Zehner, • Einer und lesen gezeichnete Zahlen ab. Wählst du eine Förderzone aus dem Rechnen, passt das Blatt genau dazu, zum Beispiel „Plus bis 20, mit Zehnerübergang“ für R3.
 
 ## Schritt 7: Rückmeldung geben
 
