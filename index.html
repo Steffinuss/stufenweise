@@ -84,7 +84,11 @@ main{padding:12px 18px 12px 10px;height:100%;min-height:0;min-width:0;display:fl
 .stage.busy{pointer-events:none}
 .nl-wrap{position:absolute;inset:0}
 .nl-wrap>svg{width:100%;height:100%;display:block}
-.nl-svg{touch-action:none}
+.nl-svg{touch-action:none}.nl-wrap{touch-action:none}.nl-svg *{pointer-events:none}.nl-svg.hit *{pointer-events:auto}
+html{overscroll-behavior:none;touch-action:manipulation}
+.rail>*{flex-shrink:0}
+@media (max-height:860px){#modes button{min-height:54px;padding:4px 2px}#modes b{font-size:21px}}
+.toolbar{align-items:flex-end}.inputs input{height:48px;box-sizing:border-box}
 .nl-zoom{position:absolute;top:4px;right:4px;display:flex;gap:6px;z-index:2}
 .nl-zoom button{width:46px;height:46px;border-radius:12px;border:1.5px solid #e2dbcd;background:#fff;font-size:24px;font-weight:800;color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px #0001}
 .nl-zoom button:disabled{opacity:.35}
@@ -2023,16 +2027,27 @@ function nlSet(L, span){
   const R = app.range, t = task(); span = Math.max(10, Math.min(R, span)); L = Math.max(0, Math.min(R - span, L));
   t.lz = {L, H: L + span}; if(!NLZ.raf) NLZ.raf = requestAnimationFrame(() => { NLZ.raf = 0; nlRedraw(); });
 }
-function nlRedraw(){ const st = $('#stage'); if(!st || !nlOn()) return; st.innerHTML = nlWrap(drawLine(task())); }
+function nlRedraw(){
+  const st = $('#stage'); if(!st || !nlOn()) return;
+  const html = nlWrap(drawLine(task())), old = st.querySelector('.nl-svg'), wrap = st.querySelector('.nl-wrap');
+  if(old && wrap){ /* Zahlenstrahl innen erneuern: Das Element unter dem Finger bleibt erhalten (sonst verliert Safari die Geste) */
+    const tpl = document.createElement('template'); tpl.innerHTML = html;
+    const ns = tpl.content.querySelector('.nl-svg'), nz = tpl.content.querySelector('.nl-zoom'), oz = wrap.querySelector('.nl-zoom');
+    if(ns){ for(const a of ['viewBox', 'aria-label']) old.setAttribute(a, ns.getAttribute(a)); old.innerHTML = ns.innerHTML; if(oz && nz) oz.innerHTML = nz.innerHTML; return; }
+  }
+  st.innerHTML = html;
+}
+/* Kinder des Zahlenstrahls fangen keine Finger (stabiles Ziel); beim Antippen das echte Element unter dem Finger suchen */
+function nlHit(e){ const svg = e.target.closest?.('.nl-svg'); if(!svg) return e.target; svg.classList.add('hit'); const el = document.elementFromPoint(e.clientX, e.clientY); svg.classList.remove('hit'); return el || e.target; }
 function nlVal(svg, cx){ const m = svg.getScreenCTM(); if(!m) return 0; const x = new DOMPoint(cx, 0).matrixTransform(m.inverse()).x, {L, H} = nlWin(task()); return {x, v: L + (x - 50)/900*(H - L)}; }
 /* Finger am stabilen Rahmen festhalten: Der Zahlenstrahl wird bei jeder Bewegung neu gezeichnet; ohne Capture schickt Safari (iPad) die Bewegungen an das entfernte Bild. Capture erst bei echter Geste, damit Antippen (Sprung, Überblick) normal funktioniert. */
 const nlCap = id => { try{ $('#stage').setPointerCapture(id); }catch{} };
 function nlSnap(){ const t = task(); if(!t.lz) return; const {L, H} = t.lz; const span = Math.round(H - L), l = Math.round(L); t.lz = {L: Math.max(0, Math.min(app.range - span, l)), H: Math.max(0, Math.min(app.range - span, l)) + span}; nlRedraw(); }
 $('#stage').addEventListener('pointerdown', e => {
   if(NLZ.pts.size === 0) NLZ.moved = false;
-  if(!nlOn() || !e.target.closest('.nl-svg')) return;
+  if(!nlOn() || !e.target.closest('.nl-wrap') || e.target.closest('.nl-zoom')) return;
   NLZ.pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
-  const svg = e.target.closest('.nl-svg'), {L, H} = nlWin(task()), ps = [...NLZ.pts.values()];
+  const svg = $('#stage .nl-svg'), {L, H} = nlWin(task()), ps = [...NLZ.pts.values()];
   if(ps.length === 2){ for(const id of NLZ.pts.keys()) nlCap(id); const mx = (ps[0].x + ps[1].x)/2; NLZ.g = {two:true, d0: Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1, span: H - L, v: nlVal(svg, mx).v}; }
   else if(ps.length === 1) NLZ.g = {two:false, x0: e.clientX, L, span: H - L, w: svg.getBoundingClientRect().width};
 });
@@ -2051,20 +2066,20 @@ window.addEventListener('pointermove', e => {
 const nlUp = e => { if(!NLZ.pts.delete(e.pointerId)) return; if(NLZ.pts.size === 0){ if(NLZ.moved) nlSnap(); NLZ.g = null; } else if(NLZ.pts.size === 1){ const [p] = NLZ.pts.values(), {L, H} = nlWin(task()), svg = $('#stage .nl-svg'); NLZ.g = {two:false, x0:p.x, L, span:H - L, w: svg ? svg.getBoundingClientRect().width : 1000}; } };
 window.addEventListener('pointerup', nlUp); window.addEventListener('pointercancel', nlUp);
 $('#stage').addEventListener('wheel', e => {
-  if(!nlOn() || !e.target.closest('.nl-svg')) return;
-  const svg = e.target.closest('.nl-svg'), {L, H} = nlWin(task()), span0 = H - L;
+  if(!nlOn() || !e.target.closest('.nl-wrap')) return;
+  const svg = $('#stage .nl-svg'); if(!svg) return; const {L, H} = nlWin(task()), span0 = H - L;
   if(e.ctrlKey){ /* Pinch am Trackpad (Chrome, Firefox, Edge) */
     e.preventDefault(); const {x, v} = nlVal(svg, e.clientX), span = span0*Math.exp(e.deltaY*.01);
     nlSet(v - (x - 50)/900*span, span);
-  } else if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && span0 < app.range){ /* zwei Finger seitlich wischen: verschieben */
-    e.preventDefault(); const w = svg.getBoundingClientRect().width || 1, vb = svg.viewBox.baseVal.width || 1000;
-    nlSet(L + e.deltaX/(w*900/vb)*span0, span0);
+  } else if(Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey){ /* zwei Finger seitlich wischen: verschieben (nie Browser-Zurück) */
+    e.preventDefault(); if(span0 >= app.range) return; const w = svg.getBoundingClientRect().width || 1, vb = svg.viewBox.baseVal.width || 1000, d = e.deltaX || e.deltaY;
+    nlSet(L + d/(w*900/vb)*span0, span0);
   } else return;
   clearTimeout(NLZ.wt); NLZ.wt = setTimeout(nlSnap, 250);
 }, {passive:false});
 /* Safari: Pinch am Mac-Trackpad kommt als Gesture-Event. Auf dem iPad laufen Finger über Pointer-Events; hier nur Seitenzoom verhindern. */
 $('#stage').addEventListener('gesturestart', e => {
-  if(!nlOn() || !e.target.closest?.('.nl-svg')) return; e.preventDefault();
+  if(!nlOn() || !e.target.closest?.('.nl-wrap')) return; e.preventDefault();
   if(NLZ.pts.size) return; const svg = $('#stage .nl-svg'), {L, H} = nlWin(task());
   NLZ.ge = {span: H - L, v: nlVal(svg, e.clientX).v, x: e.clientX};
 });
@@ -2073,6 +2088,8 @@ $('#stage').addEventListener('gesturechange', e => {
   const svg = $('#stage .nl-svg'); if(!svg) return; const span = NLZ.ge.span/(e.scale || 1), fx = (nlVal(svg, NLZ.ge.x).x - 50)/900;
   nlSet(NLZ.ge.v - fx*span, span);
 });
+document.addEventListener('gesturestart', e => { if(NLZ.pts.size || e.target.closest?.('.nl-wrap')) e.preventDefault(); });
+document.addEventListener('gesturechange', e => { if(NLZ.pts.size || NLZ.ge) e.preventDefault(); });
 $('#stage').addEventListener('gestureend', e => { if(NLZ.ge){ e.preventDefault(); NLZ.ge = null; nlSnap(); } });
 $('#stage').addEventListener('click', e => {
   if(!nlOn()) return;
@@ -2085,12 +2102,12 @@ $('#stage').addEventListener('click', e => {
     else if(k === 'all') nlSet(0, app.range);
     else { t.lz = null; nlRedraw(); }
     return; }
-  const j = e.target.closest('[data-jz]');
+  const hit = nlHit(e), j = hit.closest('[data-jz]');
   if(j){ const [a, b] = j.dataset.jz.split(',').map(Number), w = Math.max(10, Math.ceil((b - a)*1.3)), mid = (a + b)/2;
     if(t.lz && Math.abs(t.lz.H - t.lz.L - w) < 2 && Math.abs((t.lz.L + t.lz.H)/2 - mid) < 2){ t.lz = null; nlRedraw(); } // zweites Antippen: zurück
     else nlSet(Math.round(mid - w/2), w);
     return; }
-  if(e.target.closest('[data-ov]')){ const svg = e.target.closest('svg'), m = svg.getScreenCTM(); const x = new DOMPoint(e.clientX, 0).matrixTransform(m.inverse()).x; const v = (x - 50)/900*app.range; nlSet(Math.round(v - span/2), span); }
+  if(hit.closest('[data-ov]')){ const svg = hit.closest('svg'), m = svg.getScreenCTM(); const x = new DOMPoint(e.clientX, 0).matrixTransform(m.inverse()).x; const v = (x - 50)/900*app.range; nlSet(Math.round(v - span/2), span); }
 });
 
 /* ---------- Schriftlich rechnen ---------- */
