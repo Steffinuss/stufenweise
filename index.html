@@ -1091,7 +1091,7 @@ function autoConf(mode){
   if(mode === 'add' || mode === 'sub'){ if(rz){ const c = R_CONF[rz.slice(2)]; if(app.range !== c.range){ app.range = c.range; reset(); } settings.ten = c.ten; saveSettings(); } }
   else if(mode === 'number'){ if(RANGES.includes(zr) && app.range !== zr){ app.range = zr; reset(); } }
   else if(mode === 'blitz'){ const r = zr <= 10 ? 10 : zr <= 20 ? 20 : 100; if(app.blitz.range !== r){ app.blitz.range = r; app.blitz.phase = 'idle'; } }
-  else if(mode === 'money'){ const g = app.money, r = zr <= 10 ? 10 : zr <= 20 ? 20 : 100; if(g.range !== r){ g.range = r; g.ready = false; } g.cents = zr >= 1000; }
+  else if(mode === 'money'){ const g = app.money, r = zr <= 10 ? 10 : zr <= 20 ? 20 : 100; if(g.range !== r){ g.range = r; g.ready = false; } g.cents = zr >= 1000; if(!g.cents) g.exact = false; }
   else if(mode === 'times'){ if(!(m['R|R7']?.status === 'erreicht')){ settings.timesRows = [2, 5, 10]; saveSettings(); } }
 }
 /* Blitzblick: Anzeigezeit passt sich pro Kind an (kürzer nach 3 richtigen, länger nach Fehlern) */
@@ -2581,7 +2581,7 @@ function adaptStep(mode, dir){
   const nextIn = (list, v) => { const i = list.indexOf(v); const j = i + dir; return i >= 0 && j >= 0 && j < list.length ? list[j] : null; };
   if(['number', 'add', 'sub'].includes(mode)){ const r = nextIn([10, 20, 100, 1000], app.range); return r && {text: `Zahlenraum bis ${r}`, apply(){ app.range = r; for(const k of Object.keys(app.tasks)) app.tasks[k] = blankTask(); app.mode = mode; startRandom(); }}; }
   if(mode === 'written'){ const w = app.written, r = nextIn([100, 1000, 10000], w.range); return r && {text: `Schriftlich bis ${r}`, apply(){ w.range = r; w.ready = false; wrRandom(); }}; }
-  if(mode === 'money'){ const g = app.money; if(dir > 0 && g.range === 100 && !g.cents) return {text:'Geld mit Cent', apply(){ g.cents = true; moneyNew(); }}; if(dir < 0 && g.cents) return {text:'Geld ohne Cent', apply(){ g.cents = false; moneyNew(); }}; const r = nextIn([10, 20, 100], g.range); return r && {text:`Geld bis ${r} €`, apply(){ g.range = r; moneyNew(); }}; }
+  if(mode === 'money'){ const g = app.money; if(dir > 0 && g.range === 100 && !g.cents) return {text:'Geld mit Cent', apply(){ g.cents = true; moneyNew(); }}; if(dir > 0 && g.cents && !g.exact) return {text:'Geld auf den Cent genau (mit 1, 2 und 5 Cent)', apply(){ g.exact = true; moneyNew(); }}; if(dir < 0 && g.exact) return {text:'Geld in 10-Cent-Schritten', apply(){ g.exact = false; moneyNew(); }}; if(dir < 0 && g.cents) return {text:'Geld ohne Cent', apply(){ g.cents = false; moneyNew(); }}; const r = nextIn([10, 20, 100], g.range); return r && {text:`Geld bis ${r} €`, apply(){ g.range = r; moneyNew(); }}; }
   if(mode === 'blitz'){ const b = app.blitz; if(blitzAdaptive() && dir > 0) return null; if(dir > 0 && b.range === 100 && b.dur > 1) return {text:'Blitzblick kürzer zeigen', apply(){ b.dur--; render(); }}; const r = nextIn([6, 10, 20, 100], b.range); return r && {text:`Mengen bis ${r}`, apply(){ b.range = r; b.phase = 'idle'; render(); }}; }
   if(mode === 'times' && dir > 0){ const rs = settings.timesRows, n = TIMES_ORDER.find(x => !rs.includes(x)); return n && {text:`${n}er-Reihe dazunehmen`, apply(){ rs.push(n); rs.sort((a, b) => a - b); saveSettings(); timesRandom(); }}; }
   return null;
@@ -2607,7 +2607,7 @@ function showAdapt(st, up){
    ===================================================================== */
 const DENOMS = [5000, 2000, 1000, 500, 200, 100, 50, 20, 10, 5, 2, 1];
 const NOTE_COL = {500:'#8e9a8f', 1000:'#cf6b6b', 2000:'#5f86cf', 5000:'#e0954a', 10000:'#4f9a6a', 20000:'#d9b84a'};
-app.money = {sub:'pay', range:10, cents:false, ready:false, target:0, price:0, paid:0, items:[], check:null, tries:0};
+app.money = {sub:'pay', range:10, cents:false, exact:false, ready:false, target:0, price:0, paid:0, items:[], check:null, tries:0};
 const fmtMoney = c => c % 100 === 0 ? `${c/100} €` : `${Math.floor(c/100)},${String(c % 100).padStart(2,'0')} €`;
 const denomLabel = c => c >= 100 ? `${c/100} €` : `${c} ct`;
 const isNote = c => c >= 500;
@@ -2634,11 +2634,22 @@ function moneySvg(c, x, y, attrs=''){
 }
 function moneyDenoms(){
   const m = app.money, max = m.sub === 'change' ? m.paid - 1 : m.range*100;
-  return DENOMS.filter(c => c <= max && (m.cents ? c >= 10 : c >= 100)).sort((a, b) => b - a);
+  return DENOMS.filter(c => c <= max && (m.cents ? (m.exact ? c >= 1 : c >= 10) : c >= 100)).sort((a, b) => b - a);
 }
 function moneyNew(){
   const m = app.money;
-  if(m.sub === 'pay'){
+  if(m.cents && m.exact){
+    /* auf den Cent: typische Ladenpreise (…,99 / …,49 / …,95) und freie Centbeträge */
+    const ENDS = [99, 99, 95, 49, 29, 89, 45, 15, 75, 59, 19, 39];
+    const ct = () => Math.random() < .6 ? ENDS[rnd(0, ENDS.length - 1)] : rnd(1, 99);
+    if(m.sub === 'pay'){ m.target = rnd(0, m.range - 1)*100 + ct(); }
+    else {
+      const notes = [500, 1000, 2000, 5000].filter(n => n <= m.range*100);
+      m.paid = notes[rnd(0, notes.length - 1)];
+      m.price = rnd(0, m.paid/100 - 1)*100 + ct();
+      m.target = m.paid - m.price;
+    }
+  } else if(m.sub === 'pay'){
     m.target = m.cents ? rnd(10, m.range*10 - 1)*10 : rnd(1, m.range)*100;
     if(m.cents && m.target % 100 === 0) m.target += 10*rnd(1, 9);
     if(m.target > m.range*100) m.target = m.range*100 - 10;
@@ -2699,7 +2710,7 @@ function moneyCheck(){
   if(sum === m.target){
     m.check = 'ok';
     const best = greedy(m.target, moneyDenoms());
-    logAttempt({mode:'money', sub:m.sub, range:m.range, cents:m.cents, task: m.sub === 'pay' ? fmtMoney(m.target) : `${fmtMoney(m.paid)} − ${fmtMoney(m.price)}`, ok: m.tries === 1, tries:m.tries, pieces:m.items.length, best: best ? best.length : null});
+    logAttempt({mode:'money', sub:m.sub, range:m.range, cents:m.cents, exact:m.exact, task: m.sub === 'pay' ? fmtMoney(m.target) : `${fmtMoney(m.paid)} − ${fmtMoney(m.price)}`, ok: m.tries === 1, tries:m.tries, pieces:m.items.length, best: best ? best.length : null});
     renderMoney();
     let msg = m.sub === 'pay' ? `Richtig! Das sind ${fmtMoney(m.target)}.` : `Richtig! Das Wechselgeld ist ${fmtMoney(m.target)}.`;
     if(best && m.items.length > best.length) msg += ` Es geht auch mit weniger Teilen: ${best.map(denomLabel).join(' + ')}.`;
@@ -2903,7 +2914,7 @@ function screenAnswer(skip){
 function applyRec(i){
   const rec = REC[i]; if(!rec) return;
   app.range = rec.range; settings.ten = rec.ten; settings.hundred = 'any';
-  app.blitz.range = rec.blitz; app.money.range = rec.money[0]; app.money.cents = rec.money[1];
+  app.blitz.range = rec.blitz; app.money.range = rec.money[0]; app.money.cents = rec.money[1]; if(!app.money.cents) app.money.exact = false;
   app.written.range = rec.range >= 1000 ? 1000 : 100;
   if(rec.rows) settings.timesRows = [...rec.rows];
   for(const k of Object.keys(app.tasks)) app.tasks[k] = blankTask();
@@ -3064,7 +3075,7 @@ function renderTopNew(){
     const g = app.money;
     $('#range-label').textContent = 'Geld bis';
     $('#ranges').innerHTML = [10, 20, 100].map(n => `<button data-mrange="${n}" aria-pressed="${g.range === n}">${n} €</button>`).join('');
-    $('#inputs').innerHTML = `<div class="seg" role="group" aria-label="Art"><button data-msub="pay" aria-pressed="${g.sub === 'pay'}">Betrag legen</button><button data-msub="change" aria-pressed="${g.sub === 'change'}">Wechselgeld</button></div><button data-mcent aria-pressed="${g.cents}" class="chip-toggle">mit Cent</button>`;
+    $('#inputs').innerHTML = `<div class="seg" role="group" aria-label="Art"><button data-msub="pay" aria-pressed="${g.sub === 'pay'}">Betrag legen</button><button data-msub="change" aria-pressed="${g.sub === 'change'}">Wechselgeld</button></div><button data-mcent aria-pressed="${g.cents}" class="chip-toggle">mit Cent</button>${g.cents ? `<button data-mexact aria-pressed="${g.exact}" class="chip-toggle" title="Auch 1, 2 und 5 Cent, z. B. 1,99 €">auf den Cent</button>` : ''}`;
     rb.hidden = false; rb.innerHTML = icon('random') + '<span>Neue Aufgabe</span>'; rb.setAttribute('aria-label', 'Neue Aufgabe');
     return true;
   }
@@ -4610,7 +4621,7 @@ function applyOffer(set){
   if(set.ten) settings.ten = set.ten;
   if(set.rows){ settings.timesRows = [...set.rows]; saveSettings(); }
   if(set.blitz){ app.blitz.range = set.blitz; app.blitz.phase = 'idle'; }
-  if(set.mode === 'money'){ Object.assign(app.money, {sub: set.msub || 'pay', range: set.mrange || 20, cents: !!set.cents}); app.mode = 'money'; saveSettings(); $('#stage').innerHTML = ''; moneyNew(); return; }
+  if(set.mode === 'money'){ Object.assign(app.money, {sub: set.msub || 'pay', range: set.mrange || 20, cents: !!set.cents, exact: !!set.exact}); app.mode = 'money'; saveSettings(); $('#stage').innerHTML = ''; moneyNew(); return; }
   app.mode = set.mode;
   if(['number','add','sub'].includes(set.mode)){
     const t = task(); t.view = set.view || 'material'; t.find = !!set.find;
@@ -5260,7 +5271,8 @@ $('#inputs').addEventListener('click', e => {
   if(e.target.closest('[data-rsyl]')){ app.read.colored = !app.read.colored; render(); return; }
   if(e.target.closest('#btn-commit')) return commitAny();
   const ms = e.target.closest('[data-msub]'); if(ms){ app.money.sub = ms.dataset.msub; app.money.ready = false; render(); return; }
-  if(e.target.closest('[data-mcent]')){ app.money.cents = !app.money.cents; app.money.ready = false; render(); return; }
+  if(e.target.closest('[data-mcent]')){ app.money.cents = !app.money.cents; if(!app.money.cents) app.money.exact = false; app.money.ready = false; render(); return; }
+  if(e.target.closest('[data-mexact]')){ app.money.exact = !app.money.exact; app.money.ready = false; render(); return; }
   const bd = e.target.closest('[data-bdur]'); if(bd){ app.blitz.dur = +bd.dataset.bdur; renderTop(); return; }
   const op = e.target.closest('[data-op]');
   if(op){ const w = app.written; w.op = op.dataset.op; if(w.ready && wrValid(w.a, w.b, w.op, w.range)) wrStart(w.a, w.b); else { w.ready = false; render(); } }
