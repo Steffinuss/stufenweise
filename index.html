@@ -734,7 +734,9 @@ const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
 const DEFAULTS = {fbMail:'stufenweise@posteo.de', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', ownWords:'', guide:'plus', fbOn:true, fbName:''};
-const STORE = 'zahlenraum-werkstatt.v2';
+const STORE = 'stufenweise.settings';
+/* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
+try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
 const settings = (() => { try { const st = JSON.parse(localStorage.getItem(STORE) || '{}'); if(!st.v3){ delete st.colors; st.v3 = true; } if(!st.v4){ delete st.speech; st.v4 = true; } return {...DEFAULTS, ...st}; } catch { return {...DEFAULTS}; } })();
 settings.v3 = true; settings.v4 = true;
 const saveSettings = () => { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {} };
@@ -2601,7 +2603,7 @@ function randomAny(){ app.mode === 'written' ? wrRandom() : app.mode === 'times'
 /* =====================================================================
    Profile, Lernstand-Protokoll
    ===================================================================== */
-const DATA_KEY = 'zahlenraum-werkstatt.data';
+const DATA_KEY = 'stufenweise.data';
 const data = (() => { try { return {profiles:[], current:null, log:{}, ...JSON.parse(localStorage.getItem(DATA_KEY) || '{}')}; } catch { return {profiles:[], current:null, log:{}}; } })();
 const saveData = () => { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch {} };
 const curProfile = () => data.profiles.find(p => p.id === data.current) || null;
@@ -4850,7 +4852,7 @@ async function saveFile(filename, text){
 }
 /* ---------- Datensicherung ---------- */
 function exportData(){
-  const payload = {app:'zahlenraum-werkstatt', version:2, exported: new Date().toISOString(), data, settings: {...settings, pin: undefined}};
+  const payload = {app:'stufenweise', version:2, exported: new Date().toISOString(), data, settings: {...settings, pin: undefined}};
   const json = JSON.stringify(payload);
   const name = `stufenweise-sicherung-${new Date().toISOString().slice(0, 10)}.json`;
   saveFile(name, json);
@@ -4861,7 +4863,7 @@ let pendingImport = null;
 function importFile(file){
   const r = new FileReader();
   r.onload = () => {
-    try{ const obj = JSON.parse(r.result); if(obj.app !== 'zahlenraum-werkstatt' || !obj.data) throw 0; pendingImport = obj;
+    try{ const obj = JSON.parse(r.result); if(!['stufenweise', 'zahlenraum-werkstatt'].includes(obj.app) || !obj.data) throw 0; pendingImport = obj;
       $('#import-ask').hidden = false; $('#import-info').textContent = `Sicherung vom ${new Date(obj.exported).toLocaleString('de-DE')} mit ${obj.data.profiles?.length || 0} Kindern.`;
     }catch{ toast('Diese Datei ist keine Stufenweise-Sicherung.'); }
   };
