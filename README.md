@@ -53,7 +53,7 @@ Stufenweise ist ein gemeinsames Projekt, kein Produkt.
 Fehler, Ideen und Lob:
 
 - **[Neue Meldung auf GitHub](https://github.com/Steffinuss/stufenweise/issues/new)** (kostenloses GitHub-Konto nötig, öffentlich sichtbar, bitte keine Namen von Kindern). Am einfachsten über den Knopf „Rückmeldung“ in der App, der die Meldung schon vorausfüllt.
-- Ohne GitHub-Konto: per E-Mail an stufenweise@posteo.de.
+- Ohne GitHub-Konto: die Rückmeldung an die Person geben, die Stufenweise an deiner Schule betreut. Wer an einer Schule Rückmeldungen sammelt, kann in den Einstellungen eine eigene E-Mail-Adresse eintragen; dann bietet der Knopf „Rückmeldung“ zusätzlich „Per E-Mail senden“ an.
 
 ## Mit KI entwickelt
 

@@ -658,7 +658,8 @@ a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:v
   <fieldset><legend>Ergebnisse</legend>
     <label class="row cb"><input type="checkbox" data-key="allowResults"> Ergebnisse und Mengen anzeigen erlauben</label>
     <label class="row cb"><input type="checkbox" data-key="fbOn"> Knopf „Rückmeldung“ anzeigen</label>
-    <label class="row">Rückmeldungen per E-Mail an <input type="email" data-key="fbMail" placeholder="leer = nur über GitHub" autocomplete="off" style="flex:1;max-width:260px"></label>
+    <label class="row">Rückmeldungen zusätzlich per E-Mail an <input type="email" data-key="fbMail" placeholder="leer = nur über GitHub" autocomplete="off" style="flex:1;max-width:260px"></label>
+    <p class="note">Rückmeldungen gehen über GitHub (öffentliche Meldung, kostenloses Konto nötig). Wer zusätzlich per E-Mail sammeln möchte, zum Beispiel an die Testleitung an der eigenen Schule, trägt hier eine Adresse ein. Sie bleibt nur auf diesem Gerät.</p>
     <p class="note">Aus: Die Kinder rechnen selbst. Ergebnis, Gesamtmenge und Ziffern unter der Tafel bleiben verborgen. „Ergebnis prüfen“ geht trotzdem.</p>
     <label class="row cb"><input type="checkbox" data-key="digits"> Ziffern unter der Stellenwerttafel</label>
     <label class="row cb"><input type="checkbox" data-key="numberWords"> Zahlwort zeigen (Zahlen-Modus)</label>
@@ -750,11 +751,11 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'stufenweise@posteo.de', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
-const settings = (() => { try { const st = JSON.parse(localStorage.getItem(STORE) || '{}'); if(!st.v3){ delete st.colors; st.v3 = true; } if(!st.v4){ delete st.speech; st.v4 = true; } return {...DEFAULTS, ...st}; } catch { return {...DEFAULTS}; } })();
+const settings = (() => { try { const st = JSON.parse(localStorage.getItem(STORE) || '{}'); if(!st.v3){ delete st.colors; st.v3 = true; } if(!st.v4){ delete st.speech; st.v4 = true; } if(!st.v5){ if(String(st.fbMail || '').includes('posteo.de')) st.fbMail = ''; st.v5 = true; } return {...DEFAULTS, ...st}; } catch { return {...DEFAULTS}; } })();
 settings.v3 = true; settings.v4 = true;
 const saveSettings = () => { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {} };
 
@@ -5628,11 +5629,11 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.6 · 11.11.2026';
+const APP_VERSION = '0.9.7 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
-const fbMail = () => (settings.fbMail ?? 'stufenweise@posteo.de').trim();
+const fbMail = () => String(settings.fbMail || '').trim();
 const FB_ART = [['fehler', 'Fehler', 'Etwas funktioniert nicht'], ['passung', 'Passt nicht', 'Aufgabe, Sprache oder Einstufung passt nicht'], ['idee', 'Idee', 'Vorschlag oder Wunsch'], ['lob', 'Gefällt mir', 'Das ist gut so']];
 const FB_SEV = [['blockiert', 'Ich komme nicht weiter'], ['stoert', 'Stört'], ['klein', 'Kleinigkeit']];
 function fbContext(){
@@ -5824,7 +5825,7 @@ $('#help-content').innerHTML = [
   ['edit','Schrift','Die Schrift „Stufenfibel“ ist aus der Leseschrift Andika von SIL International abgeleitet (SIL Open Font License&nbsp;1.1). Geändert: Das kleine l hat unten einen Bogen, damit es sich deutlich vom großen I unterscheidet; die Schrift ist auf die Zeichen für Deutsch reduziert. Sie steckt in der App selbst, es wird nichts aus dem Internet nachgeladen.'],
   ['edit','Mit KI entwickelt','Stufenweise wurde mit Unterstützung der KI Claude (Anthropic) programmiert. Konzept, fachliche Entscheidungen und Prüfung: Stefan Hackl. Die Einstufungen sind begründete Vorschläge und ersetzen keine sonderpädagogische Diagnostik.'],
   ['user','Danke','__THANKS__'],
-  ['chat','Mitmachen','Fehler, Ideen und Lob über den Knopf „Rückmeldung“ oder per E-Mail an stufenweise@posteo.de. Öffentliche Meldungen und den Quelltext findest du auf GitHub: github.com/Steffinuss/stufenweise. Eigene Texte oder Aufgaben übernimmt Stefan nur mit deinem Einverständnis; sie stehen dann ebenfalls unter CC&nbsp;BY-SA&nbsp;4.0.']
+  ['chat','Mitmachen','Fehler, Ideen und Lob über den Knopf „Rückmeldung“: Er füllt eine Meldung auf GitHub vor (github.com/Steffinuss/stufenweise, dort liegt auch der Quelltext). Dafür braucht es ein kostenloses GitHub-Konto, und die Meldung ist öffentlich, also bitte keine Namen von Kindern. Ohne Konto: die Rückmeldung an die Person geben, die Stufenweise an deiner Schule betreut. Eigene Texte oder Aufgaben übernimmt Stefan nur mit deinem Einverständnis; sie stehen dann ebenfalls unter CC&nbsp;BY-SA&nbsp;4.0.']
 ].map(([i,h,p]) => i === 'h' ? `<h3 class="help-group">${h}</h3>` : `<div class="help-step">${icon(i)}<div><h3>${h}</h3><p>${p === '__THANKS__' ? thanksHtml() : p}</p></div></div>`).join('');
 
 if('speechSynthesis' in window) speechSynthesis.getVoices();

@@ -117,13 +117,12 @@ Melde dich am besten genau dann, wenn dir etwas auffällt. Die App schickt autom
 2. Auswählen: **Fehler**, **Passt nicht**, **Idee** oder **Gefällt mir**.
 3. Bei Fehlern und „Passt nicht“ angeben, wie schlimm es ist.
 4. In eigenen Worten schreiben, was passiert ist und was du erwartet hättest.
-5. Absenden, auf einem von zwei Wegen:
-    - **Auf GitHub melden:** öffnet eine fertig ausgefüllte Meldung (Issue). Dafür brauchst du ein kostenloses GitHub-Konto. Die Meldung ist öffentlich, also bitte keine Namen von Kindern.
-    - **Per E-Mail senden:** öffnet deine Mail-App mit fertigem Text an stufenweise@posteo.de.
+5. **Auf GitHub melden** tippen: Das öffnet eine fertig ausgefüllte Meldung (Issue), du musst sie nur noch absenden. Dafür brauchst du ein kostenloses GitHub-Konto. Die Meldung ist öffentlich, also bitte keine Namen von Kindern.
+    - Optional **Per E-Mail senden:** Diesen Knopf gibt es nur, wenn in den Einstellungen eine Adresse eingetragen ist, zum Beispiel die der Testleitung an deiner Schule. Die Adresse bleibt nur auf deinem Gerät.
 
 ![Rückmeldeformular](bilder/14_rueckmeldung.png)
 
-Öffnet sich nichts, tipp auf **Text kopieren** und füge den Text in eine Mail oder eine [neue Meldung auf GitHub](https://github.com/Steffinuss/stufenweise/issues/new) ein. Die Mail-Adresse lässt sich in den Einstellungen ändern oder leeren.
+Öffnet sich nichts, tipp auf **Text kopieren** und füge den Text in eine [neue Meldung auf GitHub](https://github.com/Steffinuss/stufenweise/issues/new) ein.
 
 ## Auf dem iPad: als App auf den Home-Bildschirm und aktualisieren
 
