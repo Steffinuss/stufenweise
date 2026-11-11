@@ -86,15 +86,25 @@ Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das
 
 Nach dem Test findet das Kind seine Übungen selbst. Das Stufen-Zeichen links oben führt zur Startseite.
 
-1. Das Kind tippt auf seinen Namen.
-2. Unter **Heute für dich** steht die passende Übung aus der Förderzone. Ein Tipp darauf startet sie.
-3. Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.
+Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigen drei Treppenstufen, wo das Kind gerade ist; mit einem Tipp auf eine fertige Stufe geht es zurück.
+
+1. **Wer übt?** Das Kind tippt auf seinen Namen.
+2. **Fach:** Unter **Heute für dich** steht die passende Übung aus der Förderzone. Ein Tipp darauf startet sie sofort. Sonst wählt das Kind Mathe oder Deutsch.
+3. **Übung:** Das Kind wählt einen Bereich, zum Beispiel Plus oder Hundertertafel. Oben steht wieder „Für dich“ mit der passenden Übung.
+
+Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.
 
 ![Startseite mit „Heute für dich“](bilder/11_heute.png)
 
 Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Links sieht das Kind nur die Bereiche, die für es dran sind, mit ★ für die Förderzone. Bei Fehlern gibt es einen konkreten Tipp. Wie viel ein Kind sehen darf, stellst du in den Einstellungen unter „Geführte Oberfläche“ ein.
 
 ![Übung Wechselgeld mit Material](bilder/12_ueben.png)
+
+### Hundertertafel und Tausenderbuch
+
+Links unter **Tafel** übt das Kind mit der Hundertertafel (1 bis 100) in sieben Stufen: Zahlen finden, Tafel und Material verbinden (Zehnerstangen, Punktefeld, Zahlwort), Nachbarn und Lücken, Ausschnitte ergänzen, Wege gehen (unten +10, rechts +1), Muster erkennen und zuletzt das Tausenderbuch. Die Stufen H1–H7 sind Teil des Mathe-Tests (Teil 2) und erscheinen in der Kompetenzmatrix.
+
+Bei **Zahlen**, **Plus** und **Minus** gibt es im Zahlenraum bis 100 außerdem die Ansicht **Tafel** (bis 1000: **Tausenderbuch**). Das Kind springt mit den Knöpfen +10 und +1 (oder −10, −1, ±100) oder tippt Felder an. Der Weg bleibt sichtbar. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet.
 
 ## Schritt 6: Arbeitsblätter drucken
 
@@ -104,6 +114,8 @@ Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Lin
 4. **Drucken** tippen. „Lösungsblatt anhängen“ legt eine Seite mit den Lösungen dazu.
 
 ![Arbeitsblatt-Generator mit Vorschau](bilder/13_arbeitsblatt.png)
+
+Unter „Hundertertafel und Tausenderbuch“ gibt es Blätter zu allen sieben Stufen und drei Material-Blätter: eine ausgefüllte Hundertertafel, eine leere Tafel zum Eintragen und eine Seite aus dem Tausenderbuch (mit „Neue Aufgaben“ kommt eine andere Seite).
 
 Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0“, du darfst es also kopieren und weitergeben.
 

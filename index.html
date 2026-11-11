@@ -615,6 +615,60 @@ a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:v
 .intro-card{background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:18px 28px;max-width:620px;font-size:21px;line-height:1.45}
 .intro-card p{margin:8px 0}
 .help-group{margin:18px 0 6px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.hb{--hs:clamp(24px,min(4.2vw,4.4vh),46px);display:flex;flex-direction:column;align-items:center;gap:6px}
+.hb.mid{--hs:clamp(24px,min(3.6vw,4.3vh),40px)}.hb.small{--hs:clamp(20px,min(2.8vw,3.4vh),32px)}.hb.big{--hs:clamp(44px,min(7vw,8.5vh),70px)}.hb.col{--hs:clamp(30px,min(4.4vw,5.6vh),48px)}
+.hb-grid{display:grid;grid-template-columns:repeat(var(--hcols),auto);gap:3px;padding:6px;background:#efe8da;border-radius:12px}
+.hb-c{width:var(--hs);height:var(--hs);min-height:0;padding:0;border-radius:6px;border:1.5px solid #d6cdbb;background:#fff;box-shadow:none;display:flex;align-items:center;justify-content:center;font-size:calc(var(--hs)*.42);font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);transition:none}
+.h3d .hb-c{font-size:calc(var(--hs)*.34)}
+.hb-c.g5c{margin-right:5px}.hb-c.g5r{margin-bottom:5px}
+.hb-off{visibility:hidden}
+button.hb-c:hover{background:#f6f1e6;transform:none}button.hb-c:active{transform:scale(.94)}
+.hb-c.mk{background:#fde3b8;border:2.5px solid var(--focus)}.hb-c.mk2{background:#d9e8fa;border:2.5px solid var(--z)}
+.hb-c.pat{background:#cfe0f6;border-color:var(--z)}
+.hb-c.sel{background:var(--z);border-color:var(--z);color:#fff}
+.hb-c.fb-ok{background:var(--ok);border-color:var(--ok);color:#fff}.hb-c.fb-no{background:var(--bad);border-color:var(--bad);color:#fff}
+input.hb-in{border:2.5px dashed var(--focus);text-align:center;color:var(--ink);background:#fff;-moz-appearance:textfield}
+input.hb-in::-webkit-inner-spin-button,input.hb-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input.hb-in.no{border-style:solid;border-color:var(--bad);background:#fbe7e4}
+.hb-title{font-weight:800;font-size:15px;color:var(--muted);letter-spacing:.02em}
+.hb-wrap{gap:12px}.hb-wrap.side{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:28px}.hb-wrap.side>.it-svg{width:auto;flex:none}
+@media (max-aspect-ratio:1/1){.hb-wrap.side{flex-direction:column;gap:14px}.hb,.hb.mid{--hs:clamp(24px,min(7.4vw,4.2vh),58px)}.hb-wrap.side .it-svg svg{width:min(320px,50vw);max-height:26vh}}
+.hb-wrap.side .it-svg svg{width:min(300px,30vw);height:auto;max-height:46vh}
+.it-text.hb-way,.it-text.hb-eq{font-size:30px;font-weight:800;letter-spacing:.04em}
+.it-doc .hb{margin:0 auto}
+.hb-mat svg{width:150px;height:auto;display:block}
+.hb-book{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-left:6px solid var(--z);border-radius:4px}.hb-book small{font-size:14px;color:var(--muted);font-weight:700}.hb-book b{font-size:26px}
+.hb-task{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;overflow:auto;padding:6px}
+.hb-c.path{background:#e3edf9;border-color:#9cbbe6}.hb-c.cur{background:var(--z);border-color:var(--z);color:#fff}
+.hb-steps{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center;font-weight:800;font-size:20px}.hb-steps span{background:#e3edf9;border-radius:10px;padding:2px 10px}.hb-steps span.st0{background:#fde3b8}
+button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
+.rail-tafel{width:22px;height:22px;display:block;margin:0 auto}
+#ranges.many button{padding:6px 10px;font-size:15px}
+
+.home.wz{justify-content:flex-start;gap:12px;padding:22px 20px 16px}
+.wz-top{display:flex;align-items:center;justify-content:space-between;gap:18px 30px;width:min(980px,100%);flex-wrap:wrap}
+.wz-hero{display:flex;align-items:center;gap:12px}
+.wz-logo svg{width:56px;height:56px;display:block}
+.wz-brand{display:flex;flex-direction:column;align-items:flex-start;text-align:left;line-height:1.1}.wz-brand b{font-size:clamp(28px,3.2vw,38px);font-weight:800;letter-spacing:.01em}.wz-brand span{font-size:16px;color:var(--muted);font-weight:700}
+.wz-stair{list-style:none;display:flex;align-items:flex-end;gap:6px;margin:4px 0 2px;padding:0}
+.wz-stair button{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;box-shadow:none;min-height:0;padding:2px 4px;color:var(--muted);font-weight:700;font-size:14px}
+.wz-stair button:disabled{opacity:1;cursor:default}
+.wz-blk{width:76px;height:calc(var(--h)*14px);border-radius:8px 8px 3px 3px;background:#e4dccb;transition:background .2s}
+.wz-stair li.done .wz-blk{background:var(--e)}.wz-stair li.now .wz-blk{background:var(--focus)}.wz-stair li.now button{color:var(--ink)}
+.wz-stair li.done button:hover .wz-blk{filter:brightness(1.1)}
+.wz-body{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;margin:auto 0}
+.wz-body h2{font-size:clamp(26px,3.2vw,38px)}
+.home.wz .home-subj button{width:210px;min-height:150px;gap:8px;font-size:24px}.home.wz .home-subj svg{width:140px;height:auto}.home.wz .home-cards+.home-sub+.home-subj button{min-height:110px;width:180px;font-size:20px}.home.wz .home-cards+.home-sub+.home-subj svg{width:96px}
+.home.wz .home-subj button:hover{transform:translateY(-2px)}
+.wz-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;width:min(900px,100%)}
+.wz-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:92px;font-size:17px;font-weight:700;padding:10px 6px}
+.wz-tile b{font-size:30px;line-height:1;min-height:32px;display:flex;align-items:center}.wz-tile b small{font-size:15px;font-weight:800}.wz-tile .rail-tafel{width:32px;height:32px}
+.wz-tile:hover{transform:translateY(-2px)}
+.wz-gh{margin-top:4px}
+.wz-fy{width:min(560px,100%);min-height:0;flex-direction:row;align-items:center;gap:14px}.wz-fy .hc-title{font-size:19px}
+.wz-back{font-size:16px;color:var(--muted)}
+.home.wz .home-legal{margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -1070,7 +1124,7 @@ function guideOf(subj){
     g.modes = modes; g.zrs = zrs;
   }
   g.lvlOk = l => { const ax = l[0]; if(l === 'LX' || l === 'WX') return true; if(!axHas(ax)) return gm !== 'zone'; return allow.has(`${ax}|${l}`); };
-  g.first = ax => { const lv = {L:L_LEVELS, W:W_LEVELS, U:U_LEVELS, G:G_LEVELS}[ax]; return lv.find(l => g.zones.has(`${ax}|${l}`)) || [...lv].reverse().find(l => g.lvlOk(l)) || lv[0]; };
+  g.first = ax => { const lv = {L:L_LEVELS, W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS}[ax]; return lv.find(l => g.zones.has(`${ax}|${l}`)) || [...lv].reverse().find(l => g.lvlOk(l)) || lv[0]; };
   g.axVisible = ax => !axHas(ax) ? gm !== 'zone' : [...allow].some(k => k.startsWith(ax + '|'));
   return g;
 }
@@ -1078,7 +1132,7 @@ const guideOn = () => !!guideOf(settings.subject);
 /* Nächste offene Stufe je Bereich, wenn dort keine Förderzone (mehr) besteht – z. B. nach einem bestandenen Kurztest */
 function frontierKeys(pid, subj){
   const m = matrixOf(pid), out = [], zones = new Set((subj === 'M' ? ['M'] : ['L', 'W']).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)));
-  const axes = subj === 'M' ? [['R', R_LEVELS], ['U', U_LEVELS], ['G', G_LEVELS]] : [['L', L_LEVELS], ['W', W_LEVELS]];
+  const axes = subj === 'M' ? [['R', R_LEVELS], ['U', U_LEVELS], ['G', G_LEVELS], ['H', H_LEVELS]] : [['L', L_LEVELS], ['W', W_LEVELS]];
   for(const [ax, lv] of axes){ const ks = lv.map(l => `${ax}|${l}`); if(!ks.some(k => m[k]) || ks.some(k => zones.has(k))) continue; const f = ks.find(k => m[k]?.status !== 'erreicht'); if(f) out.push(f); }
   if(subj === 'M' && Object.keys(m).some(k => k.startsWith('M|')) && ![...zones].some(k => k.startsWith('M|'))){ const f = ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)).find(k => m[k]?.status !== 'erreicht'); if(f) out.push(f); }
   return out;
@@ -1086,7 +1140,7 @@ function frontierKeys(pid, subj){
 const guideZones = (pid, subj) => [...(subj === 'M' ? ['M'] : ['L', 'W']).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)), ...frontierKeys(pid, subj)];
 /* Aufsteigen: 10 Aufgaben in der Förderzone, mindestens 9 beim ersten Versuch richtig → Kurztest anbieten */
 function activeZoneKey(){
-  if(app.mode === 'read'){ const l = String(app.read.lvl); return /^[LWUG]\d$/.test(l) ? `${l[0]}|${l}` : null; }
+  if(app.mode === 'read'){ const l = String(app.read.lvl); return /^[LWUGH]\d$/.test(l) ? `${l[0]}|${l}` : null; }
   return app.activeZone || null;
 }
 function trackRun(e){
@@ -1149,6 +1203,7 @@ function blitzLearn(ok){
 
 /* ---------- Fachwahl und Leiste ---------- */
 const MATH_RAIL = ['number','add','sub','written','times','money','blitz','free'];
+const TAFEL_SYM = '<svg class="rail-tafel" viewBox="0 0 22 22" aria-hidden="true"><path d="M2 2h18v18H2zM2 8h18M2 14h18M8 2v18M14 2v18" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="9" y="9" width="4" height="4" fill="currentColor"/></svg>';
 const READ_RAIL = [['L1','▣'],['L2','<small>STOP</small>'],['L3','A'],['L4','Ab'],['L5','<small>Ro|se</small>'],['L6','¶'],['L7','≣'],['L8','▦'],['L9','<small>¶¶</small>']];
 const HEAR_RAIL = [['P1','<small>●●</small>'],['P2','<small>●‿●</small>'],['P3','≈'],['P4','<small>M…</small>']];
 function subjOfMode(m){ return m === 'read' ? 'D' : m === 'diag' ? (app.diag?.subj === 'M' ? 'M' : 'D') : 'M'; }
@@ -1164,7 +1219,8 @@ function railHtml(){
   let h = `<div class="subj" role="group" aria-label="Fach"><button data-subj="M" aria-pressed="${subj === 'M'}">Mathe</button><button data-subj="D" aria-pressed="${subj === 'D'}">Deutsch</button></div>`;
   if(fy) h += `<button data-foryou class="foryou" title="${escHtml(fy.info.offer.text)}"><b aria-hidden="true">★</b>Für dich</button>`;
   const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l);
-  if(subj === 'M') h += MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>`).join('')
+  const tafelBtn = !g || g.axVisible('H') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1'}" data-board="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'H'}"><b aria-hidden="true">${TAFEL_SYM}</b>Tafel</button>` : '';
+  if(subj === 'M') h += MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '')).join('') + (g && !g.modes.has('number') ? tafelBtn : '')
     + (!g || g.axVisible('U') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1'}" data-clock="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'U'}"><b aria-hidden="true">◷</b>Uhr</button>` : '')
     + (!g || g.axVisible('G') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1'}" data-size="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'G'}"><b aria-hidden="true">⚖</b>Größen</button>` : '');
   else {
@@ -1196,7 +1252,7 @@ function leaveMode(){
   try{ speechSynthesis.cancel(); }catch{}
   setHint(''); app.sel.clear(); $('#error').hidden = true; $('#stage').innerHTML = '';
 }
-const homeMode = () => settings.subject === 'D' ? (app.read.item = null, ('UG'.includes(String(app.read.lvl)[0]) ? app.read.lvl = 'L4' : 0), 'read') : (settings.lastMath === 'clock' ? (Object.assign(app.read, {lvl: app.read.ulvl || 'U1', item:null}), 'read') : settings.lastMath === 'size' ? (Object.assign(app.read, {lvl: app.read.glvl || 'G1', item:null}), 'read') : settings.lastMath || 'number');
+const homeMode = () => settings.subject === 'D' ? (app.read.item = null, ('UGH'.includes(String(app.read.lvl)[0]) ? app.read.lvl = 'L4' : 0), 'read') : (settings.lastMath === 'clock' ? (Object.assign(app.read, {lvl: app.read.ulvl || 'U1', item:null}), 'read') : settings.lastMath === 'size' ? (Object.assign(app.read, {lvl: app.read.glvl || 'G1', item:null}), 'read') : settings.lastMath === 'board' ? (Object.assign(app.read, {lvl: app.read.hlvl || 'H1', item:null}), 'read') : settings.lastMath || 'number');
 function setSubject(subj){
   if(app.busy) return;
   settings.subject = subj; saveSettings(); leaveMode(); app.railGrp = null;
@@ -1364,6 +1420,7 @@ function dice(n){
 
 function taskPrompt(t){
   const ex = settings.words === 'bundle';
+  if(t.view === 'board'){ const w = app.range === 1000 ? 'im Tausenderbuch' : 'in der Hundertertafel'; return app.mode === 'number' ? (t.find ? `Wo steht die Zahl ${w}? Tippe das Feld an.` : `Hier steht die Zahl ${w}.`) : app.mode === 'add' ? `Starte bei ${t.a} und gehe ${t.b} weiter. Wo landest du?` : `Starte bei ${t.a} und gehe ${t.b} zurück. Wo landest du?`; }
   if(t.view === 'line') return app.mode === 'number' ? (t.find ? 'Schätze: Wo liegt die Zahl? Tippe auf den Zahlenstrahl.' : 'Hier liegt die Zahl auf dem Zahlenstrahl.') : app.mode === 'add' ? `Springe von ${t.a} aus ${t.b} weiter. Wo landest du?` : `Springe von ${t.a} aus ${t.b} zurück. Wo landest du?`;
   if(app.mode === 'number') return app.range < 10 ? 'Wie viele sind es? Zähle nach.' : `Die Zahl ist gelegt. ${ex ? 'Bündle oder entbündle' : 'Tausche um'}: Die Menge bleibt gleich.`;
   if(app.mode === 'add') return t.done ? (countKind(t.rows[0],'e') >= 10 ? `10 Einer = 1 Zehner. ${ex ? 'Bündle' : 'Tausche'} die Einer.` : countKind(t.rows[0],'z') >= 10 && app.range >= 100 ? `10 Zehner = 1 Hunderter. ${ex ? 'Bündle' : 'Tausche'} die Zehner.` : 'Wie viele sind es zusammen?') : 'Zwei Mengen. Lege sie zusammen.';
@@ -1387,9 +1444,11 @@ function renderTask(before){
   $('#prompt').textContent = taskPrompt(t);
   const stage = $('#stage');
   if(t.view === 'dice' && !(app.mode === 'number' && app.range <= 6)) t.view = 'material';
-  stage.innerHTML = t.view === 'line' ? (app.mode === 'number' && t.find ? drawFindLine(t) : nlWrap(drawLine(t))) : t.view === 'dice' ? dice(a) : drawTask(t);
+  if(t.view === 'board' && !boardViewOk()) t.view = 'material';
+  stage.innerHTML = t.view === 'board' ? drawTaskBoard(t) : t.view === 'line' ? (app.mode === 'number' && t.find ? drawFindLine(t) : nlWrap(drawLine(t))) : t.view === 'dice' ? dice(a) : drawTask(t);
   renderTaskControls(t);
   taskHint(t);
+  if(t.view === 'board') hbFit();
   if(before && t.view === 'material') flip(stage, before);
 }
 
@@ -1398,12 +1457,26 @@ function selectedPieces(t){ return t.rows.flat().filter(p => app.sel.has(p.id));
 function viewButtons(t){
   const views = [['material','blocks','Material'], ['line','line','Zahlenstrahl']];
   if(app.mode === 'number' && app.range <= 6) views.push(['dice','dice','Würfelbild']);
+  if(boardViewOk()) views.push(['board','grid', app.range === 1000 ? 'Tausenderbuch' : 'Tafel']);
   return `<div class="views" role="group" aria-label="Ansicht">${views.map(([v,ic,l]) => toolBtn({ic, label:l, pressed: t.view === v}).replace('<button', `<button data-view="${v}"`)).join('')}</div>`;
 }
 function checkBox(t){
   return `<div class="check"><label for="guess">Ergebnis</label><input id="guess" type="number" inputmode="numeric" min="0" ${t.check==='ok' ? 'disabled' : ''}><button id="c-check" class="primary" aria-label="Prüfen">${icon('check','ic')}</button></div>`;
 }
 function renderTaskControls(t){
+  if(t.view === 'board'){
+    const c = [viewButtons(t)];
+    if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
+    else {
+      const sg = app.mode === 'add' ? '+' : '−', k = app.mode === 'add' ? 1 : -1, done = t.check === 'ok';
+      c.push('<span class="sep"></span>');
+      for(const d of app.range === 1000 ? [100, 10, 1] : [10, 1]) c.push(`<button class="tb-jump" data-tbj="${k*d}" aria-label="${sg}${d}" ${done ? 'disabled' : ''}>${sg}${d}</button>`);
+      c.push(toolBtn({id:'c-tbundo', ic:'undo', label:'Zurück', disabled: done || (t.bpath || []).length < 2}));
+      c.push('<span class="sep"></span>', checkBox(t)); if(resultsOn()) c.push(toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
+    }
+    $('#controls').innerHTML = c.join('');
+    return;
+  }
   if(t.view === 'line'){
     const c = [viewButtons(t)];
     if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
@@ -1442,6 +1515,13 @@ function renderTaskControls(t){
 }
 
 function taskHint(t){
+  if(t.view === 'board'){
+    if(app.mode === 'number') return t.find && t.findGuess != null ? undefined : setHint('');
+    if(!settings.help || t.check === 'ok') return t.check === 'ok' ? undefined : setHint('');
+    const sg = app.mode === 'add' ? '+' : '−', h = Math.floor(t.b/100), z = Math.floor(t.b/10) % 10, e = t.b % 10, parts = [];
+    if(h) parts.push(`${h}-mal ${sg}100`); if(z) parts.push(`${z}-mal ${sg}10`); if(e) parts.push(`${e}-mal ${sg}1`);
+    return setHint(`${app.mode === 'add' ? 'Unten +10, rechts +1' : 'Oben −10, links −1'}${app.range === 1000 ? `, eine Seite ${app.mode === 'add' ? 'weiter' : 'zurück'} ${sg}100` : ''}. Für ${sg}${t.b}: ${parts.join(', dann ')}.`);
+  }
   if(t.view === 'line'){
     if(app.mode === 'number' && t.find && t.findGuess != null) return;
     if(app.mode === 'number' || !settings.help) return setHint('');
@@ -1591,6 +1671,32 @@ const ERR_HINT = {
 };
 const ERR_NAME = {dreher:'Zahlendreher', eins:'um 1 daneben (Zählfehler)', zehn:'um 10 daneben', hundert:'um 100 daneben', anders:'anderer Fehler'};
 function noteError(mode, type){ if(!type) return; const pid = data.current || 'guest'; (data.errs ??= {})[pid] ??= {}; const e = data.errs[pid][mode] ??= {}; e[type] = (e[type] || 0) + 1; saveData(); }
+/* ---------- Ansicht „Tafel“: Hundertertafel (bis 100) bzw. Tausenderbuch-Seite (bis 1000) ---------- */
+const boardViewOk = () => (app.range === 100 || app.range === 1000) && ['number', 'add', 'sub'].includes(app.mode);
+const tbPos = t => (t.bpath ||= [t.a]).at(-1);
+function drawTaskBoard(t){
+  const num = app.mode === 'number', res = num ? t.a : resultOf(app.mode, t.a, t.b), pos = num ? t.a : tbPos(t), marks = {};
+  if(!num){ for(const p of t.bpath) if(p >= 1) marks[p] = 'path'; if(t.a >= 1) marks[t.a] = 'mk'; if(pos >= 1 && pos !== t.a) marks[pos] = 'cur'; if(t.check === 'ok' || (resultsOn() && t.reveal)) marks[res] = 'fb-ok'; }
+  else if(!t.find) marks[t.a] = 'mk';
+  else if(t.findGuess != null){ marks[t.a] = t.findGuess === t.a ? 'fb-ok' : 'mk'; if(t.findGuess !== t.a) marks[t.findGuess] = 'fb-no'; }
+  const page = hPageOf(Math.max(1, num ? t.a : (t.check === 'ok' ? res : pos)));
+  const steps = !num && t.bpath.length > 1 ? `<div class="hb-steps"><span class="st0">${t.a}</span>${t.bpath.slice(1).map((p, i) => { const d = p - t.bpath[i]; return `<span>${d > 0 ? '+' : '−'}${Math.abs(d)}</span>`; }).join('')}<b>= ${pos}</b></div>` : '';
+  const hide = num && t.find && t.findGuess == null, show = {};
+  if(hide) for(let i = 0; i < 10; i++){ show[hAt(page, 0, i)] = 'num'; show[hAt(page, i, 9)] = 'num'; }
+  return `<div class="hb-task">${boardHtml({page, marks, def: hide ? 'blank' : 'num', show, title: app.range === 1000 ? `Seite ${hPageName(page)}` : ''}, {tap: num ? !!t.find && t.findGuess == null : t.check !== 'ok'})}${steps}</div>`;
+}
+function boardTap(n){
+  const t = task();
+  if(app.mode !== 'number'){ if(t.check === 'ok') return; tbPos(t); if(n !== t.bpath.at(-1)) t.bpath.push(n); return renderWork(); }
+  if(!t.find || t.findGuess != null) return;
+  t.findGuess = n; const ok = n === t.a;
+  logAttempt({mode:'find', range:app.range, task:String(t.a), guess:n, dist:Math.abs(n - t.a), ok, tries:1, view:'board'});
+  renderWork();
+  const msg = ok ? 'Genau getroffen!' : `Das ist die ${n}. Die ${t.a} ist orange markiert.`;
+  setHint(msg, ok ? 'good' : 'warn'); speak(ok ? msg : `Das ist die ${n}.`);
+  if(ok) celebrate($('#stage .hb-c.fb-ok'));
+}
+function tbJump(t, d){ const p = tbPos(t), q = p + d; if(q < (app.mode === 'sub' ? 0 : 1) || q > app.range) return; t.bpath.push(q); renderWork(); }
 function checkGuess(){
   const t = task(), g = $('#guess'); if(!g || g.value.trim() === '') { g?.focus(); return; }
   const res = resultOf(app.mode, t.a, t.b);
@@ -3090,8 +3196,8 @@ function statsSections(id){
     if(mode === 'read'){
       for(const l of L_LEVELS){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${L_INFO[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
     }
-    if(mode === 'clock' || mode === 'size'){
-      const [lv, info] = mode === 'clock' ? [U_LEVELS, U_INFO] : [G_LEVELS, G_INFO];
+    if(mode === 'clock' || mode === 'size' || mode === 'board'){
+      const [lv, info] = mode === 'clock' ? [U_LEVELS, U_INFO] : mode === 'board' ? [H_LEVELS, H_INFO] : [G_LEVELS, G_INFO];
       for(const l of lv){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${info[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
     }
     if(mode === 'read' && E.some(e => e.lvl === 'LX')) lines.push(`Meine Wörter lesen: ${frac(E.filter(e => e.lvl === 'LX'))} beim ersten Versuch richtig`);
@@ -3129,7 +3235,7 @@ function classHtml(){
 }
 /* Klassenübersicht als CSV (Semikolon, UTF-8 mit BOM – öffnet direkt in Excel und Numbers) */
 function classCsv(){
-  const keys = [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...R_LEVELS.map(l => 'R|' + l), ...L_LEVELS.map(l => 'L|' + l), ...W_LEVELS.map(l => 'W|' + l)];
+  const keys = [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l), ...L_LEVELS.map(l => 'L|' + l), ...W_LEVELS.map(l => 'W|' + l)];
   const q = v => { const t = String(v ?? ''); return /[;"\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
   const zone = (pid, subj) => zoneReport(pid, subj).zones.map(z => cellLabel(z.key)).join(', ');
   const st = c => !c ? '' : c.status === 'erreicht' ? (c.quelle === 'abgeleitet' ? 'erreicht (abgeleitet)' : 'erreicht') : c.status;
@@ -3186,7 +3292,7 @@ function renderProfiles(){
   const locked = !teacherOn();
   $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
     (locked ? `<p class="note">Kinder anlegen, löschen und Tests starten kann nur die Lehrkraft. <button class="linkish" id="p-unlock">Lehrkraft-PIN eingeben</button></p>` : !settings.privacyAck ? PRIVACY_BOX : `<form id="padd" class="row" style="margin-top:12px"><input id="pname" maxlength="20" placeholder="Vorname oder Kürzel" style="flex:1"><button class="primary" type="submit">Hinzufügen</button></form>`) +
-    `<div class="row" style="margin-top:14px;justify-content:flex-start;gap:8px"><button data-ptest="M1" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 1: Zahlen und Rechnen</span></button><button data-ptest="M2" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 2: Uhr und Größen</span></button><button data-ptest="L" class="icon-btn primary">${icon('target')}<span style="display:inline">Lese-Test</span></button>${typeof W_LEVELS !== 'undefined' ? `<button data-ptest="W" class="icon-btn primary">${icon('target')}<span style="display:inline">Schreib-Test</span></button>` : ''}<span class="note" style="align-self:center">für ${escHtml(curName())}</span></div>
+    `<div class="row" style="margin-top:14px;justify-content:flex-start;gap:8px"><button data-ptest="M1" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 1: Zahlen und Rechnen</span></button><button data-ptest="M2" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 2: Uhr, Größen, Hundertertafel</span></button><button data-ptest="L" class="icon-btn primary">${icon('target')}<span style="display:inline">Lese-Test</span></button>${typeof W_LEVELS !== 'undefined' ? `<button data-ptest="W" class="icon-btn primary">${icon('target')}<span style="display:inline">Schreib-Test</span></button>` : ''}<span class="note" style="align-self:center">für ${escHtml(curName())}</span></div>
     <p class="note" style="margin-top:12px">Namen und Ergebnisse bleiben nur auf diesem Gerät gespeichert. Am besten Vornamen oder Kürzel verwenden.</p>`;
   $('#btn-profile').innerHTML = icon('user') + `<span class="pname">${escHtml(curName())}</span>`;
 }
@@ -3965,6 +4071,7 @@ function cellInfo(key){
   if(ax === 'W') return {...W_INFO[a], short:a, place:'Schreiben'};
   if(ax === 'U') return {...U_INFO[a], short:a, place:'Uhrzeit'};
   if(ax === 'G') return {...G_INFO[a], short:a, place:'Größen'};
+  if(ax === 'H') return {...H_INFO[a], short:a, place: a === 'H7' ? 'Tausenderbuch' : 'Hundertertafel'};
   if(ax === 'R') return {...R_INFO[a], short:a, place:'Rechnen'};
   return {...L_INFO[a], short:a, place: ax === 'L' ? 'Lesen' : 'Hören'};
 }
@@ -3976,10 +4083,11 @@ function itemsFor(key){
   if(ax === 'W') return WRITE[a];
   if(ax === 'U') return CLOCK[a];
   if(ax === 'G') return G_ITEMS[a];
+  if(ax === 'H') return H_ITEMS[a];
   if(ax === 'R') return R_ITEMS[a];
   return PHON[a];
 }
-const cellLabel = key => { const [ax, a, b] = key.split('|'), i = cellInfo(key); return ax === 'M' ? `ZR ${a}, Niveau ${b} (${i.name})` : ax === 'S' ? `Stellenwert ${a} (${i.name})` : ax === 'U' ? `Uhrzeit ${a} (${i.name})` : ax === 'G' ? `Größen ${a} (${i.name})` : ax === 'R' ? `Rechnen ${a} (${i.name})` : `${ax === 'L' ? 'Lesen' : ax === 'W' ? 'Schreiben' : 'Hören'} ${a} (${i.name})`; };
+const cellLabel = key => { const [ax, a, b] = key.split('|'), i = cellInfo(key); return ax === 'M' ? `ZR ${a}, Niveau ${b} (${i.name})` : ax === 'S' ? `Stellenwert ${a} (${i.name})` : ax === 'U' ? `Uhrzeit ${a} (${i.name})` : ax === 'G' ? `Größen ${a} (${i.name})` : ax === 'H' ? `Hundertertafel ${a} (${i.name})` : ax === 'R' ? `Rechnen ${a} (${i.name})` : `${ax === 'L' ? 'Lesen' : ax === 'W' ? 'Schreiben' : 'Hören'} ${a} (${i.name})`; };
 
 /* =====================================================================
    Schreiben und Rechtschreibung W1–W6 (BP GENT Deutsch 2.1.2)
@@ -4291,6 +4399,149 @@ const G_SHEETS = {
   G4: {name:'Einkaufen: lesen und rechnen', cols:1, max:3, gens:[() => { const d = GOODS_DOCS[fresh(Object.keys(GOODS_DOCS))](); return T_(['lies', 'rechne'], 'Lies genau. Rechne und schreibe die Antwort auf.', `<div class="ab-doc">${d.html}</div>${d.qs.map(([k, q]) => `<div class="ab-q"><b>${q}</b>${lineW()}</div>`).join('')}`, `${d.title}: ` + d.qs.map(q => q[2][0]).join(' · ')); }]}
 };
 
+/* ---------- Hundertertafel und Tausenderbuch H1–H7 (BP GENT M 2.1.1.2 Zahldarstellungen) ---------- */
+const H_LEVELS = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'];
+const hRC = n => { const k = (n - 1) % 100; return [Math.floor(k/10), k % 10]; };
+const hAt = (page, r, c) => page*100 + r*10 + c + 1;
+const hPageOf = n => Math.floor((n - 1)/100);
+const hPageName = p => `${p*100 + 1}–${p*100 + 100}`;
+/* Tafel als HTML-Gitter. bd = {page, def:'num'|'blank', show:{n:'num'|'blank'|'in'|'off'|'q'}, marks:{n:cls}, cut:[r0,r1,c0,c1], title, cls}
+   o = {tap, vals, wrong:Set, sel, set:[], fb} (Zustand der Bearbeitung) */
+function boardHtml(bd, o = {}){
+  const page = bd.page || 0, [r0, r1, c0, c1] = bd.cut || [0, 9, 0, 9], inputs = {};
+  Object.entries(bd.show || {}).filter(([, v]) => v === 'in').map(([n]) => +n).sort((a, b) => a - b).forEach((n, i) => inputs[n] = i);
+  const set = new Set(o.set || []), want = o.want ? new Set(o.want) : null;
+  let s = '';
+  for(let r = r0; r <= r1; r++) for(let c = c0; c <= c1; c++){
+    const n = hAt(page, r, c), sh = bd.show?.[n] || bd.def || 'num';
+    let cls = 'hb-c' + (c === 4 && c < c1 ? ' g5c' : '') + (r === 4 && r < r1 ? ' g5r' : '') + (bd.marks?.[n] ? ' ' + bd.marks[n] : '');
+    if(sh === 'off'){ s += `<span class="hb-c hb-off${c === 4 && c < c1 ? ' g5c' : ''}${r === 4 && r < r1 ? ' g5r' : ''}" aria-hidden="true"></span>`; continue; }
+    if(sh === 'in' && o.print){ s += `<span class="${cls} hb-gap"></span>`; continue; }
+    if(sh === 'in'){ const i = inputs[n]; s += `<input class="dg-in hb-in ${cls}${o.wrong?.has(i) ? ' no' : ''}" data-bdin="${i}" type="number" inputmode="numeric" value="${o.vals?.[i] ?? ''}" aria-label="fehlende Zahl ${i + 1}">`; continue; }
+    if(o.sel === n) cls += o.fb ? (o.fb.ok ? ' fb-ok' : ' fb-no') : ' sel';
+    if(set.has(n)) cls += o.fb && want && !want.has(n) ? ' fb-no' : o.fb?.ok ? ' fb-ok' : ' sel';
+    const txt = sh === 'num' ? n : sh === 'q' ? '?' : sh.startsWith('L:') ? sh.slice(2) : '';
+    s += o.tap ? `<button class="${cls}" data-hb="${n}" aria-label="${sh === 'num' ? n : `Feld Reihe ${r + 1}, Spalte ${c + 1}`}">${txt}</button>` : `<span class="${cls}">${txt}</span>`;
+  }
+  return `<div class="hb${bd.cls ? ' ' + bd.cls : ''}${page ? ' h3d' : ''}" style="--hcols:${c1 - c0 + 1}">${bd.title ? `<div class="hb-title">${bd.title}</div>` : ''}<div class="hb-grid">${s}</div></div>`;
+}
+/* Tafel an den Platz anpassen: Felder verkleinern, bis nichts mehr überläuft */
+function hbFit(){
+  for(const hb of document.querySelectorAll('#stage .hb')){
+    const wrap = hb.closest('.it-wrap, .hb-task, .blitz'); if(!wrap) continue;
+    hb.style.removeProperty('--hs');
+    let hs = parseFloat(getComputedStyle(hb).getPropertyValue('--hs')) || hb.querySelector('.hb-c')?.getBoundingClientRect().width || 40;
+    for(let i = 0; i < 30 && hs > 18 && (wrap.scrollHeight > wrap.clientHeight + 1 || wrap.scrollWidth > wrap.clientWidth + 1); i++){ hs -= 1.5; hb.style.setProperty('--hs', hs + 'px'); }
+  }
+}
+addEventListener('resize', () => { clearTimeout(hbFit.t); hbFit.t = setTimeout(hbFit, 120); });
+const hFields = bd => Object.entries(bd.show || {}).filter(([, v]) => v === 'in').map(([n]) => +n).sort((a, b) => a - b);
+const hBoard = (base, bd, mode, extra = {}) => ({type:'board', ...base, bd, mode, ...extra, ...(mode === 'fill' ? {fields: hFields(bd)} : {})});
+const hRev = n => { const s = String(n % 100).padStart(2, '0'); return s[0] !== s[1] && s[0] !== '0' && s[1] !== '0' ? Math.floor(n/100)*100 + +[...s].reverse().join('') : null; };
+function hMiss(s, t){
+  const d = s - t;
+  if(Math.abs(d) === 100) return 'eine Seite daneben (±100)';
+  if(Math.abs(d) === 10) return 'eine Zeile daneben (±10)';
+  if(Math.abs(d) === 1) return 'ein Feld daneben (±1)';
+  if(hRev(t) === s) return 'Zahlendreher';
+  return `${s} statt ${t} angetippt`;
+}
+const hDecade = () => rnd(1, 9)*10 + rnd(1, 9);           /* 11 … 99 ohne Zehnerzahlen */
+const hInPage = (p, rLo = 0, rHi = 9, cLo = 0, cHi = 9) => hAt(p, rnd(rLo, rHi), rnd(cLo, cHi));
+function hdotsSvg(n){
+  const U = 17; let s = '';
+  for(let i = 0; i < 100; i++){ const r = Math.floor(i/10), c = i % 10, x = 14 + c*U + (c >= 5 ? 6 : 0), y = 14 + r*U + (r >= 5 ? 6 : 0); s += `<circle cx="${x}" cy="${y}" r="6.4" fill="${i < n ? PLACE.z : '#fff'}" stroke="${i < n ? '#1f4f9a' : '#b9b2a4'}" stroke-width="1.4"/>`; }
+  return `<svg viewBox="0 0 ${28 + 9*U + 6} ${28 + 9*U + 6}" role="img" aria-label="Hunderterfeld mit Punkten">${s}</svg>`;
+}
+const hArrows = (d, k, up = false, left = false) => `<span class="hb-arrows">${(up ? '↑' : '↓').repeat(d)}${(left ? '←' : '→').repeat(k)}</span>`;
+const hShape = () => pick([
+  {name:'Kreuz', cells:[[-1, 0], [0, -1], [0, 0], [0, 1], [1, 0]], given:2},
+  {name:'Quadrat', cells:[[0, 0], [0, 1], [1, 0], [1, 1]], given:0},
+  {name:'L', cells:[[0, 0], [1, 0], [2, 0], [2, 1]], given:3},
+  {name:'T', cells:[[0, 0], [0, 1], [0, 2], [1, 1], [2, 1]], given:1},
+  {name:'Treppe', cells:[[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]], given:4},
+  {name:'Haken', cells:[[0, 1], [1, 1], [2, 1], [2, 0]], given:0}
+]);
+/* Ausschnitt: Form auf die Tafel legen, eine Zahl vorgeben, Rest ausfüllen */
+function hCut(page, sh, given = sh.given){
+  const rs = sh.cells.map(x => x[0]), cs = sh.cells.map(x => x[1]);
+  const r = rnd(-Math.min(...rs), 9 - Math.max(...rs)), c = rnd(-Math.min(...cs), 9 - Math.max(...cs));
+  const abs = sh.cells.map(([dr, dc]) => hAt(page, r + dr, c + dc)), show = {};
+  const rr = sh.cells.map(x => r + x[0]), cc = sh.cells.map(x => c + x[1]);
+  for(let i = Math.min(...rr); i <= Math.max(...rr); i++) for(let j = Math.min(...cc); j <= Math.max(...cc); j++) show[hAt(page, i, j)] = 'off';
+  abs.forEach((n, i) => show[n] = i === given ? 'num' : 'in');
+  return {bd:{page, show, cut:[Math.min(...rr), Math.max(...rr), Math.min(...cc), Math.max(...cc)], cls:'big', marks:{[abs[given]]:'mk'}}, given: abs[given], abs};
+}
+const H_ITEMS = {
+  H1: [
+    () => { const n = hDecade(); return hBoard({kern:true, prompt:`Tippe auf die ${n}.`, label:`Tafel: ${n} finden`, tip:'Noch nicht. Suche zuerst die richtige Zeile. Dann gehe nach rechts.'}, {}, 'tap', {target:n}); },
+    () => { let n; do n = hDecade(); while(!hRev(n)); return hBoard({prompt:`Tippe auf die ${n}.`, label:`Tafel: ${n} finden (Dreher ${hRev(n)})`, tip:`Noch nicht. Bei ${n} kommt die ${String(n)[0]} zuerst: ${String(n)[0]} Zehner.`}, {}, 'tap', {target:n}); },
+    () => { const n = rnd(2, 9)*10; return hBoard({prompt:`Tippe auf die ${n}.`, label:`Tafel: Zehnerzahl ${n} finden`, tip:`Noch nicht. Die Zehnerzahlen stehen ganz rechts am Ende der Zeile.`}, {}, 'tap', {target:n}); }
+  ],
+  H2: [
+    () => { const z = rnd(1, 9), e = rnd(1, 9), n = z*10 + e; return hBoard({kern:true, side:true, svg: materialSvg(z, e), prompt:'Welche Zahl ist das? Tippe sie in der Tafel an.', label:`Material ${z} Z ${e} E → Tafel`, tip:'Noch nicht. Zähle zuerst die Zehnerstangen, dann die Einer.'}, {cls:'mid'}, 'tap', {target:n}); },
+    () => { const n = hDecade(); return hBoard({side:true, svg: hdotsSvg(n), prompt:'Wie viele Punkte sind blau? Tippe die Zahl in der Tafel an.', label:`Hunderterfeld ${n} → Tafel`, tip:'Noch nicht. Jede volle Reihe sind 10. Zähle die vollen Reihen, dann die Punkte in der letzten Reihe.'}, {cls:'mid'}, 'tap', {target:n}); },
+    () => { const n = hDecade(); return hBoard({prompt:`Tippe auf: ${numberWord(n)}`, label:`Zahlwort „${numberWord(n)}“ → Tafel`, tip:`Noch nicht. Im Zahlwort hörst du die Einer zuerst. Geschrieben kommen die Zehner zuerst.`}, {}, 'tap', {target:n}); },
+    () => { const z = rnd(1, 9); let e; do e = rnd(1, 9); while(e === z); const n = z*10 + e, mat = (a, b) => ({h:`<span class="hb-mat">${materialSvg(a, b)}</span>`, a:`${a} Zehner ${b} Einer`});
+      return mkChoice({layout:'side', html: boardHtml({cls:'mid', marks:{[n]:'mk'}}), q:`Welches Material passt zur ${n}?`, prompt:`Welches Material passt zur markierten Zahl ${n}?`, label:`Tafel ${n} → Material`, tip:'Noch nicht. Die erste Ziffer sagt die Zehner, die zweite die Einer.'}, [mat(z, e), mat(e, z), mat(z, Math.max(0, e - 1) || e + 1)]); }
+  ],
+  H3: [
+    () => { const down = Math.random() < .5, n = down ? hAt(0, rnd(0, 8), rnd(0, 9)) : hAt(0, rnd(1, 9), rnd(0, 9)), t = n + (down ? 10 : -10);
+      return hBoard({kern:true, prompt:`Welche Zahl steht ${down ? 'unter' : 'über'} der ${n}?`, label:`Nachbar ${down ? 'unten' : 'oben'} von ${n}`, tip:`Noch nicht. Eine Zeile ${down ? 'tiefer' : 'höher'} sind es 10 ${down ? 'mehr' : 'weniger'}.`}, {def:'blank', show:{[n]:'num', [t]:'in'}, marks:{[n]:'mk'}}, 'fill'); },
+    () => { const right = Math.random() < .5, n = right ? hAt(0, rnd(0, 9), rnd(0, 8)) : hAt(0, rnd(0, 9), rnd(1, 9)), t = n + (right ? 1 : -1);
+      return hBoard({prompt:`Welche Zahl steht ${right ? 'rechts neben' : 'links neben'} der ${n}?`, label:`Nachbar ${right ? 'rechts' : 'links'} von ${n}`, tip:`Noch nicht. Ein Feld nach ${right ? 'rechts' : 'links'} ist 1 ${right ? 'mehr' : 'weniger'}.`}, {def:'blank', show:{[n]:'num', [t]:'in'}, marks:{[n]:'mk'}}, 'fill'); },
+    () => { const r = rnd(1, 9), gaps = shuffle([...Array(10).keys()]).slice(0, 3), show = {};
+      for(let c = 0; c < 10; c++) show[hAt(0, r, c)] = gaps.includes(c) ? 'in' : 'num';
+      return hBoard({prompt:'Eine Zeile aus der Hundertertafel. Fülle die Lücken.', label:`Zeile ${r*10 + 1}–${r*10 + 10}: Lücken`, tip:'Noch nicht. In einer Zeile wird es immer 1 mehr.'}, {show, cut:[r, r, 0, 9], cls:'mid'}, 'fill'); },
+    () => { const c = rnd(0, 8), gaps = shuffle([...Array(10).keys()]).slice(0, 4), show = {};
+      for(let r = 0; r < 10; r++) show[hAt(0, r, c)] = gaps.includes(r) ? 'in' : 'num';
+      return hBoard({prompt:'Eine Spalte aus der Hundertertafel. Fülle die Lücken.', label:`Spalte ab ${c + 1}: Lücken`, tip:'Noch nicht. In einer Spalte wird es immer 10 mehr.'}, {show, cut:[0, 9, c, c], cls:'col'}, 'fill'); }
+  ],
+  H4: [
+    () => { const x = hCut(0, {cells:[[-1, 0], [0, -1], [0, 0], [0, 1], [1, 0]], given:2}); return hBoard({kern:true, prompt:'Ein Stück aus der Hundertertafel. Fülle die leeren Felder.', label:`Ausschnitt Kreuz um ${x.given}`, tip:'Noch nicht. Rechts +1, links −1, unten +10, oben −10.'}, x.bd, 'fill'); },
+    () => { const sh = hShape(), x = hCut(0, sh, rnd(0, sh.cells.length - 1)); return hBoard({prompt:'Ein Stück aus der Hundertertafel. Fülle die leeren Felder.', label:`Ausschnitt ${sh.name} mit ${x.given}`, tip:'Noch nicht. Gehe von der bekannten Zahl aus: rechts +1, unten +10.'}, x.bd, 'fill'); },
+    () => { const sh = hShape(), x = hCut(0, sh); return hBoard({prompt:'Ein Stück aus der Hundertertafel. Fülle die leeren Felder.', label:`Ausschnitt ${sh.name} mit ${x.given}`, tip:'Noch nicht. Gehe Schritt für Schritt von der bekannten Zahl aus.'}, x.bd, 'fill'); }
+  ],
+  H5: [
+    () => { const d = rnd(1, 3), k = rnd(1, 4), s = hAt(0, rnd(0, 9 - d), rnd(0, 9 - k)), t = s + 10*d + k;
+      return hBoard({side:true, kern:true, text:`Start: ${s}   ${'↓'.repeat(d)}${'→'.repeat(k)}`, textCls:'hb-way', prompt:`Starte bei ${s}. Gehe ${d}-mal nach unten und ${k}-mal nach rechts. Tippe an, wo du ankommst.`, label:`Weg ab ${s}: ${d}↓ ${k}→`, tip:'Noch nicht. Jeder Pfeil ist ein Feld. Nach unten +10, nach rechts +1.', swap: s + 10*k + d}, {marks:{[s]:'mk'}}, 'tap', {target:t}); },
+    () => { const z = rnd(1, 4), e = rnd(0, 5), s = hAt(0, rnd(0, 9 - z), rnd(0, 9 - e)), b = z*10 + e;
+      return hBoard({side:true, text:`${s} + ${b} = ?`, textCls:'hb-eq', prompt:`Rechne mit der Tafel: ${s} + ${b}. Tippe das Ergebnis an.`, label:`Tafel-Weg ${s} + ${b}`, tip:`Noch nicht. ${z} Zehner: ${z}-mal nach unten.${e ? ` ${e} Einer: ${e}-mal nach rechts.` : ''}`}, {marks:{[s]:'mk'}}, 'tap', {target:s + b}); },
+    () => { const z = rnd(1, 4), e = rnd(0, 5), s = hAt(0, rnd(z, 9), rnd(e, 9)), b = z*10 + e;
+      return hBoard({side:true, text:`${s} − ${b} = ?`, textCls:'hb-eq', prompt:`Rechne mit der Tafel: ${s} − ${b}. Tippe das Ergebnis an.`, label:`Tafel-Weg ${s} − ${b}`, tip:`Noch nicht. ${z} Zehner: ${z}-mal nach oben.${e ? ` ${e} Einer: ${e}-mal nach links.` : ''}`}, {marks:{[s]:'mk'}}, 'tap', {target:s - b}); },
+    () => { const d = rnd(1, 4), k = rnd(1, 4), s = hAt(0, rnd(0, 9 - d), rnd(0, 9 - k)), t = s + 10*d + k, w = (a, b) => `${a}-mal nach unten, ${b}-mal nach rechts`;
+      return mkChoice({layout:'col', html: boardHtml({marks:{[s]:'mk', [t]:'mk2'}, cls:'mid'}), prompt:`Von ${s} nach ${t}: Wie bist du gegangen?`, label:`Weg ${s} → ${t}`, tip:'Noch nicht. Zähle die Zeilen nach unten (Zehner) und die Felder nach rechts (Einer).'}, [w(d, k), w(k, d) === w(d, k) ? w(d + 1, k) : w(k, d), w(d, k + 1)]); }
+  ],
+  H6: [
+    () => { const e = rnd(1, 9), set = Array.from({length:10}, (_, i) => i*10 + e); return hBoard({kern:true, prompt:`Tippe alle Zahlen an, die mit ${e} enden. Dann „Prüfen“.`, label:`Muster: Endziffer ${e}`, tip:`Noch nicht. Alle Zahlen mit ${e} am Ende stehen untereinander in einer Spalte.`}, {}, 'multi', {set}); },
+    () => { const set = Array.from({length:10}, (_, i) => (i + 1)*10); return hBoard({prompt:'Tippe alle Zehnerzahlen an (10, 20, …). Dann „Prüfen“.', label:'Muster: Zehnerzahlen', tip:'Noch nicht. Zehnerzahlen enden mit 0. Sie stehen ganz rechts.'}, {}, 'multi', {set}); },
+    () => { const z = rnd(2, 8), set = Array.from({length:10}, (_, i) => z*10 + i); return hBoard({prompt:`Tippe alle Zahlen mit ${z} Zehnern an (${z}0 bis ${z}9). Dann „Prüfen“.`, label:`Muster: alle Zahlen mit ${z} Zehnern`, tip:`Noch nicht. Achtung: Die ${z}0 steht am Ende der Zeile darüber.`, trap:[z*10 + 10], trapObs:'die ganze Zeile statt der Zehnerzahl angetippt'}, {}, 'multi', {set}); },
+    () => { const k = pick([2, 3, 4, 5]), set = Array.from({length:10}, (_, i) => (i + 1)*k); return hBoard({prompt:`Tippe die ${k}er-Reihe an: ${k}, ${2*k}, ${3*k} … bis ${10*k}. Dann „Prüfen“.`, label:`Muster: ${k}er-Reihe`, tip:`Noch nicht. Springe immer ${k} weiter.`}, {}, 'multi', {set}); },
+    () => { const k = rnd(3, 9), kind = pick(['end', 'row', 'ten']), set = kind === 'end' ? Array.from({length:10}, (_, i) => i*10 + k) : kind === 'row' ? Array.from({length:10}, (_, i) => (i + 1)*k) : Array.from({length:10}, (_, i) => k*10 + i), marks = {};
+      set.forEach(n => marks[n] = 'pat'); const o = [`Alle Zahlen mit ${k} am Ende`, `Die ${k}er-Reihe`, `Alle Zahlen mit ${k} Zehnern`];
+      return mkChoice({layout:'col', html: boardHtml({marks, cls:'mid'}), prompt:'Welches Muster ist markiert?', label:`Muster erkennen: ${o[['end', 'row', 'ten'].indexOf(kind)]}`, tip:'Noch nicht. Schau die markierten Zahlen genau an: Was haben sie gemeinsam?'}, o, ['end', 'row', 'ten'].indexOf(kind)); }
+  ],
+  H7: [
+    () => { const p = rnd(1, 9), n = hInPage(p), others = shuffle([p - 1, p + 1, (p + 5) % 10].filter(x => x >= 0 && x <= 9 && x !== p)).slice(0, 2), bk = q => ({h:`<span class="hb-book"><small>Seite</small><b>${hPageName(q)}</b></span>`, a: hPageName(q)});
+      return mkChoice({kern:true, layout:'row', prompt:`Auf welcher Seite im Tausenderbuch steht die ${n}?`, label:`Tausenderbuch: Seite zu ${n}`, tip:`Noch nicht. Schau auf die Hunderter: ${n} hat ${Math.floor(n/100)} Hunderter.`}, [bk(p), ...others.map(bk)]); },
+    () => { const p = rnd(1, 9), n = p*100 + hDecade(); return hBoard({prompt:`Tippe auf die ${n}.`, label:`Tausenderbuch: ${n} finden`, tip:'Noch nicht. Auf jeder Seite ist es wie in der Hundertertafel. Schau auf Zehner und Einer.'}, {page:p, title:`Seite ${hPageName(p)}`}, 'tap', {target:n}); },
+    () => { const p = rnd(1, 9), dir = pick(['down', 'up', 'right']), r = rnd(dir === 'up' ? 1 : 0, dir === 'down' ? 8 : 9), c = rnd(0, dir === 'right' ? 8 : 9), n = hAt(p, r, c), t = n + {down:10, up:-10, right:1}[dir];
+      return hBoard({prompt:`Welche Zahl steht ${{down:'unter', up:'über', right:'rechts neben'}[dir]} der ${n}?`, label:`Tausenderbuch: Nachbar ${dir} von ${n}`, tip:'Noch nicht. Wie in der Hundertertafel: unten +10, oben −10, rechts +1.'}, {page:p, title:`Seite ${hPageName(p)}`, def:'blank', show:{[n]:'num', [t]:'in'}, marks:{[n]:'mk'}}, 'fill'); },
+    () => { const p = rnd(0, 8), n = hInPage(p); return mkChoice({layout:'row', prompt:`Im Tausenderbuch: Welche Zahl steht eine Seite weiter an derselben Stelle wie die ${n}?`, label:`Tausenderbuch: eine Seite weiter (${n} + 100)`, tip:'Noch nicht. Eine Seite weiter sind es 100 mehr.'}, opt3(String(n + 100), [String(n + 10), String(n + 1), String(n + 110)])); },
+    () => { const p = rnd(1, 9), x = hCut(p, {cells:[[-1, 0], [0, -1], [0, 0], [0, 1], [1, 0]], given:2}); return hBoard({prompt:'Ein Stück aus dem Tausenderbuch. Fülle die leeren Felder.', label:`Tausenderbuch: Ausschnitt um ${x.given}`, tip:'Noch nicht. Rechts +1, links −1, unten +10, oben −10.'}, x.bd, 'fill'); }
+  ]
+};
+const H_INFO = {
+  H1:{name:'Zahlen in der Hundertertafel finden', short:'Finden', kann:'findet Zahlen bis 100 in der Hundertertafel, auch Zehnerzahlen und Zahlen mit Dreher-Gefahr', ziel:'orientiert sich in der Hundertertafel: erst die Zeile (Zehner), dann die Spalte (Einer)', analog:'große Hundertertafel an der Wand oder auf dem Boden: Zahlen zeigen, Plättchen legen, Zahlen abdecken und wiederfinden'},
+  H2:{name:'Tafel und Material verbinden', short:'Material', kann:'verbindet Zahlen in der Tafel mit Zehnerstangen und Einern, dem Hunderterfeld und dem Zahlwort', ziel:'übersetzt zwischen Darstellungen: Material, Punktefeld, Zahlwort und Platz in der Tafel', analog:'Zahl mit Zehnerstangen legen und in der Tafel suchen; Zahlwortkarten der Tafel zuordnen; Hunderterfeld mit Plättchen füllen'},
+  H3:{name:'Nachbarn und Lücken', short:'Nachbarn', kann:'nennt Nachbarzahlen in der Tafel (±1, ±10) und füllt Zeilen und Spalten mit Lücken', ziel:'nutzt den Aufbau der Tafel: rechts 1 mehr, unten 10 mehr', analog:'Hundertertafel-Puzzle aus Zeilen und Spalten; Zahl verdecken und von den Nachbarn erschließen'},
+  H4:{name:'Ausschnitte ergänzen', short:'Puzzle', kann:'ergänzt Ausschnitte aus der Hundertertafel (Kreuz, Quadrat, L, Treppe) ausgehend von einer Zahl', ziel:'erschließt fehlende Zahlen aus der Lage in der Tafel, ohne die ganze Tafel zu sehen', analog:'Ausschnittkarten aus einer kopierten Tafel schneiden und ergänzen; Partnerspiel „Welche Zahl versteckt sich?“'},
+  H5:{name:'Wege gehen: Plus und Minus an der Tafel', short:'Wege', kann:'geht Wege in der Tafel (unten = +10, rechts = +1) und rechnet so Plus- und Minusaufgaben bis 100', ziel:'nutzt die Tafel als Rechenhilfe: Zehner als Zeilensprünge, Einer als Schritte', analog:'Figur auf der Boden-Hundertertafel laufen lassen; Wegkarten mit Pfeilen; Rechnen mit Zeigestab an der Wandtafel'},
+  H6:{name:'Muster erkennen', short:'Muster', kann:'erkennt Muster in der Tafel (gleiche Einer, Zehnerzahlen, gleiche Zehner, Einmaleins-Reihen)', ziel:'sieht Zahlbeziehungen als Muster und beschreibt sie (Spalte = gleiche Einer, Zeile = gleiche Zehner)', analog:'Muster mit Plättchen oder Farben auf der Tafel legen; Einmaleins-Reihen einfärben und vergleichen'},
+  H7:{name:'Tausenderbuch', short:'Tausender', kann:'orientiert sich im Tausenderbuch: findet die richtige Seite, Zahlen auf der Seite und Nachbarn (±1, ±10, ±100)', ziel:'überträgt den Aufbau der Hundertertafel auf Zahlen bis 1000 (jede Seite = ein Hunderter)', analog:'Tausenderbuch selbst herstellen (10 Hundertertafeln); Hausnummern und Seitenzahlen im Buch suchen'}
+};
+for(const [k, v] of Object.entries(H_INFO)){ v.offer = {text:`Hundertertafel: ${v.name}`, set:{mode:'read', lvl:k}}; v.bp = 'BP GENT 2022, M 2.1.1.2 Zahldarstellungen (Hundertertafel, Tausenderbuch)'; }
+
 const U_INFO = {
   U1:{name:'Volle Stunden', short:'Volle Std.', kann:'liest volle Stunden an der Uhr ab und stellt sie ein', ziel:'liest volle Stunden an der Zeigeruhr ab und unterscheidet kurzen und langen Zeiger', analog:'Lernuhr mit farbigen Zeigern; Tagesplan mit Uhrzeiten (8 Uhr Schulbeginn, 12 Uhr Mittagessen)'},
   U2:{name:'Halbe Stunden', short:'Halbe Std.', kann:'liest halbe Stunden ab und sagt „halb …“ richtig', ziel:'liest halbe Stunden ab und versteht „halb 8“ als 7:30', analog:'„Halb“ heißt: halber Weg zur nächsten Stunde – mit der Lernuhr zeigen; Busplan mit halben Stunden'},
@@ -4357,6 +4608,7 @@ function inferCells(pid, subj){
     line(S_LEVELS.map(l => `S|${l}`));
     line(U_LEVELS.map(l => `U|${l}`));
     line(G_LEVELS.map(l => `G|${l}`));
+    line(H_LEVELS.map(l => `H|${l}`));
     line(R_LEVELS.slice(0, 6).map(l => `R|${l}`));
   } else if(subj === 'W') line(W_LEVELS.map(l => `W|${l}`));
   else { line(L_LEVELS.map(l => `L|${l}`)); line(P_LEVELS.map(l => `P|${l}`)); }
@@ -4366,7 +4618,7 @@ function* tst(d, key){ if(!(key in d.res)) yield key; return d.res[key]; }
 function* mathPlan(d){
   const m = matrixOf(d.pid);
   // Teil 2: Uhr, Kalender und Größen (eigene, kurze Sitzung)
-  if(d.part === 2){ yield* binary(d, U_LEVELS.map(l => `U|${l}`), 1); yield* binary(d, G_LEVELS.map(l => `G|${l}`), 1); return; }
+  if(d.part === 2){ yield* binary(d, U_LEVELS.map(l => `U|${l}`), 1); yield* binary(d, G_LEVELS.map(l => `G|${l}`), 1); yield* binary(d, H_LEVELS.map(l => `H|${l}`), hStart(d)); return; }
   // Start: höchster Zahlenraum, in dem schon etwas erreicht wurde, sonst ZR 20
   let i = 1; ZR.forEach((zr, k) => { if(N_LEVELS.some(l => isOk(m[`M|${zr}|${l}`]?.status) && m[`M|${zr}|${l}`].quelle !== 'abgeleitet')) i = k; });
   let lowFail = null, highPass = null;
@@ -4409,7 +4661,10 @@ function* mathPlan(d){
   // 5. Uhrzeit, sobald der Zahlenraum bis 20 sicher ist (binäre Suche, Start bei halben Stunden)
   if(iii(20)) yield* binary(d, U_LEVELS.map(l => `U|${l}`), 1);
   if(iii(20)) yield* binary(d, G_LEVELS.map(l => `G|${l}`), 1);
+  if(iii(20)) yield* binary(d, H_LEVELS.map(l => `H|${l}`), hStart(d));
 }
+/* Hundertertafel: Start bei „Nachbarn“ (H3), wenn der Zahlenraum bis 100 sicher ist, sonst bei „Material“ (H2) */
+const hStart = d => { const m = matrixOf(d.pid), ok100 = ['M|100|III', 'M|1000|III'].some(k => isOk(d.res[k] || m[k]?.status)); return ok100 ? 2 : 1; };
 /* Re-Diagnose: an der Förderzone beginnen und nach oben gehen */
 function* walkUp(d, keys){
   const m = matrixOf(d.pid); let i = keys.findIndex(k => m[k] && !isOk(m[k].status));
@@ -4423,6 +4678,7 @@ function* mathRePlan(d){
   yield* walkUp(d, S_LEVELS.map(l => `S|${l}`));
   yield* walkUp(d, U_LEVELS.map(l => `U|${l}`));
   yield* walkUp(d, G_LEVELS.map(l => `G|${l}`));
+  yield* walkUp(d, H_LEVELS.map(l => `H|${l}`));
   yield* walkUp(d, R_LEVELS.slice(0, 6).map(l => `R|${l}`));
 }
 function* binary(d, keys, start){
@@ -4520,6 +4776,14 @@ function evalItem(it, r, vals){
   if(it.type === 'write' || it.type === 'sent') return evalWrite(it, r);
   if(it.type === 'clockset') return evalClockSet(it, r);
   const obs = [];
+  if(it.type === 'board'){
+    if(it.mode === 'tap'){ if(r.sel == null) return null; const ok = r.sel === it.target; if(!ok) obs.push(it.swap === r.sel ? 'unten und rechts vertauscht' : hMiss(r.sel, it.target)); return {ok, given: String(r.sel), obs}; }
+    if(it.mode === 'multi'){ const st = r.set || []; if(!st.length) return null; const want = new Set(it.set), miss = it.set.filter(n => !st.includes(n)).length, extra = st.filter(n => !want.has(n)).length; if(miss) obs.push(`${miss} nicht gefunden`); if(extra) obs.push(`${extra} zu viel angetippt`); if(it.trap && st.some(n => it.trap.includes(n))) obs.push(it.trapObs); return {ok: !miss && !extra, given: [...st].sort((a, b) => a - b).join(', '), obs}; }
+    const v = vals.length ? vals : (r.vals || []); if(v.length < it.fields.length || v.some(x => x === '' || x == null)) return null;
+    const wrong = it.fields.map((f, i) => Number(v[i]) === f ? -1 : i).filter(i => i >= 0);
+    for(const i of wrong){ const g = Number(v[i]), f = it.fields[i]; obs.push(Math.abs(g - f) === 10 ? 'Zeile und Spalte verwechselt (±10)' : Math.abs(g - f) === 1 ? 'ein Feld daneben (±1)' : hRev(f) === g ? 'Zahlendreher' : `${g} statt ${f}`); }
+    return {ok: !wrong.length, given: v.join(' / '), obs: [...new Set(obs)], wrong};
+  }
   switch(it.type){
     case 'input': case 'flash': case 'scatter': case 'seq': {
       if(it.type === 'flash' && !r.hidden) return null;
@@ -4566,6 +4830,7 @@ function itemStage(it, r, opt = {}){
   if(it.type === 'write') return writeStage(it, r, opt);
   if(it.type === 'sent') return sentStage(it, r);
   if(it.type === 'clockset') return clockSetStage(it, r);
+  if(it.type === 'board') return `<div class="it-wrap hb-wrap${it.side ? ' side' : ''}">${head}${boardHtml(it.bd, {tap: it.mode !== 'fill', sel: r.sel, set: r.set, want: it.set, vals: r.vals, wrong: r.wrong, fb: opt.feedback})}</div>`;
   switch(it.type){
     case 'scatter': {
       it.pts ||= screwBox(it.n); r.marked ||= new Set();
@@ -4600,6 +4865,10 @@ function itemStage(it, r, opt = {}){
 function itemClick(e, it, r){
   if(it.type === 'write' || it.type === 'sent') return writeClick(e, it, r);
   if(it.type === 'clockset') return clockSetClick(e, it, r);
+  if(it.type === 'board'){ const c = e.target.closest('[data-hb]'); if(!c) return false; const n = +c.dataset.hb;
+    if(it.mode === 'tap'){ r.sel = n; return true; }
+    if(it.mode === 'multi'){ r.set ||= []; const i = r.set.indexOf(n); if(i >= 0) r.set.splice(i, 1); else r.set.push(n); return true; }
+    return false; }
   const sc = e.target.closest('[data-sc]');
   if(sc && it.type === 'scatter'){ const i = +sc.dataset.sc; r.marked ||= new Set(); if(r.marked.has(i)) r.marked.delete(i); else { r.marked.add(i); r.taps = (r.taps || 0) + 1; } return true; }
   if(it.type === 'line' && e.target.closest('.dg-line')){ const svg = e.target.closest('svg'), m = svg.getScreenCTM(); const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse()); r.guess = Math.round(Math.max(0, Math.min(it.zr, (p.x - 50)*it.zr/900))); return true; }
@@ -4661,7 +4930,7 @@ function renderDiag(){
   if(d.done){
     $('#equation').textContent = '';
     $('#prompt').textContent = '';
-    $('#stage').innerHTML = `<div class="home"><h2>Geschafft – danke!</h2><div class="intro-card"><p>Du hast ${d.nItems} Aufgaben bearbeitet.</p><p>Deine Lehrkraft schaut sich das an und sucht passende Übungen für dich aus.</p>${d.part === 1 ? '<p>Teil 2 (Uhr und Größen) machst du an einem anderen Tag.</p>' : ''}</div><p class="note">Für die Lehrkraft: Die Auswertung mit Begründung, Lernangeboten und ILEB-Vorschlag steht im Lernstand. Kriteriumsorientierte Einstufung, keine Normwerte.</p></div>`;
+    $('#stage').innerHTML = `<div class="home"><h2>Geschafft – danke!</h2><div class="intro-card"><p>Du hast ${d.nItems} Aufgaben bearbeitet.</p><p>Deine Lehrkraft schaut sich das an und sucht passende Übungen für dich aus.</p>${d.part === 1 ? '<p>Teil 2 (Uhr, Größen, Hundertertafel) machst du an einem anderen Tag.</p>' : ''}</div><p class="note">Für die Lehrkraft: Die Auswertung mit Begründung, Lernangeboten und ILEB-Vorschlag steht im Lernstand. Kriteriumsorientierte Einstufung, keine Normwerte.</p></div>`;
     $('#controls').innerHTML = toolBtn({id:'d-close', ic:'home', label:'Fertig', primary:true}) + '<span class="sep"></span>' + toolBtn({id:'d-stats', ic:'chart', label:'Lernstand (Lehrkraft)'});
     setHint(''); return;
   }
@@ -4669,6 +4938,7 @@ function renderDiag(){
   $('#equation').innerHTML = `<span class="screen-step">${title}${d.re ? ' · Re-Diagnose' : ''} · Aufgabe ${d.nItems + 1}${d.warm ? ' von ' + d.items.length : ''}</span>`;
   $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(it.prompt)}</span>`;
   $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, r)}</div>`;
+  if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   let c = '';
   if(needsFields(it, r)) c += fieldsHtml(it);
   if(it.type === 'flash' && r.hidden) c += toolBtn({id:'d-again', ic:'eye', label:'Nochmal zeigen'});
@@ -4685,7 +4955,7 @@ function renderDiag(){
 function diagStageClick(e){
   const d = app.diag; if(!d || d.done) return;
   const it = d.items[d.idx], r = d.resp ||= {};
-  if(itemClick(e, it, r)) $('#stage .dg-stage').innerHTML = itemStage(it, r);
+  if(itemClick(e, it, r)){ $('#stage .dg-stage').innerHTML = itemStage(it, r); if(it.type === 'board') hbFit(); }
 }
 function diagControl(btn){
   const d = app.diag;
@@ -4716,7 +4986,8 @@ function matrixHtml(pid, subj){
     <tr class="mx-gap"><th>Stellenwert</th>${S_LEVELS.map(l => cellChip(m, `S|${l}`)).join('')}<td></td></tr><tr class="mx-sub"><th></th>${S_LEVELS.map(l => `<td><small>${l}</small></td>`).join('')}</tr>
     <tr class="mx-gap"><th>Uhr und Kalender</th>${U_LEVELS.map(l => cellChip(m, `U|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${U_LEVELS.map(l => `<td><small>${U_INFO[l].short}</small></td>`).join('')}</tr>
     <tr class="mx-gap"><th>Größen</th>${G_LEVELS.map(l => cellChip(m, `G|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${G_LEVELS.map(l => `<td><small>${G_INFO[l].short}</small></td>`).join('')}</tr>
-  </tbody></table></div><p class="note mx-legend">Niveaus nach Fritz & Ricken, Zahlenräume nach Krajewski, Stellenwert S1–S4 nach Herzog, Ehlert & Fritz, Rechnen R1–R7 nach BP GENT M 2.1.1.3, Uhr und Kalender U1–U6 nach M 2.1.3.5, Größen G1–G4 nach M 2.1.3. ${legend}</p>`;
+    <tr class="mx-gap"><th>Hundertertafel</th>${H_LEVELS.map(l => cellChip(m, `H|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${H_LEVELS.map(l => `<td><small>${H_INFO[l].short}</small></td>`).join('')}</tr>
+  </tbody></table></div><p class="note mx-legend">Niveaus nach Fritz & Ricken, Zahlenräume nach Krajewski, Stellenwert S1–S4 nach Herzog, Ehlert & Fritz, Rechnen R1–R7 nach BP GENT M 2.1.1.3, Uhr und Kalender U1–U6 nach M 2.1.3.5, Größen G1–G4 nach M 2.1.3, Hundertertafel und Tausenderbuch H1–H7 nach M 2.1.1.2. ${legend}</p>`;
   if(subj === 'W') return `<div class="mx-scroll"><table class="mx-table"><thead><tr><th></th>${W_LEVELS.map(l => `<th title="${W_INFO[l].name}">${l}<small>${W_INFO[l].short}</small></th>`).join('')}</tr></thead><tbody><tr><th>Schreiben</th>${W_LEVELS.map(l => cellChip(m, `W|${l}`)).join('')}</tr></tbody></table></div><p class="note mx-legend">Schreibstufen nach dem Bildungsplan GENT (Deutsch 2.1.2.4–2.1.2.7). Bis W4 zählt lautgetreues Schreiben als richtig, ab W5 die richtige Schreibweise. ${legend}</p>`;
   return `<div class="mx-scroll"><table class="mx-table"><thead><tr><th></th>${L_LEVELS.map(l => `<th title="${L_INFO[l].name}">${l}<small>${L_INFO[l].short}</small></th>`).join('')}</tr></thead><tbody>
     <tr><th>Lesen</th>${L_LEVELS.map(l => cellChip(m, `L|${l}`)).join('')}</tr>
@@ -4730,6 +5001,7 @@ function zoneCells(pid, subj){
     const s = first(S_LEVELS.map(l => `S|${l}`)); if(s) out.push(s);
     const u = first(U_LEVELS.map(l => `U|${l}`)); if(u) out.push(u);
     const gz = first(G_LEVELS.map(l => `G|${l}`)); if(gz) out.push(gz);
+    const hz = first(H_LEVELS.map(l => `H|${l}`)); if(hz) out.push(hz);
     const rz = first(R_LEVELS.map(l => `R|${l}`)); if(rz) out.splice(Math.min(1, out.length), 0, rz);
   } else if(subj === 'W'){ const w = first(W_LEVELS.map(x => `W|${x}`)); if(w) out.push(w); }
   else { const l = first(L_LEVELS.map(x => `L|${x}`)); if(l) out.push(l); }
@@ -4739,11 +5011,11 @@ function highestIn(m, keys){ let h = null; for(const k of keys) if(isOk(m[k]?.st
 function zoneReport(pid, subj){
   const name = pid === 'guest' ? 'Das Kind' : (data.profiles.find(p => p.id === pid)?.name || 'Das Kind');
   const m = matrixOf(pid), out = {zones:[], ileb:null, subj};
-  const prefix = subj === 'M' ? ['M|', 'R|', 'S|', 'U|', 'G|'] : subj === 'W' ? ['W|'] : ['L|', 'P|'];
+  const prefix = subj === 'M' ? ['M|', 'R|', 'S|', 'U|', 'G|', 'H|'] : subj === 'W' ? ['W|'] : ['L|', 'P|'];
   if(!Object.keys(m).some(k => prefix.some(p => k.startsWith(p)))) return out;
   for(const key of zoneCells(pid, subj)){
     const info = cellInfo(key), c = m[key], [ax, a] = key.split('|');
-    const row = ax === 'M' ? N_LEVELS.map(l => `M|${a}|${l}`) : (ax === 'S' ? S_LEVELS.map(l => 'S|' + l) : ax === 'U' ? U_LEVELS.map(l => 'U|' + l) : ax === 'G' ? G_LEVELS.map(l => 'G|' + l) : ax === 'R' ? R_LEVELS.map(l => 'R|' + l) : ax === 'L' ? L_LEVELS.map(l => 'L|' + l) : ax === 'W' ? W_LEVELS.map(l => 'W|' + l) : P_LEVELS.map(l => 'P|' + l));
+    const row = ax === 'M' ? N_LEVELS.map(l => `M|${a}|${l}`) : (ax === 'S' ? S_LEVELS.map(l => 'S|' + l) : ax === 'U' ? U_LEVELS.map(l => 'U|' + l) : ax === 'G' ? G_LEVELS.map(l => 'G|' + l) : ax === 'H' ? H_LEVELS.map(l => 'H|' + l) : ax === 'R' ? R_LEVELS.map(l => 'R|' + l) : ax === 'L' ? L_LEVELS.map(l => 'L|' + l) : ax === 'W' ? W_LEVELS.map(l => 'W|' + l) : P_LEVELS.map(l => 'P|' + l));
     const hi = highestIn(m, row);
     const fails = c?.items ? c.items.filter(x => !x.ok).map(x => x.label).slice(0, 2).join('; ') : '';
     const obs = c?.obs?.length ? ` Beobachtet: ${c.obs.join(', ')}.` : '';
@@ -4757,6 +5029,7 @@ function zoneReport(pid, subj){
     const s = highestIn(m, S_LEVELS.map(l => 'S|' + l)); if(s) kann.push(cellInfo(s).kann);
     const u = highestIn(m, U_LEVELS.map(l => 'U|' + l)); if(u) kann.push(cellInfo(u).kann);
     const gz = highestIn(m, G_LEVELS.map(l => 'G|' + l)); if(gz) kann.push(cellInfo(gz).kann);
+    const hh = highestIn(m, H_LEVELS.map(l => 'H|' + l)); if(hh) kann.push(cellInfo(hh).kann);
     const rz = highestIn(m, R_LEVELS.map(l => 'R|' + l)); if(rz) kann.push(cellInfo(rz).kann);
   } else if(subj === 'W'){ const w = highestIn(m, W_LEVELS.map(x => 'W|' + x)); if(w) kann.push(cellInfo(w).kann); }
   else {
@@ -4772,14 +5045,14 @@ function zoneReport(pid, subj){
   if(!out.zones.length){ out.ileb.ziel = `${name} festigt und überträgt das Gelernte auf neue Situationen.`; out.ileb.massnahmen = 'Anwendung im Alltag und in Projekten; nächster Zahlenraum oder anspruchsvollere Texte.'; }
   return out;
 }
-const MATH_MODES = ['number', 'add', 'sub', 'written', 'times', 'money', 'blitz', 'find', 'free', 'clock', 'size'];
+const MATH_MODES = ['number', 'add', 'sub', 'written', 'times', 'money', 'blitz', 'find', 'free', 'clock', 'size', 'board'];
 function practiceSinceDiag(pid, subj){
   const p = data.profiles.find(x => x.id === pid), since = p?.['lastDiag' + subj] || 0;
   return (data.log[pid] || []).filter(e => e.ts > since && (subj === 'L' ? e.mode === 'read' : subj === 'W' ? e.mode === 'write' : MATH_MODES.includes(e.mode))).length;
 }
 function applyOffer(set){
   { const p = curProfile(); app.activeZone = null; if(p && set.mode !== 'read') for(const sj of ['M']) for(const z of zoneReport(p.id, sj).zones) if(JSON.stringify(z.info.offer?.set) === JSON.stringify(set)) app.activeZone = z.key; }
-  settings.subject = set.mode === 'read' && !/^[UG]/.test(String(set.lvl)) ? 'D' : 'M'; if(set.mode !== 'read') settings.lastMath = set.mode; saveSettings();
+  settings.subject = set.mode === 'read' && !/^[UGH]/.test(String(set.lvl)) ? 'D' : 'M'; if(set.mode !== 'read') settings.lastMath = set.mode; saveSettings();
   if(set.mode === 'read'){ app.read.lvl = set.lvl; app.read.item = null; app.mode = 'read'; $('#stage').innerHTML = ''; render(); return; }
   if(set.range) app.range = set.range;
   if(set.ten) settings.ten = set.ten;
@@ -4796,7 +5069,7 @@ function applyOffer(set){
 function subjectHtml(pid, subj, rep){
   const since = practiceSinceDiag(pid, subj), S = subj === 'M' ? 'Mathematik' : subj === 'W' ? 'Schreiben' : 'Lesen';
   let h = `<h3 class="stats-h">${S}</h3><fieldset><legend>Kompetenzmatrix ${S}</legend>${matrixHtml(pid, subj)}
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${subj === 'M' ? `<button class="icon-btn" data-diag="new-M1">${icon('target')}<span style="display:inline">Teil 1: Zahlen und Rechnen</span></button><button class="icon-btn" data-diag="new-M2">${icon('target')}<span style="display:inline">Teil 2: Uhr und Größen</span></button>` : `<button class="icon-btn" data-diag="new-${subj}">${icon('target')}<span style="display:inline">${subj === 'W' ? 'Schreib-Test' : 'Lese-Test'}</span></button>`}${rep.zones.length ? `<button class="icon-btn ${since >= 25 ? 'primary' : ''}" data-diag="re-${subj}">${icon('redo')}<span style="display:inline">Re-Diagnose${since >= 25 ? ' empfohlen' : ''}</span></button>` : ''}</div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${subj === 'M' ? `<button class="icon-btn" data-diag="new-M1">${icon('target')}<span style="display:inline">Teil 1: Zahlen und Rechnen</span></button><button class="icon-btn" data-diag="new-M2">${icon('target')}<span style="display:inline">Teil 2: Uhr, Größen, Hundertertafel</span></button>` : `<button class="icon-btn" data-diag="new-${subj}">${icon('target')}<span style="display:inline">${subj === 'W' ? 'Schreib-Test' : 'Lese-Test'}</span></button>`}${rep.zones.length ? `<button class="icon-btn ${since >= 25 ? 'primary' : ''}" data-diag="re-${subj}">${icon('redo')}<span style="display:inline">Re-Diagnose${since >= 25 ? ' empfohlen' : ''}</span></button>` : ''}</div>
     ${rep.zones.length && since ? `<p class="note">${since} Übungsaufgaben seit dem letzten Test.</p>` : ''}</fieldset>`;
   if(rep.zones.length){
     h += `<fieldset><legend>Förderzone und Lernangebote</legend>${rep.zones.map((z, i) => `<div class="zone"><p><b>${escHtml(cellLabel(z.key))}</b></p><p class="why">${escHtml(z.why)}</p><p class="note">${escHtml(z.info.bp)}</p><button class="icon-btn primary" data-offer="${subj}:${i}">${icon('next')}<span style="display:inline">Lernangebot starten</span></button> <button class="icon-btn" data-sheetzone="${z.key}">${icon('print')}<span style="display:inline">Arbeitsblatt</span></button><p class="analog"><b>Analog:</b> ${escHtml(z.info.analog)}</p></div>`).join('')}</fieldset>`;
@@ -4817,7 +5090,7 @@ const ilebText = r => `Lernstand: ${r.lernstand}\nNächstes Ziel: ${r.ziel}\nMa�
 function teacherText(pid){
   const m = matrixOf(pid); let t = '';
   for(const subj of ['M', 'L', 'W']){
-    const keys = subj === 'W' ? W_LEVELS.map(l => 'W|' + l) : subj === 'M' ? [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...R_LEVELS.map(l => 'R|' + l)] : L_LEVELS.map(l => 'L|' + l);
+    const keys = subj === 'W' ? W_LEVELS.map(l => 'W|' + l) : subj === 'M' ? [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l)] : L_LEVELS.map(l => 'L|' + l);
     const got = keys.filter(k => m[k]); if(!got.length) continue;
     const rep = zoneReport(pid, subj);
     t += `Kompetenzmatrix ${subj === 'M' ? 'Mathematik' : subj === 'W' ? 'Schreiben' : 'Lesen'} (kriteriumsorientiert)\n${got.map(k => `• ${cellLabel(k)}: ${STATUS_TXT[m[k].status]}${m[k].quelle === 'abgeleitet' ? ' (abgeleitet)' : ''}${m[k].sum && m[k].quelle !== 'abgeleitet' ? ` – ${m[k].sum}` : ''}`).join('\n')}`;
@@ -4835,10 +5108,13 @@ function readDefaultLevel(){
   const z = L_LEVELS.find(l => m['L|' + l] && !isOk(m['L|' + l].status));
   return z || (L_LEVELS.some(l => m['L|' + l]) ? L_LEVELS.at(-1) : 'L4');
 }
+const rdMode = l => ({W:'write', U:'clock', G:'size', H:'board'})[String(l)[0]] || 'read';
+const rdLevels = l => ({W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS})[String(l)[0]] || L_LEVELS;
+const rdInfo = l => L_INFO[l] || W_INFO[l] || U_INFO[l] || G_INFO[l] || H_INFO[l];
 function readNew(){
   const R = app.read; R.lvl ||= readDefaultLevel();
-  if(!READ[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl]) R.lvl = 'L4';
-  const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl];
+  if(!READ[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl]) R.lvl = 'L4';
+  const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl];
   freshNew(); let it, tries = 0; do { it = pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
   Object.assign(R, {item: it, r:{}, fb:null, tries:0, spoken:false});
   renderRead();
@@ -4846,8 +5122,9 @@ function readNew(){
 function renderTopRead(){
   const R = app.read, rb = $('#btn-random'); R.lvl ||= readDefaultLevel();
   $('#range-label').textContent = '';
-  const info = L_INFO[R.lvl] || W_INFO[R.lvl] || U_INFO[R.lvl] || G_INFO[R.lvl];
+  const info = rdInfo(R.lvl);
   if(R.lvl[0] === 'G'){ $('#range-label').textContent = 'Größen'; $('#ranges').innerHTML = G_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${G_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
+  if(R.lvl[0] === 'H'){ $('#range-label').textContent = 'Tafel'; $('#ranges').innerHTML = H_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${H_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   if(R.lvl[0] === 'U'){ $('#range-label').textContent = 'Zeit'; $('#ranges').innerHTML = U_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${U_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   $('#ranges').innerHTML = `<span class="rd-title">${escHtml(info.name)}</span>`;
   $('#inputs').innerHTML = R.lvl[0] === 'L' && !['L7', 'L8', 'L9'].includes(R.lvl) ? `<button data-rsyl aria-pressed="${R.colored}" class="chip-toggle">Silben färben</button>` : '';
@@ -4859,21 +5136,25 @@ function renderRead(){
   const it = R.item;
   $('#words').hidden = true; $('#btn-say').hidden = true;
   const isW = R.lvl[0] === 'W';
-  $('#equation').innerHTML = `<span class="screen-step">${R.lvl[0] === 'U' ? 'Uhr' : R.lvl[0] === 'G' ? 'Größen' : isW ? 'Schreiben' : 'Lesen'} · ${escHtml((L_INFO[R.lvl] || W_INFO[R.lvl] || U_INFO[R.lvl] || G_INFO[R.lvl]).name)}</span>`;
+  $('#equation').innerHTML = `<span class="screen-step">${R.lvl[0] === 'U' ? 'Uhr' : R.lvl[0] === 'G' ? 'Größen' : R.lvl[0] === 'H' ? (R.lvl === 'H7' ? 'Tausenderbuch' : 'Hundertertafel') : isW ? 'Schreiben' : 'Lesen'} · ${escHtml(rdInfo(R.lvl).name)}</span>`;
   $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(it.prompt)}</span>`;
   $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, R.r, {colored: R.colored, feedback: R.fb})}</div>`;
-  const lv = R.lvl[0] === 'W' ? W_LEVELS : R.lvl[0] === 'U' ? U_LEVELS : R.lvl[0] === 'G' ? G_LEVELS : L_LEVELS, li = lv.indexOf(R.lvl), up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn(), down = R.miss >= 3 && li > 0;
-  $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : !evalItem(it, R.r, [])})) +
+  if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
+  const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl), up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn(), down = R.miss >= 3 && li > 0;
+  $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : it.type === 'board' && it.mode === 'fill' ? false : !evalItem(it, R.r, [])})) +
     (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '');
 }
 function readCheck(){
-  const R = app.read, it = R.item, res = evalItem(it, R.r, []);
-  if(!res) return;
+  const R = app.read, it = R.item, isFill = it.type === 'board' && it.mode === 'fill';
+  if(isFill) R.r.vals = readFields();
+  const res = evalItem(it, R.r, isFill ? R.r.vals : []);
+  if(!res) return isFill ? focusEmpty() : undefined;
+  if(isFill) R.r.wrong = new Set(res.wrong || []);
   R.fb = {choice: R.r.choice, ok: res.ok};
   if(res.ok){
-    logAttempt({mode: R.lvl[0] === 'W' ? 'write' : R.lvl[0] === 'U' ? 'clock' : R.lvl[0] === 'G' ? 'size' : 'read', task: it.label, ok: R.tries === 0, tries: R.tries + 1, lvl: R.lvl, given: res.given});
+    logAttempt({mode: rdMode(R.lvl), task: it.label, ok: R.tries === 0, tries: R.tries + 1, lvl: R.lvl, given: res.given});
     if(R.tries === 0){ R.streak = (R.streak || 0) + 1; R.miss = 0; } else R.streak = 0;
-    renderRead(); setHint(R.streak >= 5 && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
+    renderRead(); setHint(R.streak >= 5 && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS, H_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
     celebrate(document.querySelector('#stage .fb-ok'));
   } else {
     if(R.tries === 0){ R.miss = (R.miss || 0) + 1; R.streak = 0; } R.tries++; renderRead();
@@ -4887,8 +5168,8 @@ function readControl(btn){
   switch(btn.id){
     case 'r-check': return readCheck();
     case 'r-next': setHint(''); return readNew();
-    case 'r-up': case 'r-down': { const lv = R.lvl[0] === 'W' ? W_LEVELS : R.lvl[0] === 'U' ? U_LEVELS : R.lvl[0] === 'G' ? G_LEVELS : L_LEVELS; Object.assign(R, {lvl: lv[lv.indexOf(R.lvl) + (btn.id === 'r-up' ? 1 : -1)], item:null, streak:0, miss:0}); setHint(''); return render(); }
-    case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: R.lvl[0] === 'W' ? 'write' : R.lvl[0] === 'U' ? 'clock' : R.lvl[0] === 'G' ? 'size' : 'read', task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
+    case 'r-up': case 'r-down': { const lv = rdLevels(R.lvl); Object.assign(R, {lvl: lv[lv.indexOf(R.lvl) + (btn.id === 'r-up' ? 1 : -1)], item:null, streak:0, miss:0}); setHint(''); return render(); }
+    case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else if(R.item.type === 'board'){ const it = R.item; if(it.mode === 'tap') R.r.sel = it.target; else if(it.mode === 'multi') R.r.set = [...it.set]; else { R.r.vals = it.fields.map(String); R.r.wrong = new Set(); } } else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: rdMode(R.lvl), task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
   }
 }
 function readStageClick(e){
@@ -4903,38 +5184,90 @@ function readStageClick(e){
    ===================================================================== */
 const kidTitle = t => t.replace(/\s*\(.*?\)\s*/g, ' ').trim();
 const SUBJ_NAME = {M:'Mathe', L:'Lesen', W:'Schreiben'};
+/* Startseite als kleiner Assistent: Wer übt? → Fach → Übung (die Stufen oben zeigen, wo man gerade ist) */
+app.wz = null;
+const WZ_ILL = {
+  M:'<svg viewBox="0 0 120 70" aria-hidden="true"><rect x="6" y="8" width="54" height="54" rx="4" fill="#c9414a"/><path d="M6 18.8h54M6 29.6h54M6 40.4h54M6 51.2h54M16.8 8v54M27.6 8v54M38.4 8v54M49.2 8v54" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/><rect x="70" y="8" width="11" height="54" rx="3" fill="#346bc3"/><path d="M70 18.8h11M70 29.6h11M70 40.4h11M70 51.2h11" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/><rect x="88" y="51" width="11" height="11" rx="2.5" fill="#27834b"/><rect x="103" y="51" width="11" height="11" rx="2.5" fill="#27834b"/></svg>',
+  D:'<svg viewBox="0 0 120 70" aria-hidden="true"><text x="60" y="48" text-anchor="middle" font-size="44" font-weight="800" fill="#2b2930" font-family="Stufenfibel,system-ui,sans-serif">Abc</text><path d="M18 57q14 9 28 0" fill="none" stroke="#346bc3" stroke-width="4" stroke-linecap="round"/><path d="M52 57q17 9 34 0" fill="none" stroke="#c9414a" stroke-width="4" stroke-linecap="round"/><path d="M92 57q7 6 14 0" fill="none" stroke="#346bc3" stroke-width="4" stroke-linecap="round"/></svg>'
+};
+function homeAreas(subj){
+  const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l), out = [];
+  if(subj === 'M'){
+    for(const k of MATH_RAIL){ if(g && !g.modes.has(k)) continue; out.push({mode:k, sym:MODES[k].sym, label:MODES[k].label});
+      if(k === 'number' && (!g || g.axVisible('H'))) out.push({mode:'read', lvl: g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1', last:'board', sym:TAFEL_SYM, label:'Hundertertafel'}); }
+    if(!g || g.axVisible('U')) out.push({mode:'read', lvl: g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1', last:'clock', sym:'◷', label:'Uhr'});
+    if(!g || g.axVisible('G')) out.push({mode:'read', lvl: g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1', last:'size', sym:'⚖', label:'Größen'});
+    return [['', out]];
+  }
+  const RL = READ_RAIL.filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:L_INFO[l].short}));
+  const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>']].filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:W_INFO[l].short}));
+  return [['Lesen', RL], ['Schreiben', WR]];
+}
 function renderHome(){
   $('#equation').textContent = ''; $('#words').hidden = true; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = ''; $('#btn-say').hidden = true;
-  const p = curProfile();
-  let h = '';
-  if(!p && data.profiles.length){
-    h = `<div class="home"><h2>Wer übt heute?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}"><b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div></div>`;
-  } else {
+  const p = curProfile(), W = app.wz ||= {};
+  const needWho = data.profiles.length > 0;
+  let step = W.step || (needWho && !p && !W.guest ? 'who' : 'subj');
+  if(step === 'area' && !W.subj) step = 'subj';
+  const steps = [...(needWho ? [['who', p ? escHtml(p.name) : W.guest ? 'Gast' : 'Wer übt?']] : []), ['subj', W.subj && step === 'area' ? (W.subj === 'M' ? 'Mathe' : 'Deutsch') : 'Fach'], ['area', 'Übung']];
+  const si = steps.findIndex(x => x[0] === step);
+  const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : ''}" style="--h:${i + 1}"><button ${i < si ? `data-wz-step="${k}"` : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk"></span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
+  const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
+  let body = '';
+  if(step === 'who'){
+    body = `<h2>Wer übt heute?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}"><b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div>`;
+  } else if(step === 'subj'){
     const cards = [];
     if(p) for(const subj of ['M', 'L', 'W']){
       if(subj === 'W' && typeof W_LEVELS === 'undefined') continue;
       let z = zoneReport(p.id, subj).zones[0];
-      if(!z){ const f = frontierKeys(p.id, subj === 'M' ? 'M' : 'D').find(k => subj === 'M' ? /^[MUG]/.test(k) : k[0] === subj); if(f) z = {key:f, info:cellInfo(f)}; }
+      if(!z){ const f = frontierKeys(p.id, subj === 'M' ? 'M' : 'D').find(k => subj === 'M' ? /^[MUGH]/.test(k) : k[0] === subj); if(f) z = {key:f, info:cellInfo(f)}; }
       if(z) cards.push(`<button class="home-card" data-home-offer="${subj}"><span class="hc-subj">${SUBJ_NAME[subj]}</span><span class="hc-title">${escHtml(kidTitle(z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>`);
     }
-    h = `<div class="home"><h2>${p ? `Hallo ${escHtml(p.name)}!` : 'Willkommen bei Stufenweise!'}</h2>
-      ${cards.length ? `<p class="home-sub">Heute für dich:</p><div class="home-cards">${cards.join('')}</div>` : p ? `<p class="home-sub">Such dir etwas aus. Deine Lehrkraft kann mit dir einen Test machen – dann stehen hier deine Aufgaben.</p>` : ''}
-      <p class="home-sub">${cards.length ? 'Oder such dir selbst etwas aus:' : ''}</p>
-      <div class="home-subj"><button data-home-subj="M"><b>123</b>Mathe</button><button data-home-subj="D"><b>Abc</b>Deutsch</button></div>
-      ${p ? `<div class="home-row">${cards.length ? `<button class="home-map" data-home-warm>${icon('next')} Startrunde (3 Aufgaben)</button>` : ''}<button class="home-map" data-home-map>${icon('target')} Meine Lernlandkarte</button></div>` : ''}
-      ${data.profiles.length ? `<button class="linkish home-switch" data-home-pick-again>${p ? `Nicht ${escHtml(p.name)}? Namen wechseln` : 'Namen wählen'}</button>` : ''}<button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
+    body = `<h2>${p ? `Hallo ${escHtml(p.name)}!` : 'Willkommen!'}</h2>
+      ${cards.length ? `<p class="home-sub">★ Heute für dich:</p><div class="home-cards">${cards.join('')}</div><p class="home-sub">Oder such dir ein Fach aus:</p>` : `<p class="home-sub">${p ? 'Was möchtest du üben? Deine Lehrkraft kann mit dir einen Test machen – dann stehen hier deine Aufgaben.' : 'Was möchtest du üben?'}</p>`}
+      <div class="home-subj"><button data-home-subj="M">${WZ_ILL.M}<span>Mathe</span></button><button data-home-subj="D">${WZ_ILL.D}<span>Deutsch</span></button></div>
+      ${p ? `<div class="home-row">${cards.length ? `<button class="home-map" data-home-warm>${icon('next')} Startrunde (3 Aufgaben)</button>` : ''}<button class="home-map" data-home-map>${icon('target')} Meine Lernlandkarte</button></div>` : ''}`;
+  } else {
+    const groups = homeAreas(W.subj), fy = p ? forYouFor(W.subj) : null;
+    body = `<h2>${W.subj === 'M' ? 'Mathe' : 'Deutsch'}: Was möchtest du üben?</h2>
+      ${fy ? `<button class="home-card wz-fy" data-home-offer="${W.subj === 'M' ? 'M' : fy.sj}"><span class="hc-subj">★ Für dich</span><span class="hc-title">${escHtml(kidTitle(fy.z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>` : ''}
+      ${groups.map(([h, list]) => `${h ? `<p class="home-sub wz-gh">${h}</p>` : ''}<div class="wz-tiles">${list.map(t => `<button class="wz-tile" data-wz-mode="${t.mode}" ${t.lvl ? `data-wz-lvl="${t.lvl}"` : ''} ${t.last ? `data-wz-last="${t.last}"` : ''}><b aria-hidden="true">${t.sym}</b><span>${t.label}</span></button>`).join('')}</div>`).join('')}
+      <button class="linkish wz-back" data-wz-step="subj">← anderes Fach</button>`;
   }
-  $('#stage').innerHTML = h;
+  const switchBtn = step !== 'who' && needWho ? `<button class="linkish home-switch" data-home-pick-again>${p ? `Nicht ${escHtml(p.name)}? Namen wechseln` : 'Namen wählen'}</button>` : '';
+  $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}${stair}</div><section class="wz-body">${body}</section>${switchBtn}<button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
+}
+/* „Für dich“ passend zum gewählten Fach (Deutsch: erst Lesen, dann Schreiben) */
+function forYouFor(subj){
+  const pid = data.current; if(!pid) return null;
+  for(const sj of subj === 'M' ? ['M'] : ['L', 'W']){
+    let z = zoneReport(pid, sj).zones[0];
+    if(!z){ const f = frontierKeys(pid, subj === 'M' ? 'M' : 'D').find(k => subj === 'M' ? /^[MUGH]/.test(k) : k[0] === sj); if(f) z = {key:f, info:cellInfo(f)}; }
+    if(z) return {z, sj};
+  }
+  return null;
+}
+function wzGo(ds){
+  const subj = app.wz?.subj || settings.subject; if(app.busy) return;
+  settings.subject = subj; app.railGrp = null; leaveMode(); app.activeZone = null;
+  if(ds.wzLvl){
+    if(ds.wzLast){ settings.lastMath = ds.wzLast; ({clock:() => app.read.ulvl = ds.wzLvl, size:() => app.read.glvl = ds.wzLvl, board:() => app.read.hlvl = ds.wzLvl})[ds.wzLast]?.(); }
+    Object.assign(app.read, {lvl: ds.wzLvl, item:null, streak:0, miss:0}); app.mode = 'read';
+  } else { app.mode = ds.wzMode; settings.lastMath = app.mode; autoConf(app.mode); }
+  saveSettings(); app.wz = null; render();
 }
 function homeClick(e){
-  const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; saveData(); renderProfiles(); render(); return; }
-  if(e.target.closest('[data-home-pick-again]')){ data.current = null; saveData(); renderProfiles(); render(); return; }
-  const of = e.target.closest('[data-home-offer]'); if(of){ const sj = of.dataset.homeOffer; let z = zoneReport(data.current, sj).zones[0]; if(!z){ const f = frontierKeys(data.current, sj === 'M' ? 'M' : 'D').find(k => sj === 'M' ? /^[MUG]/.test(k) : k[0] === sj); if(f) z = {key:f, info:cellInfo(f)}; } if(z){ leaveMode(); applyOffer(z.info.offer.set); } return; }
+  const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; app.wz = {step:'subj', guest: !data.current}; saveData(); renderProfiles(); render(); return; }
+  if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {step:'who'}; saveData(); renderProfiles(); render(); return; }
+  const ws = e.target.closest('[data-wz-step]'); if(ws){ app.wz = {...app.wz, step: ws.dataset.wzStep}; renderHome(); return; }
+  const wt = e.target.closest('[data-wz-mode]'); if(wt){ wzGo(wt.dataset); return; }
+  const of = e.target.closest('[data-home-offer]'); if(of){ const sj = of.dataset.homeOffer; let z = zoneReport(data.current, sj).zones[0]; if(!z){ const f = frontierKeys(data.current, sj === 'M' ? 'M' : 'D').find(k => sj === 'M' ? /^[MUGH]/.test(k) : k[0] === sj); if(f) z = {key:f, info:cellInfo(f)}; } if(z){ leaveMode(); applyOffer(z.info.offer.set); } return; }
   if(e.target.closest('[data-home-map]')){ app.mode = 'map'; render(); return; }
   if(e.target.closest('[data-home-warm]')){ warmStart(); return; }
-  const sj = e.target.closest('[data-home-subj]'); if(sj){ setSubject(sj.dataset.homeSubj); }
+  const sj = e.target.closest('[data-home-subj]'); if(sj){ app.wz = {...app.wz, step:'area', subj: sj.dataset.homeSubj}; if(settings.subject !== sj.dataset.homeSubj){ settings.subject = sj.dataset.homeSubj; app.railGrp = null; saveSettings(); } render(); }
 }
-function goHome(){ if(app.busy) return; leaveMode(); app.mode = 'home'; render(); }
+function goHome(){ if(app.busy) return; leaveMode(); app.mode = 'home'; app.wz = null; render(); }
 
 /* ---------- Lehrkraft-PIN ---------- */
 app.teacherUntil = 0;
@@ -5022,6 +5355,7 @@ const AB_OPS = {
   streiche:{t:'streiche weg', p:'<circle cx="7" cy="12" r="3.5" fill="none" stroke="#222" stroke-width="1.6"/><circle cx="17" cy="12" r="3.5" fill="none" stroke="#222" stroke-width="1.6"/><path d="M13 16l8-8" stroke="#222" stroke-width="1.8"/>'},
   zeichne:{t:'zeichne', p:'<circle cx="12" cy="12" r="9.5" fill="none" stroke="#222" stroke-width="1.8"/><path d="M12 12V6.5M12 12l4 2.5" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>'},
   skizze: {t:'zeichne', p:'<rect x="2.5" y="9" width="8" height="8" fill="none" stroke="#222" stroke-width="1.7"/><path d="M14 9v8" stroke="#222" stroke-width="1.9" stroke-linecap="round"/><circle cx="19" cy="15.5" r="1.7" fill="#222"/><path d="M13 6.5l6.5-4 1.5 2.4-6.5 4z" fill="none" stroke="#222" stroke-width="1.3" stroke-linejoin="round"/>'},
+  male:   {t:'male an', p:'<path d="M5.5 18.5l1.8-5.6L16.6 3.6l3.8 3.8-9.3 9.3z" fill="none" stroke="#222" stroke-width="1.8" stroke-linejoin="round"/><path d="M7.3 12.9l3.8 3.8" stroke="#222" stroke-width="1.6"/><path d="M2.5 21.5c3-1.5 6 1 9-.5" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>'},
   lege:   {t:'lege / ordne', p:'<rect x="2" y="7" width="8" height="10" rx="1.5" fill="none" stroke="#222" stroke-width="1.6"/><rect x="14" y="7" width="8" height="10" rx="1.5" fill="none" stroke="#222" stroke-width="1.6"/><path d="M10.5 12h3" stroke="#222" stroke-width="1.6"/>'}
 };
 const abOp = k => `<svg class="ab-op" viewBox="0 0 24 24" aria-label="${AB_OPS[k].t}">${AB_OPS[k].p}</svg>`;
@@ -5185,6 +5519,54 @@ const W_SHEETS = {
   W6: {name:'Sätze richtig schreiben', cols:1, gens:[() => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1], s = [cap(art(n)), n, 'ist', ...t.split(' ')]; return T_(['lege', 'schreibe'], 'Ordne die Wörter zu einem Satz und schreibe ihn auf.', `<div class="ab-pw">${iconP(n, 16)}<p class="ab-row">${shuffle(s).map(w => `<span class="ab-card">${w}</span>`).join(' ')}</p></div>${lineW()}`, s.join(' ') + '.'); },
        () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1], s = `${cap(art(n))} ${n} ist ${t}.`; return T_(['lies', 'schreibe'], 'Schreibe richtig ab. Denk an Großbuchstaben und den Punkt.', `<p class="ab-sent">${s.toLowerCase().replace('.', '')}</p>${lineW()}`, s); }]}
 };
+/* Arbeitsblätter zur Hundertertafel und zum Tausenderbuch */
+const hbP = (bd, mm = 6.5) => `<div class="hbp" style="--hs:${mm}mm">${boardHtml(bd, {print:true})}</div>`;
+const hDistinct = (k, f) => { const out = new Set(); let t = 0; while(out.size < k && t++ < 60) out.add(f()); return [...out]; };
+const H_SHEETS = {
+  H1: {name:'Zahlen in der Hundertertafel finden', cols:2, gens:[
+    () => { const ns = hDistinct(3, () => Math.random() < .25 ? rnd(1, 9)*10 : hDecade()); return T_(['lies', 'kreise'], `Kreise ein: <b>${ns.join(', ')}</b>`, hbP({}, 6.4), ns.join(', ')); },
+    () => { const show = {}, marks = {}, gaps = hDistinct(3, () => hAt(0, rnd(1, 9), rnd(1, 9))).sort((a, b) => a - b); for(let i = 0; i < 10; i++){ show[i + 1] = 'num'; show[i*10 + 1] = 'num'; } gaps.forEach((n, i) => { show[n] = 'L:' + 'ABC'[i]; marks[n] = 'mk'; });
+      return T_(['lies', 'schreibe'], 'Welche Zahlen stehen bei A, B und C?', `${hbP({def:'blank', show, marks}, 6.2)}<p class="ab-row">${'ABC'.split('').map(x => `${x} = ${box(13)}`).join('&nbsp;&nbsp;')}</p>`, gaps.map((n, i) => `${'ABC'[i]} = ${n}`).join(', ')); }
+  ]},
+  H2: {name:'Tafel und Material verbinden', cols:2, gens:[
+    () => { const z = rnd(1, 9), e = rnd(1, 9); return T_(['zaehle', 'schreibe'], 'Welche Zahl ist das?', `<span class="ab-ic" style="width:46mm">${materialSvg(z, e)}</span>${ans()}`, z*10 + e); },
+    () => { const n = hDecade(); return T_(['zaehle', 'schreibe'], 'Wie viele Punkte sind dunkel?', `<span class="ab-ic" style="width:40mm">${hdotsSvg(n)}</span>${ans()}`, n); },
+    () => { const n = hDecade(); return T_(['lies', 'schreibe'], 'Schreibe die Zahl mit Ziffern.', `<p class="ab-row">${numberWord(n)}</p>${ans()}`, n); }
+  ]},
+  H3: {name:'Nachbarn und Lücken', cols:2, gens:[
+    () => { const r = rnd(1, 9), c0 = pick([0, 5]), gaps = shuffle([0, 1, 2, 3, 4]).slice(0, 2), show = {}; for(let c = 0; c < 5; c++) show[hAt(0, r, c0 + c)] = gaps.includes(c) ? 'in' : 'num';
+      return T_('schreibe', 'Fülle die Lücken in der Zeile.', hbP({show, cut:[r, r, c0, c0 + 4]}, 12), hFields({show}).join(', ')); },
+    () => { const n = hAt(0, rnd(1, 8), rnd(1, 8)), A = {[n - 1]:'in', [n]:'num', [n + 1]:'in'}, B = {[n - 10]:'in', [n]:'num', [n + 10]:'in'}, [r, c] = hRC(n);
+      return T_('schreibe', `Nachbarn der ${n}: links und rechts, oben und unten.`, `<div class="ab-row" style="gap:10mm">${hbP({show:A, cut:[r, r, c - 1, c + 1], marks:{[n]:'mk'}}, 10)}${hbP({show:B, cut:[r - 1, r + 1, c, c], marks:{[n]:'mk'}}, 10)}</div>`, `${n - 1}, ${n + 1} · ${n - 10}, ${n + 10}`); },
+    () => { const c = rnd(0, 8), r0 = pick([0, 5]), gaps = shuffle([0, 1, 2, 3, 4]).slice(0, 2), show = {}; for(let r = 0; r < 5; r++) show[hAt(0, r0 + r, c)] = gaps.includes(r) ? 'in' : 'num';
+      return T_('schreibe', 'Fülle die Lücken in der Spalte.', hbP({show, cut:[r0, r0 + 4, c, c]}, 11), hFields({show}).join(', ')); }
+  ]},
+  H4: {name:'Ausschnitte ergänzen', cols:3, gens:[
+    () => { const x = hCut(0, {cells:[[-1, 0], [0, -1], [0, 0], [0, 1], [1, 0]], given:2}); return T_('schreibe', 'Fülle die leeren Felder.', hbP(x.bd, 9.5), hFields(x.bd).join(', ')); },
+    () => { const sh = hShape(), x = hCut(0, sh, rnd(0, sh.cells.length - 1)); return T_('schreibe', 'Fülle die leeren Felder.', hbP(x.bd, 9.5), hFields(x.bd).join(', ')); },
+    () => { const sh = hShape(), x = hCut(0, sh); return T_('schreibe', 'Fülle die leeren Felder.', hbP(x.bd, 9.5), hFields(x.bd).join(', ')); }
+  ]},
+  H5: {name:'Wege gehen: Plus und Minus an der Tafel', cols:2, gens:[
+    () => { const d = rnd(1, 3), k = rnd(1, 4), s = hAt(0, rnd(0, 9 - d), rnd(0, 9 - k)); return T_(['lies', 'schreibe'], `Start bei <b>${s}</b>: <b class="ab-arrows">${'↓'.repeat(d)}${'→'.repeat(k)}</b> Wo kommst du an?`, `${hbP({marks:{[s]:'mk'}}, 5.6)}${ans()}`, s + 10*d + k); },
+    () => { const z = rnd(1, 4), e = rnd(0, 5), s = hAt(0, rnd(0, 9 - z), rnd(0, 9 - e)), b = z*10 + e; return T_(['rechne', 'schreibe'], `Rechne mit der Tafel: <b>${s} + ${b}</b>`, `${hbP({marks:{[s]:'mk'}}, 5.6)}<p class="ab-row">${s} + ${b} = ${box(14)}</p>`, s + b); },
+    () => { const z = rnd(1, 4), e = rnd(0, 5), s = hAt(0, rnd(z, 9), rnd(e, 9)), b = z*10 + e; return T_(['rechne', 'schreibe'], `Rechne mit der Tafel: <b>${s} − ${b}</b>`, `${hbP({marks:{[s]:'mk'}}, 5.6)}<p class="ab-row">${s} − ${b} = ${box(14)}</p>`, s - b); }
+  ]},
+  H6: {name:'Muster erkennen', cols:2, gens:[
+    () => { const e = rnd(1, 9); return T_('male', `Male alle Zahlen an, die mit <b>${e}</b> enden.`, hbP({}, 6.2), Array.from({length:10}, (_, i) => i*10 + e).join(', ')); },
+    () => { const k = pick([2, 3, 4, 5]); return T_('male', `Male die <b>${k}er-Reihe</b> an: ${k}, ${2*k}, ${3*k} … bis ${10*k}.`, hbP({}, 6.2), Array.from({length:10}, (_, i) => (i + 1)*k).join(', ')); },
+    () => { const z = rnd(2, 8); return T_('male', `Male alle Zahlen mit <b>${z} Zehnern</b> an.`, hbP({}, 6.2), `${z*10} bis ${z*10 + 9}`); },
+    () => { const k = rnd(3, 9), kind = pick(['end', 'row', 'ten']), set = kind === 'end' ? Array.from({length:10}, (_, i) => i*10 + k) : kind === 'row' ? Array.from({length:10}, (_, i) => (i + 1)*k) : Array.from({length:10}, (_, i) => k*10 + i), marks = {}; set.forEach(n => marks[n] = 'pat');
+      const o = [`alle mit ${k} am Ende`, `die ${k}er-Reihe`, `alle mit ${k} Zehnern`]; return T_('kreuze', 'Welches Muster ist grau?', `${hbP({marks}, 5.6)}<p class="ab-row" style="font-size:12pt;flex-direction:column;align-items:flex-start;gap:1mm">${o.map(x => `<span>☐ ${x}</span>`).join('')}</p>`, o[['end', 'row', 'ten'].indexOf(kind)]); }
+  ]},
+  H7: {name:'Tausenderbuch', cols:2, gens:[
+    () => { const n = hInPage(rnd(1, 9)), p = hPageOf(n); return T_('schreibe', `Auf welcher Seite im Tausenderbuch steht die <b>${n}</b>?`, `<p class="ab-row">Seite ${box(14)} bis ${box(14)}</p>`, hPageName(p)); },
+    () => { const p = rnd(1, 9), x = hCut(p, {cells:[[-1, 0], [0, -1], [0, 0], [0, 1], [1, 0]], given:2}); return T_('schreibe', 'Ein Stück aus dem Tausenderbuch. Fülle die leeren Felder.', hbP(x.bd, 11), hFields(x.bd).join(', ')); },
+    () => { const n = hAt(rnd(1, 8), rnd(1, 8), rnd(1, 8)); return T_('schreibe', `Nachbarn der <b>${n}</b> im Tausenderbuch`, `<p class="ab-row" style="font-size:13pt;flex-direction:column;align-items:flex-start;gap:2mm"><span>darunter: ${box(14)}</span><span>rechts daneben: ${box(14)}</span><span>eine Seite weiter: ${box(14)}</span></p>`, `${n + 10}, ${n + 1}, ${n + 100}`); }
+  ]},
+  HM: {name:'Material: Hundertertafel (ausgefüllt)', cols:1, max:1, mat:true, gens:[() => T_('lies', 'Hundertertafel 1 bis 100', hbP({}, 16.2), '–')]},
+  HL: {name:'Material: leere Hundertertafel', cols:1, max:1, mat:true, gens:[() => { const show = {1:'num', 100:'num'}; return T_('schreibe', 'Trage die Zahlen von 1 bis 100 ein.', hbP({def:'blank', show}, 16.2), '1 bis 100'); }]},
+  HT: {name:'Material: Tausenderbuch-Seite', cols:1, max:1, mat:true, gens:[() => { const p = rnd(1, 9); return T_('lies', `Tausenderbuch, Seite ${hPageName(p)}`, hbP({page:p}, 16.2), hPageName(p)); }]}
+};
 const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:A4;margin:12mm}*{box-sizing:border-box}body{font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,Arial,sans-serif;color:#222;margin:0;font-size:13pt}
 .page{width:186mm;margin:0 auto;page-break-after:always}.page:last-child{page-break-after:auto}
 .ab-top{border-bottom:2.5px solid #222;padding-bottom:2.5mm;margin-bottom:3mm}.ab-top h1{font-size:20pt;margin:0 0 3mm;line-height:1.15}
@@ -5216,12 +5598,14 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .ab-key{font-size:9.5pt;color:#555;margin:0;display:flex;align-items:center;gap:1.5mm;flex-wrap:wrap;justify-content:center}.ab-key span{display:inline-block}.k-h{width:3.2mm;height:3.2mm;border:1.6px solid #333}.k-z{width:1.6px;height:4mm;background:#333;margin:0 1mm}.k-e{width:1.8mm;height:1.8mm;border-radius:50%;background:#333}
 .ab-foot{font-size:8pt;color:#888;margin-top:2.5mm;margin-bottom:0}.ab-lic{margin-top:.5mm}
 .sol{font-size:12pt}.sol ol{columns:2;column-gap:10mm;padding-left:6mm}.sol li{margin:1mm 0;break-inside:avoid}
-@media screen{body{background:#eee}.page{background:#fff;margin:6mm auto;padding:12mm;box-shadow:0 2px 8px #0002;width:210mm;min-height:297mm}}`;
+@media screen{body{background:#eee}.page{background:#fff;margin:6mm auto;padding:12mm;box-shadow:0 2px 8px #0002;width:210mm;min-height:297mm}}
+.hbp{display:flex;justify-content:center}.hbp .hb{display:flex;flex-direction:column;align-items:center;gap:1mm}.hbp .hb-title{font-size:10pt;font-weight:700;color:#444}.hbp .hb-grid{display:grid;grid-template-columns:repeat(var(--hcols),auto);gap:.6mm}.hbp .hb-c{width:var(--hs);height:var(--hs);border:.25mm solid #9a9a9a;border-radius:.8mm;display:flex;align-items:center;justify-content:center;font-size:calc(var(--hs)*.42);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}.hbp .h3d .hb-c{font-size:calc(var(--hs)*.33)}.hbp .hb-c.g5c{margin-right:1.1mm}.hbp .hb-c.g5r{margin-bottom:1.1mm}.hbp .hb-off{visibility:hidden}.hbp .hb-c.mk{border:.6mm solid #222;background:#e9e9e9}.hbp .hb-c.pat{background:#cfcfcf}.hbp .hb-c.hb-gap{border:.45mm solid #222;background:#fff}.ab-arrows{letter-spacing:.5mm;font-size:13pt}`;
 function sheetTopics(){
   return [
     ['Mathe', Object.entries(M_SHEETS).map(([k, v]) => [`M:${k}`, v.name])],
     ['Lesen', Object.entries(R_SHEETS).map(([k, v]) => [`L:${k}`, `${k} ${v.name}`])],
     ['Schreiben', Object.entries(W_SHEETS).map(([k, v]) => [`W:${k}`, `${k} ${v.name}`])],
+    ['Hundertertafel und Tausenderbuch', Object.entries(H_SHEETS).map(([k, v]) => [`H:${k}`, v.mat ? v.name : `${k} ${v.name}`])],
     ['Größen und Einkaufen', Object.entries(G_SHEETS).map(([k, v]) => [`G:${k}`, `${k} ${v.name}`])],
     ['Uhr und Kalender', Object.entries(U_SHEETS).map(([k, v]) => [`U:${k}`, `${k} ${v.name.replace('Uhr: ', '')}`])]
   ];
@@ -5234,13 +5618,14 @@ function zoneToSheet(key){
   if(ax === 'W') return {topic:`W:${a}`};
   if(ax === 'U') return {topic:`U:${a}`};
   if(ax === 'G') return {topic:`G:${a}`};
+  if(ax === 'H') return {topic:`H:${a}`};
   if(ax === 'R') return a === 'R7' ? {topic:'M:einmaleins'} : {topic:'M:plus', zr: R_CONF[a].range, ue: ({without:'ohne', with:'mit'})[R_CONF[a].ten] || 'egal'};
   return null;
 }
 app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false};
 function buildSheet(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
-  const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : W_SHEETS[key];
+  const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : sj === 'H' ? H_SHEETS[key] : W_SHEETS[key];
   const name = S.pid && S.pid !== 'none' ? (data.profiles.find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : ['einmaleins', 'stellenwert'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
   const title = (key === 'schriftlich' ? (S.wop === 'add' ? 'Schriftlich plus' : S.wop === 'sub' ? 'Schriftlich minus' : def.name) : def.name) + sub;
@@ -5269,7 +5654,7 @@ function buildSheet(limit){
   const body = abScale(`<div class="ab-grid" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols);
   const legend = `<div class="ab-legend">${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
-  const info = sj === 'L' ? L_INFO[key] : sj === 'W' ? W_INFO[key] : sj === 'U' ? U_INFO[key] : sj === 'G' ? G_INFO[key] : null;
+  const info = sj === 'L' ? L_INFO[key] : sj === 'W' ? W_INFO[key] : sj === 'U' ? U_INFO[key] : sj === 'G' ? G_INFO[key] : sj === 'H' ? H_INFO[key] : null;
   const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
   const sol = S.sol ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
   return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}</style></head><body><div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`};
@@ -5483,6 +5868,7 @@ function mapRoutes(pid){
   if(has(S_LEVELS.map(l => 'S|' + l))) routes.push({title:'Zehner und Einer', sym:'▥', keys: S_LEVELS.map(l => 'S|' + l)});
   if(has(U_LEVELS.map(l => 'U|' + l))) routes.push({title:'Uhr und Kalender', sym:'◷', keys: U_LEVELS.map(l => 'U|' + l)});
   if(has(G_LEVELS.map(l => 'G|' + l))) routes.push({title:'Größen und Einkaufen', sym:'⚖', keys: G_LEVELS.map(l => 'G|' + l)});
+  if(has(H_LEVELS.map(l => 'H|' + l))) routes.push({title:'Hundertertafel', sym:'▦', keys: H_LEVELS.map(l => 'H|' + l)});
   routes.push({title:'Lesen', sym:'Abc', keys: L_LEVELS.map(l => 'L|' + l)});
   routes.push({title:'Schreiben', sym:'✎', keys: W_LEVELS.map(l => 'W|' + l)});
   return routes.map(r => { const st = r.keys.map(k => m[k]?.status === 'erreicht' ? 'ok' : m[k] ? 'now' : 'todo'); const first = st.findIndex(x => x !== 'ok'); const cur = first < 0 ? -1 : first; return {...r, st: st.map((x, i) => x === 'ok' ? 'ok' : i === cur ? 'now' : 'todo'), any: has(r.keys)}; });
@@ -5522,7 +5908,7 @@ const REPORT_CSS = SHEET_CSS + `.rp h2{font-size:15pt;margin:6mm 0 2mm;border-bo
 function mxTable(pid, subj){
   const m = matrixOf(pid), sym = k => { const c = m[k]; return !c ? '–' : c.status === 'erreicht' ? (c.quelle === 'abgeleitet' ? '(✓)' : '✓') : c.status === 'teilweise' ? '½' : '✗'; };
   if(subj === 'M') return `<table class="mx"><tr><th></th>${N_LEVELS.map(l => `<th>${l}<br><small>${N_NAMES[l]}</small></th>`).join('')}</tr>${ZR.map(zr => `<tr><th>ZR ${zr}</th>${N_LEVELS.map(l => `<td>${sym(`M|${zr}|${l}`)}</td>`).join('')}</tr>`).join('')}</table>
-    <table class="mx"><tr><th>Stellenwert</th>${S_LEVELS.map(l => `<th>${l}</th>`).join('')}<th>Uhr/Kalender</th>${U_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${S_LEVELS.map(l => `<td>${sym('S|' + l)}</td>`).join('')}<td></td>${U_LEVELS.map(l => `<td>${sym('U|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Rechnen</th>${R_LEVELS.map(l => `<th>${l}<br><small>${R_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${R_LEVELS.map(l => `<td>${sym('R|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Größen</th>${G_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${G_LEVELS.map(l => `<td>${sym('G|' + l)}</td>`).join('')}</tr></table>`;
+    <table class="mx"><tr><th>Stellenwert</th>${S_LEVELS.map(l => `<th>${l}</th>`).join('')}<th>Uhr/Kalender</th>${U_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${S_LEVELS.map(l => `<td>${sym('S|' + l)}</td>`).join('')}<td></td>${U_LEVELS.map(l => `<td>${sym('U|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Rechnen</th>${R_LEVELS.map(l => `<th>${l}<br><small>${R_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${R_LEVELS.map(l => `<td>${sym('R|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Größen</th>${G_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${G_LEVELS.map(l => `<td>${sym('G|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Hundertertafel</th>${H_LEVELS.map(l => `<th>${l}<br><small>${H_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${H_LEVELS.map(l => `<td>${sym('H|' + l)}</td>`).join('')}</tr></table>`;
   const lv = subj === 'L' ? L_LEVELS : W_LEVELS, info = subj === 'L' ? L_INFO : W_INFO;
   return `<table class="mx"><tr>${lv.map(l => `<th>${l}<br><small>${info[l].short}</small></th>`).join('')}</tr><tr>${lv.map(l => `<td>${sym(subj + '|' + l)}</td>`).join('')}</tr></table>`;
 }
@@ -5575,14 +5961,14 @@ $('#modes').addEventListener('click', e => {
   if(e.target.closest('[data-guide-off]')){ app.showAll = false; render(); return; }
   const rg = e.target.closest('[data-railgrp]'); if(rg){ app.railGrp = rg.dataset.railgrp; app.railGrpLvl = app.read.lvl; $('#modes').innerHTML = railHtml(); $('#modes').querySelector('.rail-h')?.scrollIntoView({block:'nearest'}); return; }
   const el = e.target.closest('[data-mode]'); if(!el || app.busy) return;
-  if(el.dataset.lvl){ if(app.mode === 'read' && app.read.lvl === el.dataset.lvl) return; leaveMode(); if(el.dataset.clock){ settings.lastMath = 'clock'; saveSettings(); } if(el.dataset.size){ settings.lastMath = 'size'; saveSettings(); } Object.assign(app.read, {lvl: el.dataset.lvl, item:null, streak:0, miss:0}); app.mode = 'read'; render(); return; }
+  if(el.dataset.lvl){ if(app.mode === 'read' && app.read.lvl === el.dataset.lvl) return; leaveMode(); if(el.dataset.clock){ settings.lastMath = 'clock'; saveSettings(); } if(el.dataset.size){ settings.lastMath = 'size'; saveSettings(); } if(el.dataset.board){ settings.lastMath = 'board'; saveSettings(); } Object.assign(app.read, {lvl: el.dataset.lvl, item:null, streak:0, miss:0}); app.mode = 'read'; render(); return; }
   if(el.dataset.mode === app.mode) return;
   leaveMode(); app.activeZone = null;
   app.mode = el.dataset.mode; settings.lastMath = app.mode; saveSettings(); autoConf(app.mode); render();
 });
 $('#ranges').addEventListener('click', e => {
   const fm = e.target.closest('[data-fmat]'); if(fm){ const b = board(); b.mat = fm.dataset.fmat; b.sel.clear(); b.msel.clear(); $('#stage').innerHTML = ''; app.freeMat = null; render(); return; }
-  const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
+  const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'H') app.read.hlvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
   const mr = e.target.closest('[data-mrange]'); if(mr){ app.money.range = +mr.dataset.mrange; app.money.ready = false; render(); return; }
   const br = e.target.closest('[data-brange]'); if(br){ app.blitz.range = +br.dataset.brange; app.blitz.phase = 'idle'; clearTimeout(app.blitz.timer); render(); return; }
   const row = e.target.closest('[data-row]');
@@ -5601,7 +5987,7 @@ $('#inputs').addEventListener('input', () => { const t = draftOwner(); t.draft =
 $('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); commitAny(); } });
 $('#inputs').addEventListener('click', e => {
   const fp = e.target.closest('[data-fplace]'); if(fp){ const b = board(); if(b.place !== fp.dataset.fplace){ freeSave(b); b.place = fp.dataset.fplace; if(b.place === 'ze'){ const hs = b.pieces.filter(q => q.kind === 'h'); if(hs.length){ b.pieces = b.pieces.filter(q => q.kind !== 'h'); toast('Hunderter wurden weggelegt.'); } } b.sel.clear(); if(b.ordered) b.pieces = freeArrange(b.pieces); $('#stage').innerHTML = ''; render(); } return; }
-  const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
+  const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'H') app.read.hlvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
   if(e.target.closest('[data-rsyl]')){ app.read.colored = !app.read.colored; render(); return; }
   if(e.target.closest('#btn-commit')) return commitAny();
   const ms = e.target.closest('[data-msub]'); if(ms){ app.money.sub = ms.dataset.msub; app.money.ready = false; render(); return; }
@@ -5633,6 +6019,7 @@ $('#stage').addEventListener('click', e => {
     return;
   }
   if(app.mode === 'blitz'){ if(e.target.closest('#b-go')) blitzStart(); return; }
+  if(['number', 'add', 'sub'].includes(app.mode) && task()?.view === 'board'){ const c = e.target.closest('[data-hb]'); if(c) boardTap(+c.dataset.hb); return; }
   if(app.mode === 'number' && task().view === 'line' && task().find){ if(e.target.closest('.find-svg')) findTap(e); return; }
   if(app.mode === 'written') return;
   if(app.mode === 'times'){ const g = e.target.closest('[data-rc]'); if(g){ const [r, c] = g.dataset.rc.split(',').map(Number); timesStart(r + 1, c + 1); } return; }
@@ -5693,6 +6080,8 @@ $('#controls').addEventListener('click', e => {
   if(btn.id === 'c-findnext') return startRandom();
   if(btn.dataset.view){ t.view = btn.dataset.view; app.sel.clear(); t.check = t.check === 'ok' ? 'ok' : null; return renderWork(); }
   if(btn.dataset.move) return tradeButton(btn.dataset.move);
+  if(btn.dataset.tbj) return tbJump(t, +btn.dataset.tbj);
+  if(btn.id === 'c-tbundo'){ if((t.bpath || []).length > 1) t.bpath.pop(); return renderWork(); }
   switch(btn.id){
     case 'c-join': return doJoin();
     case 'c-trade': return tradeSelected();
@@ -5745,7 +6134,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.10.1 · 11.11.2026';
+const APP_VERSION = '0.11.0 · 12.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5756,7 +6145,7 @@ function fbContext(){
   const p = curProfile(), d = app.diag, R = app.read, ua = navigator.userAgent;
   let area = MODE_NAMES[app.mode] || ({home:'Startseite', diag:'Test'})[app.mode] || app.mode, detail = '';
   try{
-    if(app.mode === 'read'){ const info = L_INFO[R.lvl] || W_INFO[R.lvl] || U_INFO[R.lvl] || G_INFO[R.lvl]; area = /^U/.test(R.lvl) ? 'Uhr und Kalender' : /^G/.test(R.lvl) ? 'Größen' : /^W/.test(R.lvl) ? 'Schreiben' : 'Lesen'; detail = `${R.lvl} ${info?.name || ''}${R.item ? ` · Aufgabe: ${R.item.label}` : ''}`; }
+    if(app.mode === 'read'){ const info = rdInfo(R.lvl); area = /^U/.test(R.lvl) ? 'Uhr und Kalender' : /^G/.test(R.lvl) ? 'Größen' : /^H/.test(R.lvl) ? 'Hundertertafel' : /^W/.test(R.lvl) ? 'Schreiben' : 'Lesen'; detail = `${R.lvl} ${info?.name || ''}${R.item ? ` · Aufgabe: ${R.item.label}` : ''}`; }
     else if(app.mode === 'diag' && d){ const it = d.items?.[d.idx]; detail = `${d.kurz ? 'Kurztest' : d.warm ? 'Startrunde' : `Test ${d.subj}${d.part ? ' Teil ' + d.part : ''}`} · Aufgabe ${d.nItems + 1}${it ? ` · ${it.label}` : ''}${d.key ? ` · Stufe ${cellLabel(d.key)}` : ''}`; }
     else if(['number', 'add', 'sub'].includes(app.mode)){ const t = task(); detail = `Zahlenraum ${app.range} · Zehnerübergang ${({any:'egal', with:'mit', without:'ohne'})[settings.ten] || settings.ten}${t && t.a != null ? ` · Aufgabe ${t.a}${t.b != null ? (app.mode === 'sub' ? ' − ' : ' + ') + t.b : ''}` : ''} · Ansicht ${t?.view || ''}`; }
     else if(app.mode === 'blitz') detail = `Menge bis ${app.blitz.range}, ${app.blitz.dur} s`;
@@ -5923,10 +6312,10 @@ function thanksHtml(){ return 'Danke an alle, die Stufenweise testen und verbess
 $('#help-content').innerHTML = [
   ['h','So ist Stufenweise aufgebaut'],
   ['target','Testen – Üben – Prüfen','Stufenweise folgt einem Kreislauf: Ein kurzer adaptiver Test findet heraus, was ein Kind schon kann (Lernstand). Daraus ergibt sich die Förderzone – die erste Stufe, die noch nicht sicher ist. Dazu passende Übungen und Arbeitsblätter folgen. Nach etwa 5 Übungseinheiten zeigt eine Wiederholung des Tests, ob die nächste Stufe erreicht ist.'],
-  ['chart','Die Stufen','Mathe: Zahlenräume 10, 20, 100, 1000 mit den Niveaus I–V (Fritz & Ricken, Krajewski), Stellenwert S1–S4 (Herzog, Ehlert & Fritz) Rechnen R1–R7 (Plus und Minus bis 10, 20, 100, 1000, Einmaleins) und Zeit U1–U6 (Uhr und Kalender). Der Mathe-Test hat zwei Teile: Teil 1 Zahlen und Rechnen, Teil 2 Uhr und Größen – so bleibt jede Sitzung kurz. Deutsch: Lesen L1–L9 und Schreiben W1–W6 nach dem Bildungsplan GENT. Dazu Größen G1–G4 (Messen, cm/m/km, g/kg, Einkaufen). Jede Stufe hat einen „Ich kann“-Satz in einfacher Sprache.'],
+  ['chart','Die Stufen','Mathe: Zahlenräume 10, 20, 100, 1000 mit den Niveaus I–V (Fritz & Ricken, Krajewski), Stellenwert S1–S4 (Herzog, Ehlert & Fritz) Rechnen R1–R7 (Plus und Minus bis 10, 20, 100, 1000, Einmaleins), Zeit U1–U6 (Uhr und Kalender) und Hundertertafel H1–H7 (bis zum Tausenderbuch). Der Mathe-Test hat zwei Teile: Teil 1 Zahlen und Rechnen, Teil 2 Uhr, Größen und Hundertertafel – so bleibt jede Sitzung kurz. Deutsch: Lesen L1–L9 und Schreiben W1–W6 nach dem Bildungsplan GENT. Dazu Größen G1–G4 (Messen, cm/m/km, g/kg, Einkaufen). Jede Stufe hat einen „Ich kann“-Satz in einfacher Sprache.'],
   ['h','Für Schülerinnen und Schüler'],
   ['home','Startseite','Das Stufen-Zeichen links oben führt zur Startseite. Dort tippst du deinen Namen an. Unter „Heute für dich“ stehen deine Übungen. Die „Startrunde“ sind 3 kurze Aufgaben zum Aufwärmen. „Meine Lernlandkarte“ zeigt, was du schon kannst (✓) und woran du gerade arbeitest (★).'],
-  ['edit','Mathe','Links wählst du: Zahlen legen, Plus, Minus, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
+  ['edit','Mathe','Links wählst du: Zahlen legen, Hundertertafel, Plus, Minus, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
   ['target','Zahlenstrahl vergrößern','Tippe auf einen Sprung (zum Beispiel +7), dann wird er groß. Noch einmal tippen: zurück. Mit + und − vergrößerst und verkleinerst du. Mit zwei Fingern kannst du auch zoomen und mit einem Finger verschieben. Unten zeigt der kleine Zahlenstrahl, wo du gerade bist – tippe dort, um hinzuspringen.'],
   ['line','Deutsch','Lesen in 9 Stufen (Bilder, Signalwörter, Buchstaben, Wörter, genau lesen, Sätze, kurze Texte, Pläne und Tabellen, lange Texte) und Schreiben in 6 Stufen (abschreiben, Anlaute, kurze und lange Wörter, Merkstellen, Sätze). Unter „Meine Wörter“ übst du Wörter, die deine Lehrkraft eingetragen hat: anschauen, merken, abdecken, auswendig schreiben, vergleichen. „Silben färben“ hilft bei langen Wörtern. Beim Schreiben gibt es Buchstaben auf dem Bildschirm.'],
   ['next','Schwerer oder leichter','Wenn du 5 Aufgaben hintereinander richtig hast, schlägt Stufenweise die nächste Stufe vor. Nach 3 Fehlern gibt es eine leichtere Stufe. Du entscheidest selbst.'],

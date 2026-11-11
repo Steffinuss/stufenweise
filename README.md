@@ -16,7 +16,7 @@ Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, al
 
 - **Lernstand ermitteln:** kurze adaptive Tests in Mathe (zwei Teile), Lesen und Schreiben
 - **Förderzone zeigen:** Kompetenzmatrix, begründete Förderzone, ILEB-Formulierungsvorschläge und Ideen für die Förderung ohne Gerät
-- **Selbstständig üben:** Übungen passend zur Stufe, mit Material wie Zehnerstangen, Geld und Uhr; altersgerecht und ohne Spielmechanik
+- **Selbstständig üben:** Übungen passend zur Stufe, mit Material wie Zehnerstangen, Hundertertafel, Tausenderbuch, Geld und Uhr; altersgerecht und ohne Spielmechanik
 - **Arbeit abnehmen:** Arbeitsblätter zur Förderzone, Elterninfo in einfacher Sprache, Klassenübersicht als Tabelle
 
 ## Nutzen
