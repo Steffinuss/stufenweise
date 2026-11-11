@@ -443,6 +443,7 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 .linkish{box-shadow:none;background:none;padding:0;min-height:0;font-weight:700;text-decoration:underline;color:inherit}
 
 .money-tray{gap:6px}.money-tray .mden{padding:6px;min-height:0}
+@media(min-width:761px){.tray.money-tray{display:grid;grid-template-columns:auto auto;grid-auto-flow:row dense;align-content:center;width:auto;gap:6px}.money-tray .mden.note{grid-column:1}.money-tray .mden.coin{grid-column:2}}
 #mtab .mitem,#mboard .mitem{cursor:grab}
 .mtable #mtab{width:100%;height:100%}
 
@@ -557,6 +558,9 @@ body.np-open.np-left main{padding-right:12px;padding-left:250px}
 .lk-st.ok:not(:last-child)::after{background:#1f7a45}
 .lk-since{font-size:11px;font-weight:700;color:#1f7a45}
 .rail button[data-zone]{position:relative}
+#modes .rail-fold{min-height:52px;flex-direction:column;gap:2px;background:transparent;border:1.5px dashed #c9bfae;color:var(--muted);box-shadow:none}
+#modes .rail-fold span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+#modes .rail-fold small{font-size:11px;font-weight:600}
 .rail button[data-zone]::after{content:'★';position:absolute;top:3px;right:5px;font-size:11px;color:#e8890c;line-height:1}
 .auto-chip{display:inline-flex;align-items:center;font-size:14px;font-weight:700;color:#5f5a64;background:#efe8da;border-radius:10px;padding:8px 12px;white-space:nowrap}
 .fb-btn{border:1.5px solid #e8890c !important}
@@ -758,6 +762,7 @@ const PATHS = {
   take:'M4 12h16M7 5l10 14',
   minus:'M4 12h16',
   check:'M4 12l5 5L20 6',
+  grid:'M3 4h5v16H3zM10 4h4v16h-4zM16 4h5v16h-5z',
   settings:'M10.23 4.92L10.50 2.52L13.50 2.52L13.77 4.92A7.3 7.3 0 0 1 15.76 5.74L17.64 4.23L19.77 6.36L18.26 8.24A7.3 7.3 0 0 1 19.08 10.23L21.48 10.50L21.48 13.50L19.08 13.77A7.3 7.3 0 0 1 18.26 15.76L19.77 17.64L17.64 19.77L15.76 18.26A7.3 7.3 0 0 1 13.77 19.08L13.50 21.48L10.50 21.48L10.23 19.08A7.3 7.3 0 0 1 8.24 18.26L6.36 19.77L4.23 17.64L5.74 15.76A7.3 7.3 0 0 1 4.92 13.77L2.52 13.50L2.52 10.50L4.92 10.23A7.3 7.3 0 0 1 5.74 8.24L4.23 6.36L6.36 4.23L8.24 5.74A7.3 7.3 0 0 1 10.23 4.92ZM15.1 12a3.1 3.1 0 1 0-6.2 0 3.1 3.1 0 1 0 6.2 0',
   close:'M6 6l12 12M18 6 6 18',
   trash:'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7',
@@ -1141,15 +1146,21 @@ function railHtml(){
   else {
     const on = l => app.mode === 'read' && app.read.lvl === l;
     const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>']];
-    h += `<span class="rail-h">Lesen</span>` + [...READ_RAIL, ...(ownWords().length ? [['LX', '<small>★</small>']] : [])].filter(([l]) => lvOk(l)).map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${L_INFO[l].short}</button>`).join('');
+    /* nur eine Gruppe offen: die mit der aktiven Stufe oder die zuletzt angetippte */
+    const open = (app.railGrp && app.railGrpLvl === app.read.lvl && app.mode === 'read' ? app.railGrp : null) || (app.mode === 'read' && String(app.read.lvl)[0] === 'W' ? 'W' : 'L');
+    const fold = (gp, name, n) => `<button class="rail-fold" data-railgrp="${gp}" aria-expanded="false" title="${name} aufklappen"><span>${name}</span><small>${n} Stufen ▾</small></button>`;
+    const RL = [...READ_RAIL, ...(ownWords().length ? [['LX', '<small>★</small>']] : [])].filter(([l]) => lvOk(l));
     if(ownWords().length) WR.push(['WX', '<small>★</small>']);
-    h += `<span class="rail-h">Schreiben</span>` + WR.filter(([l]) => lvOk(l)).map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${W_INFO[l].short}</button>`).join('');
+    const WL = WR.filter(([l]) => lvOk(l));
+    h += open !== 'L' ? fold('L', 'Lesen', RL.length) : `<span class="rail-h">Lesen</span>` + RL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${L_INFO[l].short}</button>`).join('');
+    h += open !== 'W' ? fold('W', 'Schreiben', WL.length) : `<span class="rail-h">Schreiben</span>` + WL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${W_INFO[l].short}</button>`).join('');
   }
   // Förderzone in der Leiste markieren (in jeder Ansicht)
   const p = curProfile();
   if(p){
     const zk = guideZones(p.id, subj === 'M' ? 'M' : 'D'), zm = new Set(zk.filter(k => /^[MS]\|/.test(k)).map(k => cellInfo(k).offer?.set?.mode).filter(Boolean));
     h = h.replace(/<button data-mode="([a-z]+)"( data-lvl="([A-Z]\d)")?/g, (all, mode, _, lvl) => (lvl ? zk.includes(`${lvl[0]}|${lvl}`) : zm.has(mode)) ? all.replace('<button ', '<button data-zone="1" ') : all);
+    h = h.replace(/<button class="rail-fold" data-railgrp="([LW])"/g, (all, gp) => zk.some(k => k[0] === gp) ? all.replace('<button ', '<button data-zone="1" ') : all);
   }
   return h + guideRailBtn();
 }
@@ -1164,7 +1175,7 @@ function leaveMode(){
 const homeMode = () => settings.subject === 'D' ? (app.read.item = null, ('UG'.includes(String(app.read.lvl)[0]) ? app.read.lvl = 'L4' : 0), 'read') : (settings.lastMath === 'clock' ? (Object.assign(app.read, {lvl: app.read.ulvl || 'U1', item:null}), 'read') : settings.lastMath === 'size' ? (Object.assign(app.read, {lvl: app.read.glvl || 'G1', item:null}), 'read') : settings.lastMath || 'number');
 function setSubject(subj){
   if(app.busy) return;
-  settings.subject = subj; saveSettings(); leaveMode();
+  settings.subject = subj; saveSettings(); leaveMode(); app.railGrp = null;
   if(subj === 'D'){ app.read.lvl ||= readDefaultLevel(); app.read.item = null; app.mode = 'read'; }
   else { app.mode = settings.lastMath || 'number'; autoConf(app.mode); }
   render();
@@ -1784,7 +1795,12 @@ const freeObserver = new ResizeObserver(() => { if(app.mode === 'free' && !drag)
 
 /* ---------- Geld legen mit Ziehen (Geld-Modus und Frei legen mit Geld) ---------- */
 const EURO = [20000, 10000, 5000, 2000, 1000, 500, 200, 100];
-const placeOfMoney = c => c >= 10000 ? 'h' : c >= 1000 ? 'z' : 'e';
+const MB_DEN = [...EURO, 50, 20, 10, 5, 2, 1];
+/* Raster für Frei legen mit Geld: Euro-Scheine, Euro-Münzen, Cent-Münzen */
+const moneyCol = c => c >= 500 ? 's' : c >= 100 ? 'm' : 'c';
+const MB_COLS = {s:{x:10, w:350, t:'Euro-Scheine', f:'#5b6f8c'}, m:{x:370, w:250, t:'Euro-Münzen', f:'#a8842a'}, c:{x:630, w:260, t:'Cent-Münzen', f:'#a0613a'}};
+const fmtDen = c => c < 100 ? `${c} ct` : fmtMoney(c);
+const mbColOf = it => { const [w] = itemSize(it.c), cx = it.x + w/2; return Object.keys(MB_COLS).find(k => cx >= MB_COLS[k].x && cx <= MB_COLS[k].x + MB_COLS[k].w); };
 const mRect = it => { const [w, h] = itemSize(it.c); return {x: it.x, y: it.y, w, h}; };
 function mFree(it, others, W, H, top){
   const r = mRect(it);
@@ -1815,19 +1831,19 @@ const MB = {W:900, H:520};
 function mbExchange(b){
   const sel = b.money.filter(i => b.msel.has(i.id)); if(!sel.length) return null;
   const sum = sel.reduce((s, i) => s + i.c, 0);
-  if(sel.length > 1 && EURO.includes(sum) && sum > Math.max(...sel.map(i => i.c))) return {join: sum, sel, text:`${sel.length} Teile gegen ${fmtMoney(sum)} tauschen`};
-  if(sel.length === 1){ const c = sel[0].c; const split = {20000:[10000, 2], 10000:[1000, 10], 5000:[1000, 5], 2000:[1000, 2], 1000:[100, 10], 500:[100, 5], 200:[100, 2]}[c]; if(split) return {split, sel, text:`${fmtMoney(c)} in ${split[1]} × ${fmtMoney(split[0])} tauschen`}; }
+  if(sel.length > 1 && MB_DEN.includes(sum) && sum > Math.max(...sel.map(i => i.c))) return {join: sum, sel, text:`${sel.length} Teile gegen ${fmtDen(sum)} tauschen`};
+  if(sel.length === 1){ const c = sel[0].c; const split = {20000:[10000, 2], 10000:[1000, 10], 5000:[1000, 5], 2000:[1000, 2], 1000:[100, 10], 500:[100, 5], 200:[100, 2], 100:[10, 10], 50:[10, 5], 20:[10, 2], 10:[1, 10], 5:[1, 5], 2:[1, 2]}[c]; if(split) return {split, sel, text:`${fmtDen(c)} in ${split[1]} × ${fmtDen(split[0])} tauschen`}; }
   return null;
 }
 function mbSave(b){ b.mhist.push(structuredClone(b.money)); if(b.mhist.length > 60) b.mhist.shift(); }
 function mbArrange(b){
-  const cols = {h:{x:10, w:300}, z:{x:320, w:330}, e:{x:660, w:230}}, out = [];
-  for(const k of ['h', 'z', 'e']){
-    const list = b.money.filter(i => placeOfMoney(i.c) === k).sort((a, z) => z.c - a.c);
-    let x = cols[k].x + 10, y = 48, rowH = 0, last = null;
+  const out = [];
+  for(const [k, z] of Object.entries(MB_COLS)){
+    const list = b.money.filter(i => moneyCol(i.c) === k).sort((a, q) => q.c - a.c);
+    let x = z.x + 10, y = 48, rowH = 0, last = null;
     for(const it of list){
       const [w, h] = itemSize(it.c);
-      if(last !== null && (last !== it.c || x + w > cols[k].x + cols[k].w - 6)){ x = cols[k].x + 10; y += rowH + 10; rowH = 0; }
+      if(last !== null && (last !== it.c || x + w > z.x + z.w - 6)){ x = z.x + 10; y += rowH + 10; rowH = 0; }
       out.push({...it, x, y}); x += (isNote(it.c) ? 10 : w*.55); rowH = Math.max(rowH, h); last = it.c;
     }
   }
@@ -1835,13 +1851,12 @@ function mbArrange(b){
 }
 function mbSvg(b){
   let s = '';
-  if(b.mordered){
-    const cols = {h:{x:10, w:300}, z:{x:320, w:330}, e:{x:660, w:230}};
-    for(const [k, z] of Object.entries(cols)) s += `<rect x="${z.x}" y="38" width="${z.w}" height="${MB.H - 44}" rx="10" fill="${PLACE[k]}" fill-opacity=".06"/><rect x="${z.x}" y="6" width="${z.w}" height="26" rx="8" fill="${PLACE[k]}"/><text x="${z.x + z.w/2}" y="25" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">${NAME[k]}</text>`;
+  if(b.mgrid){
+    for(const z of Object.values(MB_COLS)) s += `<rect x="${z.x}" y="38" width="${z.w}" height="${MB.H - 44}" rx="10" fill="${z.f}" fill-opacity=".07"/><rect x="${z.x}" y="6" width="${z.w}" height="26" rx="8" fill="${z.f}"/><text x="${z.x + z.w/2}" y="25" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">${z.t}</text>`;
   }
   for(const it of b.money){
-    const [w, h] = itemSize(it.c), sel = b.msel.has(it.id);
-    s += `<g data-mi="${it.id}" class="mitem" transform="translate(${it.x} ${it.y})" role="button" tabindex="0" aria-pressed="${sel}" aria-label="${denomLabel(it.c)}">${moneySvg(it.c, 0, 0)}${sel ? `<rect x="-4" y="-4" width="${w + 8}" height="${h + 8}" rx="${isNote(it.c) ? 9 : w/2 + 4}" fill="none" stroke="#e8890c" stroke-width="2.5"/>` : ''}</g>`;
+    const [w, h] = itemSize(it.c), sel = b.msel.has(it.id), bad = b.mcheck && mbColOf(it) !== moneyCol(it.c);
+    s += `<g data-mi="${it.id}" class="mitem" transform="translate(${it.x} ${it.y})" role="button" tabindex="0" aria-pressed="${sel}" aria-label="${denomLabel(it.c)}">${moneySvg(it.c, 0, 0)}${bad ? `<rect x="-5" y="-5" width="${w + 10}" height="${h + 10}" rx="${isNote(it.c) ? 9 : w/2 + 5}" fill="none" stroke="#c9414a" stroke-width="3" stroke-dasharray="6 4"/>` : ''}${sel ? `<rect x="-4" y="-4" width="${w + 8}" height="${h + 8}" rx="${isNote(it.c) ? 9 : w/2 + 4}" fill="none" stroke="#e8890c" stroke-width="2.5"/>` : ''}</g>`;
   }
   return s;
 }
@@ -1850,11 +1865,13 @@ function renderFreeMoney(){
   $('#equation').textContent = ''; $('#words').hidden = true; $('#btn-say').hidden = true;
   $('#prompt').textContent = 'Frei legen mit Geld: Ziehe Scheine und Münzen auf den Tisch. Tippe an, um auszuwählen und zu tauschen.';
   const sum = b.money.reduce((s, i) => s + i.c, 0);
-  $('#stage').innerHTML = `<div class="free"><div class="tray money-tray" aria-label="Geldbörse">${EURO.map(c => { const [w, h] = itemSize(c); return `<button class="kind mden" data-den="${c}" aria-label="${denomLabel(c)} hinlegen"><svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${isNote(c) ? 76 : 44}" aria-hidden="true">${moneySvg(c, 0, 0)}</svg></button>`; }).join('')}</div>
+  $('#stage').innerHTML = `<div class="free"><div class="tray money-tray" aria-label="Geldbörse">${MB_DEN.map(c => { const [w, h] = itemSize(c); return `<button class="kind mden ${isNote(c) ? 'note' : 'coin'}" data-den="${c}" aria-label="${denomLabel(c)} hinlegen"><svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${isNote(c) ? 76 : Math.round(coinR(c)*2)}" aria-hidden="true">${moneySvg(c, 0, 0)}</svg></button>`; }).join('')}</div>
     <div class="board-wrap"><svg id="mboard" viewBox="0 0 ${MB.W} ${MB.H}" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Tisch">${mbSvg(b)}</svg>${b.money.length ? '' : '<p class="board-empty">Geld hierher ziehen</p>'}</div></div>`;
   const ex = mbExchange(b), selN = b.msel.size, c = [];
   c.push(toolBtn({id:'fm-trade', ic:'exchange', label: ex ? ex.text : 'Teile antippen, dann tauschen', disabled:!ex, primary:!!ex}));
-  c.push(toolBtn({id:'fm-arrange', ic:'arrange', label: b.mordered ? 'Tafel weg' : 'Ordnen', disabled:!b.money.length && !b.mordered}));
+  c.push(toolBtn({id:'fm-grid', ic:'grid', label: b.mgrid ? 'Raster weg' : 'Raster'}));
+  if(b.mgrid) c.push(toolBtn({id:'fm-check', ic:'check', label:'Raster prüfen', disabled:!b.money.length}));
+  c.push(toolBtn({id:'fm-arrange', ic:'arrange', label:'Ordnen', disabled:!b.money.length}));
   c.push(toolBtn({id:'fm-clear', ic:'clear', label:'Abwählen', disabled:!selN}));
   c.push(toolBtn({id:'fm-del', ic:'selTrash', label:'Auswahl weg', disabled:!selN}));
   c.push('<span class="sep"></span>');
@@ -1867,29 +1884,30 @@ function renderFreeMoney(){
 function freeMoneyControl(btn){
   const b = board();
   switch(btn.id){
-    case 'fm-trade': { const ex = mbExchange(b); if(!ex) return; mbSave(b); const ids = new Set(ex.sel.map(i => i.id)); const base = ex.sel[0]; b.money = b.money.filter(i => !ids.has(i.id)); b.msel.clear();
-      if(ex.join){ const it = mPlaceNear({id: ++uid, c: ex.join, x: base.x, y: base.y}, b.money, MB.W, MB.H, b.mordered ? 40 : 6); b.money.push(it); b.msel.add(it.id); }
-      else { for(let i = 0; i < ex.split[1]; i++){ const it = mPlaceNear({id: ++uid, c: ex.split[0], x: base.x + i*14, y: base.y + (i % 2)*10}, b.money, MB.W, MB.H, b.mordered ? 40 : 6); b.money.push(it); } }
-      if(b.mordered) b.money = mbArrange(b);
+    case 'fm-trade': { const ex = mbExchange(b); if(!ex) return; mbSave(b); b.mcheck = false; const ids = new Set(ex.sel.map(i => i.id)); const base = ex.sel[0]; b.money = b.money.filter(i => !ids.has(i.id)); b.msel.clear();
+      if(ex.join){ const it = mPlaceNear({id: ++uid, c: ex.join, x: base.x, y: base.y}, b.money, MB.W, MB.H, b.mgrid ? 40 : 6); b.money.push(it); b.msel.add(it.id); }
+      else { for(let i = 0; i < ex.split[1]; i++){ const it = mPlaceNear({id: ++uid, c: ex.split[0], x: base.x + i*14, y: base.y + (i % 2)*10}, b.money, MB.W, MB.H, b.mgrid ? 40 : 6); b.money.push(it); } }
       renderFreeMoney(); setHint(ex.text.replace('tauschen', 'getauscht') + '. Der Betrag bleibt gleich.', 'good'); return; }
-    case 'fm-arrange': mbSave(b); if(b.mordered){ b.mordered = false; } else { b.mordered = true; b.money = mbArrange(b); } return renderFreeMoney();
+    case 'fm-arrange': mbSave(b); b.mgrid = true; b.mcheck = false; b.money = mbArrange(b); renderFreeMoney(); setHint('Geordnet: Scheine, Euro-Münzen und Cent-Münzen, jeweils vom größten Wert an.', 'good'); return;
+    case 'fm-grid': b.mgrid = !b.mgrid; b.mcheck = false; if(b.mgrid){ const keep = []; for(const it of b.money){ const q = it.y < 40 ? mPlaceNear({...it, y: 44}, keep, MB.W, MB.H, 40) : it; it.x = q.x; it.y = q.y; keep.push(it); } } return renderFreeMoney();
+    case 'fm-check': { b.mcheck = true; const bad = b.money.filter(i => mbColOf(i) !== moneyCol(i.c)).length; renderFreeMoney(); setHint(bad ? `${bad === 1 ? 'Ein Teil liegt' : `${bad} Teile liegen`} noch nicht in der richtigen Spalte. Sie sind rot markiert.` : 'Alles liegt in der richtigen Spalte.', bad ? '' : 'good'); return; }
     case 'fm-clear': b.msel.clear(); return renderFreeMoney();
-    case 'fm-del': mbSave(b); b.money = b.money.filter(i => !b.msel.has(i.id)); b.msel.clear(); return renderFreeMoney();
+    case 'fm-del': mbSave(b); b.mcheck = false; b.money = b.money.filter(i => !b.msel.has(i.id)); b.msel.clear(); return renderFreeMoney();
     case 'fm-show': b.show = !b.show; return renderFreeMoney();
-    case 'fm-undo': if(b.mhist.length){ b.money = b.mhist.pop(); b.msel.clear(); } return renderFreeMoney();
+    case 'fm-undo': b.mcheck = false; if(b.mhist.length){ b.money = b.mhist.pop(); b.msel.clear(); } return renderFreeMoney();
     case 'fm-all': mbSave(b); b.money = []; b.msel.clear(); return renderFreeMoney();
   }
 }
 function freeMoneyAdd(c, at){
   const b = board(); if(b.money.length >= 80) return; mbSave(b);
-  const top = b.mordered ? 40 : 6;
+  const top = b.mgrid ? 40 : 6;
   let it = {id: ++uid, c};
   it = at ? mPlaceNear({...it, x: at.x - itemSize(c)[0]/2, y: at.y - itemSize(c)[1]/2}, b.money, MB.W, MB.H, top) : mAutoPlace(it, b.money, MB.W, MB.H, top);
-  b.money.push(it); if(b.mordered) b.money = mbArrange(b); renderFreeMoney();
+  b.money.push(it); b.mcheck = false; renderFreeMoney();
 }
 /* Gemeinsames Ziehen */
 let mdrag = null;
-const moneyCtx = () => app.mode === 'money' && app.money.ready ? {svg: $('#mtab'), items: app.money.items, W: MT.W, H: MT.H, top: mtTop(), locked: app.money.check === 'ok'} : app.mode === 'free' && board().mat === 'money' ? {svg: $('#mboard'), items: board().money, W: MB.W, H: MB.H, top: board().mordered ? 40 : 6} : null;
+const moneyCtx = () => app.mode === 'money' && app.money.ready ? {svg: $('#mtab'), items: app.money.items, W: MT.W, H: MT.H, top: mtTop(), locked: app.money.check === 'ok'} : app.mode === 'free' && board().mat === 'money' ? {svg: $('#mboard'), items: board().money, W: MB.W, H: MB.H, top: board().mgrid ? 40 : 6} : null;
 function mPoint(svg, e){ const m = svg.getScreenCTM(); const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse()); return {x: p.x, y: p.y}; }
 const mOutside = (svg, e) => { const r = svg.getBoundingClientRect(); return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom; };
 document.addEventListener('pointerdown', e => {
@@ -1936,7 +1954,7 @@ function mEnd(e, cancel){
   const p = mPoint(ctx.svg, e), others = ctx.items.filter(i => i !== d.it);
   const q = mPlaceNear({...d.it, x: p.x - d.dx, y: p.y - d.dy}, others, ctx.W, ctx.H, ctx.top);
   d.it.x = q.x; d.it.y = q.y;
-  if(free && board().mordered) board().money = mbArrange(board());
+  if(free) board().mcheck = false;
   free ? renderFreeMoney() : renderMoney();
 }
 document.addEventListener('pointerup', e => mEnd(e, false));
@@ -3193,7 +3211,7 @@ const ICON = {
   Toilette: ic(`<rect x="34" y="8" width="18" height="22" rx="3" fill="#fff" stroke="${INK}" stroke-width="2.5"/><path d="M10 30h42v4q0 12-14 15l2 9H22l2-9Q10 45 10 34z" fill="#fff" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 30h30" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><rect x="40" y="12" width="7" height="3" rx="1.5" fill="#9aa0a6"/>`),
   Handy: ic(`<rect x="19" y="5" width="26" height="54" rx="6" fill="#3d3a44" stroke="${INK}" stroke-width="2.5"/><rect x="22.5" y="12" width="19" height="36" rx="2" fill="#8fc1e8"/><circle cx="32" cy="53" r="2.5" fill="#9aa0a6"/><path d="M28 8.5h8" stroke="#9aa0a6" stroke-width="2" stroke-linecap="round"/>`),
   Pflaster: ic(`<g transform="rotate(-35 32 32)"><rect x="4" y="21" width="56" height="22" rx="11" fill="#f0c9a0" stroke="${INK}" stroke-width="2.5"/><rect x="22" y="23" width="20" height="18" rx="3" fill="#fbeee0" stroke="#c99a6a" stroke-width="1.5"/>${[0,1,2].flatMap(i => [0,1].map(j => `<circle cx="${11 + j*4}" cy="${27 + i*5}" r="1" fill="#c99a6a"/><circle cx="${49 + j*4}" cy="${27 + i*5}" r="1" fill="#c99a6a"/>`)).join('')}</g>`),
-  Stopp: ic(`<path d="M22 4h20l14 14v20L42 52H22L8 38V18z" transform="translate(0 4)" fill="#c9414a" stroke="${INK}" stroke-width="2"/><path d="M23.5 11h17l11 11v16l-11 11h-17l-11-11V22z" fill="none" stroke="#fff" stroke-width="2.5"/><rect x="40" y="58" width="0" height="0"/>`)
+  Stopp: ic(`<path d="M56.94 42.33 L42.33 56.94 L21.67 56.94 L7.06 42.33 L7.06 21.67 L21.67 7.06 L42.33 7.06 L56.94 21.67Z" fill="#c9414a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M52.79 40.61 L40.61 52.79 L23.39 52.79 L11.21 40.61 L11.21 23.39 L23.39 11.21 L40.61 11.21 L52.79 23.39Z" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>`)
 };
 const WORDS = {
   Bus:['Bus'], Auto:['Au','to'], Rad:['Rad'], Sofa:['So','fa'], Lampe:['Lam','pe'], Tasse:['Tas','se'], Hose:['Ho','se'], Dose:['Do','se'], Rose:['Ro','se'],
@@ -3444,6 +3462,8 @@ function fresh(pool){
   return p;
 }
 const freshNew = () => FRESH.used.clear();
+/* n verschiedene Einträge, bevorzugt noch nicht benutzte */
+function freshN(pool, n){ const out = []; for(let t = 0; out.length < Math.min(n, pool.length) && t < 50; t++){ const avail = pool.filter(x => !out.includes(x)), x = fresh(avail); if(!out.includes(x)) out.push(x); } return out; }
 
 /* ---------- Lesen L1–L7 (BP GENT Deutsch 2.1.3): großer Aufgabenbestand ---------- */
 const iconOpt = k => ({h: iconSvg(k, 92), a: k});
@@ -3467,6 +3487,8 @@ function pictoItem(kern){
   return choiceRow({kern, icon: PICTO_MATCH[k], prompt:'Welches Schild passt zum Bild?', label:`Bild zu Schild: ${PICTO_MATCH[k]} → ${k}`, pk:k}, [k, ...others(Object.keys(PICTO), [k, ...(k === 'bus' ? ['zug'] : k === 'zug' ? ['bus'] : [])], 2)].map(x => ({h: pictoSvg(x, 104), a: x})));
 }
 /* L2: Bild → Signalwort auf neutralem Schild */
+const SIG_MIXED = {STOP:'Stopp', WC:'WC'};
+const sigCase = w => app.sheet.lcase ? (SIG_MIXED[w] || w[0] + w.slice(1).toLowerCase()) : w;
 const SIGN_PIC = {STOP:{icon:'Stopp'}, WC:{icon:'Toilette'}, BUS:{icon:'Bus'}, ZUG:{icon:'Zug'}, KASSE:{icon:'Kasse'}, KANTINE:{icon:'Essen'}, KAFFEE:{icon:'Tasse'}, PIZZA:{icon:'Pizza'}, EIS:{icon:'Eis'}, AUSGANG:{picto:'ausgang'}};
 const SIGN_SIMILAR = {AUSGANG:['EINGANG','NOTAUSGANG'], KASSE:['KANTINE','KAFFEE'], KANTINE:['KASSE','KAFFEE'], KAFFEE:['KASSE','KANTINE'], BUS:['BÜRO','ZUG'], ZUG:['BUS','ZOO'], STOP:['SHOP','STOFF'], PIZZA:['PREIS','PAUSE'], EIS:['EIN','BUS'], WC:['WEG','INFO']};
 function signItem(kern, target, distract){
@@ -3817,7 +3839,7 @@ const L_INFO = {
   L1:{name:'Bilder und Symbole', short:'Bilder', bp:'D 2.1.3.1 Lesen von Bildern, ikonischen Zeichen und Symbolen',
       kann:'ordnet Alltagsbilder den passenden Piktogrammen zu (Essen, Toilette, Erste Hilfe, Bus)', ziel:'versteht häufige Piktogramme im Schulhaus und im Alltag (Toilette, Erste Hilfe, Bus) und nutzt Bildpläne',
       analog:'Piktogramme im Schulhaus suchen und zuordnen; Tagesplan mit Bildkarten; Fotos von Alltagsorten benennen'},
-  L2:{name:'Signalwörter', short:'Wortbilder', bp:'D 2.1.3.2 Logographemisches Lesen',
+  L2:{name:'Signalwörter', short:'Signalwörter', bp:'D 2.1.3.2 Logographemisches Lesen',
       kann:'erkennt Signalwörter (STOP, WC, KASSE) als ganze Wortbilder und ordnet sie Bildern zu', ziel:'erkennt wichtige Signalwörter auch ohne Farbe und Form des Schildes und unterscheidet ähnliche Wortbilder (AUSGANG/EINGANG)',
       analog:'Signalwörter im Schulhaus und in der Stadt fotografieren und als Lesewörter-Kartei sammeln; Wort-Schild-Memory'},
   L3:{name:'Buchstaben und Laute', short:'Buchstaben', bp:'D 2.1.3.3 Alphabetisches Lesen (Buchstaben-Laut-Zuordnung)',
@@ -4005,7 +4027,7 @@ const wordOpt2 = t => ({h:`<span class="rd-word" style="font-size:26px">${escHtm
 const clockSet = (h, m, step, kern) => ({kern, type:'clockset', target:{h: h % 12, m}, step, prompt:`Stelle die Uhr auf ${step >= 60 ? `${H12(h)} Uhr` : step === 30 || step === 15 ? timeWords(h, m) : dig(H12(h), m)}.`, label:`Uhr stellen: ${dig(H12(h), m)}`});
 const rh = () => rnd(1, 12);
 const CLOCK = {
-  U1: [() => { const h = rh(), o = H12(h + 1); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, 0), prompt:'Wie spät ist es?', label:`volle Stunde ablesen: ${h} Uhr`}, [`${h} Uhr`, h === 12 ? `${o} Uhr` : '12 Uhr', `${H12(h - 1)} Uhr`].map(wordOpt2)); },
+  U1: [() => { const h = rh(), o = H12(h + 1); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, 0), prompt:'Wie spät ist es?', label:`volle Stunde ablesen: ${h} Uhr`}, [...new Set([`${h} Uhr`, h === 12 ? `${o} Uhr` : '12 Uhr', `${H12(h - 1)} Uhr`, `${o} Uhr`])].slice(0, 3).map(wordOpt2)); },
        () => clockSet(rh(), 0, 60, false),
        () => { const h = rnd(1, 11); return mkChoice({layout:'row', text:`${h} Uhr`, textCls:'rd-letter', prompt:'Welche Uhr zeigt diese Zeit?', label:`Uhr zur Zeit ${h} Uhr`}, [clockOpt(h, 0), {h: clockSvg(0, h*5 % 60, {size:130}), a:'vertauscht'}, clockOpt(h + 1, 0)]); }],
   U2: [() => { const h = rh(); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, 30), prompt:'Wie spät ist es?', label:`halbe Stunde: ${dig(h, 30)}`}, [`halb ${H12(h + 1)}`, `halb ${h}`, `${h} Uhr`].map(wordOpt2)); },
@@ -4914,7 +4936,10 @@ const AB_OPS = {
   lege:   {t:'lege / ordne', p:'<rect x="2" y="7" width="8" height="10" rx="1.5" fill="none" stroke="#222" stroke-width="1.6"/><rect x="14" y="7" width="8" height="10" rx="1.5" fill="none" stroke="#222" stroke-width="1.6"/><path d="M10.5 12h3" stroke="#222" stroke-width="1.6"/>'}
 };
 const abOp = k => `<svg class="ab-op" viewBox="0 0 24 24" aria-label="${AB_OPS[k].t}">${AB_OPS[k].p}</svg>`;
-const T_ = (op, text, body, a) => ({ops:[].concat(op), text, body, a});
+const T_ = (op, text, body, a, d) => ({ops:[].concat(op), text, body, a, d});
+/* Schwierigkeit für die Reihenfolge auf dem Blatt: Überträge zählen stellenweise */
+const carries = (a, b, op) => { let c = 0, k = 0; for(let x = a, y = b; x > 0 || y > 0; x = Math.floor(x/10), y = Math.floor(y/10)){ const dx = x % 10, dy = y % 10; if(op === '+'){ k = dx + dy + k >= 10 ? 1 : 0; } else { k = dx - dy - k < 0 ? 1 : 0; } c += k; } return c; };
+const sheetD = g => { if(g.d != null) return g.d; const ns = String(g.a).match(/\d+(?:,\d+)?/g); return ns ? Math.max(...ns.map(n => parseFloat(n.replace(',', '.')))) : String(g.a).length; };
 const box = (w = 16) => `<span class="ab-box" style="width:${w}mm"></span>`;
 const ans = (w = 18, unit = '') => `<div class="ab-ans">${box(w)}${unit ? ` ${unit}` : ''}</div>`;
 const iconP = (k, mm = 24) => `<span class="ab-ic" style="width:${mm}mm">${iconSvg(k, 100)}</span>`;
@@ -5008,8 +5033,8 @@ const M_SHEETS = {
   unterschied: {name:'Unterschiede bestimmen', cols:2, gens:[
     zr => { const T = zrMax(zr), a = rnd(Math.ceil(T*.1), Math.floor(T*.5)), b = a + rnd(Math.max(1, Math.floor(T*.1)), Math.floor(T*.4)); const nm = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']), nm2 = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_('rechne', `${nm} hat ${a} €. ${nm2} hat ${b} €. Wie viel mehr hat ${nm2}?`, `${app.sheet.mat && zr <= 20 ? `<div class="ab-bars"><span>${nm}</span>${abField(a, 0, '+', 20)}<span>${nm2}</span>${abField(b, 0, '+', 20)}</div>` : ''}${ans(18, '€')}`, b - a); },
     zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${ans()}`, b - a); }]},
-  plus: {name:'Plus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('+', zr, app.sheet.ue); const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '+', zr) : `<div class="ab-matrow">${abMat(a, zr)}<b>+</b>${abMat(b, zr)}</div>`; return T_('rechne', 'Rechne.', `${mat}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b); }]},
-  minus: {name:'Minus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('−', zr, app.sheet.ue); const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '−', zr) : abMat(a, zr); return T_(zr <= 20 || !app.sheet.mat ? 'rechne' : ['streiche', 'rechne'], zr <= 20 || !app.sheet.mat ? 'Rechne.' : `Streiche ${b} weg und rechne.`, `${mat}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b); }]},
+  plus: {name:'Plus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('+', zr, app.sheet.ue); const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '+', zr) : `<div class="ab-matrow">${abMat(a, zr)}<b>+</b>${abMat(b, zr)}</div>`; return T_('rechne', 'Rechne.', `${mat}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b); }]},
+  minus: {name:'Minus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('−', zr, app.sheet.ue); const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '−', zr) : abMat(a, zr); return T_(zr <= 20 || !app.sheet.mat ? 'rechne' : ['streiche', 'rechne'], zr <= 20 || !app.sheet.mat ? 'Rechne.' : `Streiche ${b} weg und rechne.`, `${mat}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a); }]},
   stellenwert: {name:'Zehner und Einer (Stellenwert)', cols:2, gens:[
     zr => { const n = zr >= 1000 ? rnd(1, 4)*100 + rnd(1, 6)*10 + rnd(1, 8) : rnd(2, 8)*10 + rnd(1, 9); return T_('schreibe', 'Welche Zahl ist das?', `${abMat(n, zr)}${ans()}`, n); },
     zr => { const n = zr >= 1000 ? rnd(120, 980) : rnd(21, 98); return zr >= 1000 ? T_('schreibe', 'Zerlege in Hunderter, Zehner und Einer.', `<p class="ab-row">${n} = ${box(11)} H ${box(11)} Z ${box(11)} E</p>`, `${Math.floor(n/100)} H ${Math.floor(n % 100/10)} Z ${n % 10} E`) : T_('schreibe', 'Zerlege in Zehner und Einer.', `<p class="ab-row">${n} = ${box(11)} Z ${box(11)} E</p>`, `${Math.floor(n/10)} Z ${n % 10} E`); },
@@ -5020,7 +5045,7 @@ const M_SHEETS = {
     zr => { const n = zr >= 1000 ? rnd(1, 3)*100 + rnd(1, 7)*10 + rnd(1, 8) : zr >= 100 ? rnd(2, 8)*10 + rnd(1, 9) : zr >= 20 ? rnd(11, 19) : rnd(4, 10); return T_('schreibe', 'Welche Zahl ist gezeichnet?', `${zr >= 20 ? paperHZE(Math.floor(n/100), Math.floor(n % 100/10), n % 10, true) : paperHZE(0, 0, n, true)}${ans()}`, n); },
     zr => { const big = zr >= 1000, a = big ? rnd(1, 4)*100 + rnd(1, 4)*10 + rnd(1, 4) : zr >= 100 ? rnd(1, 5)*10 + rnd(1, 4) : zr >= 20 ? rnd(11, 14) : rnd(2, 5), b = big ? rnd(1, 4)*100 + rnd(1, 4)*10 + rnd(1, 4) : zr >= 100 ? rnd(1, 3)*10 + rnd(1, 4) : zr >= 20 ? rnd(2, 5) : rnd(1, 4); return T_(['skizze', 'rechne'], 'Zeichne beide Zahlen. Rechne.', `<p class="ab-row big">${a} + ${b} = ${box(18)}</p><div class="ab-draw"></div>${abKey(zr)}`, a + b); }]},
   geld: {name:'Geld zählen', cols:2, gens:[zr => { const T = zr === 1000 ? 100 : zrMax(zr), notes = T >= 100 ? [5000, 2000, 1000, 500, 200, 100] : T >= 20 ? [1000, 500, 200, 100] : [500, 200, 100]; const amt = rnd(Math.ceil(T*.3), T), list = greedy(amt*100, notes) || [100]; return T_(['zaehle', 'schreibe'], 'Wie viel Geld ist das?', `${abMoney(list)}${ans(18, '€')}`, amt + ' €'); }]},
-  einmaleins: {name:'Einmaleins', cols:2, gens:[zr => { const rs = settings.timesRows.length ? settings.timesRows : [2, 5, 10], b = pick(rs), a = rnd(1, 10); let dots = ''; if(app.sheet.mat){ for(let r = 0; r < a; r++) for(let c = 0; c < b; c++) dots += `<circle cx="${6 + c*10 + (c >= 5 ? 3 : 0)}" cy="${6 + r*10 + (r >= 5 ? 3 : 0)}" r="3.6" fill="#2f5ea8"/>`; dots = `<svg class="ab-svg dots" style="width:${(b*10 + 6)*.3}mm;height:${(a*10 + 6)*.3}mm" viewBox="0 0 ${b*10 + 6} ${a*10 + 6}">${dots}</svg>`; } return T_('rechne', 'Rechne.', `${dots}<p class="ab-row big">${a} · ${b} = ${box(18)}</p>`, a*b); }]},
+  einmaleins: {name:'Einmaleins', cols:2, gens:[zr => { const rs = settings.timesRows.length ? settings.timesRows : [2, 5, 10], b = pick(rs), a = rnd(1, 10); let dots = ''; if(app.sheet.mat){ for(let r = 0; r < a; r++) for(let c = 0; c < b; c++) dots += `<circle cx="${6 + c*10 + (c >= 5 ? 3 : 0)}" cy="${6 + r*10 + (r >= 5 ? 3 : 0)}" r="3.6" fill="#2f5ea8"/>`; dots = `<svg class="ab-svg dots" style="width:${(b*10 + 6)*.3}mm;height:${(a*10 + 6)*.3}mm" viewBox="0 0 ${b*10 + 6} ${a*10 + 6}">${dots}</svg>`; } return T_('rechne', 'Rechne.', `${dots}<p class="ab-row big">${a} · ${b} = ${box(18)}</p>`, a*b, ([1, 2, 5, 10].includes(a) ? 0 : 1e5) + a*b); }]},
   schriftlich: {name:'Schriftlich rechnen', cols:3, gens:[zr => {
     const d = {100:2, 1000:3, 10000:4}[app.sheet.wzr] || 3, lim = 10**d, wop = app.sheet.wop, op = wop === 'add' ? '+' : wop === 'sub' ? '−' : pick(['+', '−']), ue = app.sheet.ue;
     let a, b, t = 0;
@@ -5049,8 +5074,8 @@ U_SHEETS.U6 = {name:'Kalender und Termine', cols:1, max:2, gens:[() => { const c
   return T_(['lies', 'schreibe'], 'Schau in den Kalender. Schreibe die Antworten auf.', `<div class="ab-doc">${calHtml(c.y, c.mo, {marks:{[p.e]: p.n1, [p.e2]: p.n2}})}</div>${qs.map(([q]) => `<div class="ab-q"><b>${q}</b>${lineW()}</div>`).join('')}`, qs.map(q => q[1]).join(' · ')); }]};
 const lineW = (n = 1) => `<div class="ab-wline"></div>`.repeat(n);
 const R_SHEETS = {
-  L1: {name:'Bilder und Schilder zuordnen', match:true, gen:() => { const ks = Object.keys(PICTO_MATCH).map(() => fresh(Object.keys(PICTO_MATCH))).filter((x, i, a) => a.indexOf(x) === i).slice(0, 4); return {left: ks.map(k => iconP(PICTO_MATCH[k], 20)), right: shuffle(ks).map(k => `<span class="ab-ic" style="width:18mm">${pictoSvg(k, 100)}</span>`), a: ks.map(k => `${PICTO_MATCH[k]} – ${k}`).join('; ')}; }},
-  L2: {name:'Bild und Wort verbinden', match:true, gen:() => { const ks = Object.keys(SIGN_PIC).map(() => fresh(Object.keys(SIGN_PIC))).filter((x, i, a) => a.indexOf(x) === i).slice(0, 4); return {left: ks.map(k => SIGN_PIC[k].icon ? iconP(SIGN_PIC[k].icon, 20) : `<span class="ab-ic" style="width:18mm">${pictoSvg(SIGN_PIC[k].picto, 100)}</span>`), right: shuffle(ks).map(k => `<span class="ab-sign">${k}</span>`), a: ks.join(', ')}; }},
+  L1: {name:'Bilder und Schilder zuordnen', match:true, gen:() => { const ks = freshN(Object.keys(PICTO_MATCH), 4); return {left: ks.map(k => iconP(PICTO_MATCH[k], 17)), right: shuffle(ks).map(k => `<span class="ab-ic" style="width:16mm">${pictoSvg(k, 100)}</span>`), a: ks.map(k => `${PICTO_MATCH[k]} – ${k}`).join('; ')}; }},
+  L2: {name:'Signalwörter', match:true, gen:() => { const ks = freshN(Object.keys(SIGN_PIC), 4); return {left: ks.map(k => SIGN_PIC[k].icon ? iconP(SIGN_PIC[k].icon, 17) : `<span class="ab-ic" style="width:16mm">${pictoSvg(SIGN_PIC[k].picto, 100)}</span>`), right: shuffle(ks).map(k => `<span class="ab-sign${app.sheet.lcase ? ' lc' : ''}">${sigCase(k)}</span>`), a: ks.map(sigCase).join(', ')}; }},
   L3: {name:'Anfangsbuchstaben', cols:2, gens:[() => { const k = fresh(Object.values(INITIAL).flat()), L = k[0]; const opts = shuffle([L, ...others(['A','M','S','T','L','R','H','B','K','O','E','F','N','P','G','Z','D','W'], [L], 2)]); return T_('kreise', 'Womit fängt das Wort an?', `${iconP(k)}<p class="ab-row big letters">${opts.join(' ')}</p>`, `${k}: ${L}`); }]},
   L4: {name:'Wörter lesen', cols:2, gens:[() => { const k = fresh(L4_POOL), dis = others(WITH_ICON().filter(x => x[0] !== k[0]), [k], 2); return T_(['lies', 'kreise'], 'Lies das Wort. Kreise das Bild ein.', `<p class="ab-word">${k}</p><p class="ab-row">${shuffle([k, ...dis]).map(x => iconP(x, 17)).join(' ')}</p>`, k); }]},
   L5: {name:'Genau lesen', cols:2, gens:[() => { const k = fresh(MINIMAL.map(s => s[0])), set = MINIMAL.find(s => s[0] === k); return T_(['lies', 'kreise'], 'Kreise das richtige Wort ein.', `${iconP(k, 22)}<p class="ab-row words">${shuffle(set).map(w => `<span>${w}</span>`).join('')}</p>`, k); },
@@ -5093,8 +5118,8 @@ const SHEET_CSS = `@page{size:A4;margin:12mm}*{box-sizing:border-box}body{font-f
 .ab-word{font-size:24pt;font-weight:700;letter-spacing:1px;text-align:center;margin:0}.ab-sent{font-size:17pt;font-weight:600;margin:0;text-align:center}.ab-text{font-size:14pt;line-height:1.6;margin:0 0 1mm;padding:2mm 3mm;background:#f6f6f6;border-radius:2mm;align-self:stretch}
 .dc-bon{font-family:Menlo,Consolas,monospace;font-size:11pt;border-top:1px dashed #555;border-bottom:1px dashed #555;padding:1.5mm 0;max-width:80mm}.dc-bon>div{display:flex;justify-content:space-between}.dc-bon .dc-bon-sum{font-weight:700;border-top:1px solid #333}.dc-offer{display:inline-flex;flex-direction:column;border:2px solid #333;border-radius:3mm;padding:2mm 4mm}.dc-offer b{font-size:14pt}.dc-old{text-decoration:line-through}.dc-new{font-size:16pt;font-weight:700}.dc-tag{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #333;border-radius:2mm;padding:2mm 6mm}.dc-tag b{font-size:16pt}.ab-trace{font-family:Andika,'Atkinson Hyperlegible',Verdana,Arial,sans-serif;font-size:30pt;letter-spacing:2pt;color:#fff;-webkit-text-stroke:.7pt #888;margin:1mm 0 2mm;align-self:flex-start}.ab-q{align-self:stretch;font-size:12.5pt}.ab-q div{display:flex;gap:6mm;flex-wrap:wrap;margin-top:1mm}.ab-doc{align-self:stretch;font-size:13pt;line-height:1.5;border:1px solid #bbb;border-radius:2mm;padding:3mm 4mm}.ab-doc .dc-g{font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;color:#555}.ab-doc .dc-h{font-size:14pt;margin:1mm 0 2mm}.ab-doc .dc-p{margin:0 0 1.6mm}.ab-doc .dc-pn{display:inline-block;width:5mm;font-size:9pt;font-weight:700;color:#777}.ab-doc .dc-head{font-size:10pt;color:#555;margin:0 0 2mm}.dc-t{border-collapse:collapse;width:100%;font-size:11.5pt}.dc-t th,.dc-t td{border:1px solid #999;padding:1.2mm 2mm;text-align:left;vertical-align:top}.dc-t thead th{background:#eee}.dc-note{font-size:10.5pt;margin:1.5mm 0 0}.dc-veg{display:inline-block;border:1px solid #333;border-radius:50%;width:5mm;text-align:center;font-size:8pt;font-weight:700}.dc-msg{border:1px solid #bbb;border-radius:3mm;padding:1mm 3mm;margin:1.2mm 0;max-width:85%}.dc-msg.me{margin-left:auto;background:#f2f2f2}.dc-msg b{display:block;font-size:9pt;color:#555}.dc-rec{display:grid;grid-template-columns:1fr 1.6fr;gap:4mm}.cal{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12pt}.cal th{font-size:10pt;padding:1mm 0}.cal td{border:1px solid #999;height:12mm;vertical-align:top;padding:1mm}.cal td.cal-x{border:none}.cal td.cal-we{background:#eee}.cal .cal-d{font-weight:700}.cal .cal-t{display:block;font-size:8pt;line-height:1.1;border:1px solid #333;border-radius:1mm;padding:0 1mm;margin-top:1mm}.dc-rec ul,.dc-rec ol{margin:1mm 0 0;padding-left:5mm}
 .ab-wline{height:13mm;border-bottom:1.5px solid #444;background:linear-gradient(#fff 0 60%, #ddd 60% 62%, #fff 62%);align-self:stretch}.ab-gap{display:inline-block;width:14mm;border-bottom:2px solid #222;margin:0 1mm}.ab-syl{text-align:center;font-size:16pt;color:#888;margin:0;letter-spacing:3mm}
-.ab-card{display:inline-block;border:1.4px solid #333;border-radius:2mm;padding:1mm 3mm;font-size:15pt}.ab-sign{display:inline-block;border:2px solid #222;border-radius:2mm;padding:2mm 4mm;font-weight:700;font-size:15pt;letter-spacing:1px}
-.ab-match{display:grid;grid-template-columns:1fr 34mm 1fr;align-items:center;row-gap:6mm;align-self:stretch}.ab-match .l,.ab-match .r{display:flex;align-items:center;gap:3mm}.ab-match .l{justify-content:flex-start}.ab-match .r{justify-content:flex-end}.ab-dot{width:3mm;height:3mm;border-radius:50%;background:#222;display:inline-block}
+.ab-card{display:inline-block;border:1.4px solid #333;border-radius:2mm;padding:1mm 3mm;font-size:15pt}.ab-sign{display:inline-block;border:2px solid #222;border-radius:2mm;padding:2mm 4mm;font-weight:700;font-size:15pt;letter-spacing:1px}.ab-sign.lc{letter-spacing:.3px;font-size:16pt}
+.ab-match{display:grid;grid-template-columns:1fr 34mm 1fr;align-items:center;row-gap:4.5mm;align-self:stretch}.ab-match .l,.ab-match .r{display:flex;align-items:center;gap:3mm}.ab-match .l{justify-content:flex-start}.ab-match .r{justify-content:flex-end}.ab-dot{width:3mm;height:3mm;border-radius:50%;background:#222;display:inline-block}
 .ab-col{border-collapse:collapse;font-size:17pt}.ab-col td,.ab-col th{width:9mm;height:10mm;border:1px solid #bbb;text-align:center}.ab-col th{height:6mm;font-size:9pt;color:#666;border:0}.ab-col .ab-res td{border-top:2.5px solid #222}.ab-col .ab-carry td{height:5mm;font-size:9pt}.ab-col tr td:first-child{border:0;width:6mm}
 .ab-ic svg[aria-label^="Uhr"]{width:100%;height:auto}
 .ab-svg.matp{display:block;flex:none;max-width:none;max-height:none;margin:0 auto}.ab-matrow{flex-wrap:wrap;row-gap:2mm}.ab-matrow .ab-svg.matp{max-width:none;max-height:none;margin:0}.ab-matrow:has(.matp){align-items:flex-start}.ab-matrow b{margin:0 2mm;align-self:center}
@@ -5123,7 +5148,7 @@ function zoneToSheet(key){
   if(ax === 'R') return a === 'R7' ? {topic:'M:einmaleins'} : {topic:'M:plus', zr: R_CONF[a].range, ue: ({without:'ohne', with:'mit'})[R_CONF[a].ten] || 'egal'};
   return null;
 }
-app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000};
+app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false};
 function buildSheet(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
   const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : W_SHEETS[key];
@@ -5133,23 +5158,25 @@ function buildSheet(limit){
   const fill = S.n === 'fill', cols = def.match ? 1 : (typeof def.cols === 'function' ? def.cols(S) : def.cols || 2);
   if(limit == null){
     FRESH.used = new Set();
-    const G = app.sheetGen = {tasks: [], sols: [], ops: [], match: !!def.match, fill, cols};
+    const G = app.sheetGen = {tasks: [], sols: [], ops: [], d: [], gi: [], match: !!def.match, fill, cols};
     if(def.match){
-      const nb = fill ? 2 : Math.max(1, Math.round(S.n/4));
-      for(let i = 0; i < nb; i++){ const g = def.gen(); G.sols.push(g.a); G.ops.push(['verbinde']); G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">${i + 1}</span><span class="ops">${abOp('verbinde')}</span>Verbinde, was zusammengehört.</div><div class="ab-body"><div class="ab-match">${g.left.map((l, j) => `<div class="l">${l}<span class="ab-dot"></span></div><div></div><div class="r"><span class="ab-dot"></span>${g.right[j]}</div>`).join('')}</div></div></div>`); }
+      const nb = fill ? 3 : Math.max(1, Math.round(S.n/4));
+      for(let i = 0; i < nb; i++){ const g = def.gen(); G.sols.push(g.a); G.ops.push(['verbinde']); G.d.push(0); G.gi.push(0); G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${abOp('verbinde')}</span>Verbinde, was zusammengehört.</div><div class="ab-body"><div class="ab-match">${g.left.map((l, j) => `<div class="l">${l}<span class="ab-dot"></span></div><div></div><div class="r"><span class="ab-dot"></span>${g.right[j]}</div>`).join('')}</div></div></div>`); }
     } else {
       const want = fill ? (def.max || 30) : Math.min(S.n, def.max || S.n), seen = new Set();
       for(let i = 0; i < want; i++){
         let g, t = 0; do { g = def.gens[i % def.gens.length](sj === 'M' ? S.zr : null); t++; } while(seen.has(String(g.a)) && t < 12);
         if(fill && seen.has(String(g.a)) && i >= def.gens.length*2) break; /* Blatt füllen: keine Wiederholungen, wenn der Vorrat erschöpft ist */
-        seen.add(String(g.a)); G.sols.push(g.a); G.ops.push(g.ops);
-        G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">${i + 1}</span><span class="ops">${g.ops.map(abOp).join('')}</span><span>${g.text}</span></div><div class="ab-body">${g.body}</div></div>`);
+        seen.add(String(g.a)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
+        G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${g.ops.map(abOp).join('')}</span><span>${g.text}</span></div><div class="ab-body">${g.body}</div></div>`);
       }
     }
     G.limit = G.tasks.length;
   }
   const G = app.sheetGen, n = Math.min(limit ?? G.limit, G.tasks.length);
-  const tasks = G.tasks.slice(0, n), sols = G.sols.slice(0, n), used = new Set(G.ops.slice(0, n).flat());
+  /* gleiche Aufgabenart zusammen, innerhalb davon von leicht nach schwer */
+  const ord = [...Array(n).keys()].sort((x, y) => G.gi[x] - G.gi[y] || G.d[x] - G.d[y] || x - y);
+  const tasks = ord.map((j, i) => G.tasks[j].replace('§NR§', i + 1)), sols = ord.map(j => G.sols[j]), used = new Set(G.ops.slice(0, n).flat());
   const body = abScale(`<div class="ab-grid" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols);
   const legend = `<div class="ab-legend">${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
@@ -5167,9 +5194,12 @@ function sheetFit(fr){
   const pr = page.getBoundingClientRect(), limit = pr.top + (12 + 273 - 5)*mm - (foot ? foot.getBoundingClientRect().height + 6*mm : 10*mm); /* 5 mm Sicherheit: Druck misst minimal anders als die Vorschau */
   let fit = tasks.filter(t => t.getBoundingClientRect().bottom <= limit + 1).length;
   fit = Math.max(G.cols, fit - fit % G.cols);
-  G.fitted = true;
-  if(fit === G.limit && fit === tasks.length) return;
-  G.limit = fit; app.sheetDoc = buildSheet(fit); sheetShow();
+  if(G.checking){ /* Prüfrunde: die ausgewählten Aufgaben sind sortiert anders hoch – notfalls eine Reihe weniger */
+    if(fit >= tasks.length || G.limit <= G.cols || ++G.checking > 6){ G.fitted = true; return; }
+    G.limit -= G.cols; app.sheetDoc = buildSheet(G.limit); sheetShow(); return;
+  }
+  if(fit === G.limit && fit === tasks.length){ G.fitted = true; return; }
+  G.checking = 1; G.limit = fit; app.sheetDoc = buildSheet(fit); sheetShow();
 }
 function openSheets(pid, zoneKey){
   const S = app.sheet;
@@ -5189,6 +5219,7 @@ function renderSheets(keep){
     ${isM && key === 'schriftlich' ? `<label class="row">Zahlenraum ${sel('sh-wzr', [[100, 'bis 100 (zweistellig)'], [1000, 'bis 1000 (dreistellig)'], [10000, 'bis 10 000 (vierstellig)']], S.wzr)}</label><label class="row">Rechenart ${sel('sh-wop', [['add', 'nur Plus'], ['sub', 'nur Minus'], ['both', 'gemischt']], S.wop)}</label>` : isM && !['einmaleins'].includes(key) ? `<label class="row">Zahlenraum ${sel('sh-zr', [10, 20, 100, 1000].map(z => [z, 'bis ' + z]), S.zr)}</label>` : ''}
     ${isM && ['plus', 'minus', 'schriftlich'].includes(key) ? `<label class="row">${key === 'schriftlich' ? 'Übertrag' : 'Zehnerübergang'} ${sel('sh-ue', [['egal', 'gemischt'], ['ohne', 'ohne'], ['mit', 'mit']], S.ue)}</label>` : ''}
     ${isM && !['schriftlich', 'zahlenstrahl', 'geld', 'zaehlen', 'zeichnen'].includes(key) ? `<label class="row cb"><input type="checkbox" id="sh-mat" ${S.mat ? 'checked' : ''}> mit Materialbildern</label>` : ''}
+    ${S.topic === 'L:L2' ? `<label class="row">Schrift ${sel('sh-case', [['up', 'nur Großbuchstaben'], ['mixed', 'Groß- und Kleinschreibung']], S.lcase ? 'mixed' : 'up')}</label>` : ''}
     <label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button></div>
@@ -5217,6 +5248,7 @@ function sheetChange(e){
   if(t.id === 'sh-wzr') S.wzr = +t.value;
   if(t.id === 'sh-wop') S.wop = t.value;
   if(t.id === 'sh-ue') S.ue = t.value;
+  if(t.id === 'sh-case') S.lcase = t.value === 'mixed';
   if(t.id === 'sh-mat') S.mat = t.checked;
   if(t.id === 'sh-n') S.n = t.value === 'fill' ? 'fill' : +t.value;
   if(t.id === 'sh-sol') S.sol = t.checked;
@@ -5370,6 +5402,7 @@ $('#modes').addEventListener('click', e => {
   if(e.target.closest('[data-foryou]')){ const z = forYouOffer(); if(z && !app.busy){ leaveMode(); applyOffer(z.info.offer.set); toast(z.info.offer.text); } return; }
   if(e.target.closest('[data-guide-all]')){ requireTeacher(() => { app.showAll = true; if(!settings.pin) app.teacherUntil = Date.now() + 20*60e3; toast('Alle Bereiche sichtbar (Lehrkraft, 20 Minuten).'); render(); }); return; }
   if(e.target.closest('[data-guide-off]')){ app.showAll = false; render(); return; }
+  const rg = e.target.closest('[data-railgrp]'); if(rg){ app.railGrp = rg.dataset.railgrp; app.railGrpLvl = app.read.lvl; $('#modes').innerHTML = railHtml(); $('#modes').querySelector('.rail-h')?.scrollIntoView({block:'nearest'}); return; }
   const el = e.target.closest('[data-mode]'); if(!el || app.busy) return;
   if(el.dataset.lvl){ if(app.mode === 'read' && app.read.lvl === el.dataset.lvl) return; leaveMode(); if(el.dataset.clock){ settings.lastMath = 'clock'; saveSettings(); } if(el.dataset.size){ settings.lastMath = 'size'; saveSettings(); } Object.assign(app.read, {lvl: el.dataset.lvl, item:null, streak:0, miss:0}); app.mode = 'read'; render(); return; }
   if(el.dataset.mode === app.mode) return;
@@ -5541,7 +5574,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.2 · 11.11.2026';
+const APP_VERSION = '0.9.3 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5683,7 +5716,7 @@ $('#help-content').innerHTML = [
   ['home','Startseite','Das Stufen-Zeichen links oben führt zur Startseite. Dort tippst du deinen Namen an. Unter „Heute für dich“ stehen deine Übungen. Die „Startrunde“ sind 3 kurze Aufgaben zum Aufwärmen. „Meine Lernlandkarte“ zeigt, was du schon kannst (✓) und woran du gerade arbeitest (★).'],
   ['edit','Mathe','Links wählst du: Zahlen legen, Plus, Minus, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
   ['target','Zahlenstrahl vergrößern','Tippe auf einen Sprung (zum Beispiel +7), dann wird er groß. Noch einmal tippen: zurück. Mit + und − vergrößerst und verkleinerst du. Mit zwei Fingern kannst du auch zoomen und mit einem Finger verschieben. Unten zeigt der kleine Zahlenstrahl, wo du gerade bist – tippe dort, um hinzuspringen.'],
-  ['line','Deutsch','Lesen in 9 Stufen (Bilder, Wortbilder, Buchstaben, Wörter, genau lesen, Sätze, kurze Texte, Pläne und Tabellen, lange Texte) und Schreiben in 6 Stufen (abschreiben, Anlaute, kurze und lange Wörter, Merkstellen, Sätze). Unter „Meine Wörter“ übst du Wörter, die deine Lehrkraft eingetragen hat: anschauen, merken, abdecken, auswendig schreiben, vergleichen. „Silben färben“ hilft bei langen Wörtern. Beim Schreiben gibt es Buchstaben auf dem Bildschirm.'],
+  ['line','Deutsch','Lesen in 9 Stufen (Bilder, Signalwörter, Buchstaben, Wörter, genau lesen, Sätze, kurze Texte, Pläne und Tabellen, lange Texte) und Schreiben in 6 Stufen (abschreiben, Anlaute, kurze und lange Wörter, Merkstellen, Sätze). Unter „Meine Wörter“ übst du Wörter, die deine Lehrkraft eingetragen hat: anschauen, merken, abdecken, auswendig schreiben, vergleichen. „Silben färben“ hilft bei langen Wörtern. Beim Schreiben gibt es Buchstaben auf dem Bildschirm.'],
   ['next','Schwerer oder leichter','Wenn du 5 Aufgaben hintereinander richtig hast, schlägt Stufenweise die nächste Stufe vor. Nach 3 Fehlern gibt es eine leichtere Stufe. Du entscheidest selbst.'],
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
@@ -5692,7 +5725,7 @@ $('#help-content').innerHTML = [
   ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],
-  ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln oder Geld; erst „Ordnen“ zeigt die Stellenwerttafel.'],
+  ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schülerinnen und Schüler selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch.'],
   ['h','Über Stufenweise'],
   ['target','Die Idee','Stufenweise zeigt jedem Kind, was als Nächstes dran ist: seine Förderzone. Das schafft Klarheit und Sicherheit. Es gibt keine Klassenstufen, nur Stufen. So arbeiten Jugendliche nicht an Aufgaben „für die 1. Klasse“, sondern an altersgerechten Aufgaben aus ihrer Lebenswelt, genau auf ihrem Lernstand.'],
   ['check','Freie Software','Stufenweise ist kostenlos, ohne Werbung und für alle Schulen gedacht. ©&nbsp;2026 Stefan Hackl. Der Programmcode steht unter der Lizenz EUPL-1.2 (European Union Public Licence): Du darfst ihn nutzen, verändern und weitergeben. Wer eine veränderte Fassung weitergibt, muss sie ebenfalls offen unter dieser Lizenz weitergeben.'],
