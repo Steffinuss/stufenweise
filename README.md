@@ -29,7 +29,7 @@ Die ganze App steckt in einer einzigen Datei: `index.html`. Öffne sie in Safari
 
 - Alle Namen und Ergebnisse bleiben im Browser des Geräts (localStorage).
 - Es gibt keinen Server, kein Konto und kein Tracking.
-- Noch offen: Die Schrift Andika wird derzeit von Google Fonts geladen. Sie wird in einer der nächsten Versionen direkt in die App eingebunden.
+- Die Schrift ist in die App eingebunden; es wird nichts aus dem Internet nachgeladen. Die App funktioniert nach dem ersten Laden auch offline.
 - Die Rückmeldefunktion öffnet nur das eigene Mailprogramm oder GitHub; ein Kindername wird nicht mitgeschickt.
 
 ## Lizenz
@@ -38,6 +38,7 @@ Die ganze App steckt in einer einzigen Datei: `index.html`. Öffne sie in Safari
 | --- | --- |
 | Programmcode | [EUPL-1.2](https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12) (European Union Public Licence), siehe `LICENSE` |
 | Texte, Aufgaben, Lesetexte, Wortlisten, Formulierungsvorschläge, Arbeitsblätter, Anleitung | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.de), siehe `LIZENZ-INHALTE.md` |
+| Schrift „Stufenfibel“ (abgeleitet von Andika, © SIL International; kleines l mit Bogen, auf Deutsch reduziert) | [SIL Open Font License 1.1](https://openfontlicense.org), siehe `fonts/OFL.txt` |
 
 © 2026 Stefan Hackl. Namensnennung für Inhalte: **„Stufenweise, Stefan Hackl, CC BY-SA 4.0“**.
 
