@@ -122,7 +122,7 @@ html{overscroll-behavior:none;touch-action:manipulation}
 .check svg{width:28px;height:28px}
 
 .welcome{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;overflow:auto}
-.welcome .mark svg{width:120px;height:80px}
+.welcome .mark svg{width:150px;height:111px}
 .welcome h2{font-size:30px;margin:14px 0 8px}
 .welcome p{font-size:19px;color:var(--muted);margin:0 0 24px}
 .welcome .acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
@@ -504,6 +504,8 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 #dlg-sheet{width:min(1100px,96vw);height:min(900px,94vh)}
 #dlg-sheet[open]{display:flex;flex-direction:column}
 #sheet-body{display:grid;grid-template-columns:320px 1fr;gap:14px;flex:1;min-height:0}
+.sh-mode{display:flex}.sh-mode button{flex:1}
+.hf-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:14px}.hf-list li{display:flex;align-items:center;gap:4px}.hf-list li span{flex:1;min-width:0}.hf-list .icon-btn{min-height:34px;min-width:34px;padding:2px 6px}
 .sheet-form{display:flex;flex-direction:column;gap:10px;overflow:auto}.sheet-form .row{min-width:0}.sheet-form select{min-width:0;max-width:100%;flex:1 1 auto}#sh-topic{width:100%}
 .sh-zones{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 #sh-frame{width:100%;height:100%;border:1px solid var(--line);border-radius:12px;background:#eee}
@@ -783,6 +785,7 @@ const PATHS = {
   take:'M4 12h16M7 5l10 14',
   minus:'M4 12h16',
   check:'M4 12l5 5L20 6',
+  plus:'M12 5v14M5 12h14',
   grid:'M3 4h5v16H3zM10 4h4v16h-4zM16 4h5v16h-5z',
   settings:'M10.23 4.92L10.50 2.52L13.50 2.52L13.77 4.92A7.3 7.3 0 0 1 15.76 5.74L17.64 4.23L19.77 6.36L18.26 8.24A7.3 7.3 0 0 1 19.08 10.23L21.48 10.50L21.48 13.50L19.08 13.77A7.3 7.3 0 0 1 18.26 15.76L19.77 17.64L17.64 19.77L15.76 18.26A7.3 7.3 0 0 1 13.77 19.08L13.50 21.48L10.50 21.48L10.23 19.08A7.3 7.3 0 0 1 8.24 18.26L6.36 19.77L4.23 17.64L5.74 15.76A7.3 7.3 0 0 1 4.92 13.77L2.52 13.50L2.52 10.50L4.92 10.23A7.3 7.3 0 0 1 5.74 8.24L4.23 6.36L6.36 4.23L8.24 5.74A7.3 7.3 0 0 1 10.23 4.92ZM15.1 12a3.1 3.1 0 1 0-6.2 0 3.1 3.1 0 1 0 6.2 0',
   close:'M6 6l12 12M18 6 6 18',
@@ -1265,7 +1268,7 @@ function renderWelcome(){
   
   $('#equation').textContent = ''; $('#words').hidden = true; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = '';
   $('#btn-say').hidden = true;
-  $('#stage').innerHTML = `<div class="welcome"><div><div class="mark" aria-hidden="true"><svg viewBox="0 0 60 40"><rect x="2" y="4" width="30" height="30" rx="3" fill="${fillOf('h','a')}"/><path d="M8 4v30M14 4v30M20 4v30M26 4v30M2 10h30M2 16h30M2 22h30M2 28h30" stroke="#0003"/><rect x="38" y="4" width="6" height="30" rx="2" fill="${fillOf('z','a')}"/><rect x="50" y="28" width="6" height="6" rx="1.5" fill="${fillOf('e','a')}"/></svg></div>
+  $('#stage').innerHTML = `<div class="welcome"><div><div class="mark" aria-hidden="true"><svg viewBox="0 0 54 40"><rect x="4" y="5" width="30" height="30" rx="1.5" fill="${fillOf('h','a')}"/><path d="M7 5v30M4 8h30M10 5v30M4 11h30M13 5v30M4 14h30M16 5v30M4 17h30M19 5v30M4 20h30M22 5v30M4 23h30M25 5v30M4 26h30M28 5v30M4 29h30M31 5v30M4 32h30" stroke="#0004" stroke-width=".5"/><rect x="40" y="5" width="3.4" height="30" rx="1" fill="${fillOf('z','a')}"/><path d="M40 8h3.4M40 11h3.4M40 14h3.4M40 17h3.4M40 20h3.4M40 23h3.4M40 26h3.4M40 29h3.4M40 32h3.4" stroke="#0004" stroke-width=".5"/><rect x="48" y="31.6" width="3.4" height="3.4" rx=".8" fill="${fillOf('e','a')}"/></svg></div>
     <h2>${{number:'Welche Zahl legst du?', add:'Welche Plus-Aufgabe legst du?', sub:'Welche Minus-Aufgabe legst du?', written:'Welche Aufgabe rechnest du schriftlich?', times:'Welche Mal-Aufgabe übst du?', money:'Rechnen mit Geld'}[app.mode]}</h2>
     <p>${app.mode === 'times' ? 'Wähle oben die Reihen – oder trage eine Aufgabe ein.' : app.mode === 'money' ? 'Oben wählst du: Betrag legen oder Wechselgeld.' : 'Trage oben ein – oder lass dir eine Aufgabe geben.'}</p>
     <div class="acts"><button id="w-edit" ${app.mode === 'money' ? 'hidden' : ''}>${icon('edit')}<span>${app.mode === 'number' ? 'Zahl eintragen' : 'Aufgabe eintragen'}</span></button>
@@ -5293,12 +5296,51 @@ function openSheets(pid, zoneKey){
   if(zoneKey){ const z = zoneToSheet(zoneKey); if(z){ S.topic = z.topic; if(z.zr) S.zr = z.zr; S.ue = z.ue || 'egal'; } }
   $('#dlg-sheet').showModal(); renderSheets();
 }
+/* ---------- Arbeitsheft: mehrere Blätter sammeln, mit Titelblatt, ohne Lösungen ---------- */
+const HEFT_KEY = 'stufenweise.heft';
+app.heft = (() => { try{ const h = JSON.parse(localStorage.getItem(HEFT_KEY)); if(h && Array.isArray(h.items)) return h; }catch{} return null; })() || {title:'Mein Arbeitsheft', pid:'none', items:[], toc:true};
+app.sheetMode = 'single';
+function saveHeft(){ try{ localStorage.setItem(HEFT_KEY, JSON.stringify(app.heft)); }catch{ toast('Das Heft ist zu groß zum Merken. Bitte jetzt drucken oder speichern.'); } }
+const LOGO_SVG = '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="26" width="10" height="9.5" rx="1.6" fill="#27834b"/><rect x="15" y="26" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="15" y="15.5" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="26" y="26" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="15.5" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="5" width="10" height="9.5" rx="1.6" fill="#c9414a"/><path d="M2.5 37.8h35" stroke="#2b2930" stroke-width="2.2" stroke-linecap="round"/></svg>';
+/* aktuelles Blatt als Heftseite übernehmen: genau diese Aufgaben, ohne Name/Datum, ohne Lösungen */
+function heftAdd(){
+  const doc = app.sheetDoc; if(!doc) return;
+  const d = new DOMParser().parseFromString(doc.html, 'text/html'), pg = d.querySelector('.page'); if(!pg) return;
+  pg.querySelector('.ab-meta')?.remove();
+  app.heft.items.push({title: doc.title, html: pg.innerHTML});
+  saveHeft(); toast(`Ins Arbeitsheft übernommen – jetzt ${app.heft.items.length} ${app.heft.items.length === 1 ? 'Seite' : 'Seiten'}.`);
+  renderSheets(true);
+}
+function buildHeft(){
+  const H = app.heft, kid = data.profiles.find(p => p.id === H.pid), name = kid ? kid.name : '';
+  const pages = H.items.map((it, i) => `<div class="page">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + 1} · `)}</div>`).join('');
+  const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><span class="cv-dots"></span><span>${i + 1}</span></li>`).join('')}</ol></div>` : '';
+  const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1><div class="cv-name">Name: <span>${escHtml(name)}</span></div>${toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
+  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:268mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}`;
+  return {title: H.title || 'Mein Arbeitsheft', html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${css}</style></head><body>${cover}${pages}</body></html>`};
+}
+function renderHeft(){
+  const H = app.heft;
+  $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
+    <label class="row">Titel <input id="hf-title" value="${escHtml(H.title)}" maxlength="40" style="flex:1;min-width:0"></label>
+    <label class="row">Name auf dem Titelblatt <select id="hf-kid">${[['none', 'leer lassen (zum Selbstschreiben)'], ...data.profiles.map(p => [p.id, escHtml(p.name)])].map(([v, n]) => `<option value="${v}" ${v === H.pid ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    <label class="row cb"><input type="checkbox" id="hf-toc" ${H.toc ? 'checked' : ''}> Inhaltsverzeichnis auf dem Titelblatt</label>
+    ${H.items.length ? `<ol class="hf-list">${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><button class="icon-btn" data-hf-up="${i}" ${i ? '' : 'disabled'} aria-label="nach oben">↑</button><button class="icon-btn" data-hf-down="${i}" ${i < H.items.length - 1 ? '' : 'disabled'} aria-label="nach unten">↓</button><button class="icon-btn" data-hf-del="${i}" aria-label="Seite entfernen">✕</button></li>`).join('')}</ol>` : `<p class="note"><b>Noch leer.</b> Wechsle zu „Einzelblatt“, stell ein Blatt zusammen und tippe auf „Ins Arbeitsheft“. Das wiederholst du für jede Seite.</p>`}
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
+    <p class="note">Das Heft hat ein Titelblatt mit Namen. Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Aufgaben bleiben so, wie du sie übernommen hast. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst.</p></div>
+    <iframe id="sh-frame" title="Vorschau Arbeitsheft"></iframe>`;
+  app.heftDoc = buildHeft();
+  const fr = $('#sh-frame'); fr.onload = null;
+  fr.srcdoc = app.heftDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.4, ((fr.clientWidth || 700) - 30)/830)).toFixed(2)}}}</style></head>`);
+}
+const sheetModeSwitch = () => `<div class="seg sh-mode" role="group" aria-label="Was drucken?"><button data-shmode="single" aria-pressed="${app.sheetMode === 'single'}">Einzelblatt</button><button data-shmode="heft" aria-pressed="${app.sheetMode === 'heft'}">Arbeitsheft${app.heft.items.length ? ` (${app.heft.items.length})` : ''}</button></div>`;
 function renderSheets(keep){
+  if(app.sheetMode === 'heft') return renderHeft();
   const S = app.sheet, isM = S.topic.startsWith('M:'), key = S.topic.split(':')[1];
   const kid = data.profiles.find(p => p.id === S.pid);
   const zones = kid ? ['M', 'L', 'W'].flatMap(sj => zoneReport(kid.id, sj).zones).filter(z => zoneToSheet(z.key)) : [];
   const sel = (id, opts, cur) => `<select id="${id}">${opts.map(([v, n]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
-  $('#sheet-body').innerHTML = `<div class="sheet-form">
+  $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Kind ${sel('sh-kid', [['none', 'ohne Namen'], ...data.profiles.map(p => [p.id, escHtml(p.name)])], S.pid)}</label>
     ${zones.length ? `<div class="sh-zones"><span class="note">Passend zur Förderzone:</span>${zones.map(z => `<button class="chip-toggle" data-shzone="${z.key}" aria-pressed="${(() => { const t = zoneToSheet(z.key); return t.topic === S.topic && (!t.zr || t.zr === S.zr) && (!t.ue || t.ue === S.ue); })()}">${escHtml(cellLabel(z.key).replace(/ \(.*\)$/, ''))}</button>`).join('')}</div>` : ''}
     <label class="row">Thema <select id="sh-topic">${sheetTopics().map(([g, opts]) => `<optgroup label="${g}">${opts.map(([v, n]) => `<option value="${v}" ${v === S.topic ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</optgroup>`).join('')}</select></label>
@@ -5308,7 +5350,7 @@ function renderSheets(keep){
     ${S.topic === 'L:L2' ? `<label class="row">Schrift ${sel('sh-case', [['up', 'nur Großbuchstaben'], ['mixed', 'Groß- und Kleinschreibung']], S.lcase ? 'mixed' : 'up')}</label>` : ''}
     <label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button></div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
     <p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge. Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P).</p></div>
     <iframe id="sh-frame" title="Vorschau Arbeitsblatt"></iframe>`;
   if(!keep || !app.sheetDoc) app.sheetDoc = buildSheet();
@@ -5320,7 +5362,15 @@ function sheetShow(){
   fr.srcdoc = app.sheetDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.4, ((fr.clientWidth || 700) - 30)/830)).toFixed(2)}}}</style></head>`);
 }
 function sheetEvents(e){
-  const S = app.sheet;
+  const S = app.sheet, H = app.heft;
+  const md = e.target.closest('[data-shmode]'); if(md){ app.sheetMode = md.dataset.shmode; return renderSheets(true); }
+  if(e.target.closest('#sh-heft')) return heftAdd();
+  const up = e.target.closest('[data-hf-up]'), dn = e.target.closest('[data-hf-down]'), del = e.target.closest('[data-hf-del]');
+  if(up || dn){ const i = +(up || dn).dataset[up ? 'hfUp' : 'hfDown'], j = up ? i - 1 : i + 1; [H.items[i], H.items[j]] = [H.items[j], H.items[i]]; saveHeft(); return renderHeft(); }
+  if(del){ H.items.splice(+del.dataset.hfDel, 1); saveHeft(); return renderHeft(); }
+  if(e.target.closest('#hf-clear')){ const b = e.target.closest('#hf-clear'); if(!b.dataset.sure){ b.dataset.sure = '1'; b.textContent = 'Wirklich leeren?'; return; } H.items = []; saveHeft(); return renderHeft(); }
+  if(e.target.closest('#hf-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
+  if(e.target.closest('#hf-save')){ const doc = app.heftDoc || buildHeft(); return saveFile(`Arbeitsheft ${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
   const z = e.target.closest('[data-shzone]'); if(z){ const t = zoneToSheet(z.dataset.shzone); S.topic = t.topic; if(t.zr) S.zr = t.zr; S.ue = t.ue || 'egal'; return renderSheets(); }
   if(e.target.closest('#sh-new')) return renderSheets();
   if(e.target.closest('#sh-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
@@ -5328,6 +5378,7 @@ function sheetEvents(e){
 }
 function sheetChange(e){
   const S = app.sheet, t = e.target;
+  if(t.id && t.id.startsWith('hf-')){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid') H.pid = t.value; if(t.id === 'hf-toc') H.toc = t.checked; saveHeft(); return renderHeft(); }
   if(t.id === 'sh-kid') S.pid = t.value;
   if(t.id === 'sh-topic') S.topic = t.value;
   if(t.id === 'sh-zr') S.zr = +t.value;
@@ -5660,7 +5711,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.13 · 11.11.2026';
+const APP_VERSION = '0.10.0 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5848,7 +5899,7 @@ $('#help-content').innerHTML = [
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
   ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung und am Ende keine Ergebnisse. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
   ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, Ideen für die Förderung ohne Gerät, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
-  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
+  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],
   ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schülerinnen und Schüler selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch.'],

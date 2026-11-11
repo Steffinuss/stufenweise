@@ -109,6 +109,16 @@ Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufe
 
 Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in Fünferreihen. Neu ist das Thema **Zahlen mit Material zeichnen**: Die Kinder zeichnen Zahlen in der Kurzschreibweise □ Hunderter, | Zehner, • Einer und lesen gezeichnete Zahlen ab. Wählst du eine Förderzone aus dem Rechnen, passt das Blatt genau dazu, zum Beispiel „Plus bis 20, mit Zehnerübergang“ für R3.
 
+### Arbeitsheft
+
+Mehrere Blätter lassen sich zu einem Heft zusammenstellen:
+
+1. Ein Blatt einstellen und auf **Ins Arbeitsheft** tippen. Das Blatt wird genau so übernommen, wie es in der Vorschau steht. Für jede weitere Seite wiederholen.
+2. Oben auf **Arbeitsheft** wechseln. Dort Titel und Namen für das Titelblatt wählen (oder leer lassen zum Selbstschreiben), die Reihenfolge mit ↑ ↓ ändern oder Seiten entfernen.
+3. **Heft drucken.** Das Heft hat ein Titelblatt mit Namen und Inhaltsverzeichnis. Die Seiten haben Seitenzahlen, aber keine Namenszeilen und keine Lösungen.
+
+Das Heft bleibt auf dem Gerät gespeichert, bis du es leerst.
+
 ## Schritt 7: Rückmeldung geben
 
 Melde dich am besten genau dann, wenn dir etwas auffällt. Die App schickt automatisch mit, wo du gerade bist, aber keinen Kindernamen.
