@@ -119,6 +119,8 @@ Mehrere Blätter lassen sich zu einem Heft zusammenstellen:
 
 Das Heft bleibt auf dem Gerät gespeichert, bis du es leerst.
 
+**Heft zur Förderzone:** Wenn ein Kind schon getestet wurde, kann Stufenweise das Heft selbst zusammenstellen. Im Lernstand des Kindes auf **Arbeitsheft zur Förderzone** tippen (oder im Arbeitsheft oben das Kind wählen). Die App zeigt die Förderzonen in Mathe, Lesen und Schreiben. Wähle 1 oder 2 Blätter je Stufe und tippe auf **Heft erstellen**. Jedes Blatt wird mit neuen Aufgaben gefüllt. Ein vorhandenes Heft wird dabei ersetzt; danach kannst du wie gewohnt Seiten verschieben, entfernen oder weitere hinzufügen.
+
 ## Schritt 7: Rückmeldung geben
 
 Melde dich am besten genau dann, wenn dir etwas auffällt. Die App schickt automatisch mit, wo du gerade bist, aber keinen Kindernamen.

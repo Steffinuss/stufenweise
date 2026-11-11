@@ -504,7 +504,7 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 #dlg-sheet{width:min(1100px,96vw);height:min(900px,94vh)}
 #dlg-sheet[open]{display:flex;flex-direction:column}
 #sheet-body{display:grid;grid-template-columns:320px 1fr;gap:14px;flex:1;min-height:0}
-.sh-mode{display:flex}.sh-mode button{flex:1}
+.sh-mode{display:flex}.hf-zone{display:flex;flex-direction:column;gap:6px;background:#fff;border:1.5px solid var(--line);border-left:5px solid #27834b;border-radius:12px;padding:10px 12px}.sh-mode button{flex:1}
 .hf-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:14px}.hf-list li{display:flex;align-items:center;gap:4px}.hf-list li span{flex:1;min-width:0}.hf-list .icon-btn{min-height:34px;min-width:34px;padding:2px 6px}
 .sheet-form{display:flex;flex-direction:column;gap:10px;overflow:auto}.sheet-form .row{min-width:0}.sheet-form select{min-width:0;max-width:100%;flex:1 1 auto}#sh-topic{width:100%}
 .sh-zones{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -3152,7 +3152,7 @@ function renderStats(){
   statsReport = teacher.rep;
   $('#stats-body').innerHTML = backupBox() + `<label class="row">Kind <select id="stats-who">${ids.map(([id, n]) => `<option value="${id}" ${id === statsId ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` + teacher.html + (secs.length ? '<h3 class="stats-h">Übungsprotokoll</h3>' : '') +
     (secs.length ? secs.map(s => `<fieldset><legend>${s.title}</legend><ul class="stat-lines">${s.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul></fieldset>`).join('') : '<p class="note" style="margin:14px 0">Noch keine Aufgaben geprüft. Gezählt wird jede Aufgabe mit „Prüfen“ oder „Fertig“.</p>') +
-    `<div class="row" style="margin-top:10px"><button id="stats-report" class="icon-btn primary">${icon('print')}<span style="display:inline">Bericht drucken</span></button><button id="stats-copy" class="icon-btn">${icon('check')}<span style="display:inline">Als Text kopieren</span></button><button id="stats-del" class="icon-btn">${icon('trash')}<span style="display:inline">Daten löschen</span></button></div><textarea id="stats-text" readonly hidden></textarea>`;
+    `<div class="row" style="margin-top:10px"><button id="stats-report" class="icon-btn primary">${icon('print')}<span style="display:inline">Bericht drucken</span></button><button id="stats-heft" class="icon-btn">${icon('print')}<span style="display:inline">Arbeitsheft zur Förderzone</span></button><button id="stats-copy" class="icon-btn">${icon('check')}<span style="display:inline">Als Text kopieren</span></button><button id="stats-del" class="icon-btn">${icon('trash')}<span style="display:inline">Daten löschen</span></button></div><textarea id="stats-text" readonly hidden></textarea>`;
 }
 
 /* =====================================================================
@@ -5275,7 +5275,7 @@ function buildSheet(limit){
   return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}</style></head><body><div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`};
 }
 /* Blatt füllen: in der Vorschau messen, wie viele volle Reihen auf die erste Seite passen */
-function sheetFit(fr){
+function sheetFit(fr, show = sheetShow){
   const G = app.sheetGen; if(!G || !G.fill || G.fitted) return;
   const d = fr.contentDocument; if(!d) return;
   const page = d.querySelector('.page'), tasks = [...d.querySelectorAll('.ab-grid > .ab-task')], foot = d.querySelector('.ab-lic'); if(!page || !tasks.length) return;
@@ -5283,12 +5283,18 @@ function sheetFit(fr){
   const pr = page.getBoundingClientRect(), limit = pr.top + (12 + 273 - 5)*mm - (foot ? foot.getBoundingClientRect().height + 6*mm : 10*mm); /* 5 mm Sicherheit: Druck misst minimal anders als die Vorschau */
   let fit = tasks.filter(t => t.getBoundingClientRect().bottom <= limit + 1).length;
   fit = Math.max(G.cols, fit - fit % G.cols);
-  if(G.checking){ /* Prüfrunde: die ausgewählten Aufgaben sind sortiert anders hoch – notfalls eine Reihe weniger */
-    if(fit >= tasks.length || G.limit <= G.cols || ++G.checking > 6){ G.fitted = true; return; }
-    G.limit -= G.cols; app.sheetDoc = buildSheet(G.limit); sheetShow(); return;
+  if(G.checking){ /* Prüfrunde: die ausgewählten Aufgaben sind sortiert anders hoch – notfalls eine Reihe weniger, bei viel Platz eine Reihe mehr */
+    if(fit >= tasks.length){
+      const top = tasks[0].getBoundingClientRect().top, last = Math.max(...tasks.slice(-G.cols).map(t => t.getBoundingClientRect().bottom));
+      const rowH = (last - top)/Math.ceil(tasks.length/G.cols);
+      if(!G.shrunk && G.limit < G.tasks.length && limit - last > rowH*0.75 && ++G.checking <= 10){ G.limit = Math.min(G.tasks.length, G.limit + G.cols); app.sheetDoc = buildSheet(G.limit); show(); return; }
+      G.fitted = true; return;
+    }
+    if(G.limit <= G.cols || ++G.checking > 10){ G.fitted = true; return; }
+    G.shrunk = true; G.limit -= G.cols; app.sheetDoc = buildSheet(G.limit); show(); return;
   }
   if(fit === G.limit && fit === tasks.length){ G.fitted = true; return; }
-  G.checking = 1; G.limit = fit; app.sheetDoc = buildSheet(fit); sheetShow();
+  G.checking = 1; G.limit = fit; app.sheetDoc = buildSheet(fit); show();
 }
 function openSheets(pid, zoneKey){
   const S = app.sheet;
@@ -5319,12 +5325,39 @@ function buildHeft(){
   const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:268mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}`;
   return {title: H.title || 'Mein Arbeitsheft', html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${css}</style></head><body>${cover}${pages}</body></html>`};
 }
+/* Heft zur Förderzone: je Förderzone ein (oder zwei) passende Blätter, auf die Seite eingepasst */
+const heftZones = pid => ['M', 'L', 'W'].flatMap(sj => zoneReport(pid, sj).zones).filter(z => { const t = zoneToSheet(z.key); return t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic)); });
+async function heftFromZones(pid, per = 1){
+  const kid = data.profiles.find(p => p.id === pid); if(!kid) return;
+  const zones = heftZones(pid); if(!zones.length){ toast(`Für ${kid.name} gibt es noch keine Förderzone. Zuerst einen Test machen.`); return; }
+  const keep = {...app.sheet}, H = app.heft, items = [];
+  const fr = document.createElement('iframe'); fr.setAttribute('aria-hidden', 'true'); fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:820px;height:1200px;visibility:hidden'; document.body.append(fr);
+  const load = html => new Promise(r => { fr.onload = () => setTimeout(r, 30); fr.srcdoc = html; });
+  toast('Das Heft wird zusammengestellt …');
+  try{
+    for(const z of zones) for(let k = 0; k < per; k++){
+      const t = zoneToSheet(z.key);
+      Object.assign(app.sheet, {pid, topic:t.topic, zr:t.zr || app.sheet.zr, ue:t.ue || 'egal', n:'fill', sol:false});
+      app.sheetDoc = buildSheet();
+      for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
+      const d = new DOMParser().parseFromString(app.sheetDoc.html, 'text/html'), pg = d.querySelector('.page');
+      pg.querySelector('.ab-meta')?.remove();
+      items.push({title: app.sheetDoc.title, html: pg.innerHTML});
+    }
+  } finally { fr.remove(); Object.assign(app.sheet, keep); app.sheetDoc = null; }
+  H.items = items; H.pid = pid; if(!H.title || H.title === 'Mein Arbeitsheft') H.title = 'Mein Übungsheft';
+  saveHeft(); app.sheetMode = 'heft'; renderSheets();
+  toast(`Fertig: ${items.length} ${items.length === 1 ? 'Seite' : 'Seiten'} passend zur Förderzone von ${kid.name}.`);
+}
+function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.sheet.pid = pid; $('#dlg-sheet').showModal(); renderSheets(); }
 function renderHeft(){
   const H = app.heft;
   $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Titel <input id="hf-title" value="${escHtml(H.title)}" maxlength="40" style="flex:1;min-width:0"></label>
     <label class="row">Name auf dem Titelblatt <select id="hf-kid">${[['none', 'leer lassen (zum Selbstschreiben)'], ...data.profiles.map(p => [p.id, escHtml(p.name)])].map(([v, n]) => `<option value="${v}" ${v === H.pid ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
     <label class="row cb"><input type="checkbox" id="hf-toc" ${H.toc ? 'checked' : ''}> Inhaltsverzeichnis auf dem Titelblatt</label>
+    ${(() => { const kid = data.profiles.find(p => p.id === H.pid); if(!kid) return data.profiles.length ? `<p class="note">Tipp: Wähle oben ein Kind – dann kann Stufenweise das Heft passend zu seiner Förderzone zusammenstellen.</p>` : ''; const zs = heftZones(kid.id);
+      return zs.length ? `<div class="hf-zone"><b>Heft zur Förderzone von ${escHtml(kid.name)}</b><span class="note">${zs.map(z => escHtml(cellLabel(z.key))).join(' · ')}</span><div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><label class="row">Blätter je Stufe <select id="hf-per">${[1, 2].map(n => `<option value="${n}" ${n === (H.per || 1) ? 'selected' : ''}>${n}</option>`).join('')}</select></label><button class="icon-btn primary" id="hf-zone">${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'}</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>` : `<p class="note">Für ${escHtml(kid.name)} gibt es noch keine Förderzone mit passendem Arbeitsblatt. Zuerst einen Test machen.</p>`; })()}
     ${H.items.length ? `<ol class="hf-list">${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><button class="icon-btn" data-hf-up="${i}" ${i ? '' : 'disabled'} aria-label="nach oben">↑</button><button class="icon-btn" data-hf-down="${i}" ${i < H.items.length - 1 ? '' : 'disabled'} aria-label="nach unten">↓</button><button class="icon-btn" data-hf-del="${i}" aria-label="Seite entfernen">✕</button></li>`).join('')}</ol>` : `<p class="note"><b>Noch leer.</b> Wechsle zu „Einzelblatt“, stell ein Blatt zusammen und tippe auf „Ins Arbeitsheft“. Das wiederholst du für jede Seite.</p>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
     <p class="note">Das Heft hat ein Titelblatt mit Namen. Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Aufgaben bleiben so, wie du sie übernommen hast. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst.</p></div>
@@ -5365,6 +5398,7 @@ function sheetEvents(e){
   const S = app.sheet, H = app.heft;
   const md = e.target.closest('[data-shmode]'); if(md){ app.sheetMode = md.dataset.shmode; return renderSheets(true); }
   if(e.target.closest('#sh-heft')) return heftAdd();
+  const hz = e.target.closest('#hf-zone'); if(hz){ if(hz.disabled) return; hz.disabled = true; return heftFromZones(H.pid, H.per || 1); }
   const up = e.target.closest('[data-hf-up]'), dn = e.target.closest('[data-hf-down]'), del = e.target.closest('[data-hf-del]');
   if(up || dn){ const i = +(up || dn).dataset[up ? 'hfUp' : 'hfDown'], j = up ? i - 1 : i + 1; [H.items[i], H.items[j]] = [H.items[j], H.items[i]]; saveHeft(); return renderHeft(); }
   if(del){ H.items.splice(+del.dataset.hfDel, 1); saveHeft(); return renderHeft(); }
@@ -5378,7 +5412,7 @@ function sheetEvents(e){
 }
 function sheetChange(e){
   const S = app.sheet, t = e.target;
-  if(t.id && t.id.startsWith('hf-')){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid') H.pid = t.value; if(t.id === 'hf-toc') H.toc = t.checked; saveHeft(); return renderHeft(); }
+  if(t.id && t.id.startsWith('hf-')){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid') H.pid = t.value; if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; saveHeft(); return renderHeft(); }
   if(t.id === 'sh-kid') S.pid = t.value;
   if(t.id === 'sh-topic') S.topic = t.value;
   if(t.id === 'sh-zr') S.zr = +t.value;
@@ -5711,7 +5745,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.10.0 · 11.11.2026';
+const APP_VERSION = '0.10.1 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5853,6 +5887,7 @@ $('#dlg-stats').addEventListener('change', e => { if(e.target.id === 'stats-who'
 $('#dlg-stats').addEventListener('click', async e => {
   const sz = e.target.closest('[data-sheetzone]'); if(sz){ $('#dlg-stats').close(); openSheets(statsId === 'guest' || statsId === 'class' ? 'none' : statsId, sz.dataset.sheetzone); return; }
   if(e.target.closest('#stats-report')){ $('#dlg-stats').close(); openReport(statsId); return; }
+  if(e.target.closest('#stats-heft')){ $('#dlg-stats').close(); openHeftZone(statsId); return; }
   if(e.target.closest('#class-csv')){ saveFile(`stufenweise-klasse-${new Date().toISOString().slice(0, 10)}.csv`, classCsv()); return; }
   const op = e.target.closest('[data-open]'); if(op){ statsId = op.dataset.open; renderStats(); $('#stats-body').scrollTop = 0; return; }
   const mx = e.target.closest('[data-mx]');
