@@ -560,6 +560,10 @@ body.np-open.np-left main{padding-right:12px;padding-left:250px}
 .lk-st.ok:not(:last-child)::after{background:#1f7a45}
 .lk-since{font-size:11px;font-weight:700;color:#1f7a45}
 .rail button[data-zone]{position:relative}
+.rail.compact #modes button.rail-fold{flex-direction:column;justify-content:center;align-items:center;gap:1px;text-align:center}
+.backup-due{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff4e3;border:1.5px solid #e8890c;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:15px}
+.backup-due span{flex:1;min-width:220px}
+.backup-state.due{color:#9a5a10;font-weight:700}
 #modes .rail-fold{min-height:52px;flex-direction:column;gap:2px;background:transparent;border:1.5px dashed #c9bfae;color:var(--muted);box-shadow:none}
 #modes .rail-fold span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
 #modes .rail-fold small{font-size:11px;font-weight:600}
@@ -690,6 +694,7 @@ a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:v
   </fieldset>
   <fieldset><legend>Daten sichern</legend>
     <p class="note">Alle Kinder, Ergebnisse und Einstellungen liegen nur in diesem Browser. Eine Sicherung schützt vor Verlust und bringt die Daten auf ein anderes Gerät. Die PIN wird nicht mitgesichert.</p>
+    <p class="note backup-state"></p>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button type="button" id="data-export" class="icon-btn primary">Sicherung speichern</button><label class="icon-btn file-btn">Sicherung laden<input type="file" id="data-import" accept=".json,application/json" hidden></label></div>
     <div id="import-ask" hidden><p class="note" id="import-info"></p><div class="row" style="justify-content:flex-start;gap:8px"><button type="button" id="import-merge" class="icon-btn primary">Zusammenführen</button><button type="button" id="import-replace" class="icon-btn">Alles ersetzen</button></div></div>
     <p class="note" id="data-text-note" hidden>Falls kein Download startet: Den Text unten markieren, kopieren und als Datei mit der Endung .json speichern.</p>
@@ -2642,6 +2647,15 @@ const DATA_KEY = 'stufenweise.data';
 const data = (() => { try { return {profiles:[], current:null, log:{}, ...JSON.parse(localStorage.getItem(DATA_KEY) || '{}')}; } catch { return {profiles:[], current:null, log:{}}; } })();
 const saveData = () => { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch {} };
 const curProfile = () => data.profiles.find(p => p.id === data.current) || null;
+/* Sicherung: Erinnerung nach 14 Tagen und Bitte an den Browser, die Daten nicht von selbst zu löschen */
+if(data.profiles.length && !data.firstUse){ data.firstUse = Date.now(); saveData(); }
+const BACKUP_DAYS = 14;
+const backupAge = () => Math.floor((Date.now() - (data.lastBackup || data.firstUse || Date.now()))/864e5);
+const backupDue = () => data.profiles.length > 0 && backupAge() >= BACKUP_DAYS;
+const backupText = () => data.lastBackup ? `Letzte Sicherung: ${backupAge() === 0 ? 'heute' : backupAge() === 1 ? 'gestern' : `vor ${backupAge()} Tagen`} (${new Date(data.lastBackup).toLocaleDateString('de-DE')}).` : 'Noch keine Sicherung gespeichert.';
+function backupStateUpdate(){ document.querySelectorAll('.backup-state').forEach(e => { e.textContent = backupText() + (backupDue() ? ' Bitte jetzt sichern.' : ''); e.classList.toggle('due', backupDue()); }); }
+const backupBox = () => backupDue() ? `<div class="backup-due" role="status"><span>${backupText()} Die Ergebnisse liegen nur auf diesem Gerät. Bitte sichere sie regelmäßig.</span><button type="button" class="icon-btn primary" data-backup-now>Jetzt sichern</button></div>` : '';
+(async () => { try{ if(navigator.storage?.persist && !(await navigator.storage.persisted())) await navigator.storage.persist(); }catch{} })();
 const curName = () => curProfile()?.name || 'Gast';
 const rnd = (lo, hi) => lo + Math.floor(Math.random()*(hi - lo + 1));
 const escHtml = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -3122,10 +3136,10 @@ function groupsHtml(){
 }
 function renderStats(){
   const ids = [...(data.profiles.length ? [['class', 'Ganze Klasse (Übersicht)']] : []), ...data.profiles.map(p => [p.id, p.name]), ['guest','Gast']];
-  if(statsId === 'class'){ statsReport = null; $('#stats-body').innerHTML = `<label class="row">Kind <select id="stats-who">${ids.map(([id, n]) => `<option value="${id}" ${id === statsId ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` + classHtml(); return; }
+  if(statsId === 'class'){ statsReport = null; $('#stats-body').innerHTML = backupBox() + `<label class="row">Kind <select id="stats-who">${ids.map(([id, n]) => `<option value="${id}" ${id === statsId ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` + classHtml(); return; }
   const secs = statsSections(statsId), teacher = teacherSectionHtml(statsId);
   statsReport = teacher.rep;
-  $('#stats-body').innerHTML = `<label class="row">Kind <select id="stats-who">${ids.map(([id, n]) => `<option value="${id}" ${id === statsId ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` + teacher.html + (secs.length ? '<h3 class="stats-h">Übungsprotokoll</h3>' : '') +
+  $('#stats-body').innerHTML = backupBox() + `<label class="row">Kind <select id="stats-who">${ids.map(([id, n]) => `<option value="${id}" ${id === statsId ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` + teacher.html + (secs.length ? '<h3 class="stats-h">Übungsprotokoll</h3>' : '') +
     (secs.length ? secs.map(s => `<fieldset><legend>${s.title}</legend><ul class="stat-lines">${s.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul></fieldset>`).join('') : '<p class="note" style="margin:14px 0">Noch keine Aufgaben geprüft. Gezählt wird jede Aufgabe mit „Prüfen“ oder „Fertig“.</p>') +
     `<div class="row" style="margin-top:10px"><button id="stats-report" class="icon-btn primary">${icon('print')}<span style="display:inline">Bericht drucken</span></button><button id="stats-copy" class="icon-btn">${icon('check')}<span style="display:inline">Als Text kopieren</span></button><button id="stats-del" class="icon-btn">${icon('trash')}<span style="display:inline">Daten löschen</span></button></div><textarea id="stats-text" readonly hidden></textarea>`;
 }
@@ -3475,8 +3489,38 @@ function freshN(pool, n){ const out = []; for(let t = 0; out.length < Math.min(n
 
 /* ---------- Lesen L1–L7 (BP GENT Deutsch 2.1.3): großer Aufgabenbestand ---------- */
 const iconOpt = k => ({h: iconSvg(k, 92), a: k});
-const SYL_X = {Tasche:['Ta','sche'], Fleisch:['Fleisch'], Sahne:['Sah','ne']};
-const rdWordHtml = (k, colored) => `<span class="rd-word">${colored ? (WORDS[k] || SYL_X[k] || [k]).map((s, i) => `<span class="syl ${i % 2 ? 'b' : 'a'}">${s}</span>`).join('') : k}</span>`;
+const SYL_X = {Tasche:['Ta','sche'], Fleisch:['Fleisch'], Sahne:['Sah','ne'], Bleistift:['Blei','stift'], Zitrone:['Zi','tro','ne'], Mittagessen:['Mit','tag','es','sen'], Ferien:['Fe','ri','en'], Radio:['Ra','di','o'], Besteck:['Be','steck']};
+/* Silben automatisch für alle Wörter ohne Eintrag: Regeln der Silbentrennung (vereinfacht).
+   Ein Konsonant zwischen zwei Vokalen geht zur nächsten Silbe (Ro-se), von mehreren nur der letzte (Kan-ne, Fens-ter);
+   ch, ck, sch, ph, th und qu bleiben zusammen (Zu-cker, Ta-sche). Häufige Vorsilben werden abgetrennt (ein-schla-gen). */
+const SYL_PRE = ['ein', 'aus', 'auf', 'ab', 'an', 'mit', 'vor', 'nach', 'hin', 'weg', 'ver', 'zer', 'un'];
+function sylRule(w){
+  const s = w.toLowerCase(), n = s.length, V = 'aeiouyäöü', nuc = [];
+  for(let i = 0; i < n;){
+    if(s.startsWith('qu', i)){ i += 2; continue; }
+    if(V.includes(s[i])){ const j = ['ei', 'ai', 'au', 'eu', 'äu', 'ie', 'aa', 'ee', 'oo'].includes(s.slice(i, i + 2)) ? i + 2 : i + 1; nuc.push([i, j]); i = j; }
+    else i++;
+  }
+  if(nuc.length < 2) return [w];
+  const cuts = [];
+  for(let k = 0; k < nuc.length - 1; k++){
+    const a = nuc[k][1], b = nuc[k + 1][0]; let p = a, lastU = a;
+    while(p < b){ const u = ['sch', 'ch', 'ck', 'ph', 'th'].find(x => s.startsWith(x, p) && p + x.length <= b) || s[p]; lastU = p; p += u.length; }
+    cuts.push(lastU);
+  }
+  const out = []; let last = 0; for(const c of cuts){ out.push(w.slice(last, c)); last = c; } out.push(w.slice(last));
+  return out.filter(Boolean);
+}
+function sylAuto(w){
+  const s = w.toLowerCase();
+  const pre = SYL_PRE.find(p => s.startsWith(p) && s.length > p.length + 2 && !'aeiouyäöü'.includes(s[p.length]) && /[aeiouyäöü]/.test(s.slice(p.length)));
+  return pre ? [w.slice(0, pre.length), ...sylRule(w.slice(pre.length))] : sylRule(w);
+}
+const sylOf = k => WORDS[k] || SYL_X[k] || sylAuto(k);
+const sylSpans = (parts, o = 0) => parts.map((s, i) => `<span class="syl ${(i + o) % 2 ? 'b' : 'a'}">${escHtml(s)}</span>`).join('');
+/* ganze Sätze silbenweise färben, Satzzeichen bleiben schwarz */
+const sylText = t => { let o = 0; return String(t).split(/([A-Za-zÄÖÜäöüß]+)/).map((x, i) => { if(!(i % 2)) return escHtml(x); const p = sylOf(x), h = sylSpans(p, o); o += p.length; return h; }).join(''); };
+const rdWordHtml = (k, colored) => `<span class="rd-word">${colored ? sylSpans(sylOf(k)) : k}</span>`;
 const wordOpt = (k, colored) => ({h: rdWordHtml(k, colored), a: k, word: k});
 const plainWordOpt = w => ({h: `<span class="rd-word">${escHtml(w)}</span>`, a: w, word: w});
 const others = (pool, not, n) => shuffle(pool.filter(x => !not.includes(x))).slice(0, n);
@@ -4481,7 +4525,7 @@ function itemStage(it, r, opt = {}){
   const head = (it.svg && it.type !== 'flash' ? `<div class="it-svg">${it.svg}</div>` : '') +
     (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 150)}</div>` : '') +
     (it.word ? `<div class="it-word">${rdWordHtml(it.word, opt.colored && it.colored !== false)}</div>` : '') +
-    (it.text ? `<div class="it-text ${it.textCls || ''}">${it.text.split(/ {3,}/).map(escHtml).join('<span class="it-gap" aria-hidden="true"></span>')}</div>` : '') +
+    (it.text ? `<div class="it-text ${it.textCls || ''}">${it.text.split(/ {3,}/).map(opt.colored ? sylText : escHtml).join('<span class="it-gap" aria-hidden="true"></span>')}</div>` : '') +
     (it.html ? `<div class="it-doc">${it.html}</div>` : '') +
 ''
   if(it.type === 'write') return writeStage(it, r, opt);
@@ -4877,6 +4921,7 @@ function pinKey(k){
   renderPin();
 }
 function pinSettingsHtml(){
+  backupStateUpdate();
   $('#pin-state').textContent = settings.pin ? 'Eine PIN ist festgelegt. Lernstand, Tests, Arbeitsblätter, Einstellungen und das Anlegen von Kindern sind geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.' : 'Noch keine PIN. Ohne PIN können auch Kinder Lernstand und Einstellungen öffnen.';
   $('#pin-del').hidden = !settings.pin; $('#pin-lock').hidden = !settings.pin;
   $('#pin-save').textContent = settings.pin ? 'PIN ändern' : 'PIN festlegen';
@@ -4891,6 +4936,7 @@ async function saveFile(filename, text){
 }
 /* ---------- Datensicherung ---------- */
 function exportData(){
+  data.lastBackup = Date.now(); saveData(); backupStateUpdate();
   const payload = {app:'stufenweise', version:2, exported: new Date().toISOString(), data, settings: {...settings, pin: undefined}};
   const json = JSON.stringify(payload);
   const name = `stufenweise-sicherung-${new Date().toISOString().slice(0, 10)}.json`;
@@ -5582,7 +5628,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.5 · 11.11.2026';
+const APP_VERSION = '0.9.6 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5699,6 +5745,7 @@ $('#pin-save').addEventListener('click', () => { const v = $('#pin-new').value.t
 $('#pin-del').addEventListener('click', () => { settings.pin = ''; saveSettings(); pinSettingsHtml(); toast('PIN entfernt.'); });
 $('#pin-lock').addEventListener('click', () => { app.teacherUntil = 0; dlgSet.close(); renderProfiles(); toast('Lehrkraft-Bereich gesperrt.'); });
 $('#data-export').addEventListener('click', exportData);
+document.addEventListener('click', e => { if(e.target.closest('[data-backup-now]')){ exportData(); e.target.closest('.backup-due')?.remove(); toast('Sicherung gespeichert. Auf dem iPad liegt sie in der Dateien-App.'); } });
 $('#data-import').addEventListener('change', e => { const f = e.target.files[0]; if(f) importFile(f); e.target.value = ''; });
 $('#import-merge').addEventListener('click', () => applyImport('merge'));
 $('#import-replace').addEventListener('click', () => applyImport('replace'));
@@ -5714,7 +5761,7 @@ $('#dlg-profile').addEventListener('click', e => {
 $('#dlg-profile').addEventListener('submit', e => {
   e.preventDefault(); if(!teacherOn()) return; const n = $('#pname').value.trim(); if(!n) return;
   const p = {id: 'p' + Date.now().toString(36), name: n, created: Date.now(), rec: null, screening: null};
-  data.profiles.push(p); data.current = p.id; saveData(); renderProfiles(); render();
+  data.profiles.push(p); data.current = p.id; data.firstUse ||= Date.now(); saveData(); renderProfiles(); render();
 });
 $('#dlg-stats').addEventListener('change', e => { if(e.target.id === 'stats-who'){ statsId = e.target.value; renderStats(); } });
 $('#dlg-stats').addEventListener('click', async e => {

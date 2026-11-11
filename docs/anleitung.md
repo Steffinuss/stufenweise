@@ -131,6 +131,10 @@ In Safari auf „Teilen“ → „Zum Home-Bildschirm“ tippen. Stufenweise sta
 
 iPadOS lädt eine solche App beim Öffnen oft nicht neu. Deshalb prüft Stufenweise selbst, ob es eine neue Version gibt: beim Öffnen, beim Zurückkehren in die App und alle 30 Minuten. Gibt es eine, erscheint oben der Hinweis „Neue Version … ist da“ mit dem Knopf **Jetzt aktualisieren**. Von Hand geht es in den Einstellungen („Nach neuer Version suchen“) oder in der Anleitung neben der Versionsnummer („Aktualisieren“). Namen, Ergebnisse und Einstellungen bleiben dabei erhalten.
 
+### Daten sichern
+
+Alle Namen und Ergebnisse liegen nur auf diesem Gerät, und zwar getrennt für jede Adresse und für die App auf dem Home-Bildschirm. Wer das Symbol vom Home-Bildschirm löscht oder in Safari die Websitedaten löscht, löscht auch die Ergebnisse. Deshalb: Einstellungen → „Daten sichern“ → **Sicherung speichern**. Die Datei landet in der Dateien-App und kann mit „Sicherung laden“ zurückgeholt oder auf ein anderes Gerät gebracht werden. Ist die letzte Sicherung 14 Tage oder länger her, erinnert der Lernstand mit einem Hinweis „Jetzt sichern“. Die App bittet das iPad außerdem, ihre Daten dauerhaft aufzubewahren.
+
 ## Über Stufenweise: Lizenz und Danke
 
 Stufenweise ist ein offenes Projekt: kostenlos, ohne Werbung und für alle Schulen. Unter **Anleitung (?)** steht ganz unten „Über Stufenweise“.
