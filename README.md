@@ -32,6 +32,10 @@ Die ganze App steckt in einer einzigen Datei: `index.html`. Öffne sie in Safari
 - Die Schrift ist in die App eingebunden; es wird nichts aus dem Internet nachgeladen. Die App funktioniert nach dem ersten Laden auch offline.
 - Die Rückmeldefunktion öffnet nur das eigene Mailprogramm oder GitHub; ein Kindername wird nicht mitgeschickt.
 
+## Impressum und Datenschutz
+
+Stefan Hackl, c/o Gustav-Werner-Schule, Böfinger Weg 28, 89075 Ulm. Stufenweise ist ein privates, nicht kommerzielles Projekt und kein Angebot der Schule. Ausführlich: [Impressum und Datenschutz](https://steffinuss.github.io/stufenweise/impressum.html) (auch in der App über die Startseite und die Anleitung erreichbar).
+
 ## Lizenz
 
 | Teil | Lizenz |

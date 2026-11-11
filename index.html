@@ -563,6 +563,8 @@ body.np-open.np-left main{padding-right:12px;padding-left:250px}
 .rail.compact #modes button.rail-fold{flex-direction:column;justify-content:center;align-items:center;gap:1px;text-align:center}
 .backup-due{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff4e3;border:1.5px solid #e8890c;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:15px}
 .backup-due span{flex:1;min-width:220px}
+.legal{max-width:720px;line-height:1.55;font-size:15.5px}.legal h3{font-size:19px;margin:18px 0 6px}.legal p{margin:0 0 10px}.legal .legal-addr{display:inline-block;background:#f2ede3;border-radius:10px;padding:8px 14px}.legal .legal-stand{color:var(--muted);font-size:13.5px}
+.home-legal{display:block;margin:28px auto 0;font-size:13px;color:var(--muted)}
 .privacy-box{margin-top:12px;background:#fff;border:1.5px solid var(--line);border-left:5px solid #346bc3;border-radius:12px;padding:12px 16px}.privacy-box h3{margin:0 0 6px;font-size:17px}.privacy-box ul{margin:0 0 10px;padding-left:20px;font-size:14.5px;line-height:1.45}.privacy-box li{margin:3px 0}
 .backup-state.due{color:#9a5a10;font-weight:700}
 #modes .rail-fold{min-height:52px;flex-direction:column;gap:2px;background:transparent;border:1.5px dashed #c9bfae;color:var(--muted);box-shadow:none}
@@ -732,6 +734,10 @@ a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:v
 <dialog id="dlg-fb" aria-labelledby="fb-title">
   <div class="dlg-head"><h2 id="fb-title">Rückmeldung geben</h2><button data-close class="icon-btn">Schließen</button></div>
   <div id="fb-body"></div>
+</dialog>
+<dialog id="dlg-legal" aria-labelledby="legal-title">
+  <div class="dlg-head"><h2 id="legal-title">Impressum und Datenschutz</h2><button data-close class="icon-btn">Schließen</button></div>
+  <div id="legal-content" class="legal"></div>
 </dialog>
 <dialog id="dlg-help" aria-labelledby="help-title">
   <div class="dlg-head"><h2 id="help-title">So geht Stufenweise</h2><button data-close class="icon-btn">Schließen</button></div>
@@ -3150,13 +3156,29 @@ function renderStats(){
    Kinderprofile
    ===================================================================== */
 /* Datenschutz-Hinweis: einmal bestätigen, bevor das erste Kind angelegt wird */
+const LEGAL_HTML = `<h3>Impressum</h3>
+<p>Angaben nach § 18 Abs. 1 Medienstaatsvertrag:</p>
+<p class="legal-addr">Stefan Hackl<br>c/o Gustav-Werner-Schule<br>Böfinger Weg 28<br>89075 Ulm</p>
+<p>Stufenweise ist ein privates, nicht kommerzielles Open-Source-Projekt von Stefan Hackl. Es ist kein Angebot der Gustav-Werner-Schule, der Stadt Ulm oder des Landes Baden-Württemberg. Es gibt keine Werbung und keine Einnahmen.</p>
+<p><b>Kontakt:</b> über eine Meldung auf GitHub: <a href="https://github.com/Steffinuss/stufenweise/issues" target="_blank" rel="noopener">github.com/Steffinuss/stufenweise/issues</a> (öffentlich sichtbar) oder per Post an die Anschrift oben.</p>
+
+<h3>Datenschutz</h3>
+<p><b>1. Verantwortlich für diese Website</b> ist Stefan Hackl, Anschrift siehe Impressum.</p>
+<p><b>2. Daten in der App.</b> Alles, was in Stufenweise eingegeben wird (Namen oder Kürzel, Ergebnisse, Lernstände, Einstellungen), wird ausschließlich im Speicher des Browsers auf dem verwendeten Gerät abgelegt (localStorage). Diese Daten werden nicht an den Anbieter oder an Dritte übertragen; der Anbieter hat keinen Zugriff darauf. Verantwortlich für diese Daten ist, wer die App einsetzt, an einer Schule also die Schule. Gelöscht werden sie in der App (im Lernstand „Daten löschen“, unter „Wer übt?“ das Kind löschen) oder durch Löschen der Websitedaten im Browser. Eine Sicherungsdatei entsteht nur, wenn sie ausdrücklich gespeichert wird.</p>
+<p><b>3. Bereitstellung (Hosting).</b> Die Website wird über GitHub Pages bereitgestellt (GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA, ein Unternehmen von Microsoft). Beim Aufruf verarbeitet GitHub technisch notwendige Daten in Protokolldateien, insbesondere IP-Adresse, Datum und Uhrzeit, aufgerufene Datei und Browserangaben, um die Seite auszuliefern und vor Missbrauch zu schützen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren Bereitstellung). Für Übermittlungen in die USA stützt sich GitHub nach eigenen Angaben auf das EU-US Data Privacy Framework und Standardvertragsklauseln. Weitere Informationen: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">Datenschutzerklärung von GitHub</a>.</p>
+<p><b>4. Keine Cookies, kein Tracking.</b> Stufenweise setzt keine Cookies, nutzt keine Analyse- oder Werbedienste und lädt keine Inhalte von Dritten nach. Die Schrift ist in die App eingebaut.</p>
+<p><b>5. Suche nach neuen Versionen.</b> Die App fragt beim Öffnen und gelegentlich während der Nutzung beim selben Server die Datei version.json ab, um auf neue Versionen hinzuweisen. Dabei werden keine Daten aus der App übertragen.</p>
+<p><b>6. Rückmeldungen.</b> Der Knopf „Rückmeldung“ öffnet eine vorausgefüllte Meldung auf GitHub oder, falls in den Einstellungen eine Adresse eingetragen ist, das eigene Mailprogramm. Die App selbst sendet nichts. Meldungen auf GitHub sind öffentlich; für sie gilt die Datenschutzerklärung von GitHub.</p>
+<p><b>7. Ihre Rechte.</b> Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Widerspruch (Art. 15–18 und 21 DSGVO). Sie können sich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel beim Landesbeauftragten für den Datenschutz und die Informationsfreiheit Baden-Württemberg, Lautenschlagerstraße 20, 70173 Stuttgart.</p>
+<p class="legal-stand">Stand: 11. November 2026</p>`;
+function openLegal(){ document.querySelectorAll('dialog[open]').forEach(d => d.close()); $('#legal-content').innerHTML = LEGAL_HTML; $('#dlg-legal').showModal(); }
 const PRIVACY_BOX = `<div class="privacy-box" role="note"><h3>Bevor du Kinder anlegst: Datenschutz</h3><ul>
 <li><b>Nur auf diesem Gerät:</b> Namen und Lernstände werden nur hier gespeichert. Stufenweise schickt keine Schülerdaten ins Internet.</li>
 <li><b>Schülerdaten:</b> Lernstände sind Schülerdaten. Für den Einsatz mit echten Namen braucht es die Freigabe der Schulleitung; auf privaten Geräten zusätzlich die Genehmigung nach der VwV „Datenschutz an öffentlichen Schulen“.</li>
 <li><b>Sparsam:</b> Nur Vornamen oder Kürzel, keine Nachnamen, keine Diagnosen oder Gesundheitsangaben.</li>
 <li><b>Schützen:</b> Gerätecode einschalten und eine Lehrkraft-PIN festlegen. Sicherungsdateien nur dort ablegen, wo die Schule Schülerdaten erlaubt.</li>
 <li><b>Löschen:</b> Kinder löschen, wenn sie die Lerngruppe verlassen, spätestens am Ende des folgenden Schuljahres.</li>
-</ul><button type="button" class="icon-btn primary" id="privacy-ok">Verstanden</button></div>`;
+</ul><div class="row" style="justify-content:flex-start;gap:12px;flex-wrap:wrap"><button type="button" class="icon-btn primary" id="privacy-ok">Verstanden</button><button type="button" class="link-btn" data-legal>Impressum und Datenschutz</button></div></div>`;
 function renderProfiles(){
   const locked = !teacherOn();
   $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
@@ -4897,7 +4919,7 @@ function renderHome(){
       <p class="home-sub">${cards.length ? 'Oder such dir selbst etwas aus:' : ''}</p>
       <div class="home-subj"><button data-home-subj="M"><b>123</b>Mathe</button><button data-home-subj="D"><b>Abc</b>Deutsch</button></div>
       ${p ? `<div class="home-row">${cards.length ? `<button class="home-map" data-home-warm>${icon('next')} Startrunde (3 Aufgaben)</button>` : ''}<button class="home-map" data-home-map>${icon('target')} Meine Lernlandkarte</button></div>` : ''}
-      ${data.profiles.length ? `<button class="linkish home-switch" data-home-pick-again>${p ? `Nicht ${escHtml(p.name)}? Namen wechseln` : 'Namen wählen'}</button>` : ''}</div>`;
+      ${data.profiles.length ? `<button class="linkish home-switch" data-home-pick-again>${p ? `Nicht ${escHtml(p.name)}? Namen wechseln` : 'Namen wählen'}</button>` : ''}<button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
   }
   $('#stage').innerHTML = h;
 }
@@ -5638,7 +5660,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.8 · 11.11.2026';
+const APP_VERSION = '0.9.9 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5756,6 +5778,7 @@ $('#pin-save').addEventListener('click', () => { const v = $('#pin-new').value.t
 $('#pin-del').addEventListener('click', () => { settings.pin = ''; saveSettings(); pinSettingsHtml(); toast('PIN entfernt.'); });
 $('#pin-lock').addEventListener('click', () => { app.teacherUntil = 0; dlgSet.close(); renderProfiles(); toast('Lehrkraft-Bereich gesperrt.'); });
 $('#data-export').addEventListener('click', exportData);
+document.addEventListener('click', e => { if(e.target.closest('[data-legal]')){ e.preventDefault(); openLegal(); } });
 document.addEventListener('click', e => { if(e.target.closest('#privacy-ok')){ settings.privacyAck = Date.now(); saveSettings(); renderProfiles(); setTimeout(() => $('#pname')?.focus(), 50); } });
 document.addEventListener('click', e => { if(e.target.closest('[data-backup-now]')){ exportData(); e.target.closest('.backup-due')?.remove(); toast('Sicherung gespeichert. Auf dem iPad liegt sie in der Dateien-App.'); } });
 $('#data-import').addEventListener('change', e => { const f = e.target.files[0]; if(f) importFile(f); e.target.value = ''; });
@@ -5836,6 +5859,7 @@ $('#help-content').innerHTML = [
   ['edit','Schrift','Die Schrift „Stufenfibel“ ist aus der Leseschrift Andika von SIL International abgeleitet (SIL Open Font License&nbsp;1.1). Geändert: Das kleine l hat unten einen Bogen, damit es sich deutlich vom großen I unterscheidet; die Schrift ist auf die Zeichen für Deutsch reduziert. Sie steckt in der App selbst, es wird nichts aus dem Internet nachgeladen.'],
   ['edit','Mit KI entwickelt','Stufenweise wurde mit Unterstützung der KI Claude (Anthropic) programmiert. Konzept, fachliche Entscheidungen und Prüfung: Stefan Hackl. Die Einstufungen sind begründete Vorschläge und ersetzen keine sonderpädagogische Diagnostik.'],
   ['user','Danke','__THANKS__'],
+  ['check','Impressum und Datenschutz','Stufenweise ist ein privates, nicht kommerzielles Open-Source-Projekt von Stefan Hackl. Alle eingegebenen Daten bleiben nur auf diesem Gerät. <button class="link-btn" type="button" data-legal>Impressum und Datenschutz öffnen</button>'],
   ['chat','Mitmachen','Fehler, Ideen und Lob über den Knopf „Rückmeldung“: Er füllt eine Meldung auf GitHub vor (github.com/Steffinuss/stufenweise, dort liegt auch der Quelltext). Dafür braucht es ein kostenloses GitHub-Konto, und die Meldung ist öffentlich, also bitte keine Namen von Kindern. Ohne Konto: die Rückmeldung an die Person geben, die Stufenweise an deiner Schule betreut. Eigene Texte oder Aufgaben übernimmt Stefan nur mit deinem Einverständnis; sie stehen dann ebenfalls unter CC&nbsp;BY-SA&nbsp;4.0.']
 ].map(([i,h,p]) => i === 'h' ? `<h3 class="help-group">${h}</h3>` : `<div class="help-step">${icon(i)}<div><h3>${h}</h3><p>${p === '__THANKS__' ? thanksHtml() : p}</p></div></div>`).join('');
 
