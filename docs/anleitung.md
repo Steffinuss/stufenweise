@@ -100,11 +100,17 @@ Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Lin
 
 ![Übung Wechselgeld mit Material](bilder/12_ueben.png)
 
+### Frei legen mit Tausendern
+
+Unter **Frei legen → Würfel** wählst du oben „Zehner und Einer“, „mit Hundertern“ oder „mit Tausendern“. Mit Tausendern kommen Tausenderwürfel dazu: 10 Hunderter lassen sich zu 1 Tausender bündeln und 1 Tausender wieder in 10 Hunderter tauschen. „Ordnen“ legt alles in die Stellenwerttafel T · H · Z · E.
+
 ### Hundertertafel und Tausenderbuch
 
 Links unter **Tafel** übt das Kind mit der Hundertertafel (1 bis 100) in sieben Stufen: Zahlen finden, Tafel und Material verbinden (Zehnerstangen, Punktefeld, Zahlwort), Nachbarn und Lücken, Ausschnitte ergänzen, Wege gehen (unten +10, rechts +1), Muster erkennen und zuletzt das Tausenderbuch. Die Stufen H1–H7 sind Teil des Mathe-Tests (Teil 2) und erscheinen in der Kompetenzmatrix.
 
-Bei **Zahlen**, **Plus** und **Minus** gibt es im Zahlenraum bis 100 außerdem die Ansicht **Tafel** (bis 1000: **Tausenderbuch**). Das Kind springt mit den Knöpfen +10 und +1 (oder −10, −1, ±100) oder tippt Felder an. Der Weg bleibt sichtbar. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet.
+Bei **Zahlen**, **Plus** und **Minus** gibt es im Zahlenraum bis 100 außerdem die Ansicht **Tafel** (bis 1000: **Tausenderbuch**). Der Start ist orange markiert. Das Kind springt mit den Knöpfen +10 und +1 (bei Minus −10 und −1, bis 1000 auch ±100) oder tippt ein Feld in seiner Spalte (Zehner) oder ein paar Felder weiter (Einer) an. Schräge Sprünge lässt die App nicht zu. Der Weg bleibt sichtbar, darunter steht er als Rechnung, zum Beispiel „Start 52 · +10 +10 +10 +10 · 3-mal +1 = 95“. Bei jeder neuen Aufgabe beginnt der Weg neu.
+
+Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901–1000). Ein orangefarbener Punkt markiert die Startseite, ein blauer die Seite, auf der das Kind gerade ist. Mit einem Tipp auf eine Seite kann es blättern. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet; im Tausenderbuch muss das Kind zuerst die richtige Seite aufschlagen.
 
 ## Schritt 6: Arbeitsblätter drucken
 

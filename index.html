@@ -640,6 +640,10 @@ input.hb-in.no{border-style:solid;border-color:var(--bad);background:#fbe7e4}
 .hb-book{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-left:6px solid var(--z);border-radius:4px}.hb-book small{font-size:14px;color:var(--muted);font-weight:700}.hb-book b{font-size:26px}
 .hb-task{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;overflow:auto;padding:6px}
 .hb-c.path{background:#e3edf9;border-color:#9cbbe6}.hb-c.cur{background:var(--z);border-color:var(--z);color:#fff}
+.hb-pages{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}.hb-pages button{position:relative;min-height:36px;min-width:52px;padding:2px 6px;font-size:14px;font-weight:700;border-radius:8px 8px 3px 3px;border-bottom:3px solid #d6cdbb}.hb-pages button[aria-pressed=true]{background:var(--dark);color:#fff;border-bottom-color:var(--dark)}
+.hb-pages i{position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;border:2px solid #fff}.hb-pages .pg-start{left:-3px;background:var(--focus)}.hb-pages .pg-cur{right:-3px;background:var(--z)}
+@media (min-aspect-ratio:1/1){.hb-task.book{display:grid;grid-template-columns:auto auto;grid-template-rows:1fr auto;align-content:center;justify-content:center;column-gap:16px}.hb-task.book .hb-pages{flex-direction:column;flex-wrap:nowrap;grid-row:1;align-self:center}.hb-task.book .hb-pages button{min-height:30px;border-radius:3px 8px 8px 3px;border-bottom:0;border-left:3px solid #d6cdbb;font-size:13px}.hb-task.book .hb-pages button[aria-pressed=true]{border-left-color:var(--dark)}.hb-task.book .hb{grid-row:1}.hb-task.book .hb-steps{grid-column:1/3}}
+.hb-c.mk.cur0{box-shadow:0 0 0 3px var(--z)}
 .hb-steps{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center;font-weight:800;font-size:20px}.hb-steps span{background:#e3edf9;border-radius:10px;padding:2px 10px}.hb-steps span.st0{background:#fde3b8}
 button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .rail-tafel{width:22px;height:22px;display:block;margin:0 auto}
@@ -805,9 +809,9 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 'use strict';
 /* ---------- Grundlagen ---------- */
 const $ = s => document.querySelector(s);
-const SIZE = {h:100, z:10, e:1};
-const NAME = {h:'Hunderter', z:'Zehner', e:'Einer'};
-const PLACE = {h:'#c9414a', z:'#346bc3', e:'#27834b'};
+const SIZE = {t:1000, h:100, z:10, e:1};
+const NAME = {t:'Tausender', h:'Hunderter', z:'Zehner', e:'Einer'};
+const PLACE = {t:'#27834b', h:'#c9414a', z:'#346bc3', e:'#27834b'}; /* Montessori: Tausender wieder grün */
 const RANGES = [6,10,20,100,1000];
 const MODES = {number:{label:'Zahlen', sym:'▦'}, add:{label:'Plus', sym:'+'}, sub:{label:'Minus', sym:'−'}, written:{label:'Schriftlich', sym:'≡'}, times:{label:'Einmaleins', sym:'×'}, money:{label:'Geld', sym:'€'}, blitz:{label:'Blitzblick', sym:'✦'}, read:{label:'Lesen', sym:'Aa'}, free:{label:'Frei legen', sym:'✋'}};
 const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'];
@@ -957,6 +961,8 @@ function moveFor(ps, range){
   if(ps.length % 10 === 0 && k === 'z' && range >= 100) return {from:'z', to:'h', up:true, groups: ps.length/10};
   if(ps.length === 1 && k === 'z') return {from:'z', to:'e', up:false, groups:1};
   if(ps.length === 1 && k === 'h') return {from:'h', to:'z', up:false, groups:1};
+  if(ps.length % 10 === 0 && k === 'h' && range > 1000) return {from:'h', to:'t', up:true, groups: ps.length/10};
+  if(ps.length === 1 && k === 't') return {from:'t', to:'h', up:false, groups:1};
   return null;
 }
 /* Tauscht in einer Liste: Zellen bleiben erhalten (für die Animation). */
@@ -1018,7 +1024,13 @@ function fillOf(kind, c){
 }
 
 /* ---------- Miniaturbild für Tausch-Knöpfe ---------- */
+/* Tausenderwürfel schräg: Vorderseite s×s mit 10er-Raster, Deckel und Seite */
+function cubeArt(x, y, s, col, attrs = ''){
+  const d = s*.32, u = s/10, top = shadeHex(col, .35), side = shadeHex(col, -.25);
+  return `<g${attrs}><path d="M${x} ${y + d}l${d} ${-d}h${s}l${-d} ${d}z" fill="${top}" stroke="#0005" stroke-width="${s/150}"/><path d="M${x + s} ${y + d}l${d} ${-d}v${s}l${-d} ${d}z" fill="${side}" stroke="#0005" stroke-width="${s/150}"/><rect x="${x}" y="${y + d}" width="${s}" height="${s}" fill="${col}" stroke="#0005" stroke-width="${s/150}"/><path d="${Array.from({length:9}, (_, i) => `M${x + u*(i + 1)} ${y + d}v${s}M${x} ${y + d + u*(i + 1)}h${s}`).join('')}" stroke="#0003" stroke-width="${s/240}"/><path d="${Array.from({length:9}, (_, i) => `M${x + u*(i + 1)} ${y + d}l${d} ${-d}M${x + s + d*(i + 1)/10} ${y + d - d*(i + 1)/10}v${s}`).join('')}" stroke="#0002" stroke-width="${s/300}"/></g>`;
+}
 function mini(kind, count, color){
+  if(kind === 't'){ let c = ''; for(let n = 0; n < count; n++) c += cubeArt(n*36, 0, 26, color); return `<svg viewBox="0 0 ${count*36} 36" width="${count*36}" height="36" aria-hidden="true">${c}</svg>`; }
   const w = kind==='h' ? 40 : 4, h = kind==='e' ? 4 : 40, gap = kind==='e' ? 1 : 3;
   const span = count*w + (count-1)*gap + (kind==='e' && count>5 ? 3 : 0);
   let cells = '';
@@ -1027,7 +1039,8 @@ function mini(kind, count, color){
     const y = kind==='h' ? Math.floor(i/10)*4 : kind==='z' ? i*4 : 0;
     cells += `<rect x="${x}" y="${y}" width="4" height="4" fill="${color}" stroke="#00000040" stroke-width=".35" rx=".6"/>`;
   }
-  return `<svg viewBox="0 0 ${span} ${h}" width="${span}" height="${h}" aria-hidden="true">${cells}</svg>`;
+  const k = kind === 'h' && count > 5 ? .55 : 1;
+  return `<svg viewBox="0 0 ${span} ${h}" width="${span*k}" height="${h*k}" aria-hidden="true">${cells}</svg>`;
 }
 function tradePicture(mv, color){
   if(!mv) return icon('exchange') + `<span class="lbl">${exchangeVerb()}</span>`;
@@ -1422,7 +1435,7 @@ function taskPrompt(t){
   const ex = settings.words === 'bundle';
   if(t.view === 'board'){ const w = app.range === 1000 ? 'im Tausenderbuch' : 'in der Hundertertafel'; return app.mode === 'number' ? (t.find ? `Wo steht die Zahl ${w}? Tippe das Feld an.` : `Hier steht die Zahl ${w}.`) : app.mode === 'add' ? `Starte bei ${t.a} und gehe ${t.b} weiter. Wo landest du?` : `Starte bei ${t.a} und gehe ${t.b} zurück. Wo landest du?`; }
   if(t.view === 'line') return app.mode === 'number' ? (t.find ? 'Schätze: Wo liegt die Zahl? Tippe auf den Zahlenstrahl.' : 'Hier liegt die Zahl auf dem Zahlenstrahl.') : app.mode === 'add' ? `Springe von ${t.a} aus ${t.b} weiter. Wo landest du?` : `Springe von ${t.a} aus ${t.b} zurück. Wo landest du?`;
-  if(app.mode === 'number') return app.range < 10 ? 'Wie viele sind es? Zähle nach.' : `Die Zahl ist gelegt. ${ex ? 'Bündle oder entbündle' : 'Tausche um'}: Die Menge bleibt gleich.`;
+  if(app.mode === 'number') return app.range < 10 || t.a < 10 ? 'Wie viele sind es? Zähle nach.' : `Die Zahl ist gelegt. ${ex ? 'Bündle oder entbündle' : 'Tausche um'}: Die Menge bleibt gleich.`;
   if(app.mode === 'add') return t.done ? (countKind(t.rows[0],'e') >= 10 ? `10 Einer = 1 Zehner. ${ex ? 'Bündle' : 'Tausche'} die Einer.` : countKind(t.rows[0],'z') >= 10 && app.range >= 100 ? `10 Zehner = 1 Hunderter. ${ex ? 'Bündle' : 'Tausche'} die Zehner.` : 'Wie viele sind es zusammen?') : 'Zwei Mengen. Lege sie zusammen.';
   if(t.done) return 'Die durchgestrichenen Teile sind weg. Wie viele bleiben übrig?';
   return settings.subMode === 'self' ? `Nimm ${t.b} weg. Tippe die Teile an und drücke „Wegnehmen“.` : `Nimm ${t.b} weg.`;
@@ -1516,8 +1529,9 @@ function renderTaskControls(t){
 
 function taskHint(t){
   if(t.view === 'board'){
-    if(app.mode === 'number') return t.find && t.findGuess != null ? undefined : setHint('');
+    if(app.mode === 'number') return t.find && t.findGuess != null ? undefined : setHint(t.find && app.range === 1000 ? 'Suche zuerst die richtige Seite. Dann tippe das Feld an.' : '');
     if(!settings.help || t.check === 'ok') return t.check === 'ok' ? undefined : setHint('');
+    if((t.bpath || []).length > 1 && tbPos(t) === resultOf(app.mode, t.a, t.b)) return setHint(`Du bist bei ${tbPos(t)} angekommen. Schreibe das Ergebnis ins Feld.`, 'good');
     const sg = app.mode === 'add' ? '+' : '−', h = Math.floor(t.b/100), z = Math.floor(t.b/10) % 10, e = t.b % 10, parts = [];
     if(h) parts.push(`${h}-mal ${sg}100`); if(z) parts.push(`${z}-mal ${sg}10`); if(e) parts.push(`${e}-mal ${sg}1`);
     return setHint(`${app.mode === 'add' ? 'Unten +10, rechts +1' : 'Oben −10, links −1'}${app.range === 1000 ? `, eine Seite ${app.mode === 'add' ? 'weiter' : 'zurück'} ${sg}100` : ''}. Für ${sg}${t.b}: ${parts.join(', dann ')}.`);
@@ -1566,7 +1580,7 @@ function selectionHelp(ps){
 function pushHist(t){ t.hist.push(structuredClone({rows:t.rows, done:t.done})); if(t.hist.length > 50) t.hist.shift(); }
 function setupRows(t){
   t.rows = app.mode === 'add' ? [build(t.a,'a',app.range), build(t.b,'b',app.range)] : [build(t.a,'a',app.range)];
-  t.done = false; t.reveal = false; t.hist = []; t.check = null; t.tries = 0; t.findGuess = null; app.sel.clear();
+  t.done = false; t.reveal = false; t.hist = []; t.check = null; t.tries = 0; t.findGuess = null; t.bpath = null; t.bview = null; app.sel.clear();
 }
 function commitTask(){
   const t = task(), a = t.draft[0].trim() === '' ? NaN : Number(t.draft[0]), b = app.mode === 'number' ? 0 : t.draft[1].trim() === '' ? NaN : Number(t.draft[1]);
@@ -1675,28 +1689,39 @@ function noteError(mode, type){ if(!type) return; const pid = data.current || 'g
 const boardViewOk = () => (app.range === 100 || app.range === 1000) && ['number', 'add', 'sub'].includes(app.mode);
 const tbPos = t => (t.bpath ||= [t.a]).at(-1);
 function drawTaskBoard(t){
-  const num = app.mode === 'number', res = num ? t.a : resultOf(app.mode, t.a, t.b), pos = num ? t.a : tbPos(t), marks = {};
-  if(!num){ for(const p of t.bpath) if(p >= 1) marks[p] = 'path'; if(t.a >= 1) marks[t.a] = 'mk'; if(pos >= 1 && pos !== t.a) marks[pos] = 'cur'; if(t.check === 'ok' || (resultsOn() && t.reveal)) marks[res] = 'fb-ok'; }
+  const num = app.mode === 'number', res = num ? t.a : resultOf(app.mode, t.a, t.b), pos = num ? t.a : tbPos(t), marks = {}, done = t.check === 'ok';
+  if(!num){ for(const p of t.bpath) if(p >= 1) marks[p] = 'path'; if(pos >= 1 && pos !== t.a) marks[pos] = 'cur'; if(t.a >= 1) marks[t.a] = pos === t.a ? 'mk cur0' : 'mk'; if(done || (resultsOn() && t.reveal)) marks[res] = 'fb-ok'; }
   else if(!t.find) marks[t.a] = 'mk';
   else if(t.findGuess != null){ marks[t.a] = t.findGuess === t.a ? 'fb-ok' : 'mk'; if(t.findGuess !== t.a) marks[t.findGuess] = 'fb-no'; }
-  const page = hPageOf(Math.max(1, num ? t.a : (t.check === 'ok' ? res : pos)));
-  const steps = !num && t.bpath.length > 1 ? `<div class="hb-steps"><span class="st0">${t.a}</span>${t.bpath.slice(1).map((p, i) => { const d = p - t.bpath[i]; return `<span>${d > 0 ? '+' : '−'}${Math.abs(d)}</span>`; }).join('')}<b>= ${pos}</b></div>` : '';
+  const big = app.range === 1000, auto = hPageOf(Math.max(1, num ? t.a : (done ? res : pos))), page = big && t.bview != null ? t.bview : big && num && t.find && t.findGuess == null ? 0 : auto;
   const hide = num && t.find && t.findGuess == null, show = {};
   if(hide) for(let i = 0; i < 10; i++){ show[hAt(page, 0, i)] = 'num'; show[hAt(page, i, 9)] = 'num'; }
-  return `<div class="hb-task">${boardHtml({page, marks, def: hide ? 'blank' : 'num', show, title: app.range === 1000 ? `Seite ${hPageName(page)}` : ''}, {tap: num ? !!t.find && t.findGuess == null : t.check !== 'ok'})}${steps}</div>`;
+  /* Tausenderbuch: Seitenleiste zum Blättern; Punkte zeigen Start (orange) und aktuelle Stelle (blau) */
+  const pages = big ? `<div class="hb-pages" role="group" aria-label="Seiten im Tausenderbuch">${Array.from({length:10}, (_, p) => `<button data-tbpage="${p}" aria-pressed="${p === page}" aria-label="Seite ${hPageName(p)}"><span>${hPageName(p)}</span>${!num && hPageOf(Math.max(1, t.a)) === p ? '<i class="pg-start"></i>' : ''}${!num && pos >= 1 && pos !== t.a && hPageOf(pos) === p ? '<i class="pg-cur"></i>' : ''}</button>`).join('')}</div>` : '';
+  const runs = []; if(!num) for(let i = 1; i < t.bpath.length; i++){ const d = t.bpath[i] - t.bpath[i - 1], last = runs.at(-1); if(last && last.d === d) last.n++; else runs.push({d, n:1}); }
+  const chip = d => `<span>${d > 0 ? '+' : '−'}${Math.abs(d)}</span>`;
+  const steps = !num ? `<div class="hb-steps"><span class="st0">Start ${t.a}</span>${runs.map(r => r.n <= 3 ? chip(r.d).repeat(r.n) : `<span>${r.n}-mal ${r.d > 0 ? '+' : '−'}${Math.abs(r.d)}</span>`).join('')}${t.bpath.length > 1 ? `<b>= ${pos}</b>` : ''}</div>` : '';
+  return `<div class="hb-task${big ? ' book' : ''}">${pages}${boardHtml({page, marks, def: hide ? 'blank' : 'num', show, title: big ? `Seite ${hPageName(page)}` : ''}, {tap: num ? !!t.find && t.findGuess == null : !done})}${steps}</div>`;
 }
+/* Erlaubte Sprünge: Einer (bis 9 Schritte), Zehner und Hunderter – immer in Rechenrichtung */
+function tbAllowed(p, q){ const d = q - p; if(!d || (app.mode === 'add' ? d < 0 : d > 0)) return false; const a = Math.abs(d); return a <= 9 || a % 10 === 0; }
 function boardTap(n){
   const t = task();
-  if(app.mode !== 'number'){ if(t.check === 'ok') return; tbPos(t); if(n !== t.bpath.at(-1)) t.bpath.push(n); return renderWork(); }
+  if(app.mode !== 'number'){
+    if(t.check === 'ok') return; const p = tbPos(t);
+    if(n === p) return;
+    if(!tbAllowed(p, n)) return setHint(app.mode === 'add' ? 'Bei Plus gehst du nach unten (Zehner) oder nach rechts (Einer). Tippe ein Feld in deiner Spalte oder ein paar Felder weiter.' : 'Bei Minus gehst du nach oben (Zehner) oder nach links (Einer). Tippe ein Feld in deiner Spalte oder ein paar Felder zurück.', 'warn');
+    t.bpath.push(n); t.bview = null; return renderWork();
+  }
   if(!t.find || t.findGuess != null) return;
-  t.findGuess = n; const ok = n === t.a;
+  t.findGuess = n; t.bview = null; const ok = n === t.a;
   logAttempt({mode:'find', range:app.range, task:String(t.a), guess:n, dist:Math.abs(n - t.a), ok, tries:1, view:'board'});
   renderWork();
   const msg = ok ? 'Genau getroffen!' : `Das ist die ${n}. Die ${t.a} ist orange markiert.`;
   setHint(msg, ok ? 'good' : 'warn'); speak(ok ? msg : `Das ist die ${n}.`);
   if(ok) celebrate($('#stage .hb-c.fb-ok'));
 }
-function tbJump(t, d){ const p = tbPos(t), q = p + d; if(q < (app.mode === 'sub' ? 0 : 1) || q > app.range) return; t.bpath.push(q); renderWork(); }
+function tbJump(t, d){ const p = tbPos(t), q = p + d; if(q < (app.mode === 'sub' ? 0 : 1) || q > app.range){ setHint(q > app.range ? `Weiter als ${app.range} geht es nicht.` : 'Kleiner als 0 geht es nicht.', 'warn'); return; } t.bpath.push(q); t.bview = null; renderWork(); }
 function checkGuess(){
   const t = task(), g = $('#guess'); if(!g || g.value.trim() === '') { g?.focus(); return; }
   const res = resultOf(app.mode, t.a, t.b);
@@ -1713,15 +1738,16 @@ function checkGuess(){
 }
 
 /* ---------- Frei legen ---------- */
-const FS = {h:[120,120], z:[12,120], e:[12,12]};
+const FS = {t:[159,159], h:[120,120], z:[12,120], e:[12,12]};
 function board(){ return app.freeBoard ||= {pieces:[], hist:[], sel:new Set(), color:0, show:false, place:'ze', mat:'cubes', ordered:false, money:[], msel:new Set(), mhist:[]}; }
-const freeCols = () => board().place === 'hze' ? ['h','z','e'] : ['z','e'];
-const freeCap = () => board().place === 'hze' ? 1000 : 99;
+const freeCols = () => ({thze:['t','h','z','e'], hze:['h','z','e']})[board().place] || ['z','e'];
+const freeCap = () => ({thze:9999, hze:1000})[board().place] || 99;
+const freeMax = () => ({thze:19999, hze:1999})[board().place] || 299;
 let ext = {w:640, h:420};
 const freeTotal = b => b.pieces.reduce((n,p) => n + SIZE[p.kind], 0);
 const freeFill = (p, c) => montessori() ? PLACE[p.kind] : c;
 function zones(){
-  const cols = freeCols(), share = {h:.48, z:.30, e:.22}, sum = cols.reduce((n,k) => n + share[k], 0);
+  const cols = freeCols(), share = cols.includes('t') ? {t:.36, h:.32, z:.18, e:.14} : {h:.48, z:.30, e:.22}, sum = cols.reduce((n,k) => n + share[k], 0);
   let x = 0; const out = {};
   for(const k of cols){ const w = ext.w * share[k] / sum; out[k] = {x, w}; x += w; }
   return out;
@@ -1747,7 +1773,7 @@ function placeNear(p, others){
 function firstFree(p, others){
   const z = board().ordered ? zones()[p.kind] : null, [w,h] = FS[p.kind];
   const x0 = z ? z.x + 8 : 8, x1 = z ? z.x + z.w - w - 4 : ext.w - w - 4;
-  const step = p.kind === 'h' ? 10 : 4;
+  const step = p.kind === 'h' || p.kind === 't' ? 10 : 4;
   for(let y = board().ordered ? 40 : 8; y <= ext.h - h - 2; y += p.kind === 'e' ? 4 : 10)
     for(let x = x0; x <= Math.max(x0, x1); x += step){ const q = {...p, x, y}; if(isFree(q, others)) return q; }
   return placeNear({...p, x:x0, y:40}, others) ?? {...p, x:x0, y:40};
@@ -1755,14 +1781,14 @@ function firstFree(p, others){
 function freeArrange(ps){
   const out = [], zs = board().ordered ? zones() : null;
   let yAll = 8;
-  for(const k of ['h','z','e']){
+  for(const k of ['t','h','z','e']){
     const list = ps.filter(p => p.kind === k); if(!list.length) continue;
-    const [w,h] = FS[k], gx = k === 'h' ? 10 : k === 'z' ? 4 : 2, gy = k === 'e' ? 2 : 10;
+    const [w,h] = FS[k], gx = k === 'h' || k === 't' ? 10 : k === 'z' ? 4 : 2, gy = k === 'e' ? 2 : 10;
     const x0 = zs ? zs[k].x + 10 : 8, width = zs ? zs[k].w - 20 : ext.w - 16;
-    const extra = k === 'h' ? 0 : 6;
+    const extra = k === 'h' || k === 't' ? 0 : 6;
     let per = Math.max(1, Math.floor((width + gx) / (w + gx)));
-    if(k !== 'h') per = per >= 10 ? 10 : per >= 5 ? 5 : per;
-    if(k === 'h') per = Math.min(per, 5);
+    if(k !== 'h' && k !== 't') per = per >= 10 ? 10 : per >= 5 ? 5 : per;
+    if(k === 'h' || k === 't') per = Math.min(per, 5);
     let y0 = zs ? 42 : yAll;
     list.forEach((p, i) => { const c = i % per, r = Math.floor(i / per); out.push({...p, x: x0 + c*(w+gx) + (c >= 5 ? extra : 0), y: y0 + r*(h+gy) + (k === 'e' ? Math.floor(r/5)*6 : 0)}); });
     const rows = Math.ceil(list.length / per);
@@ -1786,10 +1812,10 @@ function renderFree(before){
     freeObserver.disconnect(); freeObserver.observe($('#board'));
   }
   const cols = freeCols(), col = FREE_COLORS[b.color];
-  const art = k => { const [w,h] = FS[k]; return Array.from({length:SIZE[k]}, (_,i) => `<rect x="${k==='h' ? i%10*12 : 0}" y="${k==='h' ? Math.floor(i/10)*12 : k==='z' ? i*12 : 0}" width="12" height="12" fill="${montessori() ? PLACE[k] : col}" stroke="#0000004d" stroke-width=".8" rx="1.6"/>`).join(''); };
-  const vb = {h:'-6 -6 132 132', z:'-60 -6 132 132', e:'-18 -18 48 48'};
+  const art = k => { if(k === 't') return cubeArt(0, 0, 120, montessori() ? PLACE.t : col); const [w,h] = FS[k]; return Array.from({length:SIZE[k]}, (_,i) => `<rect x="${k==='h' ? i%10*12 : 0}" y="${k==='h' ? Math.floor(i/10)*12 : k==='z' ? i*12 : 0}" width="12" height="12" fill="${montessori() ? PLACE[k] : col}" stroke="#0000004d" stroke-width=".8" rx="1.6"/>`).join(''); };
+  const vb = {t:'-6 -6 171 171', h:'-6 -6 132 132', z:'-60 -6 132 132', e:'-18 -18 48 48'};
   const total = freeTotal(b);
-  $('#stage .tray').innerHTML = cols.map(k => `<button class="kind" data-kind="${k}" aria-label="${NAME[k]} hinlegen" ${total + SIZE[k] > (board().place === 'hze' ? 1999 : 299) ? 'disabled' : ''}><svg viewBox="${vb[k]}" aria-hidden="true">${art(k)}</svg><span>${NAME[k]}</span></button>`).join('') +
+  $('#stage .tray').innerHTML = cols.map(k => `<button class="kind" data-kind="${k}" aria-label="${NAME[k]} hinlegen" ${total + SIZE[k] > freeMax() ? 'disabled' : ''}><svg viewBox="${vb[k]}" aria-hidden="true">${art(k)}</svg><span>${NAME[k]}</span></button>`).join('') +
     (montessori() ? '' : `<div class="colors" role="group" aria-label="Farbe">${FREE_COLORS.map((c,i) => `<button data-color="${i}" style="--sw:${c}" aria-pressed="${b.color===i}" aria-label="${FREE_COLOR_NAMES[i]}" title="${FREE_COLOR_NAMES[i]}"></button>`).join('')}</div>`);
   updateExtent();
   drawBoard();
@@ -1810,7 +1836,7 @@ function drawBoard(){
     const [w,h] = FS[p.kind], sel = b.sel.has(p.id);
     s += `<g data-p="${p.id}" filter="url(#sh)" transform="translate(${p.x} ${p.y})" role="button" tabindex="0" aria-pressed="${sel}" aria-label="${NAME[p.kind]}. Antippen wählt aus, Pfeiltasten verschieben, Entfernen löscht.">
       <rect x="-2" y="-2" width="${w+4}" height="${h+4}" fill="transparent"/>` +
-      p.cells.map((c,i) => `<rect data-cell="${c.id}" x="${p.kind==='h' ? i%10*12 : 0}" y="${p.kind==='h' ? Math.floor(i/10)*12 : p.kind==='z' ? i*12 : 0}" width="12" height="12" fill="${freeFill(p, c.c)}" stroke="#0000004d" stroke-width=".8" rx="1.6"/>`).join('') +
+      (p.kind === 't' ? cubeArt(0, 0, 120, freeFill(p, p.cells[0].c)) : p.cells.map((c,i) => `<rect data-cell="${c.id}" x="${p.kind==='h' ? i%10*12 : 0}" y="${p.kind==='h' ? Math.floor(i/10)*12 : p.kind==='z' ? i*12 : 0}" width="12" height="12" fill="${freeFill(p, c.c)}" stroke="#0000004d" stroke-width=".8" rx="1.6"/>`).join('')) +
       (sel ? `<rect x="-3" y="-3" width="${w+6}" height="${h+6}" rx="3" fill="none" stroke="#e8890c" stroke-width="1.8" pointer-events="none"/>` : '') + '</g>';
   }
   svg.innerHTML = s;
@@ -1826,7 +1852,7 @@ function renderFreeControls(){
   c.push(toolBtn({id:'f-del', ic:'selTrash', label:'Auswahl weg', disabled:!ps.length}));
   c.push('<span class="sep"></span>');
   if(resultsOn()){
-    const counts = ['h','z','e'].filter(k => freeCols().includes(k)).map(k => `${k.toUpperCase()} ${b.pieces.filter(p => p.kind === k).length}`).join(' · ');
+    const counts = ['t','h','z','e'].filter(k => freeCols().includes(k)).map(k => `${k.toUpperCase()} ${b.pieces.filter(p => p.kind === k).length}`).join(' · ');
     c.push(`<div class="total" aria-live="polite">${b.show ? `${total} <small>${counts}</small>` : '?'}</div>`);
     c.push(toolBtn({id:'f-show', ic: b.show ? 'eyeoff' : 'eye', label: b.show ? 'Verdecken' : 'Menge'}));
   }
@@ -1834,12 +1860,12 @@ function renderFreeControls(){
   c.push(toolBtn({id:'f-all', ic:'trash', label:'Alles weg', disabled:!b.pieces.length}));
   $('#controls').innerHTML = c.join('');
   if(!settings.help){ setHint(''); return; }
-  if(!b.pieces.length) setHint(b.place === 'hze' ? 'Tippe oder ziehe Hunderter, Zehner oder Einer.' : 'Tippe oder ziehe Zehner oder Einer.');
+  if(!b.pieces.length) setHint(b.place === 'thze' ? 'Tippe oder ziehe Tausender, Hunderter, Zehner oder Einer.' : b.place === 'hze' ? 'Tippe oder ziehe Hunderter, Zehner oder Einer.' : 'Tippe oder ziehe Zehner oder Einer.');
   else setHint(selectionHelp(ps));
 }
 function freeRefresh(before){ renderFree(before); }
 function addFree(kind, at){
-  const b = board(); if(freeTotal(b) + SIZE[kind] > (b.place === 'hze' ? 1999 : 299)) return;
+  const b = board(); if(freeTotal(b) + SIZE[kind] > freeMax()) return;
   const col = FREE_COLORS[b.color];
   let p = {id: ++uid, kind, cells: Array.from({length:SIZE[kind]}, () => ({id: ++uid, c: col})), x:0, y:0};
   p = at ? (placeNear({...p, ...at}, b.pieces) ?? firstFree(p, b.pieces)) : firstFree(p, b.pieces);
@@ -3330,7 +3356,7 @@ function renderTopNew(){
     const b = board();
     $('#range-label').textContent = 'Material';
     $('#ranges').innerHTML = `<button data-fmat="cubes" aria-pressed="${b.mat === 'cubes'}">Würfel</button><button data-fmat="money" aria-pressed="${b.mat === 'money'}">Geld</button>`;
-    $('#inputs').innerHTML = b.mat === 'cubes' ? `<div class="seg" role="group" aria-label="Stellen"><button data-fplace="ze" aria-pressed="${b.place === 'ze'}">Zehner und Einer</button><button data-fplace="hze" aria-pressed="${b.place === 'hze'}">mit Hundertern</button></div>` : '';
+    $('#inputs').innerHTML = b.mat === 'cubes' ? `<div class="seg" role="group" aria-label="Stellen"><button data-fplace="ze" aria-pressed="${b.place === 'ze'}">Zehner und Einer</button><button data-fplace="hze" aria-pressed="${b.place === 'hze'}">mit Hundertern</button><button data-fplace="thze" aria-pressed="${b.place === 'thze'}">mit Tausendern</button></div>` : '';
     rb.hidden = true; return true;
   }
   if(m === 'home' || m === 'map'){ $('#range-label').textContent = ''; $('#ranges').innerHTML = ''; $('#inputs').innerHTML = ''; rb.hidden = true; return true; }
@@ -3646,13 +3672,20 @@ function sylRule(w){
   const cuts = [];
   for(let k = 0; k < nuc.length - 1; k++){
     const a = nuc[k][1], b = nuc[k + 1][0]; let p = a, lastU = a;
-    while(p < b){ const u = ['sch', 'ch', 'ck', 'ph', 'th'].find(x => s.startsWith(x, p) && p + x.length <= b) || s[p]; lastU = p; p += u.length; }
+    const us = [];
+    while(p < b){ const u = ['sch', 'ch', 'ck', 'ph', 'th', 'gh'].find(x => s.startsWith(x, p) && p + x.length <= b) || s[p]; us.push([p, u]); lastU = p; p += u.length; }
+    /* Sprechsilben: Verbindungen wie tr, br, pl, kl, schl bleiben zusammen (Zi-tro-ne, Pa-pri-ka, ge-schlos-sen) */
+    if(us.length >= 2){ const [[p1, u1], [, u2]] = us.slice(-2); if((['b', 'p', 'd', 't', 'g', 'k', 'f'].includes(u1) && ['r', 'l'].includes(u2) && !['dl', 'tl'].includes(u1 + u2)) || (u1 === 'sch' && ['l', 'r', 'w'].includes(u2))) lastU = p1; }
     cuts.push(lastU);
   }
   const out = []; let last = 0; for(const c of cuts){ out.push(w.slice(last, c)); last = c; } out.push(w.slice(last));
   return out.filter(Boolean);
 }
+/* Zusammengesetzte Wörter, die die Regeln nicht erkennen (Wortfuge) */
+const SYL_XL = {hausaufgabe:['Haus', 'auf', 'ga', 'be'], notausgang:['Not', 'aus', 'gang'], fischstäbchen:['Fisch', 'stäb', 'chen'], käsespätzle:['Kä', 'se', 'spätz', 'le'], mittwoch:['Mitt', 'woch'], nachtschicht:['Nacht', 'schicht'], unangenehm:['un', 'an', 'ge', 'nehm'], weitererzählt:['wei', 'ter', 'er', 'zählt'], spiegeleier:['Spie', 'gel', 'ei', 'er'], werkstatt:['Werk', 'statt'], lasagne:['La', 'sa', 'gne'], kaya:['Ka', 'ya'], hausaufgaben:['Haus', 'auf', 'ga', 'ben'], nachtisch:['Nach', 'tisch'], mittag:['Mit', 'tag'], abendessen:['A', 'bend', 'es', 'sen'], frühstück:['Früh', 'stück'], bushaltestelle:['Bus', 'hal', 'te', 'stel', 'le'], waschanlage:['Wasch', 'an', 'la', 'ge'], funkloch:['Funk', 'loch'], blütenstaub:['Blü', 'ten', 'staub'], baustelle:['Bau', 'stel', 'le'], schulstraße:['Schul', 'stra', 'ße'], rathaus:['Rat', 'haus'], bolognese:['Bo', 'lo', 'gne', 'se'], team:['Team']};
 function sylAuto(w){
+  if(w.includes('-')){ const segs = w.split('-'), out = []; segs.forEach((g, i) => { if(!g) return; const q = sylAuto(g); if(i < segs.length - 1) q[q.length - 1] += '-'; out.push(...q); }); return out; }
+  const xl = SYL_XL[w.toLowerCase()]; if(xl){ let i = 0; return xl.map(x => { const r = w.slice(i, i + x.length); i += x.length; return r; }); }
   const s = w.toLowerCase();
   const pre = SYL_PRE.find(p => s.startsWith(p) && s.length > p.length + 2 && !'aeiouyäöü'.includes(s[p.length]) && /[aeiouyäöü]/.test(s.slice(p.length)));
   return pre ? [w.slice(0, pre.length), ...sylRule(w.slice(pre.length))] : sylRule(w);
@@ -3733,7 +3766,7 @@ function ynItem(){ let s, yes, n, t = 0; do { [s, yes, n] = factSentence(); t++;
 const TEXTS = [
   {text:'Lea will Brot kaufen. Sie fährt mit dem Bus zum Laden. Der Bus kommt um 8 Uhr. Das Brot kostet 3 Euro.', qs:[['Womit fährt Lea zum Laden?', ['mit dem Bus', 'mit dem Rad', 'mit dem Auto']], ['Wann kommt der Bus?', ['um 8 Uhr', 'um 3 Uhr', 'um 10 Uhr']], ['Was will Lea kaufen?', ['Brot', 'Milch', 'Limo']]]},
   {text:'Tom macht ein Praktikum in einer Werkstatt. Am Montag streicht er eine Tür. Dafür braucht er einen Pinsel. Am Dienstag repariert er einen Stuhl.', qs:[['Was braucht Tom zum Streichen?', ['einen Pinsel', 'einen Hammer', 'eine Lupe']], ['Was macht Tom am Dienstag?', ['Er repariert einen Stuhl.', 'Er streicht eine Tür.', 'Er kauft Brot.']], ['Wo macht Tom sein Praktikum?', ['in einer Werkstatt', 'in einem Laden', 'in der Kantine']]]},
-  {text:'In der Kantine gibt es heute Nudeln mit Tomaten-Soße. Das Essen kostet 4 Euro. Die Kantine ist von 12 bis 14 Uhr offen.', qs:[['Was kostet das Essen?', ['4 Euro', '12 Euro', '14 Euro']], ['Was gibt es heute?', ['Nudeln', 'Fisch', 'Pizza']], ['Wann macht die Kantine auf?', ['um 12 Uhr', 'um 4 Uhr', 'um 14 Uhr']]]},
+  {text:'In der Kantine gibt es heute Nudeln mit Tomatensoße. Das Essen kostet 4 Euro. Die Kantine ist von 12 bis 14 Uhr offen.', qs:[['Was kostet das Essen?', ['4 Euro', '12 Euro', '14 Euro']], ['Was gibt es heute?', ['Nudeln', 'Fisch', 'Pizza']], ['Wann macht die Kantine auf?', ['um 12 Uhr', 'um 4 Uhr', 'um 14 Uhr']]]},
   {text:'Ali hat am Freitag Geburtstag. Er wird 16 Jahre alt. Er lädt seine Freunde zum Pizza-Essen ein. Die Feier beginnt um 18 Uhr.', qs:[['Wann hat Ali Geburtstag?', ['am Freitag', 'am Montag', 'am Sonntag']], ['Wie alt wird Ali?', ['16 Jahre', '18 Jahre', '6 Jahre']], ['Was gibt es zu essen?', ['Pizza', 'Kuchen', 'Suppe']]]},
   {text:'Mia arbeitet im Supermarkt. Sie räumt Äpfel und Bananen in das Regal. Ihre Pause ist um 10 Uhr. Dann trinkt sie einen Tee.', qs:[['Wo arbeitet Mia?', ['im Supermarkt', 'in der Schule', 'im Kino']], ['Was räumt Mia ein?', ['Äpfel und Bananen', 'Hosen und Jacken', 'Bücher und Stifte']], ['Was trinkt Mia in der Pause?', ['einen Tee', 'eine Limo', 'einen Kaffee']]]},
   {text:'Heute regnet es. Ben zieht seine Jacke und seine Mütze an. Er nimmt den Bus zur Schule. Der Bus ist voll.', qs:[['Wie ist das Wetter?', ['Es regnet.', 'Die Sonne scheint.', 'Es schneit.']], ['Was zieht Ben an?', ['Jacke und Mütze', 'Hose und Hut', 'nur eine Jacke']], ['Wie ist der Bus?', ['voll', 'leer', 'kaputt']]]},
@@ -3851,7 +3884,7 @@ function docRecipe(){
   const r = pick(RECIPES), o = RECIPES.filter(x => x !== r);
   const html = dcBox('Rezept', `${r.t} (für ${r.p} Personen)`, `<div class="dc-rec"><div><b>Zutaten</b><ul>${r.ing.map(([a, n]) => `<li>${a} ${n}</li>`).join('')}</ul></div><div><b>So geht es</b><ol>${r.st.map(s => `<li>${s}</li>`).join('')}</ol></div></div>`);
   const qs = [];
-  { const [a, n] = pick(r.ing.filter(x => !/Prise/.test(x[0]))); qs.push(['info', `Wie viel ${n} brauchst du?`, opt3(a, r.ing.map(x => x[0]), ['500 g', '3', '1 Liter'])]); }
+  { const [a, n] = pick(r.ing.filter(x => !/Prise/.test(x[0]))); qs.push(['info', `Wie viel${/^\d+$/.test(a) ? 'e' : ''} ${n} brauchst du?`, opt3(a, r.ing.map(x => x[0]), ['500 g', '3', '1 Liter'])]); }
   { const k = rnd(1, 3); qs.push(['folge', `Was machst du direkt nach Schritt ${k}?`, opt3(r.st[k], [r.st[k - 1], r.st[k + 1]], r.st)]); }
   { const no = pick(o.flatMap(x => x.ing.map(i => i[1])).filter(n => !r.ing.some(i => i[1] === n))); qs.push(['schluss', 'Was brauchst du für dieses Rezept NICHT?', [no, ...shuffle(r.ing.map(i => i[1])).slice(0, 2)]]); }
   qs.push(['folge', 'Was ist der letzte Schritt?', opt3(r.st[4], r.st.slice(0, 4))]);
@@ -4228,12 +4261,12 @@ const CLOCK = {
   U2: [() => { const h = rh(); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, 30), prompt:'Wie spät ist es?', label:`halbe Stunde: ${dig(h, 30)}`}, [`halb ${H12(h + 1)}`, `halb ${h}`, `${h} Uhr`].map(wordOpt2)); },
        () => { const h = rh(); return mkChoice({layout:'row', text: dig(h, 30), textCls:'rd-letter', prompt:'Wie sagt man dazu?', label:`digital ${dig(h, 30)} → halb`}, [`halb ${H12(h + 1)}`, `halb ${h}`, `${h} Uhr`].map(wordOpt2)); },
        () => { const h = rh(); return clockSet(h, 30, 30, false); }],
-  U3: [() => { const h = rh(), m = pick([15, 45]); return mkChoice({kern:true, layout:'col', svg: clockSvg(h, m), prompt:'Wie spät ist es?', label:`Viertelstunde: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m), m === 15 ? `Viertel nach ${H12(h + 1)}` : `Viertel vor ${h}`].map(wordOpt2)); },
+  U3: [() => { const h = rh(), m = pick([15, 45]); return mkChoice({kern:true, layout:'side', q:'Wie spät ist es?', svg: clockSvg(h, m), prompt:'Lies die Uhr ab.', label:`Viertelstunde: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m), m === 15 ? `Viertel nach ${H12(h + 1)}` : `Viertel vor ${h}`].map(wordOpt2)); },
        () => { const h = rh(), m = pick([15, 45]); return mkChoice({layout:'row', text: timeWords(h, m), textCls:'rd-letter', prompt:'Welche Uhr passt?', label:`Uhr zu „${timeWords(h, m)}“`}, [clockOpt(h, m), clockOpt(h, 60 - m), clockOpt(h + 1, m)]); },
        () => clockSet(rh(), pick([15, 45]), 15, false)],
   U4: [() => { const h = rh(), m = pick([5, 10, 20, 25, 35, 40, 50, 55]); const set = [...new Set([dig(h, m), dig(h, m/5), m > 30 ? dig(H12(h + 1), m) : dig(H12(h - 1), m), dig(h, (m + 30) % 60)])].slice(0, 3); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, m), prompt:'Wie spät ist es? Lies genau ab.', label:`Minuten ablesen: ${dig(h, m)}`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
        () => clockSet(rh(), pick([5, 10, 20, 25, 35, 40, 50, 55]), 5, false),
-       () => { const h = rh(), m = pick([5, 10, 20, 25, 35, 40, 50, 55]); return mkChoice({layout:'col', svg: clockSvg(h, m), prompt:'Wie sagt man dazu?', label:`Minuten in Worten: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m === 60 ? 0 : 60 - m), timeWords(h + 1, m)].filter((x, i, a) => a.indexOf(x) === i).map(wordOpt2)); }],
+       () => { const h = rh(), m = pick([5, 10, 20, 25, 35, 40, 50, 55]); return mkChoice({layout:'side', q:'Wie sagt man dazu?', svg: clockSvg(h, m), prompt:'Lies die Uhr ab.', label:`Minuten in Worten: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m === 60 ? 0 : 60 - m), timeWords(h + 1, m)].filter((x, i, a) => a.indexOf(x) === i).map(wordOpt2)); }],
   U5: [() => { const h = rnd(6, 16), m = pick([30, 40, 45, 50]), d = pick([15, 20, 30]), e = h*60 + m + d; const at = t => dig(Math.floor(t/60), t % 60), right = at(e), naive = m + d >= 60 ? dig(h, m + d - 60) : at(e + 10); const set = [...new Set([right, naive, at(e - 10), at(e + 60)])].slice(0, 3); return mkChoice({kern:true, layout:'col', text:`Der Bus fährt um ${dig(h, m)} ab. Die Fahrt dauert ${d} Minuten.`, textCls:'rd-text', prompt:'Wann kommt der Bus an?', label:`Endzeit: ${dig(h, m)} + ${d} min`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
        () => { const h = rnd(8, 14), m = pick([45, 50, 40]), d = pick([15, 20, 25]); const e = h*60 + m + d; return mkChoice({layout:'col', text:`Die Pause beginnt um ${dig(h, m)}. Sie endet um ${dig(Math.floor(e/60), e % 60)}.`, textCls:'rd-text', prompt:'Wie lange dauert die Pause?', label:`Zeitspanne ${d} min`}, [...new Set([d, Math.abs(e % 60 - m), d + 10, 60 - m, d - 5].filter(x => x > 0))].slice(0, 3).map(x => `${x} Minuten`).map(wordOpt2)); },
        () => { const h = rnd(14, 19), d = pick([[1, 30], [2, 0], [1, 15]]); const e = h*60 + d[0]*60 + d[1]; return mkChoice({layout:'col', text:`Der Film beginnt um ${dig(h, 0)}. Er dauert ${d[0]} Stunde${d[0] > 1 ? 'n' : ''}${d[1] ? ` ${d[1]} Minuten` : ''}.`, textCls:'rd-text', prompt:'Wann ist der Film zu Ende?', label:`Endzeit Film ${h}:00 + ${d[0]}:${String(d[1]).padStart(2, '0')}`}, [dig(Math.floor(e/60), e % 60), dig(h + d[0], 0) === dig(Math.floor(e/60), e % 60) ? dig(h + d[0] + 1, 0) : dig(h + d[0], 0), dig(h, d[1] || 30)].map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); }]
@@ -5138,7 +5171,9 @@ function renderRead(){
   const isW = R.lvl[0] === 'W';
   $('#equation').innerHTML = `<span class="screen-step">${R.lvl[0] === 'U' ? 'Uhr' : R.lvl[0] === 'G' ? 'Größen' : R.lvl[0] === 'H' ? (R.lvl === 'H7' ? 'Tausenderbuch' : 'Hundertertafel') : isW ? 'Schreiben' : 'Lesen'} · ${escHtml(rdInfo(R.lvl).name)}</span>`;
   $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(it.prompt)}</span>`;
-  $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, R.r, {colored: R.colored, feedback: R.fb})}</div>`;
+  /* In Mathe keine Silbenfarben für kurze Angaben (1 m = 100 cm, 8 Uhr): Blau und Rot stehen dort für Zehner und Hunderter. Sachtexte ab 4 Wörtern dürfen gefärbt werden. */
+  const colored = R.colored && (!/^[UGH]/.test(R.lvl) || (String(it.text || '').match(/[A-Za-zÄÖÜäöüß]{3,}/g) || []).length >= 3);
+  $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, R.r, {colored, feedback: R.fb})}</div>`;
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl), up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn(), down = R.miss >= 3 && li > 0;
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : it.type === 'board' && it.mode === 'fill' ? false : !evalItem(it, R.r, [])})) +
@@ -5981,12 +6016,14 @@ $('#ranges').addEventListener('click', e => {
     if(t.ready && !validTask(mode, t.a, t.b, app.range)) app.tasks[mode] = blankTask();
     else if(t.ready){ const cur = app.mode; app.mode = mode; setupRows(t); app.mode = cur; }
   }
-  app.sel.clear(); $('#error').hidden = true; $('#stage').innerHTML = ''; render();
+  app.sel.clear(); $('#error').hidden = true; $('#stage').innerHTML = '';
+  if(['number', 'add', 'sub'].includes(app.mode) && task().ready && task().view === 'board') return startRandom();
+  render();
 });
 $('#inputs').addEventListener('input', () => { const t = draftOwner(); t.draft = [$('#in-a')?.value ?? '', $('#in-b')?.value ?? '']; $('#error').hidden = true; });
 $('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); commitAny(); } });
 $('#inputs').addEventListener('click', e => {
-  const fp = e.target.closest('[data-fplace]'); if(fp){ const b = board(); if(b.place !== fp.dataset.fplace){ freeSave(b); b.place = fp.dataset.fplace; if(b.place === 'ze'){ const hs = b.pieces.filter(q => q.kind === 'h'); if(hs.length){ b.pieces = b.pieces.filter(q => q.kind !== 'h'); toast('Hunderter wurden weggelegt.'); } } b.sel.clear(); if(b.ordered) b.pieces = freeArrange(b.pieces); $('#stage').innerHTML = ''; render(); } return; }
+  const fp = e.target.closest('[data-fplace]'); if(fp){ const b = board(); if(b.place !== fp.dataset.fplace){ freeSave(b); b.place = fp.dataset.fplace; { const keep = freeCols(), gone = [...new Set(b.pieces.filter(q => !keep.includes(q.kind)).map(q => NAME[q.kind]))]; if(gone.length){ b.pieces = b.pieces.filter(q => keep.includes(q.kind)); toast(`${gone.join(' und ')} wurden weggelegt.`); } } b.sel.clear(); if(b.ordered) b.pieces = freeArrange(b.pieces); $('#stage').innerHTML = ''; render(); } return; }
   const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'H') app.read.hlvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
   if(e.target.closest('[data-rsyl]')){ app.read.colored = !app.read.colored; render(); return; }
   if(e.target.closest('#btn-commit')) return commitAny();
@@ -6019,7 +6056,7 @@ $('#stage').addEventListener('click', e => {
     return;
   }
   if(app.mode === 'blitz'){ if(e.target.closest('#b-go')) blitzStart(); return; }
-  if(['number', 'add', 'sub'].includes(app.mode) && task()?.view === 'board'){ const c = e.target.closest('[data-hb]'); if(c) boardTap(+c.dataset.hb); return; }
+  if(['number', 'add', 'sub'].includes(app.mode) && task()?.view === 'board'){ const pg = e.target.closest('[data-tbpage]'); if(pg){ task().bview = +pg.dataset.tbpage; return renderWork(); } const c = e.target.closest('[data-hb]'); if(c) boardTap(+c.dataset.hb); return; }
   if(app.mode === 'number' && task().view === 'line' && task().find){ if(e.target.closest('.find-svg')) findTap(e); return; }
   if(app.mode === 'written') return;
   if(app.mode === 'times'){ const g = e.target.closest('[data-rc]'); if(g){ const [r, c] = g.dataset.rc.split(',').map(Number); timesStart(r + 1, c + 1); } return; }
@@ -6058,7 +6095,7 @@ $('#controls').addEventListener('click', e => {
     const b = board();
     switch(btn.id){
       case 'f-trade': return freeTrade();
-      case 'f-arrange': { const before = snapshot($('#board')); freeSave(b); if(b.ordered){ b.ordered = false; drawBoard(); renderFreeControls(); return; } b.ordered = true; b.pieces = freeArrange(b.pieces); updateExtent(); return renderFree(before); }
+      case 'f-arrange': { const before = snapshot($('#board')); freeSave(b); if(b.ordered){ b.ordered = false; drawBoard(); renderFreeControls(); return; } b.ordered = true; for(let i = 0; i < 3; i++){ const w0 = ext.w; b.pieces = freeArrange(b.pieces); updateExtent(); if(Math.abs(ext.w - w0) < 1) break; } return renderFree(before); }
       case 'f-clear': b.sel.clear(); return freeRefresh();
       case 'f-del': freeSave(b); b.pieces = b.pieces.filter(p => !b.sel.has(p.id)); b.sel.clear(); return freeRefresh();
       case 'f-show': b.show = !b.show; freeRefresh(); if(b.show) speak(String(freeTotal(b))); return;
@@ -6134,7 +6171,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.11.0 · 12.11.2026';
+const APP_VERSION = '0.11.1 · 12.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -6326,7 +6363,7 @@ $('#help-content').innerHTML = [
   ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],
-  ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schülerinnen und Schüler selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch.'],
+  ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Bis 100 und 1000 gibt es die Ansicht „Tafel“ bzw. „Tausenderbuch“: Das Kind springt mit +10 und +1 (bis 1000 auch +100, mit Seitenleiste zum Blättern), der Weg bleibt sichtbar. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln (wahlweise mit Hundertern oder Tausendern) oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schülerinnen und Schüler selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch.'],
   ['h','Über Stufenweise'],
   ['target','Die Idee','Stufenweise zeigt jedem Kind, was als Nächstes dran ist: seine Förderzone. Das schafft Klarheit und Sicherheit. Es gibt keine Klassenstufen, nur Stufen. So arbeiten Jugendliche nicht an Aufgaben „für die 1. Klasse“, sondern an altersgerechten Aufgaben aus ihrer Lebenswelt, genau auf ihrem Lernstand.'],
   ['check','Freie Software','Stufenweise ist kostenlos, ohne Werbung und für alle Schulen gedacht. ©&nbsp;2026 Stefan Hackl. Der Programmcode steht unter der Lizenz EUPL-1.2 (European Union Public Licence): Du darfst ihn nutzen, verändern und weitergeben. Wer eine veränderte Fassung weitergibt, muss sie ebenfalls offen unter dieser Lizenz weitergeben.'],
