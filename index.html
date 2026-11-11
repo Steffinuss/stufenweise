@@ -563,6 +563,7 @@ body.np-open.np-left main{padding-right:12px;padding-left:250px}
 .rail.compact #modes button.rail-fold{flex-direction:column;justify-content:center;align-items:center;gap:1px;text-align:center}
 .backup-due{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff4e3;border:1.5px solid #e8890c;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:15px}
 .backup-due span{flex:1;min-width:220px}
+.privacy-box{margin-top:12px;background:#fff;border:1.5px solid var(--line);border-left:5px solid #346bc3;border-radius:12px;padding:12px 16px}.privacy-box h3{margin:0 0 6px;font-size:17px}.privacy-box ul{margin:0 0 10px;padding-left:20px;font-size:14.5px;line-height:1.45}.privacy-box li{margin:3px 0}
 .backup-state.due{color:#9a5a10;font-weight:700}
 #modes .rail-fold{min-height:52px;flex-direction:column;gap:2px;background:transparent;border:1.5px dashed #c9bfae;color:var(--muted);box-shadow:none}
 #modes .rail-fold span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
@@ -3148,10 +3149,18 @@ function renderStats(){
 /* =====================================================================
    Kinderprofile
    ===================================================================== */
+/* Datenschutz-Hinweis: einmal bestätigen, bevor das erste Kind angelegt wird */
+const PRIVACY_BOX = `<div class="privacy-box" role="note"><h3>Bevor du Kinder anlegst: Datenschutz</h3><ul>
+<li><b>Nur auf diesem Gerät:</b> Namen und Lernstände werden nur hier gespeichert. Stufenweise schickt keine Schülerdaten ins Internet.</li>
+<li><b>Schülerdaten:</b> Lernstände sind Schülerdaten. Für den Einsatz mit echten Namen braucht es die Freigabe der Schulleitung; auf privaten Geräten zusätzlich die Genehmigung nach der VwV „Datenschutz an öffentlichen Schulen“.</li>
+<li><b>Sparsam:</b> Nur Vornamen oder Kürzel, keine Nachnamen, keine Diagnosen oder Gesundheitsangaben.</li>
+<li><b>Schützen:</b> Gerätecode einschalten und eine Lehrkraft-PIN festlegen. Sicherungsdateien nur dort ablegen, wo die Schule Schülerdaten erlaubt.</li>
+<li><b>Löschen:</b> Kinder löschen, wenn sie die Lerngruppe verlassen, spätestens am Ende des folgenden Schuljahres.</li>
+</ul><button type="button" class="icon-btn primary" id="privacy-ok">Verstanden</button></div>`;
 function renderProfiles(){
   const locked = !teacherOn();
   $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
-    (locked ? `<p class="note">Kinder anlegen, löschen und Tests starten kann nur die Lehrkraft. <button class="linkish" id="p-unlock">Lehrkraft-PIN eingeben</button></p>` : `<form id="padd" class="row" style="margin-top:12px"><input id="pname" maxlength="20" placeholder="Vorname oder Kürzel" style="flex:1"><button class="primary" type="submit">Hinzufügen</button></form>`) +
+    (locked ? `<p class="note">Kinder anlegen, löschen und Tests starten kann nur die Lehrkraft. <button class="linkish" id="p-unlock">Lehrkraft-PIN eingeben</button></p>` : !settings.privacyAck ? PRIVACY_BOX : `<form id="padd" class="row" style="margin-top:12px"><input id="pname" maxlength="20" placeholder="Vorname oder Kürzel" style="flex:1"><button class="primary" type="submit">Hinzufügen</button></form>`) +
     `<div class="row" style="margin-top:14px;justify-content:flex-start;gap:8px"><button data-ptest="M1" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 1: Zahlen und Rechnen</span></button><button data-ptest="M2" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 2: Uhr und Größen</span></button><button data-ptest="L" class="icon-btn primary">${icon('target')}<span style="display:inline">Lese-Test</span></button>${typeof W_LEVELS !== 'undefined' ? `<button data-ptest="W" class="icon-btn primary">${icon('target')}<span style="display:inline">Schreib-Test</span></button>` : ''}<span class="note" style="align-self:center">für ${escHtml(curName())}</span></div>
     <p class="note" style="margin-top:12px">Namen und Ergebnisse bleiben nur auf diesem Gerät gespeichert. Am besten Vornamen oder Kürzel verwenden.</p>`;
   $('#btn-profile').innerHTML = icon('user') + `<span class="pname">${escHtml(curName())}</span>`;
@@ -5435,7 +5444,7 @@ function buildReport(pid, kind){
       ${subjects.map(([sj, S]) => { const rep = zoneReport(pid, sj); return `<h2>${S}</h2>${mxTable(pid, sj)}${rep.zones.map(z => `<div class="z"><b>Förderzone: ${escHtml(cellLabel(z.key))}</b><br>${escHtml(z.why)}<br><small>${escHtml(z.info.bp)}</small><br><b>Analog:</b> ${escHtml(z.info.analog)}</div>`).join('')}${rep.ileb ? `<h3>Formulierungsvorschlag ILEB</h3><p><b>Lernstand:</b> ${escHtml(rep.ileb.lernstand)}</p><p><b>Nächstes Ziel:</b> ${escHtml(rep.ileb.ziel)}</p><p><b>Maßnahmen:</b> ${escHtml(rep.ileb.massnahmen)}</p>` : ''}`; }).join('') || '<p>Noch keine Tests.</p>'}
       ${(() => { const pr = progressOf(pid); return pr?.gained.length ? `<h2>Lernfortschritt seit dem ersten Test (${new Date(pr.start).toLocaleDateString('de-DE')})</h2><ul>${pr.gained.map(k => `<li>${dShort(pr.sinceOf(k))}: ${escHtml(cellLabel(k))}</li>`).join('')}</ul>` : ''; })()}
       ${(() => { const secs = statsSections(pid).filter(x => x.title !== 'Zuletzt geübt'); return secs.length ? `<h2>Übungen</h2>${secs.map(x => `<h3>${escHtml(x.title)}</h3><ul>${x.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul>`).join('')}` : ''; })()}
-      <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Einstufungen sind Vorschläge und werden von der Lehrkraft geprüft.</p></div>`;
+      <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Einstufungen sind Vorschläge und werden von der Lehrkraft geprüft. Sie ersetzen keine sonderpädagogische Diagnostik.</p></div>`;
   }
   const title = {map:'Lernlandkarte', parents:'Elterninfo', teacher:'Lernstandsbericht'}[kind] + ' ' + name;
   return {title, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${REPORT_CSS}</style></head><body>${body}</body></html>`};
@@ -5629,7 +5638,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.7 · 11.11.2026';
+const APP_VERSION = '0.9.8 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5667,10 +5676,11 @@ function fbRender(){
     <fieldset><legend>${f.art === 'lob' ? 'Was gefällt dir?' : f.art === 'idee' ? 'Deine Idee' : 'Was ist passiert? Was hättest du erwartet?'}</legend>
       <textarea id="fb-text" rows="5" placeholder="${f.art === 'fehler' ? 'Zum Beispiel: Ich habe bei Plus 8 + 5 eingegeben und auf Prüfen getippt. Es kam keine Rückmeldung.' : f.art === 'passung' ? 'Zum Beispiel: Das Bild beim Wort „Rad“ ist für meine Schüler nicht eindeutig.' : 'Dein Text …'}">${escHtml(f.text)}</textarea>
       <label class="row">Dein Name (optional) <input id="fb-name" value="${escHtml(settings.fbName || '')}" placeholder="z. B. Frau Weber" autocomplete="name"></label>
+      <p class="note">Auf GitHub ist auch dein Name öffentlich sichtbar. Lass das Feld leer, wenn du das nicht möchtest.</p>
     </fieldset>
     <details class="fb-ctx"><summary>Wird automatisch mitgeschickt</summary><table>${f.ctx.map(([k, v]) => `<tr><th>${k}</th><td>${escHtml(v)}</td></tr>`).join('')}</table></details>
     <div class="row fb-actions">${fbMail() ? `<a id="fb-mail" class="icon-btn primary${f.art ? '' : ' disabled'}" href="${f.art ? fbHref() : '#'}" target="_blank" rel="noopener">${icon('chat')}<span style="display:inline">Per E-Mail senden</span></a>` : ''}<a id="fb-gh" class="icon-btn${fbMail() ? '' : ' primary'}${f.art ? '' : ' disabled'}" href="${f.art ? fbGhHref() : '#'}" target="_blank" rel="noopener">${icon('next')}<span style="display:inline">Auf GitHub melden</span></a><button id="fb-copy" class="icon-btn" ${f.art ? '' : 'disabled'}>${icon('edit')}<span style="display:inline">Text kopieren</span></button></div>
-    <p class="note">${fbMail() ? `Die E-Mail geht an ${escHtml(fbMail())}. ` : ''}<b>Auf GitHub</b> ist deine Meldung öffentlich sichtbar, bitte keine Namen von Kindern. Dafür brauchst du ein kostenloses GitHub-Konto. Öffnet sich nichts, tipp auf „Text kopieren“. Tipp: Ein Bildschirmfoto (iPad: obere Taste und Lauter-Taste gleichzeitig) kannst du anhängen.</p>`;
+    <p class="note">${fbMail() ? `Die E-Mail geht an ${escHtml(fbMail())}. ` : ''}<b>Auf GitHub</b> ist deine Meldung öffentlich sichtbar, bitte keine Namen von Kindern. Dafür brauchst du ein kostenloses GitHub-Konto. Öffnet sich nichts, tipp auf „Text kopieren“. Tipp: Ein Bildschirmfoto (iPad: obere Taste und Lauter-Taste gleichzeitig) kannst du anhängen. <b>Achtung:</b> Oben in der App steht der Name des Kindes. Wechsle vor dem Foto auf „Gast“ oder schneide den Namen ab.</p>`;
 }
 function fbSent(how){ (data.fbLog ??= []).push({date: Date.now(), art: app.fb.art, how}); data.fbLog = data.fbLog.slice(-50); saveData(); }
 $('#dlg-fb').addEventListener('click', e => {
@@ -5746,6 +5756,7 @@ $('#pin-save').addEventListener('click', () => { const v = $('#pin-new').value.t
 $('#pin-del').addEventListener('click', () => { settings.pin = ''; saveSettings(); pinSettingsHtml(); toast('PIN entfernt.'); });
 $('#pin-lock').addEventListener('click', () => { app.teacherUntil = 0; dlgSet.close(); renderProfiles(); toast('Lehrkraft-Bereich gesperrt.'); });
 $('#data-export').addEventListener('click', exportData);
+document.addEventListener('click', e => { if(e.target.closest('#privacy-ok')){ settings.privacyAck = Date.now(); saveSettings(); renderProfiles(); setTimeout(() => $('#pname')?.focus(), 50); } });
 document.addEventListener('click', e => { if(e.target.closest('[data-backup-now]')){ exportData(); e.target.closest('.backup-due')?.remove(); toast('Sicherung gespeichert. Auf dem iPad liegt sie in der Dateien-App.'); } });
 $('#data-import').addEventListener('change', e => { const f = e.target.files[0]; if(f) importFile(f); e.target.value = ''; });
 $('#import-merge').addEventListener('click', () => applyImport('merge'));
