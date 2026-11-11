@@ -125,6 +125,12 @@ Melde dich am besten genau dann, wenn dir etwas auffällt. Die App schickt autom
 
 Öffnet sich nichts, tipp auf **Text kopieren** und füge den Text in eine Mail oder eine [neue Meldung auf GitHub](https://github.com/Steffinuss/stufenweise/issues/new) ein. Die Mail-Adresse lässt sich in den Einstellungen ändern oder leeren.
 
+## Auf dem iPad: als App auf den Home-Bildschirm und aktualisieren
+
+In Safari auf „Teilen“ → „Zum Home-Bildschirm“ tippen. Stufenweise startet dann wie eine App, ohne Adressleiste.
+
+iPadOS lädt eine solche App beim Öffnen oft nicht neu. Deshalb prüft Stufenweise selbst, ob es eine neue Version gibt: beim Öffnen, beim Zurückkehren in die App und alle 30 Minuten. Gibt es eine, erscheint oben der Hinweis „Neue Version … ist da“ mit dem Knopf **Jetzt aktualisieren**. Von Hand geht es in den Einstellungen („Nach neuer Version suchen“) oder in der Anleitung neben der Versionsnummer („Aktualisieren“). Namen, Ergebnisse und Einstellungen bleiben dabei erhalten.
+
 ## Über Stufenweise: Lizenz und Danke
 
 Stufenweise ist ein offenes Projekt: kostenlos, ohne Werbung und für alle Schulen. Unter **Anleitung (?)** steht ganz unten „Über Stufenweise“.
