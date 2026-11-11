@@ -576,6 +576,8 @@ body.np-open.np-left main{padding-right:12px;padding-left:250px}
 .fb-actions{justify-content:flex-start;gap:10px;margin-top:8px}
 a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:var(--ink,#2b2930);border-radius:14px}a.icon-btn.disabled{opacity:.4}
 .help-ver{font-size:13px;color:#6b6672;margin-left:auto;margin-right:10px}
+.link-btn{background:none;border:0;padding:0;min-height:0;font:inherit;color:#346bc3;text-decoration:underline;cursor:pointer;box-shadow:none}
+.upd-bar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;background:#fffdf8;border:2px solid #e8890c;border-radius:14px;padding:8px 10px 8px 16px;box-shadow:0 6px 24px #2b293033;max-width:calc(100vw - 20px);font-size:15px}
 .rail-guide{margin-top:auto;font-size:11px !important;opacity:.75;border:1.5px dashed #c9bfae !important;background:transparent !important}
 .rail-guide svg{width:18px;height:18px}
 .lvlup{position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:60;background:#fff;border:2px solid #1f7a45;border-radius:18px;box-shadow:0 8px 30px #0003;padding:14px 18px;display:flex;flex-direction:column;gap:6px;max-width:min(560px,92vw);font-size:17px}
@@ -645,6 +647,10 @@ a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:v
 
 <dialog id="dlg-settings" aria-labelledby="set-title">
   <div class="dlg-head"><h2 id="set-title">Einstellungen</h2><button data-close class="icon-btn">Fertig</button></div>
+  <fieldset><legend>App-Version</legend>
+    <div class="row" style="justify-content:flex-start;gap:12px;flex-wrap:wrap"><span class="upd-ver"></span><button class="icon-btn upd-check" type="button">Nach neuer Version suchen</button></div>
+    <p class="note">Stufenweise prüft beim Öffnen und beim Zurückkehren in die App selbst, ob es eine neue Version gibt, und zeigt dann oben einen Hinweis. Daten und Einstellungen bleiben beim Aktualisieren erhalten.</p>
+  </fieldset>
   <fieldset><legend>Ergebnisse</legend>
     <label class="row cb"><input type="checkbox" data-key="allowResults"> Ergebnisse und Mengen anzeigen erlauben</label>
     <label class="row cb"><input type="checkbox" data-key="fbOn"> Knopf „Rückmeldung“ anzeigen</label>
@@ -5576,7 +5582,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.4 · 11.11.2026';
+const APP_VERSION = '0.9.5 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5637,7 +5643,43 @@ $('#dlg-fb').addEventListener('input', e => {
 });
 $('#btn-fb').innerHTML = icon('chat') + '<span>Rückmeldung</span>';
 $('#btn-fb').addEventListener('click', fbOpen);
-$('#help-title').insertAdjacentHTML('afterend', `<span class="help-ver">Version ${APP_VERSION}</span>`);
+$('#help-title').insertAdjacentHTML('afterend', `<span class="help-ver">Version ${APP_VERSION} · <button class="link-btn upd-check" type="button">Aktualisieren</button></span>`);
+document.querySelectorAll('.upd-ver').forEach(e => e.textContent = `Installiert: Version ${APP_VERSION}`);
+
+/* ---------- Aktualisieren (wichtig für die App auf dem Home-Bildschirm: iPadOS lädt sie sonst nicht neu) ---------- */
+const verNum = v => String(v).split(' ')[0].split('.').map(n => parseInt(n, 10) || 0);
+const verNewer = (a, b) => { const x = verNum(a), y = verNum(b); for(let i = 0; i < Math.max(x.length, y.length); i++){ if((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
+const UPD = {last:0, found:null, later:null};
+async function checkUpdate(manual){
+  UPD.last = Date.now();
+  let j = null;
+  try{ const r = await fetch(`version.json?t=${Date.now()}`, {cache:'no-store'}); if(r.ok) j = await r.json(); }catch{}
+  if(!j?.version){ if(manual) toast('Die Version konnte gerade nicht geprüft werden (keine Verbindung?).'); return; }
+  if(verNewer(j.version, APP_VERSION)){ UPD.found = j; if(manual || UPD.later !== j.version) showUpdateBar(); if(manual) doUpdate(); return; }
+  if(manual) toast(`Stufenweise ist aktuell (Version ${APP_VERSION}).`);
+}
+function showUpdateBar(){
+  if(document.querySelector('.upd-bar')) return;
+  const d = document.createElement('div'); d.className = 'upd-bar'; d.setAttribute('role', 'status');
+  d.innerHTML = `<span><b>Neue Version ${escHtml(UPD.found.version)}</b> von Stufenweise ist da.</span><button class="icon-btn primary" type="button" data-upd="go">Jetzt aktualisieren</button><button class="icon-btn" type="button" data-upd="later">Später</button>`;
+  document.body.append(d);
+}
+async function doUpdate(){
+  toast('Neue Version wird geladen …');
+  try{ saveSettings(); saveData(); }catch{}
+  const here = location.pathname;
+  await Promise.all([here, 'manifest.webmanifest', 'version.json'].map(u => fetch(u, {cache:'reload'}).catch(() => null)));
+  const u = new URL(location.href); u.searchParams.set('v', (UPD.found?.version || String(Date.now())).split(' ')[0]);
+  location.replace(u.toString());
+}
+document.addEventListener('click', e => {
+  if(e.target.closest('.upd-check')){ checkUpdate(true); return; }
+  const b = e.target.closest('[data-upd]'); if(!b) return;
+  if(b.dataset.upd === 'go') doUpdate(); else { UPD.later = UPD.found?.version; b.closest('.upd-bar')?.remove(); }
+});
+setTimeout(() => checkUpdate(false), 4000);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && Date.now() - UPD.last > 60e3) checkUpdate(false); });
+setInterval(() => { if(document.visibilityState === 'visible') checkUpdate(false); }, 30*60e3);
 
 $('#btn-help').addEventListener('click', () => dlgHelp.showModal());
 $('#btn-profile').addEventListener('click', () => { renderProfiles(); $('#dlg-profile').showModal(); });
