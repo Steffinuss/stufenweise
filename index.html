@@ -5660,7 +5660,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.9.9 · 11.11.2026';
+const APP_VERSION = '0.9.10 · 11.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -5824,7 +5824,7 @@ $('#dlg-stats').addEventListener('click', async e => {
 });
 for(const d of [$('#dlg-profile'), $('#dlg-stats')]) d.addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target === d) d.close(); });
 if('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { if(dlgSet.open) fillVoices(); });
-for(const d of [dlgSet, dlgHelp]){
+for(const d of [dlgSet, dlgHelp, $('#dlg-legal')]){
   d.addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target === d) d.close(); });
 }
 $('#btn-full').addEventListener('click', () => { try{ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()?.catch?.(() => {}); }catch{} });
