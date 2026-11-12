@@ -110,7 +110,7 @@ Geübt wird in Runden zu 10 Aufgaben. Oben links zeigt eine kleine Treppe, wie w
 
 Die App wechselt nie von selbst die Stufe; das Kind oder die Lehrkraft entscheidet. In der geführten Oberfläche geht „Schwerer“ nur bis zu den freigegebenen Stufen. Ist das Kind am Rand seiner Förderzone angekommen, bietet der Rückblick nach einer sehr guten Runde stattdessen „Nächste Stufe probieren“ an, einen Kurztest mit 2 bis 3 Aufgaben. Die Rundenlänge stellst du in den Einstellungen unter **Hilfen → Übungsrunde** ein (5, 10, 15 Aufgaben oder ohne Ende). Frei legen und Zahlen zeigen sind Werkzeuge und haben keine Runden.
 
-Bei Lesetexten steht die Frage jetzt zwischen Text und Antworten, damit das Kind sie direkt vor dem Antworten liest.
+Bei Lesetexten steht die Frage zwischen Text und Antworten, damit das Kind sie direkt vor dem Antworten liest.
 
 ### Frei legen mit Tausendern
 
