@@ -100,6 +100,18 @@ Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Lin
 
 ![Übung Wechselgeld mit Material](bilder/12_ueben.png)
 
+### Übungsrunden
+
+Geübt wird in Runden zu 10 Aufgaben. Oben links zeigt eine kleine Treppe, wie weit das Kind in der Runde ist: grün heißt gleich richtig, gelb heißt nach einem zweiten Versuch richtig. Nach der letzten Aufgabe kommt ein kurzer Rückblick („Geschafft! 10 Aufgaben – 8 davon gleich richtig“) mit großen Knöpfen:
+
+- **Schwerer** (mit Angabe, was als Nächstes kommt), wenn mindestens 7 Aufgaben gleich richtig waren. Bei 9 oder 10 ist der Knopf hervorgehoben.
+- **Leichter**, wenn weniger als die Hälfte gleich richtig war.
+- **Noch eine Runde** und **Pause** (zurück zum Start).
+
+Die App wechselt nie von selbst die Stufe; das Kind oder die Lehrkraft entscheidet. In der geführten Oberfläche geht „Schwerer“ nur bis zu den freigegebenen Stufen. Ist das Kind am Rand seiner Förderzone angekommen, bietet der Rückblick nach einer sehr guten Runde stattdessen „Nächste Stufe probieren“ an, einen Kurztest mit 2 bis 3 Aufgaben. Die Rundenlänge stellst du in den Einstellungen unter **Hilfen → Übungsrunde** ein (5, 10, 15 Aufgaben oder ohne Ende). Frei legen und Zahlen zeigen sind Werkzeuge und haben keine Runden.
+
+Bei Lesetexten steht die Frage jetzt zwischen Text und Antworten, damit das Kind sie direkt vor dem Antworten liest.
+
 ### Frei legen mit Tausendern
 
 Unter **Frei legen → Würfel** wählst du oben „Zehner und Einer“, „mit Hundertern“ oder „mit Tausendern“. Mit Tausendern kommen Tausenderwürfel dazu: 10 Hunderter lassen sich zu 1 Tausender bündeln und 1 Tausender wieder in 10 Hunderter tauschen. „Ordnen“ legt alles in die Stellenwerttafel T · H · Z · E.

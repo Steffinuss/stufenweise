@@ -335,7 +335,7 @@ body.screening .toolbar{visibility:hidden}
 
 /* Diagnostik und Lese-Werkstatt */
 .dg-in{-moz-appearance:textfield;appearance:textfield}.dg-in::-webkit-inner-spin-button,.dg-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.dg-stage{flex-direction:column;justify-content:flex-start;padding-top:clamp(14px,5vh,56px)}
+.dg-stage{flex-direction:column;justify-content:flex-start;padding-top:clamp(6px,3vh,36px)}
 .it-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-height:100%;overflow:auto;padding:6px}
 .it-svg{width:100%;display:flex;justify-content:center}.it-svg>svg{max-width:100%;max-height:300px}
 .it-icon svg{display:block;filter:drop-shadow(0 2px 3px #0002)}
@@ -360,6 +360,7 @@ body.screening .toolbar{visibility:hidden}
 .it-wrap.side{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,1fr);gap:22px;align-items:start;width:100%;max-width:1120px;text-align:left}
 .side-doc{min-width:0}
 .side-ans{display:flex;flex-direction:column;gap:12px;position:sticky;top:0}
+.it-q{text-align:center;margin:-6px 0 -8px;font-size:23px}
 .side-q{font-size:22px;font-weight:700;margin:0;line-height:1.35;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,Arial,sans-serif}
 .side-n{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .side-ans .dg-choice{min-width:0}
@@ -452,7 +453,18 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 .mtable #mtab{width:100%;height:100%}
 
 .adapt-tip{position:absolute;right:18px;top:14px;z-index:20;display:flex;gap:8px;align-items:center;background:#fff;border-radius:16px;box-shadow:0 6px 24px #0002;padding:8px 10px 8px 14px;font-weight:700;font-size:15px;animation:tipIn .35s ease}
-.adapt-tip.up{border:2px solid #1f7a45}.adapt-tip.down{border:2px solid #e8890c}
+.adapt-tip.up{border:2px solid #1f7a45}
+.round-bar{position:absolute;left:18px;top:12px;z-index:5;display:flex;align-items:flex-end;gap:3px;height:34px;pointer-events:none}
+.round-bar i{width:9px;border-radius:3px 3px 1px 1px;background:#e7dfd0}
+.round-bar i.ok{background:#1f7a45}.round-bar i.late{background:#e8b45c}.round-bar i.now{outline:2px solid #e8890c;outline-offset:1px}
+.round-end{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:#fdfbf6e8;border-radius:24px;animation:tipIn .3s ease}
+.round-card{background:#fff;border-radius:22px;box-shadow:0 10px 40px #0002;padding:22px 26px;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:min(560px,92%);text-align:center}
+.round-card h2{margin:0;font-size:28px}.round-card p{margin:0;font-size:19px;color:var(--ink)}
+.round-card .round-bar{position:static;height:56px;gap:5px;margin:4px 0}.round-card .round-bar i{width:16px}
+.round-card .acts{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:8px}
+.round-card .acts button{font:inherit;font-size:19px;font-weight:700;min-height:56px;border-radius:14px;border:1.5px solid #ddd4c3;background:#fff;padding:8px 16px}
+.round-card .acts button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.round-card .acts small{display:block;font-size:14px;font-weight:600;opacity:.8}.adapt-tip.down{border:2px solid #e8890c}
 .adapt-tip button{min-height:40px;padding:4px 12px;font-size:14px}
 @keyframes tipIn{from{opacity:0;transform:translateY(-8px)}}
 .workspace{position:relative}
@@ -750,6 +762,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <label class="row cb"><input type="checkbox" data-key="labels"> Texte unter den Knöpfen</label>
     <label class="row">Zifferntastatur auf dem Bildschirm <select data-key="numpad"><option value="auto">automatisch (Tablet)</option><option value="on">immer</option><option value="off">nie</option></select></label>
     <label class="row">Buchstabentastatur beim Schreiben <select data-key="kbd"><option value="qwertz">wie am Handy (QWERTZ)</option><option value="abc">nach dem ABC</option></select></label>
+    <label class="row">Übungsrunde <select data-key="roundLen"><option value="5">5 Aufgaben</option><option value="10">10 Aufgaben</option><option value="15">15 Aufgaben</option><option value="0">ohne Ende</option></select></label>
   </fieldset>
   <fieldset><legend>Geführte Oberfläche</legend>
     <p class="note">Nach dem Test sieht jedes Kind nur die Bereiche und Stufen, die für es dran sind. Werkzeuge (Zahlen zeigen, Frei legen) bleiben immer sichtbar. Mit der PIN zeigt „Alles zeigen“ in der Leiste vorübergehend alle Bereiche.</p>
@@ -831,7 +844,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', kbd:'qwertz', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', kbd:'qwertz', roundLen:'10', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -1175,7 +1188,7 @@ function trackRun(e){
   if(!guideZones(p.id, /^[LW]/.test(k) ? 'D' : 'M').includes(k)) return;
   app.run ??= {}; const r = app.run[k] ??= []; r.push(!!e.ok && (e.tries ?? 1) <= 1); if(r.length > 10) r.shift();
   app.offered ??= {};
-  if(r.length >= 10 && r.filter(Boolean).length >= 9 && !app.offered[k]){ app.offered[k] = true; showLevelUp(k); }
+  if(r.length >= 10 && r.filter(Boolean).length >= 9 && !app.offered[k] && !roundOn()){ app.offered[k] = true; showLevelUp(k); }
 }
 function showLevelUp(k){
   document.querySelector('.lvlup')?.remove();
@@ -1271,7 +1284,7 @@ function railHtml(){
   return h + guideRailBtn();
 }
 function leaveMode(){
-  document.querySelector('.adapt-tip')?.remove();
+  document.querySelector('.adapt-tip')?.remove(); document.querySelector('.round-end')?.remove(); clearTimeout(app.round?.timer);
   clearTimeout(app.blitz.timer); if(app.blitz.phase === 'show') app.blitz.phase = 'idle';
   if(app.mode === 'screen') app.screen = null;
   if(app.mode === 'diag'){ clearTimeout(app.diag?.timer); if(app.diag && !app.diag.done && app.diag.tested.length) inferCells(app.diag.pid, app.diag.subj); app.diag = null; saveData(); }
@@ -1320,7 +1333,7 @@ function guideFix(){
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
-function render(){ if(guideFix()) return; $('#btn-fb').hidden = settings.fbOn === false; renderTop(); renderWork(); fitTop(); }
+function render(){ if(guideFix()) return; $('#btn-fb').hidden = settings.fbOn === false; renderTop(); renderWork(); fitTop(); roundBar(); }
 /* Passt die Einstellungsleiste nicht neben die Knöpfe oben rechts, rückt sie in eine eigene Zeile (sonst verschwinden z. B. die 10er-Reihe oder „Kalender“) */
 function fitTop(){
   const tb = document.querySelector('.topbar'), t = tb?.querySelector('.toolbar'); if(!t) return;
@@ -2815,6 +2828,75 @@ const backupBox = () => backupDue() ? `<div class="backup-due" role="status"><sp
 const curName = () => curProfile()?.name || 'Gast';
 const rnd = (lo, hi) => lo + Math.floor(Math.random()*(hi - lo + 1));
 const escHtml = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* Übungsrunden: nach einer festen Zahl von Aufgaben ein kurzer Rückblick mit „Noch eine Runde“, „Schwerer/Leichter“ und „Pause“ */
+const ROUND_MODES = ['add', 'sub', 'written', 'times', 'money', 'blitz', 'read'];
+app.round = {key:null, res:[]};
+const roundLen = () => Number(settings.roundLen ?? 10) || 0;
+const roundOn = () => roundLen() > 0 && ROUND_MODES.includes(app.mode);
+const roundKey = () => `${data.current || 'guest'}|${app.mode}|${app.mode === 'read' ? app.read.lvl : ''}`;
+function roundSync(){ const k = roundKey(); if(app.round.key !== k){ app.round = {key:k, res:[]}; document.querySelector('.round-end')?.remove(); } }
+const roundBarHtml = (res, n, now) => `<div class="round-bar" aria-hidden="true">${Array.from({length:n}, (_, i) => `<i class="${res[i] === true ? 'ok' : res[i] === false ? 'late' : ''}${now && i === res.length ? ' now' : ''}" style="height:${Math.round(28 + 72*(i + 1)/n)}%"></i>`).join('')}</div>`;
+function roundBar(){
+  const ws = document.querySelector('.workspace'); if(!ws) return;
+  ws.querySelector(':scope > .round-bar')?.remove();
+  if(!roundOn()) return;
+  roundSync(); const n = roundLen(), R = app.round;
+  ws.insertAdjacentHTML('afterbegin', roundBarHtml(R.res, n, true));
+  ws.querySelector(':scope > .round-bar').setAttribute('title', `Aufgabe ${Math.min(R.res.length + 1, n)} von ${n}`);
+}
+function roundTrack(e){
+  if(!roundOn() || ['diag', 'warm', 'screen'].includes(e.mode)) return;
+  roundSync(); const R = app.round, n = roundLen();
+  R.res.push(!!e.ok && (e.tries ?? 1) <= 1); roundBar();
+  if(R.res.length >= n){ clearTimeout(R.timer); R.timer = setTimeout(roundEnd, 1400); }
+}
+/* Nächste Stufe/leichtere Stufe für den Rückblick; in der geführten Oberfläche nur innerhalb der freigegebenen Stufen */
+function roundStep(dir){
+  if(app.mode === 'read'){
+    const R = app.read, lv = rdLevels(R.lvl), g = guideOf(/^[UGH]/.test(R.lvl) ? 'M' : 'D'), ok = l => !g || g.lvlOk(l);
+    const i = lv.indexOf(R.lvl); if(i < 0) return null;
+    let j = i + dir; while(j >= 0 && j < lv.length && !ok(lv[j])) j += dir;
+    if(j < 0 || j >= lv.length) return null; const l = lv[j];
+    return {text: rdInfo(l).name, apply(){ Object.assign(R, {lvl: l, item:null, streak:0, miss:0}); if(l[0] === 'U') R.ulvl = l; if(l[0] === 'G') R.glvl = l; if(l[0] === 'H') R.hlvl = l; render(); }};
+  }
+  const st = adaptStep(app.mode, dir); if(!st) return null;
+  if(guideOn()){
+    if(['add', 'sub'].includes(app.mode)){ const gM = guideOf('M'), r = Number((st.text.match(/\d+/) || [])[0]); if(gM && gM.addZrs && !gM.addZrs.has(r)) return null; }
+    else if(dir > 0) return null;
+  }
+  return st;
+}
+function roundEnd(){
+  if(!roundOn() || app.round.res.length < roundLen()) return;
+  const ws = document.querySelector('.workspace'); if(!ws) return;
+  document.querySelector('.round-end')?.remove(); document.querySelector('.adapt-tip')?.remove();
+  const R = app.round, n = R.res.length, good = R.res.filter(Boolean).length;
+  const up = roundStep(1), down = roundStep(-1), strong = good >= Math.ceil(n*0.9), weak = good < n/2;
+  /* Geführte Oberfläche: bei einer sehr guten Runde in einer Förderzone einen Kurztest für die nächste Stufe anbieten */
+  const zk = activeZoneKey(), p = curProfile(), kurz = strong && !up && zk && p && guideOn() && guideZones(p.id, /^[LW]/.test(zk) ? 'D' : 'M').includes(zk);
+  if(kurz){ document.querySelector('.lvlup')?.remove(); (app.offered ??= {})[zk] = true; }
+  const msg = good === n ? 'Alles gleich richtig. Super!' : strong ? 'Fast alles gleich richtig. Stark!' : weak ? 'Das war nicht leicht. Gut, dass du drangeblieben bist.' : 'Gut gemacht!';
+  const btn = (id, label, sub, primary) => `<button data-round="${id}" class="${primary ? 'primary' : ''}">${label}${sub ? `<small>${escHtml(sub)}</small>` : ''}</button>`;
+  const acts = [];
+  if(kurz) acts.push(btn('kurz', 'Nächste Stufe probieren', 'kurzer Test mit 2 bis 3 Aufgaben', true));
+  if(up && good >= Math.ceil(n*0.7)) acts.push(btn('up', 'Schwerer', up.text, strong));
+  if(down && weak) acts.push(btn('down', 'Leichter', down.text, true));
+  acts.push(btn('again', 'Noch eine Runde', '', !acts.some(a => a.includes('class="primary"'))));
+  acts.push(btn('pause', 'Pause', 'zurück zum Start'));
+  const d = document.createElement('div'); d.className = 'round-end'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', 'Runde geschafft');
+  d.innerHTML = `<div class="round-card"><h2>Geschafft!</h2>${roundBarHtml(R.res, n, false)}<p><b>${n} Aufgaben</b> – ${good} davon gleich richtig.</p><p>${msg}</p><div class="acts">${acts.join('')}</div></div>`;
+  d.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-round]'); if(!b) return;
+    d.remove(); app.round = {key:null, res:[]};
+    const k = b.dataset.round;
+    if(k === 'pause') return goHome();
+    if(k === 'kurz') return quickTest(zk);
+    if(k === 'up' || k === 'down'){ const st = k === 'up' ? up : down; st.apply(); toast(st.text); roundSync(); roundBar(); return; }
+    roundSync(); randomAny(); roundBar();
+  });
+  ws.append(d); speak('Geschafft!');
+  d.querySelector('button')?.focus();
+}
 function logAttempt(e){
   const id = data.current || 'guest';
   const list = data.log[id] ??= [];
@@ -2823,6 +2905,7 @@ function logAttempt(e){
   saveData();
   try{ adaptTrack(e); }catch{}
   try{ trackRun(e); }catch{}
+  try{ roundTrack(e); }catch{}
 }
 /* ---------- Mathe-Übungen passen sich an: 5 richtig in Folge → schwerer, 3 Fehler → leichter ---------- */
 app.adapt = {key:null, ok:0, miss:0};
@@ -2841,7 +2924,7 @@ function adaptTrack(e){
   const k = adaptKey(e); if(!k) return;
   const A = app.adapt; if(A.key !== k){ Object.assign(A, {key:k, ok:0, miss:0}); }
   if(e.ok){ A.ok++; A.miss = 0; } else { A.miss++; A.ok = 0; }
-  const st = A.ok >= 5 ? (guideOn() ? null : adaptStep(k, 1)) : A.miss >= 3 ? adaptStep(k, -1) : null;
+  const st = A.ok >= 5 ? (guideOn() || roundOn() ? null : adaptStep(k, 1)) : A.miss >= 3 ? adaptStep(k, -1) : null;
   if(st){ A.ok = 0; A.miss = 0; showAdapt(st, A.ok === 0 && e.ok); }
 }
 function showAdapt(st, up){
@@ -3462,6 +3545,8 @@ function screwBox(n){
 const pick = arr => arr[rnd(0, arr.length - 1)];
 const shuffle = a => { const b = [...a]; for(let i = b.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 const T = s => ({h: escHtml(s), a: String(s)});
+/* Bei Texten steht die Frage zwischen Text und Antworten, nicht oben über allem */
+const qBelow = it => it.type === 'choice' && it.textCls === 'rd-text' && it.layout !== 'side' && /\?\s*$/.test(it.prompt || '');
 function mkChoice(base, opts, correct = 0){
   const o = opts.map(x => typeof x === 'object' ? x : T(x)), order = shuffle(o.map((_, i) => i));
   return {...base, type:'choice', options: order.map(i => o[i]), correct: order.indexOf(correct)};
@@ -4945,7 +5030,7 @@ function itemStage(it, r, opt = {}){
     case 'choice': {
       const st = i => opt.feedback && opt.feedback.choice === i ? (opt.feedback.ok ? ' fb-ok' : ' fb-no') : '';
       if(it.layout === 'side') return `<div class="it-wrap side"><div class="side-doc">${head}</div><div class="side-ans">${it.series ? `<span class="side-n">Frage ${it.series}</span>` : ''}<p class="side-q">${escHtml(it.q)}</p><div class="dg-choice">${it.options.map((o, i) => `<button data-dgc="${i}" aria-pressed="${r.choice === i}" aria-label="${escHtml(o.a)}" class="${st(i)}">${o.h}</button>`).join('')}</div></div></div>`;
-      return `<div class="it-wrap">${head}<div class="dg-choice ${it.layout === 'row' ? 'row' : ''}">${it.options.map((o, i) => `<button data-dgc="${i}" aria-pressed="${r.choice === i}" aria-label="${escHtml(o.a)}" class="${st(i)}">${o.word && opt.colored ? rdWordHtml(o.word, true) : o.h}</button>`).join('')}</div></div>`;
+      return `<div class="it-wrap">${head}${qBelow(it) ? `<p class="side-q it-q">${escHtml(it.prompt)}</p>` : ''}<div class="dg-choice ${it.layout === 'row' ? 'row' : ''}">${it.options.map((o, i) => `<button data-dgc="${i}" aria-pressed="${r.choice === i}" aria-label="${escHtml(o.a)}" class="${st(i)}">${o.word && opt.colored ? rdWordHtml(o.word, true) : o.h}</button>`).join('')}</div></div>`;
     }
     case 'pairs': r.sel ||= []; return `<div class="dg-pairs">${it.pairs.map((p, i) => `<div class="dg-pair"><button data-dgp="${i},0" aria-pressed="${r.sel[i] === 0}">${p[0]}</button><span class="oder">oder</span><button data-dgp="${i},1" aria-pressed="${r.sel[i] === 1}">${p[1]}</button></div>`).join('')}</div>`;
     default: return `<div class="it-wrap">${head}</div>`;
@@ -5027,7 +5112,7 @@ function renderDiag(){
   }
   const it = d.items[d.idx], r = d.resp ||= {};
   $('#equation').innerHTML = `<span class="screen-step">${title}${d.re ? ' · Re-Diagnose' : ''} · Aufgabe ${d.nItems + 1}${d.warm ? ' von ' + d.items.length : ''}</span>`;
-  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(it.prompt)}</span>`;
+  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
   $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, r)}</div>`;
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   let c = '';
@@ -5228,12 +5313,12 @@ function renderRead(){
   $('#words').hidden = true; $('#btn-say').hidden = true;
   const isW = R.lvl[0] === 'W';
   $('#equation').innerHTML = `<span class="screen-step">${R.lvl[0] === 'U' ? 'Uhr' : R.lvl[0] === 'G' ? 'Größen' : R.lvl[0] === 'H' ? (R.lvl === 'H7' ? 'Tausenderbuch' : 'Hundertertafel') : isW ? 'Schreiben' : 'Lesen'} · ${escHtml(rdInfo(R.lvl).name)}</span>`;
-  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(it.prompt)}</span>`;
+  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
   /* In Mathe keine Silbenfarben für kurze Angaben (1 m = 100 cm, 8 Uhr): Blau und Rot stehen dort für Zehner und Hunderter. Sachtexte ab 4 Wörtern dürfen gefärbt werden. */
   const colored = R.colored && (!/^[UGH]/.test(R.lvl) || (String(it.text || '').match(/[A-Za-zÄÖÜäöüß]{3,}/g) || []).length >= 3);
   $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, R.r, {colored, feedback: R.fb})}</div>`;
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
-  const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl), up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn(), down = R.miss >= 3 && li > 0;
+  const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl), up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn() && !roundOn(), down = R.miss >= 3 && li > 0;
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : it.type === 'board' && it.mode === 'fill' ? false : !evalItem(it, R.r, [])})) +
     (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '');
 }
@@ -5247,7 +5332,7 @@ function readCheck(){
   if(res.ok){
     logAttempt({mode: rdMode(R.lvl), task: it.label, ok: R.tries === 0, tries: R.tries + 1, lvl: R.lvl, given: res.given});
     if(R.tries === 0){ R.streak = (R.streak || 0) + 1; R.miss = 0; } else R.streak = 0;
-    renderRead(); setHint(R.streak >= 5 && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS, H_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
+    renderRead(); setHint(R.streak >= 5 && !roundOn() && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS, H_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
     celebrate(document.querySelector('#stage .fb-ok'));
   } else {
     if(R.tries === 0){ R.miss = (R.miss || 0) + 1; R.streak = 0; }
@@ -5364,7 +5449,7 @@ function homeClick(e){
   if(e.target.closest('[data-home-warm]')){ warmStart(); return; }
   const sj = e.target.closest('[data-home-subj]'); if(sj){ app.wz = {...app.wz, step:'area', subj: sj.dataset.homeSubj}; if(settings.subject !== sj.dataset.homeSubj){ settings.subject = sj.dataset.homeSubj; app.railGrp = null; saveSettings(); } render(); }
 }
-function goHome(){ if(app.busy) return; leaveMode(); app.mode = 'home'; app.wz = null; render(); }
+function goHome(){ if(app.busy) return; leaveMode(); app.mode = 'home'; app.wz = null; app.round = {key:null, res:[]}; render(); }
 
 /* ---------- Lehrkraft-PIN ---------- */
 app.teacherUntil = 0;
@@ -6233,7 +6318,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.11.5 · 12.11.2026';
+const APP_VERSION = '0.11.6 · 12.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
