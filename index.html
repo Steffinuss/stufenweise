@@ -473,7 +473,8 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 body.class-mode #controls button{min-height:58px}
 /* Zahlenstrahl */
 .nl-tool{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:6px}
-.nl-tool svg{width:100%;height:100%;max-height:520px;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,sans-serif;cursor:crosshair;touch-action:manipulation}
+.nl-tool svg{width:100%;height:100%;max-height:600px;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,sans-serif;cursor:crosshair;touch-action:none;user-select:none;-webkit-user-select:none}
+.nl-tool .nl-zoom{top:6px;right:8px}.nl-tool .nl-zoom button{width:56px;height:56px;font-size:28px}
 .nl-path{font-size:26px;font-weight:800;color:var(--ink);white-space:pre-wrap}
 .nl-jumps{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
 .nl-jumps button{min-width:72px;min-height:58px;font-size:24px;font-weight:800;color:var(--c);border:2.5px solid var(--c);border-radius:16px;background:#fff}
@@ -5558,30 +5559,56 @@ function classRailHtml(){
 }
 
 /* ---------- Zahlenstrahl-Werkzeug (Unterricht) ---------- */
-app.nl = {range:100, start:null, jumps:[], hide:false, empty:false, shown:false};
+/* Zoomen: Knöpfe + − ↔, zwei Finger auseinanderziehen, Mausrad mit Strg; Verschieben: mit einem Finger ziehen */
+app.nl = {range:100, start:null, jumps:[], hide:false, empty:false, shown:false, win:null};
 const ZS = {W:1000, x0:46, x1:954, y:230};
-const zsSnap = () => app.nl.range === 1000 ? 10 : 1;
-const zsX = v => ZS.x0 + (ZS.x1 - ZS.x0)*v/app.nl.range;
+const zsWin = () => app.nl.win || {L:0, H:app.nl.range};
+const zsX = v => { const {L, H} = zsWin(); return ZS.x0 + (ZS.x1 - ZS.x0)*(v - L)/(H - L); };
+const zsSteps = () => {
+  const {L, H} = zsWin(), ppu = (ZS.x1 - ZS.x0)/(H - L), NICE = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+  const lab = NICE.find(s => s*ppu >= (H > 100 ? 64 : 40)) || 1000;
+  const minor = NICE.find(s => s*ppu >= 7 && lab % s === 0) || lab;
+  const mid = lab/2 >= minor && (lab/2) % minor === 0 && Number.isInteger(lab/2) ? lab/2 : 0;
+  return {lab, minor, mid};
+};
+const zsSnap = () => zsSteps().minor;
 const zsCur = () => { const n = app.nl; return n.start == null ? null : n.jumps.reduce((s, d) => s + d, n.start); };
-const zsJumpSet = r => r === 10 ? [1, 2] : r === 20 ? [1, 2, 5, 10] : r === 100 ? [1, 10] : [10, 100];
+const zsJumpSet = r => r === 10 ? [1, 2] : r === 20 ? [1, 2, 5, 10] : r === 100 ? [1, 10] : [1, 10, 100];
 const placeCol = d => Math.abs(d) % 100 === 0 ? '#c9414a' : Math.abs(d) % 10 === 0 ? '#346bc3' : '#27834b';
 const sgn = d => d > 0 ? `+${d}` : `−${-d}`;
+function zsSetWin(L, span){
+  const R = app.nl.range; span = Math.max(10, Math.min(R, span));
+  if(span >= R - 1e-6){ app.nl.win = null; return; }
+  L = Math.max(0, Math.min(R - span, L)); app.nl.win = {L, H: L + span};
+}
+function zsZoom(f, v){
+  const {L, H} = zsWin(), span = H - L; v ??= (L + H)/2;
+  const ns = Math.max(10, Math.min(app.nl.range, span*f)); zsSetWin(v - (v - L)*ns/span, ns);
+}
+/* Nach einem Sprung: Ziel ins Bild holen, falls es außerhalb liegt */
+function zsFollow(){ const c = zsCur(), w = app.nl.win; if(c == null || !w) return; const span = w.H - w.L, pad = span*0.12; if(c < w.L + pad) zsSetWin(c - pad, span); else if(c > w.H - pad) zsSetWin(c - span + pad, span); }
 function zsSvg(){
-  const n = app.nl, R = n.range, y = ZS.y; let s = '';
-  s += `<rect x="0" y="0" width="${ZS.W}" height="330" fill="transparent" data-nl-hit="1"/>`;
-  s += `<path d="M${ZS.x0 - 22} ${y}H${ZS.x1 + 26}" stroke="#2b2930" stroke-width="4"/><path d="M${ZS.x1 + 34} ${y}l-14 -8v16z" fill="#2b2930"/>`;
+  const n = app.nl, y = ZS.y, {L, H} = zsWin(), {lab, minor, mid} = zsSteps(); let s = '';
+  s += `<defs><clipPath id="zs-clip"><rect x="${ZS.x0 - 46}" y="0" width="${ZS.x1 - ZS.x0 + 92}" height="400"/></clipPath></defs>`;
+  s += `<rect x="0" y="0" width="${ZS.W}" height="400" fill="transparent"/>`;
+  const lStart = L > 0 ? ZS.x0 - 30 : ZS.x0 - 22, lEnd = H < n.range ? ZS.x1 + 30 : ZS.x1 + 26;
+  s += `<path d="M${lStart} ${y}H${lEnd}" stroke="#2b2930" stroke-width="4"/>`;
+  if(H >= n.range) s += `<path d="M${ZS.x1 + 34} ${y}l-14 -8v16z" fill="#2b2930"/>`;
+  if(L > 0) s += `<text x="${ZS.x0 - 34}" y="${y + 9}" text-anchor="end" font-size="26" fill="#6b6672">…</text>`;
+  if(H < n.range) s += `<text x="${ZS.x1 + 34}" y="${y + 9}" font-size="26" fill="#6b6672">…</text>`;
+  s += `<g clip-path="url(#zs-clip)">`;
   if(!n.empty){
-    const minor = R === 1000 ? 10 : 1, mid = R === 1000 ? 50 : R === 100 ? 5 : 0, lab = R === 1000 ? 100 : R === 100 ? 10 : 1;
-    for(let v = 0; v <= R; v += minor){
+    for(let v = Math.ceil(L/minor)*minor; v <= H + 1e-9; v += minor){
       const big = v % lab === 0, md = mid && v % mid === 0, h = big ? 18 : md ? 13 : 8, x = zsX(v);
       s += `<path d="M${x} ${y - h}V${y + h}" stroke="#2b2930" stroke-width="${big ? 3 : 1.6}"/>`;
-      if(big) s += `<text x="${x}" y="${y + 50}" text-anchor="middle" font-size="${R <= 20 ? 30 : 28}" font-weight="700" fill="#2b2930">${v}</text>`;
+      if(big) s += `<text x="${x}" y="${y + 50}" text-anchor="middle" font-size="${H - L <= 20 ? 30 : 28}" font-weight="700" fill="#2b2930">${v}</text>`;
     }
-  } else s += `<path d="M${ZS.x0} ${y - 14}V${y + 14}" stroke="#2b2930" stroke-width="3"/>`;
-  if(n.start == null) return s;
+  } else if(L === 0) s += `<path d="M${ZS.x0} ${y - 14}V${y + 14}" stroke="#2b2930" stroke-width="3"/>`;
+  if(n.start == null) return s + '</g>';
   /* Sprünge: gleiche kleine Sprünge hintereinander bekommen eine gemeinsame Beschriftung („3-mal +1“) */
-  let cur = n.start; const groups = [];
-  for(const d of n.jumps){ const g = groups.at(-1), w = Math.abs(zsX(d) - zsX(0)); if(g && g.d === d && w < 46) g.n++; else groups.push({d, n:1, from:cur, w}); cur += d; }
+  const unit = Math.abs(zsX(1) - zsX(0));
+  let cur = n.start; const groups = [], labs = [];
+  for(const d of n.jumps){ const g = groups.at(-1), w = Math.abs(d)*unit; if(g && g.d === d && w < 46) g.n++; else groups.push({d, n:1, from:cur}); cur += d; }
   const pts = [n.start]; cur = n.start;
   for(const g of groups){
     const col = placeCol(g.d);
@@ -5592,15 +5619,23 @@ function zsSvg(){
       s += `<path d="M${xb} ${y - 6}l${-dir*11} -14l${dir*3} 15z" fill="${col}"/>`;
       cur = b; pts.push(b);
     }
-    const xa = zsX(g.from), xb = zsX(cur), w = Math.abs(xb - xa), hgt = Math.min(150, 26 + (g.n > 1 ? Math.abs(zsX(g.d) - zsX(0)) : w)*0.45);
-    s += `<text x="${(xa + xb)/2}" y="${y - 22 - hgt - (g.n > 1 ? 14 : 0)}" text-anchor="middle" font-size="30" font-weight="800" fill="${col}">${g.n > 1 ? `${g.n}-mal ${sgn(g.d)}` : sgn(g.d)}</text>`;
+    const xa = zsX(g.from), xb = zsX(cur), w = Math.abs(xb - xa), hgt = Math.min(150, 26 + (g.n > 1 ? Math.abs(g.d)*unit : w)*0.45);
+    /* Beschriftungen dürfen sich nicht überdecken: notfalls eine Etage höher */
+    const txt = g.n > 1 ? `${g.n}-mal ${sgn(g.d)}` : sgn(g.d), lx = (xa + xb)/2, lw = txt.length*17 + 10; let ly = y - 22 - hgt - (g.n > 1 ? 14 : 0);
+    while(labs.some(o => Math.abs(o.x - lx) < (o.w + lw)/2 && Math.abs(o.y - ly) < 32) && ly > 30) ly -= 34;
+    labs.push({x:lx, y:ly, w:lw});
+    s += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="30" font-weight="800" fill="${col}" stroke="#fdfbf6" stroke-width="6" paint-order="stroke">${txt}</text>`;
   }
   /* Marken: Start orange, Zwischenstationen klein, Ziel dunkel (oder „?“) */
-  const end = pts.at(-1), pill = (v, fill, txt, extra = '') => { const x = zsX(v), wd = Math.max(56, String(txt).length*20 + 26); return `<g ${extra}><path d="M${x} ${y}V${y + 60}" stroke="${fill}" stroke-width="3"/><rect x="${x - wd/2}" y="${y + 60}" width="${wd}" height="46" rx="12" fill="${fill}"/><text x="${x}" y="${y + 93}" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">${txt}</text></g>`; };
+  const end = pts.at(-1), pill = (v, fill, txt, extra = '', dy = 0) => { const x = zsX(v), wd = Math.max(56, String(txt).length*20 + 26); return `<g ${extra}><path d="M${x} ${y}V${y + 60 + dy}" stroke="${fill}" stroke-width="3"/><rect x="${x - wd/2}" y="${y + 60 + dy}" width="${wd}" height="46" rx="12" fill="${fill}"/><text x="${x}" y="${y + 93 + dy}" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">${txt}</text></g>`; };
   for(const v of new Set(pts.slice(1, -1))) if(v !== n.start && v !== end && !n.hide) s += `<circle cx="${zsX(v)}" cy="${y}" r="7" fill="#2b2930"/><text x="${zsX(v)}" y="${y + 84}" text-anchor="middle" font-size="24" font-weight="700" fill="#6b6672">${n.empty ? v : ''}</text>`;
   s += pill(n.start, '#e8890c', n.start);
-  if(n.jumps.length) s += n.hide && !n.shown ? pill(end, '#2b2930', '?', 'data-nl-reveal="1" style="cursor:pointer"') : pill(end, '#2b2930', end);
-  return s;
+  if(n.jumps.length){
+    /* Ziel unter den Start rücken, wenn beide Marken sonst übereinander lägen */
+    const wd = t => Math.max(56, String(t).length*20 + 26), et = n.hide && !n.shown ? '?' : end, low = Math.abs(zsX(end) - zsX(n.start)) < (wd(n.start) + wd(et))/2 + 6;
+    s += n.hide && !n.shown ? pill(end, '#2b2930', '?', 'data-nl-reveal="1" style="cursor:pointer"', low ? 52 : 0) : pill(end, '#2b2930', end, '', low ? 52 : 0);
+  }
+  return s + '</g>';
 }
 function zsPathText(){
   const n = app.nl; if(n.start == null) return 'Tippe auf den Zahlenstrahl: Dort beginnt der Weg.';
@@ -5610,31 +5645,73 @@ function zsPathText(){
   const parts = []; for(const d of n.jumps){ const p = parts.at(-1); if(p && p.d === d) p.n++; else parts.push({d, n:1}); }
   return `${n.start}  ·  ${parts.map(p => p.n > 1 ? `${p.n}-mal ${sp(p.d)}` : sp(p.d)).join('  ·  ')}  ·  Ziel ${res}`;
 }
+const zsZoomHtml = () => { const {L, H} = zsWin(), span = H - L; return `<div class="nl-zoom" role="group" aria-label="Zahlenstrahl vergrößern"><button data-zsz="in" aria-label="Vergrößern" ${span <= 10 ? 'disabled' : ''}>+</button><button data-zsz="out" aria-label="Verkleinern" ${app.nl.win ? '' : 'disabled'}>−</button><button data-zsz="all" aria-label="Ganzer Zahlenstrahl" ${app.nl.win ? '' : 'disabled'}>↔</button></div>`; };
+function zsRedraw(){
+  const svg = $('#nl-svg'); if(!svg) return renderNline();
+  svg.innerHTML = zsSvg(); const z = document.querySelector('.nl-tool .nl-zoom'); if(z) z.outerHTML = zsZoomHtml();
+}
 function renderNline(){
   const n = app.nl;
   $('#equation').innerHTML = `<span class="screen-step">Zahlenstrahl</span>`;
   $('#prompt').innerHTML = `<span class="nl-path">${escHtml(zsPathText())}</span>`;
-  $('#stage').innerHTML = `<div class="nl-tool"><svg id="nl-svg" viewBox="0 0 ${ZS.W} 330" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zahlenstrahl bis ${n.range}">${zsSvg()}</svg></div>`;
+  $('#stage').innerHTML = `<div class="nl-tool"><svg id="nl-svg" viewBox="0 0 ${ZS.W} 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zahlenstrahl bis ${n.range}">${zsSvg()}</svg>${zsZoomHtml()}</div>`;
   const cur = zsCur(), J = zsJumpSet(n.range), ok = d => cur != null && cur + d >= 0 && cur + d <= n.range;
   $('#controls').innerHTML = `<div class="nl-jumps">${[...J].reverse().map(d => `<button data-nlj="${-d}" ${ok(-d) ? '' : 'disabled'} style="--c:${placeCol(d)}">−${d}</button>`).join('')}<span class="nl-sep"></span>${J.map(d => `<button data-nlj="${d}" ${ok(d) ? '' : 'disabled'} style="--c:${placeCol(d)}">+${d}</button>`).join('')}</div>`
     + toolBtn({id:'nl-undo', ic:'undo', label:'Zurück', disabled: !n.jumps.length && n.start == null}) + toolBtn({id:'nl-new', ic:'trash', label:'Neu', disabled: n.start == null});
   setHint('');
 }
+const zsVal = (svg, cx) => { const m = svg.getScreenCTM(); if(!m) return null; const p = new DOMPoint(cx, 0).matrixTransform(m.inverse()); const {L, H} = zsWin(); return L + (p.x - ZS.x0)/(ZS.x1 - ZS.x0)*(H - L); };
 function zsClick(e){
   const n = app.nl;
+  const zb = e.target.closest('[data-zsz]'); if(zb){ const k = zb.dataset.zsz; if(k === 'in') zsZoom(0.5, zsCur() ?? undefined); if(k === 'out') zsZoom(2); if(k === 'all') n.win = null; return zsRedraw(); }
+  if(ZSP.moved){ ZSP.moved = false; return; }
   if(e.target.closest('[data-nl-reveal]')){ n.shown = true; return renderNline(); }
   const svg = e.target.closest('#nl-svg'); if(!svg) return;
   const m = svg.getScreenCTM(); if(!m) return;
   const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
   if(p.y < 40) return;
-  const sn = zsSnap(), v = Math.round(Math.max(0, Math.min(n.range, (p.x - ZS.x0)/(ZS.x1 - ZS.x0)*n.range))/sn)*sn;
+  const {L, H} = zsWin(), sn = zsSnap(), raw = L + (p.x - ZS.x0)/(ZS.x1 - ZS.x0)*(H - L);
+  const v = Math.max(0, Math.min(n.range, Math.round(raw/sn)*sn));
   if(n.start == null){ n.start = v; n.shown = false; }
   else { const c = zsCur(); if(v !== c){ n.jumps.push(v - c); n.shown = false; } }
   renderNline();
 }
+/* Ziehen und Zwei-Finger-Zoom */
+const ZSP = {pts:new Map(), g:null, moved:false};
+document.addEventListener('pointerdown', e => {
+  if(app.mode !== 'nline' || !e.target.closest('#nl-svg')) return;
+  if(ZSP.pts.size === 0) ZSP.moved = false;
+  ZSP.pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  const svg = $('#nl-svg'), {L, H} = zsWin(), ps = [...ZSP.pts.values()];
+  if(ps.length === 2){ const mx = (ps[0].x + ps[1].x)/2; ZSP.g = {two:true, d0: Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1, span: H - L, v: zsVal(svg, mx), L}; ZSP.moved = true; }
+  else if(ps.length === 1) ZSP.g = {two:false, x0: e.clientX, L, span: H - L};
+});
+document.addEventListener('pointermove', e => {
+  if(app.mode !== 'nline' || !ZSP.pts.has(e.pointerId) || !ZSP.g) return;
+  ZSP.pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  const svg = $('#nl-svg'); if(!svg) return; const ps = [...ZSP.pts.values()];
+  if(ZSP.g.two && ps.length >= 2){
+    const d = Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1, span = ZSP.g.span*ZSP.g.d0/d;
+    const fv = (ZSP.g.v - ZSP.g.L)/ZSP.g.span; zsSetWin(ZSP.g.v - fv*Math.max(10, Math.min(app.nl.range, span)), span); zsRedraw();
+  } else if(!ZSP.g.two && app.nl.win){
+    const dx = e.clientX - ZSP.g.x0; if(Math.abs(dx) > 10) ZSP.moved = true;
+    if(ZSP.moved){ const r = svg.getBoundingClientRect(), m = svg.getScreenCTM(), pxPerUnit = (ZS.x1 - ZS.x0)*(m ? m.a : r.width/ZS.W)/ZSP.g.span; zsSetWin(ZSP.g.L - dx/pxPerUnit, ZSP.g.span); zsRedraw(); }
+  }
+});
+const zsUp = e => { if(!ZSP.pts.delete(e.pointerId)) return; if(ZSP.pts.size === 0) ZSP.g = null; else if(ZSP.pts.size === 1){ const [p] = ZSP.pts.values(), {L, H} = zsWin(); ZSP.g = {two:false, x0:p.x, L, span:H - L}; } };
+document.addEventListener('pointerup', zsUp); document.addEventListener('pointercancel', zsUp);
+document.addEventListener('wheel', e => {
+  if(app.mode !== 'nline' || !e.target.closest?.('#nl-svg')) return;
+  const svg = $('#nl-svg');
+  if(e.ctrlKey || e.metaKey){ e.preventDefault(); zsZoom(Math.exp(e.deltaY*0.01), zsVal(svg, e.clientX)); zsRedraw(); return; }
+  const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  if(!app.nl.win || !d) return; e.preventDefault();
+  const {L, H} = zsWin(); zsSetWin(L + d/900*(H - L), H - L); zsRedraw();
+}, {passive:false});
+document.addEventListener('gesturestart', e => { if(app.mode === 'nline' && e.target.closest?.('#nl-svg')) e.preventDefault(); });
 function zsControl(b){
   const n = app.nl;
-  if(b.dataset.nlj){ const d = +b.dataset.nlj, c = zsCur(); if(c == null || c + d < 0 || c + d > n.range) return; n.jumps.push(d); n.shown = false; return renderNline(); }
+  if(b.dataset.nlj){ const d = +b.dataset.nlj, c = zsCur(); if(c == null || c + d < 0 || c + d > n.range) return; n.jumps.push(d); n.shown = false; zsFollow(); return renderNline(); }
   if(b.id === 'nl-undo'){ if(n.jumps.length) n.jumps.pop(); else n.start = null; n.shown = false; return renderNline(); }
   if(b.id === 'nl-new'){ n.start = null; n.jumps = []; n.shown = false; return renderNline(); }
 }
@@ -5741,7 +5818,7 @@ document.addEventListener('click', e => {
   if(inStage){ if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
   const b = e.target.closest('button'); if(!b || !(inCtl || inTop)) return;
   if(inTop){
-    if(b.dataset.nlr){ app.nl = {...app.nl, range: +b.dataset.nlr, start:null, jumps:[], shown:false}; return render(); }
+    if(b.dataset.nlr){ app.nl = {...app.nl, range: +b.dataset.nlr, start:null, jumps:[], shown:false, win:null}; return render(); }
     if(b.hasAttribute('data-nle')){ app.nl.empty = !app.nl.empty; return render(); }
     if(b.hasAttribute('data-nlh')){ app.nl.hide = !app.nl.hide; app.nl.shown = false; return render(); }
     if(b.id === 'tw-go'){ app.tw.text = $('#tw-text').value; return renderTword(); }
@@ -6637,7 +6714,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.12.0 · 13.11.2026';
+const APP_VERSION = '0.12.1 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

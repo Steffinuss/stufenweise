@@ -137,7 +137,7 @@ Beim Start fragt Stufenweise mit zwei Bildkacheln: **Üben** (mit Namen, Tests u
 Die Werkzeuge:
 
 - **Zahlen:** eine Zahl mit Material, am Zahlenstrahl oder in der Hundertertafel zeigen.
-- **Zahlenstrahl:** bis 10, 20, 100 oder 1000. Erst eine Stelle antippen: Dort beginnt der Weg (orange). Dann mit den Knöpfen springen (+1, +10, −10 …) oder eine andere Stelle antippen. Die Bögen haben die Stellenwertfarben, oben steht die Rechnung. **Rechenstrich** blendet die Striche aus (leerer Zahlenstrahl). **Ziel verdecken** zeigt am Ende ein „?“; antippen deckt das Ergebnis auf.
+- **Zahlenstrahl:** bis 10, 20, 100 oder 1000. Erst eine Stelle antippen: Dort beginnt der Weg (orange). Dann mit den Knöpfen springen (+1, +10, −10 …) oder eine andere Stelle antippen. Die Bögen haben die Stellenwertfarben, oben steht die Rechnung. **Rechenstrich** blendet die Striche aus (leerer Zahlenstrahl). **Ziel verdecken** zeigt am Ende ein „?“; antippen deckt das Ergebnis auf. Mit **+** und **−** oben rechts (oder zwei Fingern) vergrößerst du einen Ausschnitt, mit einem Finger verschiebst du ihn, **↔** zeigt wieder den ganzen Strahl. Vergrößert lassen sich auch im Tausenderraum einzelne Einer genau antippen.
 - **Hundertertafel:** Felder färben (vier Farben, auch ganze 2er-, 5er- oder 10er-Reihen) oder abdecken. „Alles abdecken“ macht eine leere Tafel, die du Feld für Feld aufdeckst.
 - **Frei legen** und **Blitzblick** wie beim Üben.
 - **Uhr:** Zeiger mit + und − stellen (in Schritten von 1, 5 oder 15 Minuten), dazu auf Wunsch die Digitalzeit und die Uhrzeit in Worten.
