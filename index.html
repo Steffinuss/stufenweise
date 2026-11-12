@@ -217,6 +217,8 @@ legend{font-weight:700;padding:0;float:left;margin-bottom:2px;font-size:17px}
 .mitem:hover{opacity:.8}
 .mtray{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
 .mden{padding:4px 6px;min-height:52px;display:flex;align-items:center}
+.mden.dg-undo{gap:6px;padding:4px 14px;font-weight:700;font-size:16px}.mden.dg-undo .ic{width:22px;height:22px;flex:none}
+.dg-rm{cursor:pointer}.dg-rm:hover{opacity:.8}
 .money-amt{color:var(--ink);background:#fff;border-radius:12px;padding:0 .3em;box-shadow:var(--shadow)}
 .chip-toggle{min-height:44px;font-weight:700}
 .chip-toggle[aria-pressed=true]{background:var(--dark);color:#fff}
@@ -333,7 +335,7 @@ body.screening .toolbar{visibility:hidden}
 
 /* Diagnostik und Lese-Werkstatt */
 .dg-in{-moz-appearance:textfield;appearance:textfield}.dg-in::-webkit-inner-spin-button,.dg-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.dg-stage{flex-direction:column}
+.dg-stage{flex-direction:column;justify-content:flex-start;padding-top:clamp(14px,5vh,56px)}
 .it-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-height:100%;overflow:auto;padding:6px}
 .it-svg{width:100%;display:flex;justify-content:center}.it-svg>svg{max-width:100%;max-height:300px}
 .it-icon svg{display:block;filter:drop-shadow(0 2px 3px #0002)}
@@ -4902,9 +4904,9 @@ function materialSvg(z, e){
   if(!z && !e) s = `<rect x="4" y="4" width="252" height="${10*U + 14}" rx="12" fill="none" stroke="#cfc6b4" stroke-width="2" stroke-dasharray="6 5"/><text x="130" y="${5*U + 16}" text-anchor="middle" font-size="16" fill="#a39e97">Noch nichts gelegt</text>`;
   return `<svg viewBox="0 0 ${Math.max(W, 260)} ${10*U + 22}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zehnerstangen und Einer">${s}</svg>`;
 }
-function moneyRowSvg(list){
+function moneyRowSvg(list, tap){
   let x = 10, s = '';
-  for(const c of list){ const [w, h] = itemSize(c); s += moneySvg(c, x, isNote(c) ? 10 : 40 - h/2 + 30); x += w + (isNote(c) ? 14 : 6); }
+  for(const c of list){ const [w, h] = itemSize(c), m = moneySvg(c, x, isNote(c) ? 10 : 40 - h/2 + 30); s += tap ? `<g data-dgrm="${c}" class="dg-rm" role="button" aria-label="${denomLabel(c)} zurücklegen">${m}</g>` : m; x += w + (isNote(c) ? 14 : 6); }
   return `<svg viewBox="0 0 ${x + 10} ${list.some(c => c >= 10000) ? 120 : 110}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Geld">${s}</svg>`;
 }
 
@@ -4933,7 +4935,7 @@ function itemStage(it, r, opt = {}){
     case 'money': {
       r.items ||= [];
       const laid = [...r.items].sort((a, b) => b - a);
-      return `<div class="money"><div class="mtable">${laid.length ? moneyRowSvg(laid) : '<p class="board-empty" style="inset:40% 0 auto">Tippe unten auf Scheine und Münzen.</p>'}</div><div class="mtray">${it.denoms.map(c => { const [w, h] = itemSize(c); return `<button class="mden" data-dgden="${c}" aria-label="${denomLabel(c)}"><svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${isNote(c) ? 74 : 40}" aria-hidden="true">${moneySvg(c, 0, 0)}</svg></button>`; }).join('')}<button class="mden" data-dgundo aria-label="Letztes zurücklegen">${icon('undo','ic')}</button></div></div>`;
+      return `<div class="money"><div class="mtable">${laid.length ? moneyRowSvg(laid, true) : '<p class="board-empty" style="inset:40% 0 auto">Tippe unten auf Scheine und Münzen. Zum Zurücklegen tippst du sie hier an.</p>'}</div><div class="mtray">${it.denoms.map(c => { const [w, h] = itemSize(c); return `<button class="mden" data-dgden="${c}" aria-label="${denomLabel(c)}"><svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${isNote(c) ? 74 : 40}" aria-hidden="true">${moneySvg(c, 0, 0)}</svg></button>`; }).join('')}<button class="mden dg-undo" data-dgundo aria-label="Letztes zurücklegen" ${r.items.length ? '' : 'disabled'}>${icon('undo')}<span>zurück</span></button></div></div>`;
     }
     case 'build': {
       r.mat ||= [...it.start]; const [Z, E] = r.mat;
@@ -4962,6 +4964,7 @@ function itemClick(e, it, r){
   if(it.type === 'line' && e.target.closest('.dg-line')){ const svg = e.target.closest('svg'), m = svg.getScreenCTM(); const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse()); r.guess = Math.round(Math.max(0, Math.min(it.zr, (p.x - 50)*it.zr/900))); return true; }
   const dn = e.target.closest('[data-dgden]'); if(dn){ if((r.items ||= []).length < 40) r.items.push(+dn.dataset.dgden); return true; }
   if(e.target.closest('[data-dgundo]')){ (r.items ||= []).pop(); return true; }
+  const rm = e.target.closest('[data-dgrm]'); if(rm){ const i = (r.items ||= []).lastIndexOf(+rm.dataset.dgrm); if(i >= 0) r.items.splice(i, 1); return true; }
   const b = e.target.closest('[data-bld]');
   if(b){ r.mat ||= [...it.start]; const [Z, E] = r.mat, k = b.dataset.bld;
     if(k === 'z+' && Z < 10) r.mat = [Z + 1, E]; if(k === 'z-' && Z) r.mat = [Z - 1, E]; if(k === 'e+' && E < 30) r.mat = [Z, E + 1]; if(k === 'e-' && E) r.mat = [Z, E - 1];
@@ -6230,7 +6233,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.11.4 · 12.11.2026';
+const APP_VERSION = '0.11.5 · 12.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
