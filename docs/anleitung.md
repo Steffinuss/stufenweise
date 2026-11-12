@@ -130,6 +130,21 @@ Bei **Zahlen**, **Plus** und **Minus** gibt es im Zahlenraum bis 100 außerdem d
 
 Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901–1000). Ein orangefarbener Punkt markiert die Startseite, ein blauer die Seite, auf der das Kind gerade ist. Mit einem Tipp auf eine Seite kann es blättern. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet; im Tausenderbuch muss das Kind zuerst die richtige Seite aufschlagen.
 
+## Unterricht an der Tafel
+
+Beim Start fragt Stufenweise mit zwei Bildkacheln: **Üben** (mit Namen, Tests und Lernstand) oder **Unterricht** (an der Tafel zeigen). Im Unterricht gibt es keine Namen, keine Tests und keine Runden, und es wird nichts gespeichert. Auf großen Bildschirmen wie einer interaktiven Tafel ist alles etwas größer. Unten links in der Leiste führt **Üben** zurück; auf der Startseite tippst du dafür auf die erste Stufe „Üben“.
+
+Die Werkzeuge:
+
+- **Zahlen:** eine Zahl mit Material, am Zahlenstrahl oder in der Hundertertafel zeigen.
+- **Zahlenstrahl:** bis 10, 20, 100 oder 1000. Erst eine Stelle antippen: Dort beginnt der Weg (orange). Dann mit den Knöpfen springen (+1, +10, −10 …) oder eine andere Stelle antippen. Die Bögen haben die Stellenwertfarben, oben steht die Rechnung. **Rechenstrich** blendet die Striche aus (leerer Zahlenstrahl). **Ziel verdecken** zeigt am Ende ein „?“; antippen deckt das Ergebnis auf.
+- **Hundertertafel:** Felder färben (vier Farben, auch ganze 2er-, 5er- oder 10er-Reihen) oder abdecken. „Alles abdecken“ macht eine leere Tafel, die du Feld für Feld aufdeckst.
+- **Frei legen** und **Blitzblick** wie beim Üben.
+- **Uhr:** Zeiger mit + und − stellen (in Schritten von 1, 5 oder 15 Minuten), dazu auf Wunsch die Digitalzeit und die Uhrzeit in Worten.
+- **Wörter:** ein Wort oder einen Satz eintippen und groß zeigen, mit farbigen Silben und Silbenbögen. Kennt die App ein Bild zum Wort, erscheint es dazu.
+
+In den Einstellungen unter **Hilfen → Beim Start** kannst du festlegen, dass ein Gerät immer direkt mit Üben oder immer mit Unterricht startet, zum Beispiel der Rechner an der Tafel.
+
 ## Schritt 6: Arbeitsblätter drucken
 
 1. Oben auf **Arbeitsblätter** (3) tippen.

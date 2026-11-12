@@ -453,6 +453,59 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 .mtable #mtab{width:100%;height:100%}
 
 .adapt-tip{position:absolute;right:18px;top:14px;z-index:20;display:flex;gap:8px;align-items:center;background:#fff;border-radius:16px;box-shadow:0 6px 24px #0002;padding:8px 10px 8px 14px;font-weight:700;font-size:15px;animation:tipIn .35s ease}
+.rail-guide{margin-top:auto}
+/* Start: Üben oder Unterricht */
+.ctx-tiles{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
+.ctx-tile{width:min(300px,42vw);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:26px;border:3px solid transparent;padding:18px}
+.ctx-tile svg{width:190px;height:auto}
+.ctx-tile b{font-size:34px;line-height:1.1}.ctx-tile span{font-size:18px;color:var(--muted);font-weight:700}
+.ctx-tile.practice{background:#eaf5ee;border-color:#9fd3ae}.ctx-tile.class{background:#e8effa;border-color:#8fb3ea}
+.ctx-tile:hover{transform:translateY(-3px)}
+.ct-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;width:min(980px,100%)}
+.ct-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;min-height:150px;border-radius:20px}
+.ct-tile svg{width:96px;height:68px}.ct-tile b{font-size:21px}.ct-tile span{font-size:14px;color:var(--muted);font-weight:600}
+.ct-tile:hover{transform:translateY(-2px)}
+.ct-note{font-size:15px}
+.ct-sym svg{width:34px;height:24px;display:block}
+/* Unterricht an der großen Tafel: alles etwas größer */
+@media (min-width:1500px){ body.class-mode{zoom:1.25} body.class-mode .shell{height:calc(100dvh / 1.25)} }
+@media (min-width:2200px){ body.class-mode{zoom:1.6} body.class-mode .shell{height:calc(100dvh / 1.6)} }
+body.class-mode #controls button{min-height:58px}
+/* Zahlenstrahl */
+.nl-tool{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:6px}
+.nl-tool svg{width:100%;height:100%;max-height:520px;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,sans-serif;cursor:crosshair;touch-action:manipulation}
+.nl-path{font-size:26px;font-weight:800;color:var(--ink);white-space:pre-wrap}
+.nl-jumps{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.nl-jumps button{min-width:72px;min-height:58px;font-size:24px;font-weight:800;color:var(--c);border:2.5px solid var(--c);border-radius:16px;background:#fff}
+.nl-jumps button:disabled{opacity:.3}
+.nl-sep{width:14px}
+/* Hundertertafel zum Färben */
+.hb2-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:4px}
+.hb2{display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(10,1fr);gap:0;border:3px solid #2b2930;border-radius:8px;overflow:hidden;background:#fff}
+.hb2 button{border:0;border-right:1.5px solid #cfc6b4;border-bottom:1.5px solid #cfc6b4;border-radius:0;min-height:0;padding:0;font:inherit;font-weight:800;background:#fff;box-shadow:none;color:var(--ink)}
+.hb2 button:nth-child(10n){border-right:0}.hb2 button:nth-child(n+91){border-bottom:0}
+.hb2 button:nth-child(10n+5){border-right:3px solid #2b2930}.hb2 button:nth-child(n+41):nth-child(-n+50){border-bottom:3px solid #2b2930}
+.hb2 button.cov{background:repeating-linear-gradient(45deg,#e7dfd0,#e7dfd0 6px,#d9cfbc 6px,#d9cfbc 12px)}
+.hb2-cols{display:flex;gap:6px}.hb2-cols button{width:46px;height:46px;min-height:0;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px #cfc6b4}
+.hb2-cols button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.hb2-rows{display:flex;gap:6px}.hb2-rows button{min-height:52px;font-weight:800;font-size:18px;padding:0 14px}
+.hb2-tools button{min-height:52px;font-size:17px;font-weight:700;padding:0 14px}
+/* Uhr */
+.tc-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:40px;padding:8px}
+.tc-wrap>svg{height:100%;max-height:440px;width:auto}
+.tc-info{display:flex;flex-direction:column;gap:14px;min-width:0}
+.tc-dig{font-size:64px;font-weight:800;font-variant-numeric:tabular-nums}.tc-dig small{display:block;font-size:24px;color:var(--muted)}
+.tc-words{font-size:40px;font-weight:800;color:#1f4f9a}
+.tc-btns{display:flex;align-items:center;gap:8px}.tc-btns span{font-weight:700;color:var(--muted)}
+.tc-btns button{min-width:64px;min-height:56px;font-size:24px;font-weight:800}
+.tc-step button{min-height:52px;padding:0 12px;font-weight:700}
+/* Wörter */
+.tw-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10px}
+.tw-one{display:flex;flex-direction:column;align-items:center;gap:20px}
+.tw-word{font-size:clamp(72px,12vw,150px);font-weight:700;letter-spacing:.03em;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,sans-serif;line-height:1.1}
+.tw-word.bows .syl{display:inline-block;padding:0 .04em .14em;border-bottom:.07em solid currentColor;border-radius:0 0 50% 50%/0 0 .45em .45em;margin:0 .03em}
+.tw-text{font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1.45;max-width:1100px;text-align:center;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,sans-serif}
+.tw-in input{width:min(360px,40vw);font-size:20px}
 .adapt-tip.up{border:2px solid #1f7a45}
 .round-bar{position:absolute;left:18px;top:12px;z-index:5;display:flex;align-items:flex-end;gap:3px;height:34px;pointer-events:none}
 .round-bar i{width:9px;border-radius:3px 3px 1px 1px;background:#e7dfd0}
@@ -762,6 +815,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <label class="row cb"><input type="checkbox" data-key="labels"> Texte unter den Knöpfen</label>
     <label class="row">Zifferntastatur auf dem Bildschirm <select data-key="numpad"><option value="auto">automatisch (Tablet)</option><option value="on">immer</option><option value="off">nie</option></select></label>
     <label class="row">Buchstabentastatur beim Schreiben <select data-key="kbd"><option value="qwertz">wie am Handy (QWERTZ)</option><option value="abc">nach dem ABC</option></select></label>
+    <label class="row">Beim Start <select data-key="startCtx"><option value="ask">fragen: Üben oder Unterricht</option><option value="practice">immer Üben</option><option value="class">immer Unterricht (Tafel)</option></select></label>
     <label class="row">Übungsrunde <select data-key="roundLen"><option value="5">5 Aufgaben</option><option value="10">10 Aufgaben</option><option value="15">15 Aufgaben</option><option value="0">ohne Ende</option></select></label>
   </fieldset>
   <fieldset><legend>Geführte Oberfläche</legend>
@@ -844,7 +898,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', kbd:'qwertz', roundLen:'10', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', kbd:'qwertz', roundLen:'10', startCtx:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -1254,6 +1308,8 @@ function forYouOffer(){
   return f ? {key:f, info:cellInfo(f)} : null;
 }
 function railHtml(){
+  if(classMode()) return classRailHtml();
+  if(!app.ctx && app.mode === 'home') return '';
   const subj = settings.subject, fy = forYouOffer();
   let h = `<div class="subj" role="group" aria-label="Fach"><button data-subj="M" aria-pressed="${subj === 'M'}">Mathe</button><button data-subj="D" aria-pressed="${subj === 'D'}">Deutsch</button></div>`;
   if(fy) h += `<button data-foryou class="foryou" title="${escHtml(fy.info.offer.text)}"><b aria-hidden="true">★</b>Für dich</button>`;
@@ -1312,6 +1368,7 @@ function renderTop(){
   document.body.classList.toggle('hide-labels', !settings.labels);
   document.documentElement.style.setProperty('--ca', colorA());
   document.body.classList.toggle('screening', app.mode === 'screen' || app.mode === 'diag');
+  if(TOOL_MODES.includes(app.mode)){ renderTopTool(); return; }
   if(renderTopNew() || renderTopExtra()) return;
   $('#range-label').textContent = 'Zahlenraum bis';
   const free = app.mode === 'free', t = free ? null : task();
@@ -1333,7 +1390,7 @@ function guideFix(){
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
-function render(){ if(guideFix()) return; $('#btn-fb').hidden = settings.fbOn === false; renderTop(); renderWork(); fitTop(); roundBar(); }
+function render(){ if(guideFix()) return; $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
 /* Passt die Einstellungsleiste nicht neben die Knöpfe oben rechts, rückt sie in eine eigene Zeile (sonst verschwinden z. B. die 10er-Reihe oder „Kalender“) */
 function fitTop(){
   const tb = document.querySelector('.topbar'), t = tb?.querySelector('.toolbar'); if(!t) return;
@@ -1353,6 +1410,7 @@ function renderWork(before){
   if(app.mode === 'diag') return renderDiag();
   if(app.mode === 'read') return renderRead();
   if(app.mode === 'home') return renderHome();
+  if(TOOL_MODES.includes(app.mode)) return renderTool();
   if(app.mode === 'map') return renderMap();
   const t = task();
   if(!t.ready) return renderWelcome();
@@ -2815,7 +2873,7 @@ function randomAny(){ app.mode === 'written' ? wrRandom() : app.mode === 'times'
 const DATA_KEY = 'stufenweise.data';
 const data = (() => { try { return {profiles:[], current:null, log:{}, ...JSON.parse(localStorage.getItem(DATA_KEY) || '{}')}; } catch { return {profiles:[], current:null, log:{}}; } })();
 const saveData = () => { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch {} };
-const curProfile = () => data.profiles.find(p => p.id === data.current) || null;
+const curProfile = () => app.ctx === 'class' ? null : data.profiles.find(p => p.id === data.current) || null;
 /* Sicherung: Erinnerung nach 14 Tagen und Bitte an den Browser, die Daten nicht von selbst zu löschen */
 if(data.profiles.length && !data.firstUse){ data.firstUse = Date.now(); saveData(); }
 const BACKUP_DAYS = 14;
@@ -2832,7 +2890,7 @@ const escHtml = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;',
 const ROUND_MODES = ['add', 'sub', 'written', 'times', 'money', 'blitz', 'read'];
 app.round = {key:null, res:[]};
 const roundLen = () => Number(settings.roundLen ?? 10) || 0;
-const roundOn = () => roundLen() > 0 && ROUND_MODES.includes(app.mode);
+const roundOn = () => roundLen() > 0 && ROUND_MODES.includes(app.mode) && app.ctx !== 'class';
 const roundKey = () => `${data.current || 'guest'}|${app.mode}|${app.mode === 'read' ? app.read.lvl : ''}`;
 function roundSync(){ const k = roundKey(); if(app.round.key !== k){ app.round = {key:k, res:[]}; document.querySelector('.round-end')?.remove(); } }
 const roundBarHtml = (res, n, now) => `<div class="round-bar" aria-hidden="true">${Array.from({length:n}, (_, i) => `<i class="${res[i] === true ? 'ok' : res[i] === false ? 'late' : ''}${now && i === res.length ? ' now' : ''}" style="height:${Math.round(28 + 72*(i + 1)/n)}%"></i>`).join('')}</div>`;
@@ -2898,6 +2956,7 @@ function roundEnd(){
   d.querySelector('button')?.focus();
 }
 function logAttempt(e){
+  if(app.ctx === 'class') return;
   const id = data.current || 'guest';
   const list = data.log[id] ??= [];
   list.push({ts: Date.now(), ...e});
@@ -5387,13 +5446,15 @@ function homeAreas(subj){
 }
 function renderHome(){
   $('#equation').textContent = ''; $('#words').hidden = true; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = ''; $('#btn-say').hidden = true;
+  if(!app.ctx) return renderCtx();
+  if(classMode()) return renderClassHome();
   const p = curProfile(), W = app.wz ||= {};
   const needWho = data.profiles.length > 0;
   let step = W.step || (needWho && !p && !W.guest ? 'who' : 'subj');
   if(step === 'area' && !W.subj) step = 'subj';
-  const steps = [...(needWho ? [['who', p ? escHtml(p.name) : W.guest ? 'Gast' : 'Wer übt?']] : []), ['subj', W.subj && step === 'area' ? (W.subj === 'M' ? 'Mathe' : 'Deutsch') : 'Fach'], ['area', 'Übung']];
+  const steps = [['ctx', 'Üben'], ...(needWho ? [['who', p ? escHtml(p.name) : W.guest ? 'Gast' : 'Wer übt?']] : []), ['subj', W.subj && step === 'area' ? (W.subj === 'M' ? 'Mathe' : 'Deutsch') : 'Fach'], ['area', 'Übung']];
   const si = steps.findIndex(x => x[0] === step);
-  const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : ''}" style="--h:${i + 1}"><button ${i < si ? `data-wz-step="${k}"` : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk"></span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
+  const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : ''}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben oder Unterricht wählen"' : `data-wz-step="${k}"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk"></span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
   let body = '';
   if(step === 'who'){
@@ -5439,7 +5500,263 @@ function wzGo(ds){
   } else { app.mode = ds.wzMode; settings.lastMath = app.mode; autoConf(app.mode); }
   saveSettings(); app.wz = null; render();
 }
+/* =====================================================================
+   Unterricht an der Tafel: Werkzeuge ohne Namen und ohne Speichern
+   ===================================================================== */
+const CLASS_TOOLS = [
+  {k:'number', label:'Zahlen', sub:'mit Material zeigen'},
+  {k:'nline', label:'Zahlenstrahl', sub:'Sprünge zeigen'},
+  {k:'hboard', label:'Hundertertafel', sub:'färben und abdecken'},
+  {k:'free', label:'Frei legen', sub:'Würfel und Geld'},
+  {k:'blitz', label:'Blitzblick', sub:'Mengen kurz zeigen'},
+  {k:'tclock', label:'Uhr', sub:'Zeiger stellen'},
+  {k:'tword', label:'Wörter', sub:'groß zeigen, Silben'}
+];
+const TOOL_MODES = ['nline', 'hboard', 'tclock', 'tword'];
+const CT_ILL = {
+  number:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="19" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="36" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="50" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="64" y="40" width="10" height="10" rx="2" fill="#27834b"/><text x="56" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#2b2930" font-family="Stufenfibel,sans-serif">23</text></svg>',
+  nline:'<svg viewBox="0 0 80 56" aria-hidden="true"><path d="M4 42h70" stroke="#2b2930" stroke-width="3"/><path d="M74 42l-6-4v8z" fill="#2b2930"/><path d="M10 38v8M24 38v8M38 38v8M52 38v8M66 38v8" stroke="#2b2930" stroke-width="2"/><path d="M10 38Q24 6 38 38" fill="none" stroke="#346bc3" stroke-width="3.5"/><path d="M38 38Q45 22 52 38" fill="none" stroke="#27834b" stroke-width="3.5"/></svg>',
+  hboard:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="14" y="2" width="52" height="52" rx="3" fill="#fff" stroke="#2b2930" stroke-width="2"/><path d="M14 15h52M14 28h52M14 41h52M27 2v52M40 2v52M53 2v52" stroke="#2b2930" stroke-width="1.4"/><rect x="40" y="2" width="13" height="13" fill="#f4b860"/><rect x="40" y="15" width="13" height="13" fill="#f4b860"/><rect x="40" y="28" width="13" height="13" fill="#f4b860"/><rect x="40" y="41" width="13" height="13" fill="#f4b860"/><rect x="14" y="28" width="13" height="13" fill="#8fb3ea"/></svg>',
+  free:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="10" width="40" height="40" rx="3" fill="#c9414a"/><path d="M6 20h40M6 30h40M6 40h40M16 10v40M26 10v40M36 10v40" stroke="#fff" stroke-opacity=".5"/><rect x="52" y="10" width="9" height="40" rx="2" fill="#346bc3"/><circle cx="70" cy="40" r="8" fill="#d5b75a" stroke="#9c8433" stroke-width="2"/></svg>',
+  blitz:'<svg viewBox="0 0 80 56" aria-hidden="true"><circle cx="22" cy="18" r="7" fill="#2b2930"/><circle cx="40" cy="18" r="7" fill="#2b2930"/><circle cx="58" cy="18" r="7" fill="#2b2930"/><circle cx="31" cy="38" r="7" fill="#2b2930"/><circle cx="49" cy="38" r="7" fill="#2b2930"/><path d="M70 2l-6 12h6l-6 12" fill="none" stroke="#e8890c" stroke-width="3" stroke-linejoin="round"/></svg>',
+  tclock:'<svg viewBox="0 0 80 56" aria-hidden="true"><circle cx="40" cy="28" r="25" fill="#fff" stroke="#2b2930" stroke-width="3"/><path d="M40 28V9" stroke="#346bc3" stroke-width="3.5" stroke-linecap="round"/><path d="M40 28l11 7" stroke="#c9414a" stroke-width="4.5" stroke-linecap="round"/><circle cx="40" cy="28" r="3" fill="#2b2930"/></svg>',
+  tword:'<svg viewBox="0 0 80 56" aria-hidden="true"><text x="40" y="36" text-anchor="middle" font-size="26" font-weight="800" font-family="Stufenfibel,sans-serif"><tspan fill="#346bc3">Ho</tspan><tspan fill="#c9414a">se</tspan></text><path d="M14 44q11 8 22 0" fill="none" stroke="#346bc3" stroke-width="3" stroke-linecap="round"/><path d="M42 44q11 8 22 0" fill="none" stroke="#c9414a" stroke-width="3" stroke-linecap="round"/></svg>'
+};
+/* Bildkacheln für den Start: auch ohne Lesen erkennbar */
+const CTX_ILL = {
+  practice:'<svg viewBox="0 0 160 110" aria-hidden="true"><rect x="38" y="30" width="84" height="64" rx="9" fill="#2b2930"/><rect x="45" y="37" width="70" height="50" rx="4" fill="#fdfbf6"/><rect x="54" y="68" width="12" height="12" rx="2" fill="#27834b"/><rect x="68" y="58" width="12" height="22" rx="2" fill="#346bc3"/><rect x="82" y="48" width="12" height="32" rx="2" fill="#c9414a"/><path d="M98 52l5 5 9-11" fill="none" stroke="#1f7a45" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="44" r="11" fill="#e8b45c"/><path d="M8 94c0-18 7-30 16-30s16 12 16 30z" fill="#e8890c"/><path d="M34 76l10 0" stroke="#e8890c" stroke-width="7" stroke-linecap="round"/></svg>',
+  class:'<svg viewBox="0 0 160 110" aria-hidden="true"><rect x="22" y="6" width="116" height="62" rx="6" fill="#fff" stroke="#2b2930" stroke-width="4"/><path d="M34 48h92" stroke="#2b2930" stroke-width="2.5"/><path d="M40 44v8M58 44v8M76 44v8M94 44v8M112 44v8" stroke="#2b2930" stroke-width="2"/><path d="M40 44Q58 14 76 44" fill="none" stroke="#346bc3" stroke-width="3.5"/><path d="M76 44Q85 30 94 44" fill="none" stroke="#27834b" stroke-width="3.5"/><path d="M80 68v10" stroke="#2b2930" stroke-width="4"/><circle cx="36" cy="88" r="8" fill="#e8b45c"/><path d="M24 108c0-10 5-14 12-14s12 4 12 14z" fill="#346bc3"/><circle cx="80" cy="88" r="8" fill="#c98a5a"/><path d="M68 108c0-10 5-14 12-14s12 4 12 14z" fill="#27834b"/><circle cx="124" cy="88" r="8" fill="#8a6436"/><path d="M112 108c0-10 5-14 12-14s12 4 12 14z" fill="#c9414a"/></svg>'
+};
+const classMode = () => app.ctx === 'class';
+function renderCtx(){
+  const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
+  $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}</div><section class="wz-body"><h2>Was machen wir?</h2>
+    <div class="ctx-tiles"><button class="ctx-tile practice" data-ctx="practice">${CTX_ILL.practice}<b>Üben</b><span>mit deinem Namen</span></button><button class="ctx-tile class" data-ctx="class">${CTX_ILL.class}<b>Unterricht</b><span>an der Tafel zeigen</span></button></div></section>
+    <button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
+}
+function renderClassHome(){
+  const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Unterricht an der Tafel</span></div></header>`;
+  $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}</div><section class="wz-body"><h2>Was zeigen wir?</h2>
+    <div class="ct-tiles">${CLASS_TOOLS.map(t => `<button class="ct-tile" data-ctool="${t.k}">${CT_ILL[t.k]}<b>${t.label}</b><span>${t.sub}</span></button>`).join('')}</div>
+    <p class="home-sub ct-note">Im Unterricht wird nichts gespeichert: keine Namen, keine Ergebnisse.</p>
+    <button class="linkish wz-back" data-ctx-reset>← Zum Üben mit Namen</button></section>
+    <button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
+}
+function setCtx(c){
+  app.ctx = c; app.round = {key:null, res:[]}; app.wz = null;
+  if(c === 'class'){ settings.subject = 'M'; }
+  leaveMode(); app.mode = 'home'; renderProfiles(); render();
+}
+function setTool(k){
+  if(app.busy) return; leaveMode(); app.activeZone = null;
+  app.mode = k;
+  if(['number', 'free', 'blitz'].includes(k)){ settings.subject = 'M'; autoConf(k); }
+  render();
+}
+function classRailHtml(){
+  return `<span class="rail-h">Unterricht</span>` + CLASS_TOOLS.map(t => `<button data-ctool="${t.k}" aria-pressed="${app.mode === t.k}"><b aria-hidden="true" class="ct-sym">${CT_ILL[t.k]}</b>${t.label}</button>`).join('') + `<button data-ctx-reset class="rail-guide">${icon('user')}<span>Üben</span></button>`;
+}
+
+/* ---------- Zahlenstrahl-Werkzeug (Unterricht) ---------- */
+app.nl = {range:100, start:null, jumps:[], hide:false, empty:false, shown:false};
+const ZS = {W:1000, x0:46, x1:954, y:230};
+const zsSnap = () => app.nl.range === 1000 ? 10 : 1;
+const zsX = v => ZS.x0 + (ZS.x1 - ZS.x0)*v/app.nl.range;
+const zsCur = () => { const n = app.nl; return n.start == null ? null : n.jumps.reduce((s, d) => s + d, n.start); };
+const zsJumpSet = r => r === 10 ? [1, 2] : r === 20 ? [1, 2, 5, 10] : r === 100 ? [1, 10] : [10, 100];
+const placeCol = d => Math.abs(d) % 100 === 0 ? '#c9414a' : Math.abs(d) % 10 === 0 ? '#346bc3' : '#27834b';
+const sgn = d => d > 0 ? `+${d}` : `−${-d}`;
+function zsSvg(){
+  const n = app.nl, R = n.range, y = ZS.y; let s = '';
+  s += `<rect x="0" y="0" width="${ZS.W}" height="330" fill="transparent" data-nl-hit="1"/>`;
+  s += `<path d="M${ZS.x0 - 22} ${y}H${ZS.x1 + 26}" stroke="#2b2930" stroke-width="4"/><path d="M${ZS.x1 + 34} ${y}l-14 -8v16z" fill="#2b2930"/>`;
+  if(!n.empty){
+    const minor = R === 1000 ? 10 : 1, mid = R === 1000 ? 50 : R === 100 ? 5 : 0, lab = R === 1000 ? 100 : R === 100 ? 10 : 1;
+    for(let v = 0; v <= R; v += minor){
+      const big = v % lab === 0, md = mid && v % mid === 0, h = big ? 18 : md ? 13 : 8, x = zsX(v);
+      s += `<path d="M${x} ${y - h}V${y + h}" stroke="#2b2930" stroke-width="${big ? 3 : 1.6}"/>`;
+      if(big) s += `<text x="${x}" y="${y + 50}" text-anchor="middle" font-size="${R <= 20 ? 30 : 28}" font-weight="700" fill="#2b2930">${v}</text>`;
+    }
+  } else s += `<path d="M${ZS.x0} ${y - 14}V${y + 14}" stroke="#2b2930" stroke-width="3"/>`;
+  if(n.start == null) return s;
+  /* Sprünge: gleiche kleine Sprünge hintereinander bekommen eine gemeinsame Beschriftung („3-mal +1“) */
+  let cur = n.start; const groups = [];
+  for(const d of n.jumps){ const g = groups.at(-1), w = Math.abs(zsX(d) - zsX(0)); if(g && g.d === d && w < 46) g.n++; else groups.push({d, n:1, from:cur, w}); cur += d; }
+  const pts = [n.start]; cur = n.start;
+  for(const g of groups){
+    const col = placeCol(g.d);
+    for(let i = 0; i < g.n; i++){
+      const a = cur, b = cur + g.d, xa = zsX(a), xb = zsX(b), w = Math.abs(xb - xa), hgt = Math.min(150, 26 + w*0.45);
+      const mx = (xa + xb)/2, dir = Math.sign(xb - xa);
+      s += `<path d="M${xa} ${y - 6}Q${mx} ${y - 6 - hgt*2} ${xb} ${y - 6}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"/>`;
+      s += `<path d="M${xb} ${y - 6}l${-dir*11} -14l${dir*3} 15z" fill="${col}"/>`;
+      cur = b; pts.push(b);
+    }
+    const xa = zsX(g.from), xb = zsX(cur), w = Math.abs(xb - xa), hgt = Math.min(150, 26 + (g.n > 1 ? Math.abs(zsX(g.d) - zsX(0)) : w)*0.45);
+    s += `<text x="${(xa + xb)/2}" y="${y - 22 - hgt - (g.n > 1 ? 14 : 0)}" text-anchor="middle" font-size="30" font-weight="800" fill="${col}">${g.n > 1 ? `${g.n}-mal ${sgn(g.d)}` : sgn(g.d)}</text>`;
+  }
+  /* Marken: Start orange, Zwischenstationen klein, Ziel dunkel (oder „?“) */
+  const end = pts.at(-1), pill = (v, fill, txt, extra = '') => { const x = zsX(v), wd = Math.max(56, String(txt).length*20 + 26); return `<g ${extra}><path d="M${x} ${y}V${y + 60}" stroke="${fill}" stroke-width="3"/><rect x="${x - wd/2}" y="${y + 60}" width="${wd}" height="46" rx="12" fill="${fill}"/><text x="${x}" y="${y + 93}" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">${txt}</text></g>`; };
+  for(const v of new Set(pts.slice(1, -1))) if(v !== n.start && v !== end && !n.hide) s += `<circle cx="${zsX(v)}" cy="${y}" r="7" fill="#2b2930"/><text x="${zsX(v)}" y="${y + 84}" text-anchor="middle" font-size="24" font-weight="700" fill="#6b6672">${n.empty ? v : ''}</text>`;
+  s += pill(n.start, '#e8890c', n.start);
+  if(n.jumps.length) s += n.hide && !n.shown ? pill(end, '#2b2930', '?', 'data-nl-reveal="1" style="cursor:pointer"') : pill(end, '#2b2930', end);
+  return s;
+}
+function zsPathText(){
+  const n = app.nl; if(n.start == null) return 'Tippe auf den Zahlenstrahl: Dort beginnt der Weg.';
+  if(!n.jumps.length) return `Start bei ${n.start}. Springe mit den Knöpfen unten – oder tippe auf eine Stelle.`;
+  const end = zsCur(), res = n.hide && !n.shown ? '?' : end, sp = d => sgn(d).replace(/^([+−])/, '$1 ');
+  if(n.jumps.length <= 8) return `${n.start} ${n.jumps.map(sp).join(' ')} = ${res}`;
+  const parts = []; for(const d of n.jumps){ const p = parts.at(-1); if(p && p.d === d) p.n++; else parts.push({d, n:1}); }
+  return `${n.start}  ·  ${parts.map(p => p.n > 1 ? `${p.n}-mal ${sp(p.d)}` : sp(p.d)).join('  ·  ')}  ·  Ziel ${res}`;
+}
+function renderNline(){
+  const n = app.nl;
+  $('#equation').innerHTML = `<span class="screen-step">Zahlenstrahl</span>`;
+  $('#prompt').innerHTML = `<span class="nl-path">${escHtml(zsPathText())}</span>`;
+  $('#stage').innerHTML = `<div class="nl-tool"><svg id="nl-svg" viewBox="0 0 ${ZS.W} 330" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zahlenstrahl bis ${n.range}">${zsSvg()}</svg></div>`;
+  const cur = zsCur(), J = zsJumpSet(n.range), ok = d => cur != null && cur + d >= 0 && cur + d <= n.range;
+  $('#controls').innerHTML = `<div class="nl-jumps">${[...J].reverse().map(d => `<button data-nlj="${-d}" ${ok(-d) ? '' : 'disabled'} style="--c:${placeCol(d)}">−${d}</button>`).join('')}<span class="nl-sep"></span>${J.map(d => `<button data-nlj="${d}" ${ok(d) ? '' : 'disabled'} style="--c:${placeCol(d)}">+${d}</button>`).join('')}</div>`
+    + toolBtn({id:'nl-undo', ic:'undo', label:'Zurück', disabled: !n.jumps.length && n.start == null}) + toolBtn({id:'nl-new', ic:'trash', label:'Neu', disabled: n.start == null});
+  setHint('');
+}
+function zsClick(e){
+  const n = app.nl;
+  if(e.target.closest('[data-nl-reveal]')){ n.shown = true; return renderNline(); }
+  const svg = e.target.closest('#nl-svg'); if(!svg) return;
+  const m = svg.getScreenCTM(); if(!m) return;
+  const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+  if(p.y < 40) return;
+  const sn = zsSnap(), v = Math.round(Math.max(0, Math.min(n.range, (p.x - ZS.x0)/(ZS.x1 - ZS.x0)*n.range))/sn)*sn;
+  if(n.start == null){ n.start = v; n.shown = false; }
+  else { const c = zsCur(); if(v !== c){ n.jumps.push(v - c); n.shown = false; } }
+  renderNline();
+}
+function zsControl(b){
+  const n = app.nl;
+  if(b.dataset.nlj){ const d = +b.dataset.nlj, c = zsCur(); if(c == null || c + d < 0 || c + d > n.range) return; n.jumps.push(d); n.shown = false; return renderNline(); }
+  if(b.id === 'nl-undo'){ if(n.jumps.length) n.jumps.pop(); else n.start = null; n.shown = false; return renderNline(); }
+  if(b.id === 'nl-new'){ n.start = null; n.jumps = []; n.shown = false; return renderNline(); }
+}
+
+/* ---------- Hundertertafel zum Färben und Abdecken ---------- */
+app.hb2 = {cells:{}, cover:new Set(), color:'o', tool:'paint'};
+const HB2_COL = {o:'#f4b860', b:'#8fb3ea', g:'#9fd3ae', r:'#ef9a9a'};
+function renderHboard(){
+  const h = app.hb2;
+  $('#equation').innerHTML = `<span class="screen-step">Hundertertafel</span>`;
+  $('#prompt').textContent = h.tool === 'cover' ? 'Tippe Felder an, um sie abzudecken oder wieder aufzudecken.' : 'Tippe Felder an, um sie zu färben. Noch einmal tippen nimmt die Farbe weg.';
+  $('#stage').innerHTML = `<div class="hb2-wrap"><div class="hb2" role="grid" aria-label="Hundertertafel">${Array.from({length:100}, (_, i) => { const v = i + 1, c = h.cells[v], cov = h.cover.has(v); return `<button data-hb2="${v}" class="${cov ? 'cov' : ''}" style="${c && !cov ? `background:${HB2_COL[c]}` : ''}" aria-label="${cov ? 'abgedeckt' : v}">${cov ? '' : v}</button>`; }).join('')}</div></div>`;
+  $('#controls').innerHTML = `<div class="hb2-tools seg" role="group" aria-label="Werkzeug"><button data-hb2t="paint" aria-pressed="${h.tool === 'paint'}">Färben</button><button data-hb2t="cover" aria-pressed="${h.tool === 'cover'}">Abdecken</button></div>`
+    + `<div class="hb2-cols">${Object.entries(HB2_COL).map(([k, c]) => `<button data-hb2c="${k}" aria-pressed="${h.color === k}" aria-label="Farbe" style="background:${c}"></button>`).join('')}</div>`
+    + `<div class="hb2-rows">${[2, 5, 10].map(r => `<button data-hb2r="${r}">${r}er</button>`).join('')}</div>`
+    + toolBtn({id:'hb2-coverall', ic:'eye', label:'Alles abdecken'}) + toolBtn({id:'hb2-clear', ic:'trash', label:'Leeren'});
+  setHint('');
+  requestAnimationFrame(hb2Fit);
+}
+function hb2Fit(){ const w = document.querySelector('.hb2-wrap'), g = document.querySelector('.hb2'); if(!w || !g) return; const s = Math.max(240, Math.min(w.clientWidth, w.clientHeight) - 8); g.style.width = g.style.height = s + 'px'; g.style.fontSize = Math.round(s/22) + 'px'; }
+addEventListener('resize', () => { if(app.mode === 'hboard') hb2Fit(); });
+function hboardClick(e){
+  const b = e.target.closest('[data-hb2]'); if(!b) return; const v = +b.dataset.hb2, h = app.hb2;
+  if(h.tool === 'cover'){ h.cover.has(v) ? h.cover.delete(v) : h.cover.add(v); }
+  else { if(h.cover.has(v)) h.cover.delete(v); else if(h.cells[v] === h.color) delete h.cells[v]; else h.cells[v] = h.color; }
+  renderHboard();
+}
+function hboardControl(b){
+  const h = app.hb2;
+  if(b.dataset.hb2t){ h.tool = b.dataset.hb2t; return renderHboard(); }
+  if(b.dataset.hb2c){ h.color = b.dataset.hb2c; h.tool = 'paint'; return renderHboard(); }
+  if(b.dataset.hb2r){ const r = +b.dataset.hb2r; for(let v = r; v <= 100; v += r) h.cells[v] = h.color; return renderHboard(); }
+  if(b.id === 'hb2-coverall'){ for(let v = 1; v <= 100; v++) h.cover.add(v); h.tool = 'cover'; return renderHboard(); }
+  if(b.id === 'hb2-clear'){ h.cells = {}; h.cover.clear(); return renderHboard(); }
+}
+
+/* ---------- Uhr zum Stellen ---------- */
+app.tc = {h:8, m:0, step:5, digital:false, words:false};
+function renderTclock(){
+  const c = app.tc;
+  $('#equation').innerHTML = `<span class="screen-step">Uhr</span>`;
+  $('#prompt').textContent = '';
+  const dig = `${c.h}:${String(c.m).padStart(2, '0')}`, dig2 = `${c.h + 12 === 24 ? 0 : c.h + 12}:${String(c.m).padStart(2, '0')}`;
+  $('#stage').innerHTML = `<div class="tc-wrap">${clockSvg(c.h % 12, c.m, {size:420, ring: c.step < 5})}<div class="tc-info">${c.digital ? `<div class="tc-dig">${dig} <small>oder ${dig2}</small></div>` : ''}${c.words ? `<div class="tc-words">${escHtml(timeWords(c.h, c.m))}</div>` : ''}</div></div>`;
+  $('#controls').innerHTML = `<div class="tc-btns"><span>Stunden</span><button data-tc="h-">−</button><button data-tc="h+">+</button></div><div class="tc-btns"><span>Minuten</span><button data-tc="m-">−${c.step}</button><button data-tc="m+">+${c.step}</button></div>`
+    + `<div class="seg tc-step" role="group" aria-label="Minutenschritte">${[1, 5, 15].map(s => `<button data-tcs="${s}" aria-pressed="${c.step === s}">${s} min</button>`).join('')}</div>`
+    + `<button class="chip-toggle" data-tcd aria-pressed="${c.digital}">Digital</button><button class="chip-toggle" data-tcw aria-pressed="${c.words}">In Worten</button>`;
+  setHint('');
+}
+function tclockControl(b){
+  const c = app.tc;
+  if(b.dataset.tc){ const k = b.dataset.tc;
+    if(k === 'h+') c.h = c.h % 12 + 1; if(k === 'h-') c.h = (c.h + 10) % 12 + 1;
+    if(k === 'm+'){ c.m += c.step; if(c.m >= 60){ c.m -= 60; c.h = c.h % 12 + 1; } }
+    if(k === 'm-'){ c.m -= c.step; if(c.m < 0){ c.m += 60; c.h = (c.h + 10) % 12 + 1; } }
+    c.m = Math.round(c.m/c.step)*c.step % 60; return renderTclock(); }
+  if(b.dataset.tcs){ c.step = +b.dataset.tcs; c.m = Math.floor(c.m/c.step)*c.step; return renderTclock(); }
+  if(b.hasAttribute('data-tcd')){ c.digital = !c.digital; return renderTclock(); }
+  if(b.hasAttribute('data-tcw')){ c.words = !c.words; return renderTclock(); }
+}
+
+/* ---------- Wörter groß zeigen ---------- */
+app.tw = {text:'Hose', syl:true, bows:true};
+function renderTword(){
+  const w = app.tw, txt = w.text.trim();
+  $('#equation').innerHTML = `<span class="screen-step">Wörter</span>`;
+  $('#prompt').textContent = '';
+  const key = Object.keys(ICON).find(k => k.toLowerCase() === txt.toLowerCase());
+  const big = txt.length <= 14 && !/\s/.test(txt);
+  const html = !txt ? '<p class="board-empty">Oben ein Wort oder einen Satz eintippen.</p>' :
+    big ? `<div class="tw-one">${key ? `<div class="tw-icon">${iconSvg(key, 200)}</div>` : ''}<div class="tw-word${w.bows && w.syl ? ' bows' : ''}">${w.syl ? sylSpans(sylOf(txt)) : escHtml(txt)}</div></div>`
+        : `<div class="tw-text">${w.syl ? sylText(txt) : escHtml(txt)}</div>`;
+  $('#stage').innerHTML = `<div class="tw-wrap">${html}</div>`;
+  $('#controls').innerHTML = `<button class="chip-toggle" data-tws aria-pressed="${w.syl}">Silben färben</button>${big ? `<button class="chip-toggle" data-twb aria-pressed="${w.bows}" ${w.syl ? '' : 'disabled'}>Silbenbögen</button>` : ''}`;
+  setHint('');
+}
+function twordControl(b){
+  const w = app.tw;
+  if(b.hasAttribute('data-tws')){ w.syl = !w.syl; return renderTword(); }
+  if(b.hasAttribute('data-twb')){ w.bows = !w.bows; return renderTword(); }
+}
+function renderTopTool(){
+  const m = app.mode, rb = $('#btn-random'); rb.hidden = true;
+  if(m === 'nline'){
+    $('#range-label').textContent = 'Zahlenstrahl bis';
+    $('#ranges').innerHTML = [10, 20, 100, 1000].map(r => `<button data-nlr="${r}" aria-pressed="${app.nl.range === r}">${r}</button>`).join('');
+    $('#inputs').innerHTML = `<button class="chip-toggle" data-nle aria-pressed="${app.nl.empty}" title="Leerer Zahlenstrahl ohne Striche (Rechenstrich)">Rechenstrich</button><button class="chip-toggle" data-nlh aria-pressed="${app.nl.hide}" title="Das Ziel erst zeigen, wenn es angetippt wird">Ziel verdecken</button>`;
+    return true;
+  }
+  $('#range-label').textContent = ''; $('#ranges').innerHTML = '';
+  if(m === 'tword'){ $('#inputs').innerHTML = `<label class="tw-in"><span>Wort oder Satz</span><input id="tw-text" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" value="${escHtml(app.tw.text)}"></label><button id="tw-go" class="primary">Zeigen</button>`; return true; }
+  $('#inputs').innerHTML = '';
+  return true;
+}
+function renderTool(){
+  if(app.mode === 'nline') return renderNline();
+  if(app.mode === 'hboard') return renderHboard();
+  if(app.mode === 'tclock') return renderTclock();
+  if(app.mode === 'tword') return renderTword();
+}
+document.addEventListener('click', e => {
+  if(!TOOL_MODES.includes(app.mode)) return;
+  const inStage = e.target.closest('#stage'), inCtl = e.target.closest('#controls'), inTop = e.target.closest('.toolbar');
+  if(inStage){ if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
+  const b = e.target.closest('button'); if(!b || !(inCtl || inTop)) return;
+  if(inTop){
+    if(b.dataset.nlr){ app.nl = {...app.nl, range: +b.dataset.nlr, start:null, jumps:[], shown:false}; return render(); }
+    if(b.hasAttribute('data-nle')){ app.nl.empty = !app.nl.empty; return render(); }
+    if(b.hasAttribute('data-nlh')){ app.nl.hide = !app.nl.hide; app.nl.shown = false; return render(); }
+    if(b.id === 'tw-go'){ app.tw.text = $('#tw-text').value; return renderTword(); }
+    return;
+  }
+  if(app.mode === 'nline') return zsControl(b);
+  if(app.mode === 'hboard') return hboardControl(b);
+  if(app.mode === 'tclock') return tclockControl(b);
+  if(app.mode === 'tword') return twordControl(b);
+});
+
 function homeClick(e){
+  const cx = e.target.closest('[data-ctx]'); if(cx){ setCtx(cx.dataset.ctx); return; }
+  if(e.target.closest('[data-ctx-reset]')){ setCtx(null); return; }
+  const ct = e.target.closest('[data-ctool]'); if(ct){ setTool(ct.dataset.ctool); return; }
   const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; app.wz = {step:'subj', guest: !data.current}; saveData(); renderProfiles(); render(); return; }
   if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {step:'who'}; saveData(); renderProfiles(); render(); return; }
   const ws = e.target.closest('[data-wz-step]'); if(ws){ app.wz = {...app.wz, step: ws.dataset.wzStep}; renderHome(); return; }
@@ -6137,6 +6454,8 @@ function renderReport(){
 
 /* ---------- Ereignisse ---------- */
 $('#modes').addEventListener('click', e => {
+  const ctb = e.target.closest('[data-ctool]'); if(ctb){ if(ctb.dataset.ctool !== app.mode) setTool(ctb.dataset.ctool); return; }
+  if(e.target.closest('[data-ctx-reset]')){ setCtx(null); return; }
   const sj = e.target.closest('[data-subj]'); if(sj){ if(sj.dataset.subj !== settings.subject || app.mode === 'diag') setSubject(sj.dataset.subj); return; }
   if(e.target.closest('[data-foryou]')){ const z = forYouOffer(); if(z && !app.busy){ leaveMode(); applyOffer(z.info.offer.set); toast(z.info.offer.text); } return; }
   if(e.target.closest('[data-guide-all]')){ requireTeacher(() => { app.showAll = true; if(!settings.pin) app.teacherUntil = Date.now() + 20*60e3; toast('Alle Bereiche sichtbar (Lehrkraft, 20 Minuten).'); render(); }); return; }
@@ -6168,7 +6487,7 @@ $('#ranges').addEventListener('click', e => {
   render();
 });
 $('#inputs').addEventListener('input', () => { const t = draftOwner(); t.draft = [$('#in-a')?.value ?? '', $('#in-b')?.value ?? '']; $('#error').hidden = true; });
-$('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); commitAny(); } });
+$('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(app.mode === 'tword'){ app.tw.text = e.target.value || ''; return renderTword(); } if(TOOL_MODES.includes(app.mode)) return; commitAny(); } });
 $('#inputs').addEventListener('click', e => {
   const fp = e.target.closest('[data-fplace]'); if(fp){ const b = board(); if(b.place !== fp.dataset.fplace){ freeSave(b); b.place = fp.dataset.fplace; { const keep = freeCols(), gone = [...new Set(b.pieces.filter(q => !keep.includes(q.kind)).map(q => NAME[q.kind]))]; if(gone.length){ b.pieces = b.pieces.filter(q => keep.includes(q.kind)); toast(`${gone.join(' und ')} wurden weggelegt.`); } } b.sel.clear(); if(b.ordered) b.pieces = freeArrange(b.pieces); $('#stage').innerHTML = ''; render(); } return; }
   const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'H') app.read.hlvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
@@ -6318,7 +6637,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.11.6 · 12.11.2026';
+const APP_VERSION = '0.12.0 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -6526,6 +6845,7 @@ if('speechSynthesis' in window) speechSynthesis.getVoices();
 renderProfiles();
 if(curProfile()?.rec != null) applyRec(curProfile().rec);
 app.mode = 'home';
+app.ctx = settings.startCtx === 'class' ? 'class' : settings.startCtx === 'practice' ? 'practice' : null;
 render();
 </script>
 </body>
