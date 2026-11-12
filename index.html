@@ -3635,10 +3635,10 @@ const cap = s => s[0].toUpperCase() + s.slice(1);
 /* Wörterlisten nach Schwierigkeit */
 /* Bilder mit eindeutigem Namen (kein „Fahrrad“ für Rad, keine „Wassermelone“ für Melone): für Anlaut- und Schreibaufgaben nach Bild */
 const CLEAR = ['Mond','Sonne','Tisch','Fisch','Hammer','Banane','Tomate','Ball','Baum','Haus','Hut','Apfel','Messer','Gabel','Kerze','Blume','Zug','Pizza','Bus','Auto','Kamera','Rose','Pinsel','Wolke','Handy','Uhr','Lampe','Nagel','Hose','Brot','Maus','Leiter','Zange','Radio','Schere','Mütze','Jacke','Tasse','Kasse','Säge','Sofa'];
-const LAUT_SHORT = ['Bus','Mond','Sofa','Hose','Rose','Hut','Brot','Zug','Haus','Baum','Auto','Maus','Uhr'].filter(w => ICON[w]);
+const LAUT_SHORT = ['Bus','Mond','Sofa','Hose','Rose','Hut','Brot','Zug','Haus','Baum','Auto','Maus','Uhr','Fisch','Tisch','Schere'].filter(w => ICON[w]); /* sch ist ein Laut mit drei Buchstaben, keine Merkstelle */
 const LAUT_SHORT_READ = ['Bus','Rad','Mond','Limo','Sofa','Hose','Lupe','Dose','Rose','Hut','Brot','Glas','Zug','Haus','Baum','Eis','Auto','Maus','Uhr'].filter(w => ICON[w]);
 const LAUT_LONG = ['Tomate','Banane','Kamera','Radio','Gabel','Pinsel','Lampe','Blume','Leiter','Kerze','Zange','Wolke','Nagel','Apfel','Säge'];
-const MERK = ['Tasse','Sonne','Kasse','Hammer','Messer','Fisch','Tisch','Ball','Mütze','Jacke','Pizza','Schere'];
+const MERK = ['Tasse','Sonne','Kasse','Hammer','Messer','Tonne','Ball','Mütze','Jacke','Pizza']; /* echte Merkstellen: doppelte Mitlaute, ck, tz */
 const INITIAL = {};
 for(const w of CLEAR) if(ICON[w] && !/^(Sch|Ei|Au|Eu)/.test(w)) (INITIAL[w[0]] ??= []).push(w);
 /* Abwechslung: Wörter wiederholen sich nicht, solange es andere gibt */
@@ -4001,12 +4001,15 @@ function ownReadItem(kind){
   const ws = ownWords(), w = ws.length ? fresh(ws) : 'Haus';
   if(kind === 'same') return mkChoice({word:w, colored:false, layout:'col', prompt:'Finde das gleiche Wort.', label:`Meine Wörter – Wortbild: ${w}`, tip:'Noch nicht. Vergleiche Buchstabe für Buchstabe.'}, [w, ...ownLike(w).slice(0, 2)]);
   if(kind === 'caps') return mkChoice({word:w.toUpperCase(), colored:false, layout:'col', prompt:'Welches Wort ist das?', label:`Meine Wörter – Großbuchstaben: ${w}`, tip:'Noch nicht. Lies die großen Buchstaben einzeln.'}, [w, ...ownLike(w).slice(0, 2)]);
-  if(kind === 'first'){ const f = w[0].toUpperCase(), others = shuffle('ABDEFGHKLMNOPRSTUWZ'.split('').filter(c => c !== f)).slice(0, 2); return mkChoice({word:w, layout:'row', prompt:'Mit welchem Buchstaben fängt das Wort an?', label:`Meine Wörter – Anfangsbuchstabe: ${w}`}, [f, ...others]); }
+  if(kind === 'pic'){ /* Bild zum Lernwort: nur Wörter mit Bild; sonst Lückenwort */
+    const wi = ws.filter(x => ICON[x]);
+    if(wi.length){ const p = fresh(wi); return mkChoice({icon:p, layout:'col', prompt:'Welches Wort passt zum Bild?', label:`Meine Wörter – Bild: ${p}`, tip:'Noch nicht. Schau das Bild an und lies jedes Wort genau.'}, [p, ...ownLike(p).slice(0, 2)].map(x => ({h:`<span class="rd-word">${escHtml(x)}</span>`, a:x})) /* ohne Silbenfarben: sonst verraten die Farben das Fantasiewort */); }
+    kind = 'gap'; }
   const i = rnd(1, w.length - 1), c = w[i].toLowerCase(), pool = shuffle('aeioulmnrst'.split('').filter(x => x !== c)).slice(0, 2);
   return mkChoice({word: w.slice(0, i) + '_' + w.slice(i + 1), colored:false, layout:'row', prompt:'Welcher Buchstabe fehlt in deinem Lernwort?', label:`Meine Wörter – Lücke: ${w}`, tip:'Noch nicht. Lies das ganze Wort langsam. Welcher Buchstabe fehlt?'}, [c, ...pool]);
 }
 const READ = {
-  LX: [() => ownReadItem('same'), () => ownReadItem('caps'), () => ownReadItem('first'), () => ownReadItem('gap')],
+  LX: [() => ownReadItem('same'), () => ownReadItem('caps'), () => ownReadItem('pic'), () => ownReadItem('gap')],
   L1: [() => pictoItem(true), () => pictoItem(false), () => pictoItem(false)],
   L2: [() => signEasy(true), () => signEasy(false), () => signHard()],
   L3: [() => anlautItem(true), () => anlautItem(false), () => caseItem()],
@@ -4130,9 +4133,9 @@ const W_INFO = {
   WX:{name:'Meine Wörter', short:'Meine Wörter', bp:'D 2.1.2.4 Logographemisches Schreiben (Lernwörter)', kann:'schreibt eigene Lernwörter ab und aus dem Gedächtnis', ziel:'schreibt bedeutsame Wörter (Namen, Praktikumswörter) sicher und auswendig', analog:'Lernwörterkartei: Lesen – Merken – Abdecken – Schreiben – Vergleichen; Wörter im Alltag suchen (Etiketten, Schilder)'},
   W1:{name:'Abschreiben', short:'Abschreiben', bp:'D 2.1.2.4 Logographemisches Schreiben', kann:'schreibt kurze Wörter mit Buchstabenkärtchen richtig ab', ziel:'schreibt Wörter buchstabengetreu ab (mit Vorlage)', analog:'Namen, Signalwörter und Einkaufswörter mit Buchstabenkarten nachlegen; Wörter auf Etiketten abschreiben'},
   W2:{name:'Anlaute schreiben', short:'Anlaute', bp:'D 2.1.2.5 Alphabetisches Schreiben (Phonem-Graphem-Zuordnung)', kann:'schreibt zu einem Bild den Anfangsbuchstaben', ziel:'hört den Anlaut eines Wortes und schreibt den passenden Buchstaben', analog:'Anlauttabelle nutzen; Gegenstände nach Anlaut sortieren und beschriften'},
-  W3:{name:'Kurze Wörter lautgetreu', short:'Kurze Wörter', bp:'D 2.1.2.5 Alphabetisches Schreiben (lautgetreues Schreiben)', kann:'schreibt kurze Wörter lautgetreu (Rad, Bus, Limo)', ziel:'schreibt kurze lautgetreue Wörter vollständig, Laut für Laut', analog:'Wörter langsam mitsprechen und Laute mit Plättchen legen; Anlauttabelle; Schreiben zu Fotos aus dem Alltag'},
+  W3:{name:'Kurze Wörter lautgetreu', short:'Kurze Wörter', bp:'D 2.1.2.5 Alphabetisches Schreiben (lautgetreues Schreiben)', kann:'schreibt kurze Wörter lautgetreu, auch mit sch (Bus, Hose, Fisch)', ziel:'schreibt kurze lautgetreue Wörter vollständig, Laut für Laut', analog:'Wörter langsam mitsprechen und Laute mit Plättchen legen; Anlauttabelle; Schreiben zu Fotos aus dem Alltag'},
   W4:{name:'Lange Wörter in Silben', short:'Lange Wörter', bp:'D 2.1.2.5 Alphabetisches Schreiben (Silben zusammenfügen)', kann:'schreibt mehrsilbige Wörter lautgetreu', ziel:'schreibt mehrsilbige Wörter Silbe für Silbe (To-ma-te)', analog:'Silben schwingen und dabei schreiben; Silbenbögen unter Wörter zeichnen'},
-  W5:{name:'Richtig schreiben: Merkstellen', short:'Merkstellen', bp:'D 2.1.2.6 Richtig schreiben (Rechtschreibmuster, Merkwörter)', kann:'schreibt Wörter mit doppelten Mitlauten und sch richtig (Tasse, Sonne, Fisch)', ziel:'erkennt und schreibt doppelte Mitlaute nach kurzem Selbstlaut (Tasse, Hammer) und sch', analog:'Wörter mit Doppelmitlaut sammeln und markieren; kurzer Selbstlaut = Punkt, langer = Strich; Wörterliste mit eigenen Merkwörtern'},
+  W5:{name:'Richtig schreiben: Merkstellen', short:'Merkstellen', bp:'D 2.1.2.6 Richtig schreiben (Rechtschreibmuster, Merkwörter)', kann:'schreibt Wörter mit Merkstellen richtig: doppelte Mitlaute, ck und tz (Tasse, Jacke, Mütze)', ziel:'erkennt und schreibt doppelte Mitlaute, ck und tz nach kurzem Selbstlaut (Tasse, Hammer, Jacke)', analog:'Wörter mit Doppelmitlaut sammeln und markieren; kurzer Selbstlaut = Punkt, langer = Strich; Wörterliste mit eigenen Merkwörtern'},
   W6:{name:'Großschreibung und Sätze', short:'Sätze', bp:'D 2.1.2.6 Richtig schreiben und 2.1.2.7 Texte verfassen', kann:'schreibt Nomen groß und bildet einfache Sätze mit Punkt', ziel:'schreibt Nomen groß, achtet auf Satzanfang und Punkt und bildet einfache Sätze zu Bildern', analog:'Sätze zu eigenen Fotos schreiben (Praktikum, Einkauf); Wortkarten zu Sätzen legen; Satzanfang und Punkt farbig markieren'}
 };
 for(const [k, v] of Object.entries(W_INFO)){ v.offer = {text:`Schreiben: ${v.name}`, set:{mode:'read', lvl:k}}; v.bp = 'BP GENT 2022, ' + v.bp; }
@@ -5550,7 +5553,7 @@ const W_SHEETS = {
   W2: {name:'Anfangsbuchstaben schreiben', cols:3, gens:[() => { const k = fresh(Object.values(INITIAL).flat()); return T_('schreibe', 'Erster Buchstabe', `${iconP(k, 22)}${ans(13)}`, `${k}: ${k[0]}`); }]},
   W3: {name:'Kurze Wörter schreiben', cols:2, gens:[() => { const k = fresh(LAUT_SHORT); return T_('schreibe', 'Schreibe das Wort.', `${iconP(k, 22)}${lineW()}`, k); }]},
   W4: {name:'Lange Wörter schreiben', cols:2, gens:[() => { const k = fresh(LAUT_LONG); return T_('schreibe', 'Sprich in Silben und schreibe.', `${iconP(k, 22)}<p class="ab-syl">${(WORDS[k] || [k]).map(() => '◡').join(' ')}</p>${lineW()}`, `${k} (${(WORDS[k] || [k]).join('-')})`); }]},
-  W5: {name:'Merkstellen: doppelte Mitlaute, ck, tz, sch', cols:2, gens:[() => { const k = fresh(MERK); const m = k.match(/(ss|nn|mm|ll|tt|ck|tz|zz|sch|ft)/); const gap = m ? k.replace(m[0], '__') : k; return T_('schreibe', 'Setze ein und schreibe das Wort.', `${iconP(k, 20)}<p class="ab-word">${gap.replace('__', '<span class="ab-gap"></span>')}</p>${lineW()}`, `${k}${m ? ` (${m[0]})` : ''}`); }]},
+  W5: {name:'Merkstellen: doppelte Mitlaute, ck, tz', cols:2, gens:[() => { const k = fresh(MERK); const m = k.match(/(ss|nn|mm|ll|tt|ck|tz|zz|sch|ft)/); const gap = m ? k.replace(m[0], '__') : k; return T_('schreibe', 'Setze ein und schreibe das Wort.', `${iconP(k, 20)}<p class="ab-word">${gap.replace('__', '<span class="ab-gap"></span>')}</p>${lineW()}`, `${k}${m ? ` (${m[0]})` : ''}`); }]},
   W6: {name:'Sätze richtig schreiben', cols:1, gens:[() => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1], s = [cap(art(n)), n, 'ist', ...t.split(' ')]; return T_(['lege', 'schreibe'], 'Ordne die Wörter zu einem Satz und schreibe ihn auf.', `<div class="ab-pw">${iconP(n, 16)}<p class="ab-row">${shuffle(s).map(w => `<span class="ab-card">${w}</span>`).join(' ')}</p></div>${lineW()}`, s.join(' ') + '.'); },
        () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1], s = `${cap(art(n))} ${n} ist ${t}.`; return T_(['lies', 'schreibe'], 'Schreibe richtig ab. Denk an Großbuchstaben und den Punkt.', `<p class="ab-sent">${s.toLowerCase().replace('.', '')}</p>${lineW()}`, s); }]}
 };
@@ -6171,7 +6174,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.11.1 · 12.11.2026';
+const APP_VERSION = '0.11.2 · 12.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
