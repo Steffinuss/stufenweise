@@ -490,7 +490,17 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 .w-boxes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .w-box{width:52px;height:64px;border-bottom:4px solid var(--dark);display:flex;align-items:flex-end;justify-content:center;font-size:44px;font-weight:700;font-family:Stufenfibel,Verdana,Arial,sans-serif;background:#fff;border-radius:8px 8px 0 0}
 .w-box.cur{border-bottom-color:#e8890c;background:#fff8ee}
-.w-keys{display:grid;grid-template-columns:repeat(10,minmax(38px,54px));gap:6px;justify-content:center}
+.w-keys{display:grid;grid-template-columns:repeat(10,minmax(30px,54px));gap:6px;justify-content:center}
+.w-keys.qwertz{grid-template-columns:repeat(23,minmax(13px,26px));gap:6px 4px}
+.w-keys.qwertz button{grid-column:span 2}
+.w-keys.qwertz .off{grid-column:span 1;visibility:hidden}
+.w-keys.qwertz .wide{grid-column:span 3}
+.w-keys.qwertz [data-wdel]{grid-column:span 4}
+.w-box.ok{border-bottom-color:#1f7a45;background:#e6f4ea;color:#1f6b3a}
+.w-box.bad{border-bottom-color:#c9414a;background:#fde8e8;color:#b0303a}
+.w-box.miss{border:2px dashed #c9414a;border-bottom-width:4px;background:#fff}
+.w-box.extra{border-bottom-color:#c9414a;background:#fde8e8;color:#b0303a;text-decoration:line-through}
+.w-box.fix{border-bottom-color:#1f7a45;color:#1f6b3a;background:#f2f9f4}
 .w-keys button,.w-tiles button{min-height:48px;padding:0;font-size:24px;font-weight:700;font-family:Stufenfibel,Verdana,Arial,sans-serif}
 .w-keys .wide{grid-column:span 2;font-size:16px}
 .w-keys button[aria-pressed=true]{background:var(--dark);color:#fff}
@@ -737,6 +747,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <label class="row cb"><input type="checkbox" data-key="help"> Auswahlhilfe (Hinweise unter der Fläche)</label>
     <label class="row cb"><input type="checkbox" data-key="labels"> Texte unter den Knöpfen</label>
     <label class="row">Zifferntastatur auf dem Bildschirm <select data-key="numpad"><option value="auto">automatisch (Tablet)</option><option value="on">immer</option><option value="off">nie</option></select></label>
+    <label class="row">Buchstabentastatur beim Schreiben <select data-key="kbd"><option value="qwertz">wie am Handy (QWERTZ)</option><option value="abc">nach dem ABC</option></select></label>
   </fieldset>
   <fieldset><legend>Geführte Oberfläche</legend>
     <p class="note">Nach dem Test sieht jedes Kind nur die Bereiche und Stufen, die für es dran sind. Werkzeuge (Zahlen zeigen, Frei legen) bleiben immer sichtbar. Mit der PIN zeigt „Alles zeigen“ in der Leiste vorübergehend alle Bereiche.</p>
@@ -818,7 +829,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', kbd:'qwertz', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -4144,6 +4155,37 @@ for(const [k, v] of Object.entries(W_INFO)){ v.offer = {text:`Schreiben: ${v.nam
 /* lautgetreu: Doppelmitlaute, Dehnungs-h, ie, ck, tz, -er usw. zählen nicht */
 const lautNorm = w => w.toLowerCase().trim().replace(/ä/g, 'e').replace(/ß/g, 's').replace(/ie/g, 'i').replace(/ck/g, 'k').replace(/tz/g, 'z').replace(/([bdfgklmnprst])\1/g, '$1').replace(/([aeiou])h(?![aeiou])/g, '$1').replace(/v/g, 'f').replace(/(dt|d)$/, 't').replace(/er$/, 'a').replace(/el$/, 'l').replace(/en$/, 'n').replace(/j/g, 'i');
 const KEYS = 'abcdefghijklmnopqrstuvwxyzäöüß'.split('');
+/* QWERTZ wie auf Handy und Tablet; ß in der dritten Reihe (am Handy liegt es hinter dem s) */
+const QWERTZ = ['qwertzuiopü', 'asdfghjklöä', 'yxcvbnmß'];
+/* Buchstabenvergleich: welche Buchstaben stimmen, welche sind falsch, fehlen oder zu viel? (Levenshtein mit Rückverfolgung) */
+function wDiff(given, target, ci){
+  const g = [...given], t = [...target], eq = (a, b) => ci ? a.toLowerCase() === b.toLowerCase() : a === b;
+  const D = Array.from({length: g.length + 1}, (_, i) => Array.from({length: t.length + 1}, (_, j) => i + j));
+  for(let i = 1; i <= g.length; i++) for(let j = 1; j <= t.length; j++) D[i][j] = Math.min(D[i-1][j] + 1, D[i][j-1] + 1, D[i-1][j-1] + (eq(g[i-1], t[j-1]) ? 0 : 1));
+  const ops = []; let i = g.length, j = t.length;
+  while(i || j){
+    if(i && j && D[i][j] === D[i-1][j-1] + (eq(g[i-1], t[j-1]) ? 0 : 1)){ ops.unshift({k: eq(g[i-1], t[j-1]) ? 'ok' : 'bad', c: g[i-1]}); i--; j--; }
+    else if(j && D[i][j] === D[i][j-1] + 1){ ops.unshift({k:'miss', c:''}); j--; }
+    else { ops.unshift({k:'extra', c: g[i-1]}); i--; }
+  }
+  const okN = ops.filter(o => o.k === 'ok').length;
+  /* Lückenwort zum Verbessern: richtige Buchstaben bleiben stehen, nur sinnvoll, wenn mindestens die Hälfte stimmt */
+  const slots = t.length >= 2 && okN >= Math.ceil(t.length / 2) && okN < t.length ? ops.filter(o => o.k !== 'extra').map(o => o.k === 'ok' ? {c: o.c, fix:true} : {c:''}) : null;
+  return {ops, slots, okN};
+}
+const slotText = r => r.slots.map(x => x.c).join('');
+function wType(it, r, ch){
+  if(r.marks && !r.slots && r.marks.slots && !it.tiles){ r.slots = r.marks.slots.map(x => ({...x})); }
+  r.marks = null;
+  if(r.slots){ const e = r.slots.find(x => !x.c); if(e){ e.c = ch; e.kid = true; } r.text = slotText(r); return; }
+  if(!it.max || r.text.length < it.max) r.text += ch;
+}
+function wDel(r){
+  if(r.marks && !r.slots && r.marks.slots){ r.slots = r.marks.slots.map(x => ({...x})); r.marks = null; r.text = slotText(r); return; }
+  r.marks = null;
+  if(r.slots){ const f = r.slots.findLast(x => x.kid && x.c); if(f){ f.c = ''; f.kid = false; } r.text = slotText(r); return; }
+  r.text = r.text.slice(0, -1); r.used?.pop();
+}
 const wItem = (k, extra) => ({type:'write', icon:k, target:k, check:'laut', prompt:'Schreibe das Wort.', label:`schreiben: ${k}`, ...extra});
 const SENTS = [['Die','Tasse','steht','auf','dem','Tisch.'], ['Der','Bus','ist','gelb.'], ['Tom','malt','mit','dem','Pinsel.'], ['Lea','kauft','eine','Banane.']];
 const SENT_ICON = {Tasse:'Tasse', Bus:'Bus', Pinsel:'Pinsel', Banane:'Banane'};
@@ -4176,10 +4218,17 @@ function writeStage(it, r, opt = {}){
   const showWord = it.word && (!it.memo || opt.feedback);
   const head = (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 130)}</div>` : '') + (showWord ? `<div class="it-word">${escHtml(it.word)}</div>` : '') + (it.memo && !opt.feedback ? `<button class="memo-peek" data-wpeek>Nochmal ansehen</button>` : '');
   const n = it.max || Math.max(it.target.length, r.text.length + 1);
-  const boxes = `<div class="w-boxes" aria-label="Deine Antwort">${Array.from({length: Math.max(n, r.text.length)}, (_, i) => `<span class="w-box ${i === r.text.length ? 'cur' : ''}">${escHtml(r.text[i] || '')}</span>`).join('')}</div>`;
+  let boxes;
+  if(opt.feedback && !opt.feedback.ok && r.marks) boxes = `<div class="w-boxes" aria-label="Deine Antwort mit Markierung">${r.marks.ops.map(o => `<span class="w-box ${o.k}" aria-label="${o.k === 'ok' ? 'richtig' : o.k === 'miss' ? 'hier fehlt ein Buchstabe' : o.k === 'extra' ? 'zu viel' : 'falsch'}">${escHtml(o.c)}</span>`).join('')}</div>`;
+  else if(r.slots){ const cur = r.slots.findIndex(x => !x.c); boxes = `<div class="w-boxes" aria-label="Verbessere das Wort">${r.slots.map((x, i) => `<span class="w-box ${x.fix ? 'fix' : ''} ${i === cur ? 'cur' : ''}">${escHtml(x.c)}</span>`).join('')}</div>`; }
+  else boxes = `<div class="w-boxes" aria-label="Deine Antwort">${Array.from({length: Math.max(n, r.text.length)}, (_, i) => `<span class="w-box ${i === r.text.length ? 'cur' : ''}">${escHtml(r.text[i] || '')}</span>`).join('')}</div>`;
   let kb;
   if(it.tiles) kb = `<div class="w-tiles">${it.tiles.map((ch, i) => `<button data-wtile="${i}" ${r.used.includes(i) ? 'disabled' : ''}>${escHtml(ch)}</button>`).join('')}<button data-wdel aria-label="Letzten Buchstaben löschen">⌫</button></div>`;
-  else kb = `<div class="w-keys">${KEYS.map(k => `<button data-wkey="${k}">${r.shift ? keyUp(k) : k}</button>`).join('')}<button data-wshift aria-pressed="${!!r.shift}" class="wide">⇧ groß</button><button data-wdel class="wide" aria-label="Löschen">⌫</button></div>`;
+  else {
+    const key = k => `<button data-wkey="${k}">${r.shift ? keyUp(k) : k}</button>`, shift = `<button data-wshift aria-pressed="${!!r.shift}" class="wide">⇧ groß</button>`, del = `<button data-wdel class="wide" aria-label="Löschen">⌫</button>`;
+    kb = settings.kbd === 'abc' ? `<div class="w-keys">${KEYS.map(key).join('')}${shift}${del}</div>`
+      : `<div class="w-keys qwertz">${[...QWERTZ[0]].map(key).join('')}<span class="off"></span><span class="off"></span>${[...QWERTZ[1]].map(key).join('')}${shift}${[...QWERTZ[2]].map(key).join('')}${del}</div>`;
+  }
   return `<div class="it-wrap w-wrap">${head}${boxes}${kb}</div>`;
 }
 function sentStage(it, r){
@@ -4195,23 +4244,24 @@ function writeClick(e, it, r){
   }
   if(e.target.closest('[data-wmemo]')){ r.hidden = true; return true; }
   if(e.target.closest('[data-wpeek]')){ r.hidden = false; r.peek = (r.peek || 0) + 1; return true; }
-  const t = e.target.closest('[data-wtile]'); if(t){ const i = +t.dataset.wtile; r.used.push(i); r.text += it.tiles[i]; return true; }
-  const k = e.target.closest('[data-wkey]'); if(k){ if(!it.max || r.text.length < it.max){ r.text += r.shift ? keyUp(k.dataset.wkey) : k.dataset.wkey; r.shift = false; } return true; }
+  const t = e.target.closest('[data-wtile]'); if(t){ const i = +t.dataset.wtile; r.marks = null; r.used.push(i); r.text += it.tiles[i]; return true; }
+  const k = e.target.closest('[data-wkey]'); if(k){ wType(it, r, r.shift ? keyUp(k.dataset.wkey) : k.dataset.wkey); r.shift = false; return true; }
   if(e.target.closest('[data-wshift]')){ r.shift = !r.shift; return true; }
-  if(e.target.closest('[data-wdel]')){ r.text = r.text.slice(0, -1); r.used?.pop(); return true; }
+  if(e.target.closest('[data-wdel]')){ wDel(r); return true; }
   return false;
 }
 function writeKey(e, it, r){
   if(!it || (it.type !== 'write' && it.type !== 'sent')) return false;
-  if(e.key === 'Backspace'){ if(it.type === 'sent') r.order?.pop(); else { r.text = (r.text || '').slice(0, -1); r.used?.pop(); } return true; }
+  if(e.key === 'Backspace'){ if(it.type === 'sent') r.order?.pop(); else { r.text ??= ''; wDel(r); } return true; }
   if(it.type === 'write' && e.key.length === 1 && /[a-zäöüß]/i.test(e.key)){
     if(it.tiles){ const i = it.tiles.findIndex((ch, j) => ch === e.key && !(r.used ??= []).includes(j)) ; const i2 = i >= 0 ? i : it.tiles.findIndex((ch, j) => ch.toLowerCase() === e.key.toLowerCase() && !r.used.includes(j)); if(i2 < 0) return false; r.used.push(i2); r.text = (r.text || '') + it.tiles[i2]; return true; }
-    if(it.max && (r.text || '').length >= it.max) return false; r.text = (r.text || '') + e.key; return true;
+    if(it.max && (r.text || '').length >= it.max) return false; r.text ??= ''; wType(it, r, e.key); return true;
   }
   return false;
 }
 function evalWrite(it, r){
   if(it.type === 'sent'){ if((r.order || []).length < it.words.length) return null; const ok = r.order.every((v, i) => it.words[v] === it.words[i]); return {ok, given: r.order.map(i => it.words[i]).join(' '), obs: ok ? [] : ['Satzbau unvollständig oder vertauscht']}; }
+  if(r.slots && r.slots.some(x => !x.c)) return null;
   const a = (r.text || '').trim(); if(!a) return null;
   const exact = a === it.target, ci = a.toLowerCase() === it.target.toLowerCase(), laut = lautNorm(a) === lautNorm(it.target);
   const ok = it.check === 'exact' ? exact : it.check === 'ci' ? ci : (ci || laut);
@@ -5197,10 +5247,14 @@ function readCheck(){
     renderRead(); setHint(R.streak >= 5 && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS, H_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
     celebrate(document.querySelector('#stage .fb-ok'));
   } else {
-    if(R.tries === 0){ R.miss = (R.miss || 0) + 1; R.streak = 0; } R.tries++; renderRead();
+    if(R.tries === 0){ R.miss = (R.miss || 0) + 1; R.streak = 0; }
+    if(it.type === 'write' && !it.max){ R.r.marks = wDiff(res.given, it.target, it.check !== 'exact'); if(it.tiles) R.r.marks.slots = null; if(R.r.marks.okN < Math.ceil([...it.target].length / 2)) R.r.marks = null; R.r.slots = null; }
+    R.tries++; renderRead();
     const lautOk = it.type === 'write' && res.obs.some(o => o.startsWith('lautgetreu'));
     if(it.type === 'clockset') return setHint(res.obs.includes('Stunde falsch') ? 'Die Minuten stimmen. Schau auf den kurzen roten Zeiger.' : 'Noch nicht. Langer blauer Zeiger = Minuten, kurzer roter Zeiger = Stunden.', 'bad');
-    setHint(lautOk ? 'Gut gehört! So spricht man es. Geschrieben wird es aber anders – schau genau.' : it.type === 'write' ? (it.tip || 'Noch nicht. Sprich das Wort langsam mit.') : it.type === 'sent' ? 'Noch nicht. Der Satz fängt groß an und endet mit Punkt.' : (it.tip || 'Noch nicht. Schau noch einmal genau.'), 'bad');
+    const mk = R.r.marks, caseOnly = it.type === 'write' && res.obs.includes('Groß-/Kleinschreibung'), wHint = !mk ? '' : mk.slots ? ' Die grünen Buchstaben stimmen. Verbessere die roten Kästchen.' : it.tiles ? ' Die grünen Buchstaben stehen schon richtig.' : mk.ops.some(o => o.k === 'extra') ? ' Die durchgestrichenen Buchstaben sind zu viel.' : ' Die grünen Buchstaben stimmen schon.';
+    if(caseOnly) return setHint('Fast! Achte auf groß und klein.' + wHint, 'bad');
+    setHint(lautOk ? 'Gut gehört! So spricht man es. Geschrieben wird es aber anders – schau genau.' + wHint : it.type === 'write' ? (it.tip || 'Noch nicht. Sprich das Wort langsam mit.') + wHint : it.type === 'sent' ? 'Noch nicht. Der Satz fängt groß an und endet mit Punkt.' : (it.tip || 'Noch nicht. Schau noch einmal genau.'), 'bad');
   }
 }
 function readControl(btn){
@@ -5209,7 +5263,7 @@ function readControl(btn){
     case 'r-check': return readCheck();
     case 'r-next': setHint(''); return readNew();
     case 'r-up': case 'r-down': { const lv = rdLevels(R.lvl); Object.assign(R, {lvl: lv[lv.indexOf(R.lvl) + (btn.id === 'r-up' ? 1 : -1)], item:null, streak:0, miss:0}); setHint(''); return render(); }
-    case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else if(R.item.type === 'board'){ const it = R.item; if(it.mode === 'tap') R.r.sel = it.target; else if(it.mode === 'multi') R.r.set = [...it.set]; else { R.r.vals = it.fields.map(String); R.r.wrong = new Set(); } } else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: rdMode(R.lvl), task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
+    case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; R.r.slots = null; R.r.marks = null; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else if(R.item.type === 'board'){ const it = R.item; if(it.mode === 'tap') R.r.sel = it.target; else if(it.mode === 'multi') R.r.set = [...it.set]; else { R.r.vals = it.fields.map(String); R.r.wrong = new Set(); } } else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: rdMode(R.lvl), task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
   }
 }
 function readStageClick(e){
@@ -6176,7 +6230,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.11.3 · 12.11.2026';
+const APP_VERSION = '0.11.4 · 12.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

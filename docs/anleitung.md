@@ -104,6 +104,12 @@ Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Lin
 
 Unter **Frei legen → Würfel** wählst du oben „Zehner und Einer“, „mit Hundertern“ oder „mit Tausendern“. Mit Tausendern kommen Tausenderwürfel dazu: 10 Hunderter lassen sich zu 1 Tausender bündeln und 1 Tausender wieder in 10 Hunderter tauschen. „Ordnen“ legt alles in die Stellenwerttafel T · H · Z · E.
 
+### Wörter schreiben
+
+Die Buchstabentastatur ist wie am Handy angeordnet (QWERTZ). Wer lieber nach dem ABC sucht, stellt das in den Einstellungen unter **Hilfen → Buchstabentastatur** um. Mit **⇧ groß** wird der nächste Buchstabe groß; das ß bleibt dabei ein ß, weil kein Wort mit ß anfängt.
+
+Schreibt das Kind ein Wort fast richtig, markiert die App die einzelnen Buchstaben: grün stimmt, rot ist falsch, ein gestricheltes Kästchen zeigt einen fehlenden Buchstaben, durchgestrichen heißt zu viel. Stimmt mindestens die Hälfte, bleiben die grünen Buchstaben beim Verbessern stehen und das Kind füllt nur die roten Kästchen neu (aus „Prot“ wird _rot, das Kind tippt das B). Ist das Wort weit weg, gibt es keine Markierung, damit das Kind nicht rät, sondern neu ansetzt. Auf den Stufen „lautgetreu“ zählt ein Wort wie „Hunt“ schon als richtig; ab der Stufe Merkstellen wird es markiert.
+
 ### Hundertertafel und Tausenderbuch
 
 Links unter **Tafel** übt das Kind mit der Hundertertafel (1 bis 100) in sieben Stufen: Zahlen finden, Tafel und Material verbinden (Zehnerstangen, Punktefeld, Zahlwort), Nachbarn und Lücken, Ausschnitte ergänzen, Wege gehen (unten +10, rechts +1), Muster erkennen und zuletzt das Tausenderbuch. Die Stufen H1–H7 sind Teil des Mathe-Tests (Teil 2) und erscheinen in der Kompetenzmatrix.
