@@ -3632,6 +3632,8 @@ const GENUS = {der:['Bus','Ball','Baum','Hut','Apfel','Mond','Tisch','Fisch','Ha
 const art = n => GENUS.der.includes(n) ? 'der' : GENUS.das.includes(n) ? 'das' : 'die';
 const artDat = n => art(n) === 'die' ? 'der' : 'dem';
 const cap = s => s[0].toUpperCase() + s.slice(1);
+// Tastatur: ß bleibt ß (kein Wort beginnt mit ß; toUpperCase würde "SS" liefern)
+const keyUp = k => k === 'ß' ? 'ß' : k.toUpperCase();
 /* Wörterlisten nach Schwierigkeit */
 /* Bilder mit eindeutigem Namen (kein „Fahrrad“ für Rad, keine „Wassermelone“ für Melone): für Anlaut- und Schreibaufgaben nach Bild */
 const CLEAR = ['Mond','Sonne','Tisch','Fisch','Hammer','Banane','Tomate','Ball','Baum','Haus','Hut','Apfel','Messer','Gabel','Kerze','Blume','Zug','Pizza','Bus','Auto','Kamera','Rose','Pinsel','Wolke','Handy','Uhr','Lampe','Nagel','Hose','Brot','Maus','Leiter','Zange','Radio','Schere','Mütze','Jacke','Tasse','Kasse','Säge','Sofa'];
@@ -4177,7 +4179,7 @@ function writeStage(it, r, opt = {}){
   const boxes = `<div class="w-boxes" aria-label="Deine Antwort">${Array.from({length: Math.max(n, r.text.length)}, (_, i) => `<span class="w-box ${i === r.text.length ? 'cur' : ''}">${escHtml(r.text[i] || '')}</span>`).join('')}</div>`;
   let kb;
   if(it.tiles) kb = `<div class="w-tiles">${it.tiles.map((ch, i) => `<button data-wtile="${i}" ${r.used.includes(i) ? 'disabled' : ''}>${escHtml(ch)}</button>`).join('')}<button data-wdel aria-label="Letzten Buchstaben löschen">⌫</button></div>`;
-  else kb = `<div class="w-keys">${KEYS.map(k => `<button data-wkey="${k}">${r.shift ? k.toUpperCase() : k}</button>`).join('')}<button data-wshift aria-pressed="${!!r.shift}" class="wide">⇧ groß</button><button data-wdel class="wide" aria-label="Löschen">⌫</button></div>`;
+  else kb = `<div class="w-keys">${KEYS.map(k => `<button data-wkey="${k}">${r.shift ? keyUp(k) : k}</button>`).join('')}<button data-wshift aria-pressed="${!!r.shift}" class="wide">⇧ groß</button><button data-wdel class="wide" aria-label="Löschen">⌫</button></div>`;
   return `<div class="it-wrap w-wrap">${head}${boxes}${kb}</div>`;
 }
 function sentStage(it, r){
@@ -4194,7 +4196,7 @@ function writeClick(e, it, r){
   if(e.target.closest('[data-wmemo]')){ r.hidden = true; return true; }
   if(e.target.closest('[data-wpeek]')){ r.hidden = false; r.peek = (r.peek || 0) + 1; return true; }
   const t = e.target.closest('[data-wtile]'); if(t){ const i = +t.dataset.wtile; r.used.push(i); r.text += it.tiles[i]; return true; }
-  const k = e.target.closest('[data-wkey]'); if(k){ if(!it.max || r.text.length < it.max){ r.text += r.shift ? k.dataset.wkey.toUpperCase() : k.dataset.wkey; r.shift = false; } return true; }
+  const k = e.target.closest('[data-wkey]'); if(k){ if(!it.max || r.text.length < it.max){ r.text += r.shift ? keyUp(k.dataset.wkey) : k.dataset.wkey; r.shift = false; } return true; }
   if(e.target.closest('[data-wshift]')){ r.shift = !r.shift; return true; }
   if(e.target.closest('[data-wdel]')){ r.text = r.text.slice(0, -1); r.used?.pop(); return true; }
   return false;
@@ -6174,7 +6176,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.11.2 · 12.11.2026';
+const APP_VERSION = '0.11.3 · 12.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
