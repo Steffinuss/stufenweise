@@ -5825,7 +5825,7 @@ function renderNline(){
     + toolBtn({id:'nl-undo', ic:'undo', label:'Zurück', disabled: !n.jumps.length && n.start == null}) + toolBtn({id:'nl-new', ic:'trash', label:'Neu', disabled: n.start == null});
   /* Bündeln: 10 gleiche Einer- oder Zehnersprünge lassen sich zu einem großen Sprung zusammenfassen */
   const last = n.jumps.at(-1), run = last ? n.jumps.length - n.jumps.findLastIndex(d => d !== last) - 1 : 0;
-  if(run >= 10 && [1, 10].includes(Math.abs(last))) document.querySelector('.nl-tool')?.insertAdjacentHTML('beforeend', `<button class="nl-bundle" data-nlb="1">10-mal ${sgn(last)} ist ${sgn(last*10)} · zusammenfassen</button>`);
+  if(!zsMerge() && run >= 10 && [1, 10].includes(Math.abs(last))) document.querySelector('.nl-tool')?.insertAdjacentHTML('beforeend', `<button class="nl-bundle" data-nlb="1">10-mal ${sgn(last)} ist ${sgn(last*10)} · zusammenfassen</button>`);
   setHint('');
 }
 const zsVal = (svg, cx) => { const m = svg.getScreenCTM(); if(!m) return null; const p = new DOMPoint(cx, 0).matrixTransform(m.inverse()); const {L, H} = zsWin(); return L + (p.x - ZS.x0)/(ZS.x1 - ZS.x0)*(H - L); };
@@ -5841,8 +5841,8 @@ function zsClick(e){
   if(p.y < 40) return;
   const {L, H} = zsWin(), sn = zsSnap(), raw = L + (p.x - ZS.x0)/(ZS.x1 - ZS.x0)*(H - L);
   const v = Math.max(0, Math.min(n.range, Math.round(raw/sn)*sn));
-  if(n.start == null){ n.start = v; n.shown = false; }
-  else { const c = zsCur(); if(v !== c){ n.jumps.push(v - c); n.shown = false; } }
+  if(n.start == null){ zsSnap0(); n.start = v; n.shown = false; }
+  else { const c = zsCur(); if(v !== c){ zsSnap0(); n.jumps.push(v - c); n.shown = false; } }
   renderNline();
 }
 /* Ziehen und Zwei-Finger-Zoom */
@@ -5878,12 +5878,27 @@ document.addEventListener('wheel', e => {
   const {L, H} = zsWin(); zsSetWin(L + d/900*(H - L), H - L); zsRedraw();
 }, {passive:false});
 document.addEventListener('gesturestart', e => { if(app.mode === 'nline' && e.target.closest?.('#nl-svg')) e.preventDefault(); });
+/* Zusammenfassen: gleiche Sprünge derselben Stelle werden gleich addiert (+10 +10 → +20, +1 +1 → +2).
+   Zehner und Einer bleiben getrennt, damit der Weg „erst Zehner, dann Einer“ sichtbar bleibt. */
+const zsMerge = () => settings.zsMerge !== false;
+const zsPlace = d => { d = Math.abs(d); return d % 100 === 0 ? 100 : d % 10 === 0 ? 10 : 1; };
+function zsSnap0(){ const n = app.nl; (n.hist ||= []).push({start:n.start, jumps:[...n.jumps]}); if(n.hist.length > 200) n.hist.shift(); }
 function zsControl(b){
   const n = app.nl;
-  if(b.dataset.nlj){ const d = +b.dataset.nlj, c = zsCur(); if(c == null || c + d < 0 || c + d > n.range) return; n.jumps.push(d); n.shown = false; zsFollow(); return renderNline(); }
-  if(b.dataset.nlb){ const d = n.jumps.at(-1), st = n.jumps.findLastIndex(x => x !== d) + 1; n.jumps.splice(st, 10, d*10); return renderNline(); }
-  if(b.id === 'nl-undo'){ if(n.jumps.length) n.jumps.pop(); else n.start = null; n.shown = false; return renderNline(); }
-  if(b.id === 'nl-new'){ n.start = null; n.jumps = []; n.shown = false; return renderNline(); }
+  if(b.dataset.nlj){
+    const d = +b.dataset.nlj, c = zsCur(); if(c == null || c + d < 0 || c + d > n.range) return;
+    zsSnap0(); const last = n.jumps.at(-1);
+    if(zsMerge() && last && Math.sign(last) === Math.sign(d) && zsPlace(last) === zsPlace(d)) n.jumps[n.jumps.length - 1] = last + d;
+    else n.jumps.push(d);
+    n.shown = false; zsFollow(); return renderNline();
+  }
+  if(b.dataset.nlb){ zsSnap0(); const d = n.jumps.at(-1), st = n.jumps.findLastIndex(x => x !== d) + 1; n.jumps.splice(st, 10, d*10); return renderNline(); }
+  if(b.id === 'nl-undo'){
+    const h = n.hist?.pop();
+    if(h){ n.start = h.start; n.jumps = h.jumps; } else if(n.jumps.length) n.jumps.pop(); else n.start = null;
+    n.shown = false; return renderNline();
+  }
+  if(b.id === 'nl-new'){ n.start = null; n.jumps = []; n.hist = []; n.shown = false; return renderNline(); }
 }
 
 /* ---------- Hundertertafel zum Färben und Abdecken ---------- */
@@ -5970,7 +5985,7 @@ function renderTopTool(){
   if(m === 'nline'){
     $('#range-label').textContent = 'Zahlenstrahl bis';
     $('#ranges').innerHTML = [10, 20, 100, 1000].map(r => `<button data-nlr="${r}" aria-pressed="${app.nl.range === r}">${r}</button>`).join('');
-    $('#inputs').innerHTML = `<button class="chip-toggle" data-nle aria-pressed="${app.nl.empty}" title="Leerer Zahlenstrahl ohne Striche (Rechenstrich)">Rechenstrich</button><button class="chip-toggle" data-nlh aria-pressed="${app.nl.hide}" title="Das Ziel erst zeigen, wenn es angetippt wird">Ziel verdecken</button>`;
+    $('#inputs').innerHTML = `<button class="chip-toggle" data-nle aria-pressed="${app.nl.empty}" title="Leerer Zahlenstrahl ohne Striche (Rechenstrich)">Rechenstrich</button><button class="chip-toggle" data-nlh aria-pressed="${app.nl.hide}" title="Das Ziel erst zeigen, wenn es angetippt wird">Ziel verdecken</button><button class="chip-toggle" data-nlm aria-pressed="${zsMerge()}" title="Gleiche Sprünge gleich addieren: +10 und +10 wird +20, +1 und +1 wird +2. Zehner und Einer bleiben getrennt.">Zusammenfassen</button>`;
     return true;
   }
   $('#range-label').textContent = ''; $('#ranges').innerHTML = '';
@@ -6032,7 +6047,8 @@ document.addEventListener('click', e => {
   if(inStage){ if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
   const b = e.target.closest('button'); if(!b || !(inCtl || inTop)) return;
   if(inTop){
-    if(b.dataset.nlr){ app.nl = {...app.nl, range: +b.dataset.nlr, start:null, jumps:[], shown:false, win:null}; return render(); }
+    if(b.dataset.nlr){ app.nl = {...app.nl, range: +b.dataset.nlr, start:null, jumps:[], hist:[], shown:false, win:null}; return render(); }
+    if(b.hasAttribute('data-nlm')){ settings.zsMerge = !zsMerge(); saveSettings(); return render(); }
     if(b.hasAttribute('data-nle')){ app.nl.empty = !app.nl.empty; return render(); }
     if(b.hasAttribute('data-nlh')){ app.nl.hide = !app.nl.hide; app.nl.shown = false; return render(); }
     if(b.id === 'tw-go'){ app.tw.text = $('#tw-text').value; return renderTword(); }
@@ -6978,7 +6994,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.7 · 13.11.2026';
+const APP_VERSION = '0.13.8 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
