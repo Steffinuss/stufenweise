@@ -272,6 +272,7 @@ body.screening .toolbar{visibility:hidden}
 .zone .analog{color:var(--muted)}
 .stats-h{margin:18px 0 0;font-size:17px}
 /* Profile & Lernstand */
+.profile-chip .psym-ic{display:inline-flex!important}.profile-chip .psym-ic svg{width:32px!important;height:32px!important}.psym-ic svg,.hello-sym svg{display:block}.hello-sym{display:inline-block;vertical-align:middle;margin-right:6px}
 .profile-chip .pname{display:inline!important;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
 .plist{display:grid;gap:8px;margin-top:8px}
 .prow{display:flex;gap:6px}
@@ -3555,7 +3556,7 @@ function renderProfiles(){
     (locked ? `<p class="note">Kinder anlegen, löschen und Tests starten kann nur die Lehrkraft. <button class="linkish" id="p-unlock">Lehrkraft-PIN eingeben</button></p>` : !settings.privacyAck ? PRIVACY_BOX : `<form id="padd" class="row" style="margin-top:12px"><input id="pname" maxlength="20" placeholder="Vorname oder Kürzel" style="flex:1"><button class="primary" type="submit">Hinzufügen</button></form>`) +
     `<div class="row" style="margin-top:14px;justify-content:flex-start;gap:8px"><button data-ptest="M1" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 1: Zahlen und Rechnen</span></button><button data-ptest="M2" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 2: Uhr, Größen, Hundertertafel</span></button><button data-ptest="L" class="icon-btn primary">${icon('target')}<span style="display:inline">Lese-Test</span></button>${typeof W_LEVELS !== 'undefined' ? `<button data-ptest="W" class="icon-btn primary">${icon('target')}<span style="display:inline">Schreib-Test</span></button>` : ''}<span class="note" style="align-self:center">für ${escHtml(curName())}</span></div>
     <p class="note" style="margin-top:12px">Namen und Ergebnisse bleiben nur auf diesem Gerät gespeichert. Am besten Vornamen oder Kürzel verwenden.</p>`;
-  $('#btn-profile').innerHTML = icon('user') + `<span class="pname">${escHtml(curName())}</span>`;
+  { const p = curProfile(); $('#btn-profile').innerHTML = (p?.sym && ICON[p.sym] ? `<span class="psym-ic">${iconSvg(p.sym, 30)}</span>` : icon('user')) + `<span class="pname">${escHtml(curName())}</span>`; }
 }
 function selectProfile(id){
   data.current = id || null; saveData();
@@ -5585,7 +5586,7 @@ function renderHome(){
       if(!z){ const f = frontierKeys(p.id, subj === 'M' ? 'M' : 'D').find(k => subj === 'M' ? /^[MUGH]/.test(k) : k[0] === subj); if(f) z = {key:f, info:cellInfo(f)}; }
       if(z) cards.push(`<button class="home-card" data-home-offer="${subj}"><span class="hc-subj">${SUBJ_NAME[subj]}</span><span class="hc-title">${escHtml(kidTitle(z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>`);
     }
-    body = `<h2>${p ? `Hallo ${escHtml(p.name)}!` : 'Willkommen!'}</h2>
+    body = `<h2>${p ? `${p.sym && ICON[p.sym] ? `<span class="hello-sym">${iconSvg(p.sym, 56)}</span> ` : ''}Hallo ${escHtml(p.name)}!` : 'Willkommen!'}</h2>
       ${cards.length ? `<p class="home-sub">★ Heute für dich:</p><div class="home-cards">${cards.join('')}</div><p class="home-sub">Oder such dir ein Fach aus:</p>` : `<p class="home-sub">${p ? 'Was möchtest du üben? Deine Lehrkraft kann mit dir einen Test machen – dann stehen hier deine Aufgaben.' : 'Was möchtest du üben?'}</p>`}
       <div class="home-subj"><button data-home-subj="M">${WZ_ILL.M}<span>Mathe</span></button><button data-home-subj="D">${WZ_ILL.D}<span>Deutsch</span></button></div>
       ${p ? `<div class="home-row">${cards.length ? `<button class="home-map" data-home-warm>${icon('next')} Startrunde (3 Aufgaben)</button>` : ''}<button class="home-map" data-home-map>${icon('target')} Meine Lernlandkarte</button></div>` : ''}`;
@@ -6928,7 +6929,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.3 · 13.11.2026';
+const APP_VERSION = '0.13.4 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
