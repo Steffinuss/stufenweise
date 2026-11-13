@@ -95,7 +95,7 @@ Nach dem Test findet das Kind seine Übungen selbst. Das Stufen-Zeichen links ob
 
 Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigt eine Treppe, wo das Kind gerade ist. Jede Stufe zeigt mit Bild und Wort, was schon gewählt ist (Üben, das Bild und der Name des Kindes, Mathe oder Deutsch). Die Stufe, die gerade dran ist, ist orange mit einem Fragezeichen. Oben wartet die Fahne „Los geht’s“: Dort beginnt das Üben. Mit einem Tipp auf eine grüne Stufe geht es zurück zu diesem Schritt.
 
-1. **Wer übt?** Das Kind tippt auf seinen Namen.
+1. **Wer übt?** Das Kind tippt auf seinen Namen. Nach jedem Neuladen oder Neustart der App kommt diese Frage wieder, damit nicht aus Versehen unter dem Namen des letzten Kindes geübt wird. Soll an einem Gerät immer dasselbe Kind angemeldet bleiben, stellst du unter **Hilfen → Name beim Start** „letztes Kind bleibt ausgewählt“ ein.
 2. **Fach:** Unter **Heute für dich** steht die passende Übung aus der Förderzone. Ein Tipp darauf startet sie sofort. Sonst wählt das Kind Mathe oder Deutsch.
 3. **Übung:** Das Kind wählt einen Bereich, zum Beispiel Plus oder Hundertertafel. Oben steht wieder „Für dich“ mit der passenden Übung.
 

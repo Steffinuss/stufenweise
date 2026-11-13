@@ -884,6 +884,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <label class="row">Uhr „Minuten genau“ <select data-key="clockMin"><option value="5">in 5-Minuten-Schritten</option><option value="1">auf die Minute genau</option></select></label>
     <label class="row">Themenwelt für Gast und Unterricht <select data-key="world"><option value="GS">Grundstufe (GS)</option><option value="HS">Hauptstufe (HS)</option><option value="BSS">Berufsschulstufe (BSS)</option></select></label>
     <label class="row">Beim Start <select data-key="startCtx"><option value="ask">fragen: Üben oder Unterricht</option><option value="practice">immer Üben</option><option value="class">immer Unterricht (Tafel)</option></select></label>
+    <label class="row">Name beim Start <select data-key="askWho"><option value="ask">jedes Mal neu wählen</option><option value="keep">letztes Kind bleibt ausgewählt</option></select></label>
     <label class="row">Übungsrunde <select data-key="roundLen"><option value="5">5 Aufgaben</option><option value="10">10 Aufgaben</option><option value="15">15 Aufgaben</option><option value="0">ohne Ende</option></select></label>
   </fieldset>
   <fieldset><legend>Geführte Oberfläche</legend>
@@ -966,7 +967,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', askWho:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -7004,7 +7005,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.10 · 13.11.2026';
+const APP_VERSION = '0.13.11 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -7209,6 +7210,8 @@ $('#help-content').innerHTML = [
 ].map(([i,h,p]) => i === 'h' ? `<h3 class="help-group">${h}</h3>` : `<div class="help-step">${icon(i)}<div><h3>${h}</h3><p>${p === '__THANKS__' ? thanksHtml() : p}</p></div></div>`).join('');
 
 if('speechSynthesis' in window) speechSynthesis.getVoices();
+/* Nach dem Neuladen wählt jedes Kind seinen Namen neu (Einstellung „Name beim Start“). Gespeichert wird dabei nichts. */
+if(settings.askWho !== 'keep' && data.profiles.length) data.current = null;
 renderProfiles();
 if(curProfile()?.rec != null) applyRec(curProfile().rec);
 picObs.observe($('#prompt'), {childList:true});
