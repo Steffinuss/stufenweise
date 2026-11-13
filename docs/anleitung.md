@@ -4,17 +4,16 @@ Diese Anleitung zeigt in sieben Schritten, wie du Stufenweise auf dem iPad einse
 
 ## Die Knöpfe oben
 
-Oben rechts liegen sieben Knöpfe. Auf dem iPad stehen keine Wörter darunter, deshalb hier mit Nummern:
+Oben rechts liegen zwei Knöpfe: der **Name** des Kindes (am Anfang „Gast“) und das Menü **⋯**. So bleibt für die Aufgabe mehr Platz.
 
-![Die sieben Knöpfe oben rechts, nummeriert von 1 bis 7](bilder/00_leiste.png)
-
-1. **Kind wählen** (zeigt den Namen, am Anfang „Gast“): Kinder anlegen und Tests starten.
-2. **Lernstand:** Kompetenzmatrix, Förderzone und ILEB-Formulierungen. Nur für die Lehrkraft.
-3. **Arbeitsblätter:** Blätter passend zur Förderzone erstellen und drucken.
-4. **Rückmeldung** (orange umrandet): Fehler, Ideen und Lob melden.
-5. **Anleitung (?):** Hilfe zu allen Bereichen und „Über Stufenweise“ mit Lizenz und Danke.
-6. **Vollbild:** blendet die Leisten des Browsers aus.
-7. **Einstellungen:** PIN, eigene Wörter, Hilfen und Datensicherung.
+1. **Name / Kind wählen:** Kinder anlegen, Themenwelt und Bildmodus einstellen und Tests starten.
+2. **Menü ⋯** mit:
+   - **Lernstand:** Kompetenzmatrix, Förderzone und ILEB-Formulierungen. Nur für die Lehrkraft.
+   - **Arbeitsblätter:** Blätter passend zur Förderzone erstellen und drucken.
+   - **Rückmeldung geben:** Fehler, Ideen und Lob melden.
+   - **Anleitung:** Hilfe zu allen Bereichen und „Über Stufenweise“ mit Lizenz und Danke.
+   - **Vollbild:** blendet die Leisten des Browsers aus.
+   - **Einstellungen:** PIN, eigene Wörter, Hilfen und Datensicherung.
 
 Das Stufen-Zeichen links oben führt immer zur Startseite. Darunter liegen die Übungsbereiche.
 
@@ -66,7 +65,7 @@ Zuerst sieht das Kind eine ermutigende Begrüßung. Lies sie bei Bedarf vor und 
 
 ![Begrüßung vor dem Mathe-Test](bilder/05_intro.png)
 
-Bei jeder Aufgabe steht oben, was zu tun ist. Zahlen gibt das Kind über die Zifferntastatur ein. Kennt es eine Aufgabe nicht, tippt es auf **Weiß ich nicht**. Das ist ausdrücklich erlaubt und verfälscht nichts. Die Zifferntastatur bleibt stehen, solange es auf dem Bildschirm ein Zahlenfeld gibt, auch wenn das Kind zwischendurch etwas antippt (z. B. die Schrauben beim Zählen). So verrutscht nichts. Mit **▾** rollt man sie zu einem kleinen Knopf „123“ ein, mit **⇆** wechselt sie die Seite.
+Bei jeder Aufgabe steht oben, was zu tun ist. Zahlen gibt das Kind über die Zifferntastatur ein. Kennt es eine Aufgabe nicht, tippt es auf **Weiß ich nicht**. Das ist ausdrücklich erlaubt und verfälscht nichts. Die Zifferntastatur bleibt stehen, solange es auf dem Bildschirm ein Zahlenfeld gibt, auch wenn das Kind zwischendurch etwas antippt (z. B. die Schrauben beim Zählen). So verrutscht nichts. Sie schwebt über der Aufgabe: Am Griff **⠿** lässt sie sich an jede Stelle ziehen, mit **▾** rollt man sie zu einem kleinen Knopf „123“ ein.
 
 ![Testaufgabe mit Zifferntastatur und dem Knopf „Weiß ich nicht“](bilder/06_aufgabe.png)
 
@@ -139,6 +138,8 @@ Bei **Zahlen**, **Plus** und **Minus** gibt es im Zahlenraum bis 100 außerdem d
 Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901–1000). Ein orangefarbener Punkt markiert die Startseite, ein blauer die Seite, auf der das Kind gerade ist. Mit einem Tipp auf eine Seite kann es blättern. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet; im Tausenderbuch muss das Kind zuerst die richtige Seite aufschlagen.
 
 ## Mehr Platz auf dem Bildschirm
+
+Oben rechts stehen nur noch der Name und das Menü **⋯**. Im Menü findest du Lernstand, Arbeitsblätter, Rückmeldung, Anleitung, Vollbild und Einstellungen. Die Überschrift über der Aufgabe (z. B. „Hundertertafel · Tafel und Material verbinden“) fällt beim Üben weg, weil die Stufe schon oben in der Leiste markiert ist; so bekommt die Aufgabe mehr Höhe.
 
 Ganz unten in der linken Leiste blendet **‹** die Leiste aus. Die Aufgabe bekommt dann die ganze Breite. Am linken Rand erscheint ein kleiner Knopf **›**, der die Leiste wieder einblendet. Die Einstellung bleibt auf dem Gerät gespeichert.
 

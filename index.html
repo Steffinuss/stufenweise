@@ -468,6 +468,21 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 .round-card .acts button{display:flex;align-items:center;justify-content:center;gap:12px}
 .r-ic{display:flex;width:36px;justify-content:center}.r-tx{display:flex;flex-direction:column;align-items:flex-start}
 .pic-mode .round-card .r-tx small{display:none}.pic-mode .round-card p{display:none}.pic-mode .round-card .r-ic svg{width:44px;height:44px}.pic-mode .round-card .r-tx{display:none}.pic-mode .round-card .acts{flex-direction:row;justify-content:center}.pic-mode .round-card .acts button{min-width:92px;min-height:80px}
+.more-wrap{position:relative}
+#btn-more{font-size:26px;font-weight:900;line-height:1;padding:0 14px}
+.more-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:70;display:flex;flex-direction:column;gap:4px;padding:8px;background:#fff;border-radius:16px;box-shadow:0 10px 30px #0003;min-width:250px}
+.more-menu[hidden]{display:none}
+.more-menu .icon-btn{justify-content:flex-start;gap:10px;min-height:46px;box-shadow:none;background:transparent;width:100%}
+.more-menu .icon-btn:hover{background:#f4efe6}
+.more-menu .icon-btn::after{content:attr(aria-label);font-weight:700;font-size:16px}
+.more-menu .icon-btn .lbl{display:none}
+.headline:has(#equation:empty):not(:has(#btn-say:not([hidden]))){display:none}
+.workspace{padding-top:10px}
+.workspace>.round-bar~#prompt{padding-inline:min(130px,16vw)}
+.pic-mode #prompt:has(.pic-ic){display:flex;align-items:center;justify-content:center;gap:10px}
+.pic-mode .pic-ic{display:inline-block;margin:0;width:46px;height:46px;flex:none}
+.pic-mode .pic-txt,.pic-mode .pic-txt *{display:inline!important;text-align:left}
+.pic-mode .pic-txt{max-width:60%}
 .rail-guide{margin-top:auto}
 .rail-toggle{flex:none;min-height:36px;font-size:22px;font-weight:800;color:var(--muted);background:transparent;box-shadow:none;border:0;margin-top:auto}
 .rail-guide~.rail-toggle,#modes:has(.rail-guide)+.rail-toggle{margin-top:4px}
@@ -626,13 +641,12 @@ svg{-webkit-touch-callout:none}
 #mtab,#mboard,.mtray,.mden,.dg-scatter,.dg-line,.find-svg,.money-tray{touch-action:none}
 #numpad{position:fixed;right:14px;top:50%;transform:translateY(-40%);z-index:60;display:grid;grid-template-columns:repeat(3,62px);gap:8px;padding:10px;background:#2b2930ee;border-radius:20px;box-shadow:0 10px 30px #0004}
 #numpad[hidden]{display:none}
-body.np-open main{padding-right:250px;transition:padding .2s}
-body.np-open.np-left main{padding-right:12px;padding-left:250px}
 #numpad{top:auto;bottom:16px;transform:none}
 #numpad.left{right:auto;left:14px}
 #numpad button{min-height:58px;font-size:28px;font-weight:700;border-radius:14px;padding:0;box-shadow:none}
 #numpad .np-ok{background:#1f7a45;color:#fff}
 #numpad .np-side{grid-column:span 2;min-height:34px;font-size:16px;background:#ffffff22;color:#fff}
+#numpad .np-drag{cursor:grab;touch-action:none;font-size:20px;letter-spacing:2px}
 #numpad .np-min{grid-column:span 1;font-size:18px}
 #numpad .np-max{display:none}
 #numpad.min{grid-template-columns:auto;padding:6px}
@@ -798,12 +812,16 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     </section>
       <div class="top-tools">
       <button id="btn-profile" class="icon-btn profile-chip" aria-label="Wer übt?"></button>
+      <div class="more-wrap">
+      <button id="btn-more" class="icon-btn" aria-label="Menü" aria-haspopup="true" aria-expanded="false" title="Lernstand, Arbeitsblätter, Anleitung, Einstellungen">⋯</button>
+      <div id="more-menu" class="more-menu" hidden>
       <button id="btn-stats" class="icon-btn" aria-label="Lernstand"></button>
       <button id="btn-sheet" class="icon-btn" aria-label="Arbeitsblätter"></button>
       <button id="btn-fb" class="icon-btn fb-btn" aria-label="Rückmeldung geben"></button>
       <button id="btn-help" class="icon-btn" aria-label="Anleitung"></button>
       <button id="btn-full" class="icon-btn" aria-label="Vollbild"></button>
       <button id="btn-settings" class="icon-btn" aria-label="Einstellungen"></button>
+      </div></div>
     </div>
   </div>
   <p id="error" class="error" role="alert" hidden></p>
@@ -5463,7 +5481,7 @@ function renderRead(){
   const it = R.item;
   $('#words').hidden = true; $('#btn-say').hidden = true;
   const isW = R.lvl[0] === 'W';
-  $('#equation').innerHTML = `<span class="screen-step">${R.lvl[0] === 'U' ? 'Uhr' : R.lvl[0] === 'G' ? 'Größen' : R.lvl[0] === 'H' ? (R.lvl === 'H7' ? 'Tausenderbuch' : 'Hundertertafel') : isW ? 'Schreiben' : 'Lesen'} · ${escHtml(rdInfo(R.lvl).name)}</span>`;
+  $('#equation').innerHTML = ''; /* Stufe steht schon oben in der Leiste */
   $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
   /* In Mathe keine Silbenfarben für kurze Angaben (1 m = 100 cm, 8 Uhr): Blau und Rot stehen dort für Zehner und Hunderter. Sachtexte ab 4 Wörtern dürfen gefärbt werden. */
   const colored = R.colored && (!/^[UGH]/.test(R.lvl) || (String(it.text || '').match(/[A-Za-zÄÖÜäöüß]{3,}/g) || []).length >= 3);
@@ -5746,7 +5764,7 @@ function zsRedraw(){
 }
 function renderNline(){
   const n = app.nl;
-  $('#equation').innerHTML = `<span class="screen-step">Zahlenstrahl</span>`;
+  $('#equation').innerHTML = '';
   $('#prompt').innerHTML = `<span class="nl-path">${escHtml(zsPathText())}</span>`;
   $('#stage').innerHTML = `<div class="nl-tool"><svg id="nl-svg" viewBox="0 0 ${ZS.W} 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zahlenstrahl bis ${n.range}">${zsSvg()}</svg>${zsZoomHtml()}</div>`;
   const cur = zsCur(), J = zsJumpSet(n.range), ok = d => cur != null && cur + d >= 0 && cur + d <= n.range;
@@ -5815,7 +5833,7 @@ app.hb2 = {cells:{}, cover:new Set(), color:'o', tool:'paint'};
 const HB2_COL = {o:'#f4b860', b:'#8fb3ea', g:'#9fd3ae', r:'#ef9a9a'};
 function renderHboard(){
   const h = app.hb2;
-  $('#equation').innerHTML = `<span class="screen-step">Hundertertafel</span>`;
+  $('#equation').innerHTML = '';
   $('#prompt').textContent = h.tool === 'cover' ? 'Tippe Felder an, um sie abzudecken oder wieder aufzudecken.' : 'Tippe Felder an, um sie zu färben. Noch einmal tippen nimmt die Farbe weg.';
   $('#stage').innerHTML = `<div class="hb2-wrap"><div class="hb2" role="grid" aria-label="Hundertertafel">${Array.from({length:100}, (_, i) => { const v = i + 1, c = h.cells[v], cov = h.cover.has(v); return `<button data-hb2="${v}" class="${cov ? 'cov' : ''}" style="${c && !cov ? `background:${HB2_COL[c]}` : ''}" aria-label="${cov ? 'abgedeckt' : v}">${cov ? '' : v}</button>`; }).join('')}</div></div>`;
   $('#controls').innerHTML = `<div class="hb2-tools seg" role="group" aria-label="Werkzeug"><button data-hb2t="paint" aria-pressed="${h.tool === 'paint'}">Färben</button><button data-hb2t="cover" aria-pressed="${h.tool === 'cover'}">Abdecken</button></div>`
@@ -5827,6 +5845,8 @@ function renderHboard(){
 }
 function hb2Fit(){ const w = document.querySelector('.hb2-wrap'), g = document.querySelector('.hb2'); if(!w || !g) return; const s = Math.max(240, Math.min(w.clientWidth, w.clientHeight) - 8); g.style.width = g.style.height = s + 'px'; g.style.fontSize = Math.round(s/22) + 'px'; }
 addEventListener('resize', () => { if(app.mode === 'hboard') hb2Fit(); });
+/* Ändert sich der Platz (z. B. Rückmeldung erscheint), passt sich die Hundertertafel an */
+{ let ro = 0; new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(() => { if(document.querySelector('#stage .hb')) hbFit(); }); }).observe(document.getElementById('stage')); }
 function hboardClick(e){
   const b = e.target.closest('[data-hb2]'); if(!b) return; const v = +b.dataset.hb2, h = app.hb2;
   if(h.tool === 'cover'){ h.cover.has(v) ? h.cover.delete(v) : h.cover.add(v); }
@@ -5846,7 +5866,7 @@ function hboardControl(b){
 app.tc = {h:8, m:0, step:5, digital:false, words:false};
 function renderTclock(){
   const c = app.tc;
-  $('#equation').innerHTML = `<span class="screen-step">Uhr</span>`;
+  $('#equation').innerHTML = '';
   $('#prompt').textContent = '';
   const dig = `${c.h}:${String(c.m).padStart(2, '0')}`, dig2 = `${c.h + 12 === 24 ? 0 : c.h + 12}:${String(c.m).padStart(2, '0')}`;
   $('#stage').innerHTML = `<div class="tc-wrap">${clockSvg(c.h % 12, c.m, {size:420, ring: c.step < 5})}<div class="tc-info">${c.digital ? `<div class="tc-dig">${dig} <small>oder ${dig2}</small></div>` : ''}${c.words ? `<div class="tc-words">${escHtml(timeWords(c.h, c.m))}</div>` : ''}</div></div>`;
@@ -5871,7 +5891,7 @@ function tclockControl(b){
 app.tw = {text:'Hose', syl:true, bows:true};
 function renderTword(){
   const w = app.tw, txt = w.text.trim();
-  $('#equation').innerHTML = `<span class="screen-step">Wörter</span>`;
+  $('#equation').innerHTML = '';
   $('#prompt').textContent = '';
   const key = Object.keys(ICON).find(k => k.toLowerCase() === txt.toLowerCase());
   const big = txt.length <= 14 && !/\s/.test(txt);
@@ -6539,17 +6559,28 @@ function npPrep(root){
 function npBuild(){
   if(NP.el) return NP.el;
   const d = document.createElement('div'); d.id = 'numpad'; d.setAttribute('role', 'group'); d.setAttribute('aria-label', 'Zifferntastatur');
-  d.innerHTML = `<button class="np-max" data-np="max" aria-label="Zifferntastatur ausklappen">123 ▴</button><button class="np-side" data-np="side" aria-label="Tastatur auf die andere Seite">⇆</button><button class="np-side np-min" data-np="min" aria-label="Tastatur einrollen">▾</button>${['7','8','9','4','5','6','1','2','3'].map(k => `<button data-np="${k}">${k}</button>`).join('')}<button data-np="del" aria-label="Löschen">⌫</button><button data-np="0">0</button><button data-np="ok" class="np-ok" aria-label="Fertig">✓</button>`;
-  d.addEventListener('pointerdown', e => e.preventDefault());
+  d.innerHTML = `<button class="np-max" data-np="max" aria-label="Zifferntastatur ausklappen">123 ▴</button><button class="np-side np-drag" data-np="drag" aria-label="Tastatur verschieben" title="Zum Verschieben ziehen">⠿</button><button class="np-side np-min" data-np="min" aria-label="Tastatur einrollen">▾</button>${['7','8','9','4','5','6','1','2','3'].map(k => `<button data-np="${k}">${k}</button>`).join('')}<button data-np="del" aria-label="Löschen">⌫</button><button data-np="0">0</button><button data-np="ok" class="np-ok" aria-label="Fertig">✓</button>`;
+  d.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    /* Am Griff ziehen: Tastatur frei verschieben (schwebt über der Aufgabe) */
+    if(!e.target.closest('.np-drag')) return;
+    const r = d.getBoundingClientRect(), ox = e.clientX - r.left, oy = e.clientY - r.top, id = e.pointerId;
+    const mv = ev => { if(ev.pointerId !== id) return; const w = d.offsetWidth, h = d.offsetHeight;
+      NP.pos = {x: Math.max(4, Math.min(innerWidth - w - 4, ev.clientX - ox)), y: Math.max(4, Math.min(innerHeight - h - 4, ev.clientY - oy))}; npPlace(); };
+    const up = ev => { if(ev.pointerId !== id) return; removeEventListener('pointermove', mv); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); };
+    addEventListener('pointermove', mv); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  });
   d.addEventListener('click', e => { const b = e.target.closest('[data-np]'); if(b) npKey(b.dataset.np); });
   document.body.append(d); NP.el = d; return d;
 }
-function npShow(){ const d = npBuild(); d.classList.toggle('left', NP.side === 'left'); d.classList.toggle('min', !!NP.min); d.hidden = false; document.body.classList.toggle('np-open', !NP.min); document.body.classList.toggle('np-left', NP.side === 'left' && !NP.min); }
+function npPlace(){ const d = NP.el; if(!d) return; if(NP.pos && !NP.min){ const w = d.offsetWidth, h = d.offsetHeight; Object.assign(d.style, {left: Math.max(4, Math.min(innerWidth - w - 4, NP.pos.x)) + 'px', top: Math.max(4, Math.min(innerHeight - h - 4, NP.pos.y)) + 'px', right:'auto', bottom:'auto'}); } else Object.assign(d.style, {left:'', top:'', right:'', bottom:''}); }
+addEventListener('resize', () => npPlace());
+function npShow(){ const d = npBuild(); d.classList.toggle('min', !!NP.min); d.hidden = false; npPlace(); }
 /* Ein anderes Ziffernfeld auf dem Bildschirm, falls das bisherige verschwunden ist */
 const npFirst = () => [...document.querySelectorAll('main input')].find(el => npEligible(el) && el.offsetParent);
 function npHide(){ if(NP.el) NP.el.hidden = true; NP.target = null; document.body.classList.remove('np-open', 'np-left'); }
 function npKey(k){
-  if(k === 'side'){ NP.side = NP.side === 'right' ? 'left' : 'right'; return npShow(); }
+  if(k === 'drag') return;
   if(k === 'min' || k === 'max'){ NP.min = k === 'min'; return npShow(); }
   const el = NP.target; if(!el || !document.contains(el)) return npHide();
   if(k === 'ok'){ el.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true, cancelable:true})); return; }
@@ -6684,6 +6715,8 @@ function renderReport(){
 }
 
 /* ---------- Ereignisse ---------- */
+$('#btn-more').addEventListener('click', e => { e.stopPropagation(); const m = $('#more-menu'), open = m.hidden; m.hidden = !open; $('#btn-more').setAttribute('aria-expanded', open); });
+document.addEventListener('click', e => { const m = $('#more-menu'); if(!m.hidden && (!e.target.closest('#more-menu') || e.target.closest('button'))){ m.hidden = true; $('#btn-more').setAttribute('aria-expanded', 'false'); } }, true);
 $('#btn-rail').addEventListener('click', () => { settings.railOff = true; saveSettings(); render(); requestAnimationFrame(hbFit); });
 $('#btn-rail-show').addEventListener('click', () => { settings.railOff = false; saveSettings(); render(); requestAnimationFrame(hbFit); });
 $('#modes').addEventListener('click', e => {
@@ -6880,7 +6913,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.1 · 13.11.2026';
+const APP_VERSION = '0.13.2 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
