@@ -141,6 +141,8 @@ Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901
 
 Auf der Stufe „Minuten genau“ übt die App normalerweise in 5-Minuten-Schritten. In den Einstellungen unter **Hilfen → Uhr „Minuten genau“** kannst du auf **auf die Minute genau** umstellen. Dann kommen Uhrzeiten wie 6:37, und beim Uhr-Stellen gibt es Knöpfe für −5, −1, +1 und +5 Minuten. Der Test bleibt bei 5-Minuten-Schritten, damit die Ergebnisse vergleichbar sind.
 
+Die Zeiger lassen sich auch mit dem Finger ziehen, beim Uhr-Stellen und im Unterricht an der Tafel: außen am Minutenzeiger die Minuten (über die 12 hinweg wandert die Stunde mit), innen am kurzen Zeiger die Stunde. Uhrzeiten in Worten folgen dem Alltag: „20 nach 2“, „4 vor halb 3“, „8 nach halb 3“, „20 vor 3“. Digitale Uhrzeiten kommen auch nachmittags und abends vor (z. B. 19:38 mit dem Hinweis „Es ist Abend“).
+
 ## Mehr Platz auf dem Bildschirm
 
 Oben rechts stehen nur noch der Name und das Menü **⋯**. Im Menü findest du Lernstand, Arbeitsblätter, Rückmeldung, Anleitung, Vollbild und Einstellungen. Die Überschrift über der Aufgabe (z. B. „Hundertertafel · Tafel und Material verbinden“) fällt beim Üben weg, weil die Stufe schon oben in der Leiste markiert ist; so bekommt die Aufgabe mehr Höhe.

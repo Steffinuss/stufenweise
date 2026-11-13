@@ -540,6 +540,7 @@ body.class-mode #controls button{min-height:58px}
 /* Uhr */
 .tc-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:40px;padding:8px}
 .tc-wrap>svg{height:100%;max-height:440px;width:auto}
+.drag-clock{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .tc-info{display:flex;flex-direction:column;gap:14px;min-width:0}
 .tc-dig{font-size:64px;font-weight:800;font-variant-numeric:tabular-nums}.tc-dig small{display:block;font-size:24px;color:var(--muted)}
 .tc-words{font-size:40px;font-weight:800;color:#1f4f9a}
@@ -4548,9 +4549,10 @@ function timeWords(h, m){
   if(m === 30) return `halb ${N}`;
   if(m === 15) return `Viertel nach ${H}`;
   if(m === 45) return `Viertel vor ${N}`;
-  if(m === 25) return `5 vor halb ${N}`;
-  if(m === 35) return `5 nach halb ${N}`;
-  if(m < 30) return `${m} nach ${H}`;
+  /* wie man es sagt: bis 20 „nach“, dann „vor halb“ / „nach halb“, ab 40 „vor“ */
+  if(m <= 20) return `${m} nach ${H}`;
+  if(m < 30) return `${30 - m} vor halb ${N}`;
+  if(m < 40) return `${m - 30} nach halb ${N}`;
   return `${60 - m} vor ${N}`;
 }
 /* Analoge Uhr: kurzer roter Stundenzeiger, langer blauer Minutenzeiger */
@@ -4571,7 +4573,10 @@ function clockSvg(h, m, {size = 220, ring = false, hands = true, cls = ''} = {})
 const clockOpt = (h, m) => ({h: clockSvg(h, m, {size:130}), a: dig(H12(h), m)});
 const digOpt = (h, m) => ({h:`<span class="dig-time">${dig(H12(h), m)}</span>`, a: dig(H12(h), m)});
 const wordOpt2 = t => ({h:`<span class="rd-word" style="font-size:26px">${escHtml(t)}</span>`, a: t});
-const clockSet = (h, m, step, kern) => ({kern, type:'clockset', target:{h: h % 12, m}, step, prompt:`Stelle die Uhr auf ${step >= 60 ? `${H12(h)} Uhr` : step === 30 || step === 15 ? timeWords(h, m) : dig(H12(h), m)}.`, label:`Uhr stellen: ${dig(H12(h), m)}`});
+const clockSet = (h, m, step, kern) => ({kern, type:'clockset', target:{h: h % 12, m}, step, prompt:`Stelle die Uhr auf ${step >= 60 ? `${H12(h)} Uhr` : step === 30 || step === 15 ? timeWords(h, m) : dig(h > 12 ? h : H12(h), m)}.`, label:`Uhr stellen: ${dig(h > 12 ? h : H12(h), m)}`});
+/* digitale Uhrzeit: manchmal am Nachmittag oder Abend (13–23 Uhr) */
+const pmH = h => h < 12 && Math.random() < .4 ? h + 12 : h;
+const dayPart = h => h >= 18 ? 'Es ist Abend. ' : h >= 13 ? 'Es ist Nachmittag. ' : '';
 const rh = () => rnd(1, 12);
 const CLOCK = {
   U1: [() => { const h = rh(), o = H12(h + 1); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, 0), prompt:'Wie spät ist es?', label:`volle Stunde ablesen: ${h} Uhr`}, [...new Set([`${h} Uhr`, h === 12 ? `${o} Uhr` : '12 Uhr', `${H12(h - 1)} Uhr`, `${o} Uhr`])].slice(0, 3).map(wordOpt2)); },
@@ -4583,8 +4588,8 @@ const CLOCK = {
   U3: [() => { const h = rh(), m = pick([15, 45]); return mkChoice({kern:true, layout:'side', q:'Wie spät ist es?', svg: clockSvg(h, m), prompt:'Lies die Uhr ab.', label:`Viertelstunde: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m), m === 15 ? `Viertel nach ${H12(h + 1)}` : `Viertel vor ${h}`].map(wordOpt2)); },
        () => { const h = rh(), m = pick([15, 45]); return mkChoice({layout:'row', text: timeWords(h, m), textCls:'rd-letter', prompt:'Welche Uhr passt?', label:`Uhr zu „${timeWords(h, m)}“`}, [clockOpt(h, m), clockOpt(h, 60 - m), clockOpt(h + 1, m)]); },
        () => clockSet(rh(), pick([15, 45]), 15, false)],
-  U4: [() => { const h = rh(), m = uMin(); const set = [...new Set([dig(h, m), m % 5 ? dig(h, (m + 5) % 60) : dig(h, m/5), m > 30 ? dig(H12(h + 1), m) : dig(H12(h - 1), m), dig(h, (m + 30) % 60)])].slice(0, 3); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, m), prompt:'Wie spät ist es? Lies genau ab.', label:`Minuten ablesen: ${dig(h, m)}`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
-       () => clockSet(rh(), uMin(), uStep(), false),
+  U4: [() => { const h0 = rh(), h = pmH(h0), m = uMin(), sh = x => h > 12 ? H12(x) + 12 : H12(x); const set = [...new Set([dig(h, m), m % 5 ? dig(h, (m + 5) % 60) : dig(h, m/5), m > 30 ? dig(sh(h0 + 1), m) : dig(sh(h0 - 1), m), dig(h, (m + 30) % 60)])].slice(0, 3); return mkChoice({kern:true, layout:'row', svg: clockSvg(h0, m), prompt:`${dayPart(h)}Wie spät ist es? Lies genau ab.`, label:`Minuten ablesen: ${dig(h, m)}`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
+       () => clockSet(pmH(rh()), uMin(), uStep(), false),
        () => { const h = rh(), m = uMin(); return mkChoice({layout:'side', q:'Wie sagt man dazu?', svg: clockSvg(h, m), prompt:'Lies die Uhr ab.', label:`Minuten in Worten: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m === 60 ? 0 : 60 - m), timeWords(h + 1, m)].filter((x, i, a) => a.indexOf(x) === i).map(wordOpt2)); }],
   U5: [() => { const h = rnd(6, 16), m = pick([30, 40, 45, 50]), d = pick([15, 20, 30]), e = h*60 + m + d; const at = t => dig(Math.floor(t/60), t % 60), right = at(e), naive = m + d >= 60 ? dig(h, m + d - 60) : at(e + 10); const set = [...new Set([right, naive, at(e - 10), at(e + 60)])].slice(0, 3); return mkChoice({kern:true, layout:'col', text:`Der Bus fährt um ${dig(h, m)} ab. Die Fahrt dauert ${d} Minuten.`, textCls:'rd-text', prompt:'Wann kommt der Bus an?', label:`Endzeit: ${dig(h, m)} + ${d} min`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
        () => { const h = rnd(8, 14), m = pick([45, 50, 40]), d = pick([15, 20, 25]); const e = h*60 + m + d; return mkChoice({layout:'col', text:`Die Pause beginnt um ${dig(h, m)}. Sie endet um ${dig(Math.floor(e/60), e % 60)}.`, textCls:'rd-text', prompt:'Wie lange dauert die Pause?', label:`Zeitspanne ${d} min`}, [...new Set([d, Math.abs(e % 60 - m), d + 10, 60 - m, d - 5].filter(x => x > 0))].slice(0, 3).map(x => `${x} Minuten`).map(wordOpt2)); },
@@ -4911,9 +4916,42 @@ for(const [k, v] of Object.entries(U_INFO)){ v.offer = {text:`Uhr: ${v.name}`, s
 /* Uhr stellen */
 function clockSetStage(it, r){
   r.h ??= 0; r.m ??= 0;
-  return `<div class="it-wrap"><div class="cs-wrap">${clockSvg(r.h, r.m, {size:240, ring: it.step <= 5})}
+  return `<div class="it-wrap"><div class="cs-wrap">${clockSvg(r.h, r.m, {size:240, ring: it.step <= 5, cls:'drag-clock'})}
     <div class="cs-btns"><div><span>Stunden</span><button data-cs="h-">−</button><button data-cs="h+">+</button></div>${it.step === 1 ? `<div><span>Minuten</span><button data-cs="m5-">−5</button><button data-cs="m-">−1</button><button data-cs="m+">+1</button><button data-cs="m5+">+5</button></div>` : it.step < 60 ? `<div><span>Minuten</span><button data-cs="m-">−</button><button data-cs="m+">+</button></div>` : ''}</div></div></div>`;
 }
+/* Zeiger ziehen: außen (und in Richtung des Minutenzeigers) die Minuten, innen in Richtung des Stundenzeigers die Stunde */
+const CD = {on:null};
+function clockCtx(){
+  if(app.mode === 'tclock') return {st: app.tc, step: app.tc.step, ring: app.tc.step < 5, redraw: renderTclock, size:420};
+  const it = app.mode === 'read' ? app.read.item : app.mode === 'diag' ? app.diag?.items?.[app.diag.idx] : null;
+  if(it?.type !== 'clockset') return null;
+  const r = app.mode === 'read' ? app.read.r : app.diag.resp; r.h ??= 0; r.m ??= 0;
+  return {st: r, step: Math.min(it.step, 60), ring: it.step <= 5, redraw: () => app.mode === 'read' ? renderRead() : renderDiag(), size:240, item:it};
+}
+document.addEventListener('pointerdown', e => {
+  const svg = e.target.closest?.('.drag-clock'); if(!svg) return;
+  const c = clockCtx(); if(!c) return;
+  const rc = svg.getBoundingClientRect(), cx = rc.left + rc.width/2, cy = rc.top + rc.height/2, sc = rc.width/240;
+  const ang = (x, y) => (Math.atan2(x - cx, cy - y)*180/Math.PI + 360) % 360, dist = Math.hypot(e.clientX - cx, e.clientY - cy)/sc;
+  if(dist > 112) return;
+  const a = ang(e.clientX, e.clientY), mA = c.st.m*6, hA = ((c.st.h % 12) + c.st.m/60)*30, dd = (p, q) => Math.min(Math.abs(p - q), 360 - Math.abs(p - q));
+  const hand = c.step >= 60 ? 'h' : dist > 62 ? 'm' : dd(a, hA) < dd(a, mA) ? 'h' : 'm';
+  CD.on = {id: e.pointerId, cx, cy, ang, hand, c, svg}; e.preventDefault();
+});
+document.addEventListener('pointermove', e => {
+  const d = CD.on; if(!d || e.pointerId !== d.id) return;
+  const st = d.c.st, a = d.ang(e.clientX, e.clientY);
+  if(d.hand === 'm'){
+    const stp = Math.min(d.c.step, 30), nm = Math.round(a/6/stp)*stp % 60;
+    if(nm !== st.m){ if(st.m >= 45 && nm <= 15) st.h = (st.h + 1) % (d.c.item ? 12 : 13) || (d.c.item ? 0 : 1); else if(st.m <= 15 && nm >= 45) st.h = d.c.item ? (st.h + 11) % 12 : (st.h + 10) % 12 + 1; st.m = nm; }
+  } else { const nh = ((Math.round((a - st.m*0.5)/30) % 12) + 12) % 12; st.h = d.c.item ? nh : (nh || 12); }
+  if(d.c.item) st.moved = true;
+  const nsvg = clockSvg(st.h % 12, st.m, {size: d.c.size, ring: d.c.ring, cls:'drag-clock'}), tmp = document.createElement('div'); tmp.innerHTML = nsvg;
+  const el = document.querySelector('.drag-clock'); if(el) el.replaceWith(tmp.firstElementChild);
+  e.preventDefault();
+}, {passive:false});
+const clockUp = e => { const d = CD.on; if(!d || e.pointerId !== d.id) return; CD.on = null; d.c.redraw(); };
+document.addEventListener('pointerup', clockUp); document.addEventListener('pointercancel', clockUp);
 function clockSetClick(e, it, r){
   const b = e.target.closest('[data-cs]'); if(!b) return false;
   r.h ??= 0; r.m ??= 0; let k = b.dataset.cs, st = Math.min(it.step, 30);
@@ -5883,7 +5921,7 @@ function renderTclock(){
   $('#equation').innerHTML = '';
   $('#prompt').textContent = '';
   const dig = `${c.h}:${String(c.m).padStart(2, '0')}`, dig2 = `${c.h + 12 === 24 ? 0 : c.h + 12}:${String(c.m).padStart(2, '0')}`;
-  $('#stage').innerHTML = `<div class="tc-wrap">${clockSvg(c.h % 12, c.m, {size:420, ring: c.step < 5})}<div class="tc-info">${c.digital ? `<div class="tc-dig">${dig} <small>oder ${dig2}</small></div>` : ''}${c.words ? `<div class="tc-words">${escHtml(timeWords(c.h, c.m))}</div>` : ''}</div></div>`;
+  $('#stage').innerHTML = `<div class="tc-wrap">${clockSvg(c.h % 12, c.m, {size:420, ring: c.step < 5, cls:'drag-clock'})}<div class="tc-info">${c.digital ? `<div class="tc-dig">${dig} <small>oder ${dig2}</small></div>` : ''}${c.words ? `<div class="tc-words">${escHtml(timeWords(c.h, c.m))}</div>` : ''}</div></div>`;
   $('#controls').innerHTML = `<div class="tc-btns"><span>Stunden</span><button data-tc="h-">−</button><button data-tc="h+">+</button></div><div class="tc-btns"><span>Minuten</span><button data-tc="m-">−${c.step}</button><button data-tc="m+">+${c.step}</button></div>`
     + `<div class="seg tc-step" role="group" aria-label="Minutenschritte">${[1, 5, 15].map(s => `<button data-tcs="${s}" aria-pressed="${c.step === s}">${s} min</button>`).join('')}</div>`
     + `<button class="chip-toggle" data-tcd aria-pressed="${c.digital}">Digital</button><button class="chip-toggle" data-tcw aria-pressed="${c.words}">In Worten</button>`;
@@ -6934,7 +6972,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.5 · 13.11.2026';
+const APP_VERSION = '0.13.6 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
