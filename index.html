@@ -484,7 +484,7 @@ body:has(dialog[open]) #numpad{display:none}
 .more-menu .icon-btn{justify-content:flex-start;gap:10px;min-height:46px;box-shadow:none;background:transparent;width:100%}
 .more-menu .icon-btn:hover{background:#f4efe6}
 .more-menu .icon-btn::after{content:attr(aria-label);font-weight:700;font-size:16px}
-.more-menu .icon-btn .lbl{display:none}
+.more-menu .icon-btn .lbl,.more-menu .icon-btn span{display:none!important}
 .headline:has(#equation:empty):not(:has(#btn-say:not([hidden]))){display:none}
 .workspace{padding-top:10px}
 .workspace>.round-bar~#prompt{padding-inline:min(130px,16vw)}
@@ -872,6 +872,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <label class="row cb"><input type="checkbox" data-key="labels"> Texte unter den Knöpfen</label>
     <label class="row">Zifferntastatur auf dem Bildschirm <select data-key="numpad"><option value="auto">automatisch (Tablet)</option><option value="on">immer</option><option value="off">nie</option></select></label>
     <label class="row">Buchstabentastatur beim Schreiben <select data-key="kbd"><option value="qwertz">wie am Handy (QWERTZ)</option><option value="abc">nach dem ABC</option></select></label>
+    <label class="row">Uhr „Minuten genau“ <select data-key="clockMin"><option value="5">in 5-Minuten-Schritten</option><option value="1">auf die Minute genau</option></select></label>
     <label class="row">Themenwelt für Gast und Unterricht <select data-key="world"><option value="GS">Grundstufe (GS)</option><option value="HS">Hauptstufe (HS)</option><option value="BSS">Berufsschulstufe (BSS)</option></select></label>
     <label class="row">Beim Start <select data-key="startCtx"><option value="ask">fragen: Üben oder Unterricht</option><option value="practice">immer Üben</option><option value="class">immer Unterricht (Tafel)</option></select></label>
     <label class="row">Übungsrunde <select data-key="roundLen"><option value="5">5 Aufgaben</option><option value="10">10 Aufgaben</option><option value="15">15 Aufgaben</option><option value="0">ohne Ende</option></select></label>
@@ -956,7 +957,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', kbd:'qwertz', roundLen:'10', startCtx:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -2069,7 +2070,7 @@ document.addEventListener('pointermove', e => {
     let gh = svg.querySelector('.ghost');
     const [w,h] = FS[drag.kind];
     if(!gh){ gh = document.createElementNS('http://www.w3.org/2000/svg','g'); gh.classList.add('ghost'); gh.setAttribute('opacity','.6'); gh.setAttribute('pointer-events','none');
-      gh.innerHTML = Array.from({length:SIZE[drag.kind]}, (_,i) => `<rect x="${drag.kind==='h' ? i%10*12 : 0}" y="${drag.kind==='h' ? Math.floor(i/10)*12 : drag.kind==='z' ? i*12 : 0}" width="12" height="12" fill="${montessori() ? PLACE[drag.kind] : FREE_COLORS[board().color]}" stroke="#0000004d" stroke-width=".8" rx="1.6"/>`).join(''); svg.append(gh); }
+      if(drag.kind === 't') gh.innerHTML = cubeArt(0, 0, 120, montessori() ? PLACE.t : FREE_COLORS[board().color]); else gh.innerHTML = Array.from({length:SIZE[drag.kind]}, (_,i) => `<rect x="${drag.kind==='h' ? i%10*12 : 0}" y="${drag.kind==='h' ? Math.floor(i/10)*12 : drag.kind==='z' ? i*12 : 0}" width="12" height="12" fill="${montessori() ? PLACE[drag.kind] : FREE_COLORS[board().color]}" stroke="#0000004d" stroke-width=".8" rx="1.6"/>`).join(''); svg.append(gh); }
     gh.setAttribute('transform', `translate(${pt.x - w/2} ${pt.y - h/2})`);
   }
   e.preventDefault();
@@ -4536,6 +4537,9 @@ function evalWrite(it, r){
    Uhrzeit U1–U5 (BP GENT M 2.1.3.5 Zeitliche Orientierung)
    ===================================================================== */
 const U_LEVELS = ['U1','U2','U3','U4','U5','U6'];
+/* Minuten für „Minuten genau“: 5er-Schritte oder (Einstellung) jede einzelne Minute */
+const uMin = () => settings.clockMin === '1' ? pick(Array.from({length:59}, (_, i) => i + 1).filter(m => m % 15)) : pick([5, 10, 20, 25, 35, 40, 50, 55]);
+const uStep = () => settings.clockMin === '1' ? 1 : 5;
 const H12 = h => ((h + 11) % 12) + 1;
 const dig = (h, m) => `${h}:${String(m).padStart(2, '0')}`;
 function timeWords(h, m){
@@ -4579,9 +4583,9 @@ const CLOCK = {
   U3: [() => { const h = rh(), m = pick([15, 45]); return mkChoice({kern:true, layout:'side', q:'Wie spät ist es?', svg: clockSvg(h, m), prompt:'Lies die Uhr ab.', label:`Viertelstunde: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m), m === 15 ? `Viertel nach ${H12(h + 1)}` : `Viertel vor ${h}`].map(wordOpt2)); },
        () => { const h = rh(), m = pick([15, 45]); return mkChoice({layout:'row', text: timeWords(h, m), textCls:'rd-letter', prompt:'Welche Uhr passt?', label:`Uhr zu „${timeWords(h, m)}“`}, [clockOpt(h, m), clockOpt(h, 60 - m), clockOpt(h + 1, m)]); },
        () => clockSet(rh(), pick([15, 45]), 15, false)],
-  U4: [() => { const h = rh(), m = pick([5, 10, 20, 25, 35, 40, 50, 55]); const set = [...new Set([dig(h, m), dig(h, m/5), m > 30 ? dig(H12(h + 1), m) : dig(H12(h - 1), m), dig(h, (m + 30) % 60)])].slice(0, 3); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, m), prompt:'Wie spät ist es? Lies genau ab.', label:`Minuten ablesen: ${dig(h, m)}`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
-       () => clockSet(rh(), pick([5, 10, 20, 25, 35, 40, 50, 55]), 5, false),
-       () => { const h = rh(), m = pick([5, 10, 20, 25, 35, 40, 50, 55]); return mkChoice({layout:'side', q:'Wie sagt man dazu?', svg: clockSvg(h, m), prompt:'Lies die Uhr ab.', label:`Minuten in Worten: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m === 60 ? 0 : 60 - m), timeWords(h + 1, m)].filter((x, i, a) => a.indexOf(x) === i).map(wordOpt2)); }],
+  U4: [() => { const h = rh(), m = uMin(); const set = [...new Set([dig(h, m), m % 5 ? dig(h, (m + 5) % 60) : dig(h, m/5), m > 30 ? dig(H12(h + 1), m) : dig(H12(h - 1), m), dig(h, (m + 30) % 60)])].slice(0, 3); return mkChoice({kern:true, layout:'row', svg: clockSvg(h, m), prompt:'Wie spät ist es? Lies genau ab.', label:`Minuten ablesen: ${dig(h, m)}`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
+       () => clockSet(rh(), uMin(), uStep(), false),
+       () => { const h = rh(), m = uMin(); return mkChoice({layout:'side', q:'Wie sagt man dazu?', svg: clockSvg(h, m), prompt:'Lies die Uhr ab.', label:`Minuten in Worten: ${dig(h, m)}`}, [timeWords(h, m), timeWords(h, 60 - m === 60 ? 0 : 60 - m), timeWords(h + 1, m)].filter((x, i, a) => a.indexOf(x) === i).map(wordOpt2)); }],
   U5: [() => { const h = rnd(6, 16), m = pick([30, 40, 45, 50]), d = pick([15, 20, 30]), e = h*60 + m + d; const at = t => dig(Math.floor(t/60), t % 60), right = at(e), naive = m + d >= 60 ? dig(h, m + d - 60) : at(e + 10); const set = [...new Set([right, naive, at(e - 10), at(e + 60)])].slice(0, 3); return mkChoice({kern:true, layout:'col', text:`Der Bus fährt um ${dig(h, m)} ab. Die Fahrt dauert ${d} Minuten.`, textCls:'rd-text', prompt:'Wann kommt der Bus an?', label:`Endzeit: ${dig(h, m)} + ${d} min`}, set.map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); },
        () => { const h = rnd(8, 14), m = pick([45, 50, 40]), d = pick([15, 20, 25]); const e = h*60 + m + d; return mkChoice({layout:'col', text:`Die Pause beginnt um ${dig(h, m)}. Sie endet um ${dig(Math.floor(e/60), e % 60)}.`, textCls:'rd-text', prompt:'Wie lange dauert die Pause?', label:`Zeitspanne ${d} min`}, [...new Set([d, Math.abs(e % 60 - m), d + 10, 60 - m, d - 5].filter(x => x > 0))].slice(0, 3).map(x => `${x} Minuten`).map(wordOpt2)); },
        () => { const h = rnd(14, 19), d = pick([[1, 30], [2, 0], [1, 15]]); const e = h*60 + d[0]*60 + d[1]; return mkChoice({layout:'col', text:`Der Film beginnt um ${dig(h, 0)}. Er dauert ${d[0]} Stunde${d[0] > 1 ? 'n' : ''}${d[1] ? ` ${d[1]} Minuten` : ''}.`, textCls:'rd-text', prompt:'Wann ist der Film zu Ende?', label:`Endzeit Film ${h}:00 + ${d[0]}:${String(d[1]).padStart(2, '0')}`}, [dig(Math.floor(e/60), e % 60), dig(h + d[0], 0) === dig(Math.floor(e/60), e % 60) ? dig(h + d[0] + 1, 0) : dig(h + d[0], 0), dig(h, d[1] || 30)].map(t => ({h:`<span class="dig-time">${t}</span>`, a:t}))); }]
@@ -4908,11 +4912,12 @@ for(const [k, v] of Object.entries(U_INFO)){ v.offer = {text:`Uhr: ${v.name}`, s
 function clockSetStage(it, r){
   r.h ??= 0; r.m ??= 0;
   return `<div class="it-wrap"><div class="cs-wrap">${clockSvg(r.h, r.m, {size:240, ring: it.step <= 5})}
-    <div class="cs-btns"><div><span>Stunden</span><button data-cs="h-">−</button><button data-cs="h+">+</button></div>${it.step < 60 ? `<div><span>Minuten</span><button data-cs="m-">−</button><button data-cs="m+">+</button></div>` : ''}</div></div></div>`;
+    <div class="cs-btns"><div><span>Stunden</span><button data-cs="h-">−</button><button data-cs="h+">+</button></div>${it.step === 1 ? `<div><span>Minuten</span><button data-cs="m5-">−5</button><button data-cs="m-">−1</button><button data-cs="m+">+1</button><button data-cs="m5+">+5</button></div>` : it.step < 60 ? `<div><span>Minuten</span><button data-cs="m-">−</button><button data-cs="m+">+</button></div>` : ''}</div></div></div>`;
 }
 function clockSetClick(e, it, r){
   const b = e.target.closest('[data-cs]'); if(!b) return false;
-  r.h ??= 0; r.m ??= 0; const k = b.dataset.cs, st = Math.min(it.step, 30);
+  r.h ??= 0; r.m ??= 0; let k = b.dataset.cs, st = Math.min(it.step, 30);
+  if(k === 'm5+' || k === 'm5-'){ st = 5; k = k.replace('5', ''); }
   if(k === 'h+') r.h = (r.h + 1) % 12; if(k === 'h-') r.h = (r.h + 11) % 12;
   if(k === 'm+'){ r.m += st; if(r.m >= 60){ r.m -= 60; r.h = (r.h + 1) % 12; } }
   if(k === 'm-'){ r.m -= st; if(r.m < 0){ r.m += 60; r.h = (r.h + 11) % 12; } }
@@ -6228,7 +6233,7 @@ const U_SHEETS = {
   U1: {name:'Uhr: volle Stunden', cols:2, gens:[() => { const h = rnd(1, 12); return T_('schreibe', 'Wie spät ist es?', `${abClock(h, 0)}<p class="ab-row">${box(14)} Uhr</p>`, `${h} Uhr`); }, () => { const h = rnd(1, 12); return T_('zeichne', `Zeichne die Zeiger: ${h} Uhr.`, abClock(h, 0, false), `${h} Uhr`); }]},
   U2: {name:'Uhr: halbe Stunden', cols:2, gens:[() => { const h = rnd(1, 12); return T_('schreibe', 'Wie spät ist es?', `${abClock(h, 30)}<p class="ab-row">halb ${box(14)}</p>`, `halb ${H12(h + 1)} (${dig(h, 30)})`); }, () => { const h = rnd(1, 12); return T_('zeichne', `Zeichne die Zeiger: halb ${H12(h + 1)}.`, abClock(h, 30, false), dig(h, 30)); }]},
   U3: {name:'Uhr: Viertelstunden', cols:2, gens:[() => { const h = rnd(1, 12), m = pick([15, 30, 45]); return T_('schreibe', 'Wie spät ist es? Schreibe in Worten.', `${abClock(h, m)}${lineW()}`, timeWords(h, m)); }, () => { const h = rnd(1, 12), m = pick([15, 45]); return T_('zeichne', `Zeichne die Zeiger: ${timeWords(h, m)}.`, abClock(h, m, false), dig(h, m)); }]},
-  U4: {name:'Uhr: Minuten genau', cols:2, gens:[() => { const h = rnd(1, 12), m = pick([5, 10, 20, 25, 35, 40, 50, 55]); return T_('schreibe', 'Wie spät ist es? Schreibe digital.', `${abClock(h, m)}${digBox()}`, dig(h, m)); }, () => { const h = rnd(1, 12), m = pick([5, 10, 20, 25, 35, 40, 50, 55]); return T_('zeichne', `Zeichne die Zeiger: ${dig(h, m)}.`, abClock(h, m, false), dig(h, m)); }]},
+  U4: {name:'Uhr: Minuten genau', cols:2, gens:[() => { const h = rnd(1, 12), m = uMin(); return T_('schreibe', 'Wie spät ist es? Schreibe digital.', `${abClock(h, m)}${digBox()}`, dig(h, m)); }, () => { const h = rnd(1, 12), m = uMin(); return T_('zeichne', `Zeichne die Zeiger: ${dig(h, m)}.`, abClock(h, m, false), dig(h, m)); }]},
   U5: {name:'Uhr: Zeitspannen im Alltag', cols:1, gens:[
     () => { const h = rnd(6, 16), m = pick([30, 40, 45, 50]), d = pick([15, 20, 30]), e = h*60 + m + d; const who = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_(['lies', 'rechne'], `${who.endsWith('s') ? who + '’' : who + 's'} Bus fährt um ${dig(h, m)} ab. Die Fahrt dauert ${d} Minuten. Wann kommt der Bus an?`, `<p class="ab-row big">Um ${box(12)}<b>:</b>${box(12)} Uhr.</p>`, dig(Math.floor(e/60), e % 60)); },
     () => { const h = rnd(8, 14), m = pick([40, 45, 50]), d = pick([15, 20, 25]), e = h*60 + m + d; return T_(['lies', 'rechne'], `Die Pause beginnt um ${dig(h, m)} und endet um ${dig(Math.floor(e/60), e % 60)}. Wie lange dauert die Pause?`, `<p class="ab-row big">${box(14)} Minuten</p>`, `${d} Minuten`); },
@@ -6732,7 +6737,7 @@ document.addEventListener('click', e => {
   if(!e.target.closest('.psym')) document.querySelectorAll('.psym-grid').forEach(x => x.hidden = true);
 });
 $('#btn-more').addEventListener('click', e => { e.stopPropagation(); const m = $('#more-menu'), open = m.hidden; m.hidden = !open; $('#btn-more').setAttribute('aria-expanded', open); });
-document.addEventListener('click', e => { const m = $('#more-menu'); if(!m.hidden && (!e.target.closest('#more-menu') || e.target.closest('button'))){ m.hidden = true; $('#btn-more').setAttribute('aria-expanded', 'false'); } }, true);
+document.addEventListener('click', e => { const m = $('#more-menu'); if(!m.hidden && !e.target.closest('#btn-more') && (!e.target.closest('#more-menu') || e.target.closest('button'))){ m.hidden = true; $('#btn-more').setAttribute('aria-expanded', 'false'); } }, true);
 $('#btn-rail').addEventListener('click', () => { settings.railOff = true; saveSettings(); render(); requestAnimationFrame(hbFit); });
 $('#btn-rail-show').addEventListener('click', () => { settings.railOff = false; saveSettings(); render(); requestAnimationFrame(hbFit); });
 $('#modes').addEventListener('click', e => {
@@ -6929,7 +6934,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.4 · 13.11.2026';
+const APP_VERSION = '0.13.5 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

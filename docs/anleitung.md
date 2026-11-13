@@ -137,6 +137,10 @@ Bei **Zahlen**, **Plus** und **Minus** gibt es im Zahlenraum bis 100 außerdem d
 
 Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901–1000). Ein orangefarbener Punkt markiert die Startseite, ein blauer die Seite, auf der das Kind gerade ist. Mit einem Tipp auf eine Seite kann es blättern. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet; im Tausenderbuch muss das Kind zuerst die richtige Seite aufschlagen.
 
+## Uhr auf die Minute genau
+
+Auf der Stufe „Minuten genau“ übt die App normalerweise in 5-Minuten-Schritten. In den Einstellungen unter **Hilfen → Uhr „Minuten genau“** kannst du auf **auf die Minute genau** umstellen. Dann kommen Uhrzeiten wie 6:37, und beim Uhr-Stellen gibt es Knöpfe für −5, −1, +1 und +5 Minuten. Der Test bleibt bei 5-Minuten-Schritten, damit die Ergebnisse vergleichbar sind.
+
 ## Mehr Platz auf dem Bildschirm
 
 Oben rechts stehen nur noch der Name und das Menü **⋯**. Im Menü findest du Lernstand, Arbeitsblätter, Rückmeldung, Anleitung, Vollbild und Einstellungen. Die Überschrift über der Aufgabe (z. B. „Hundertertafel · Tafel und Material verbinden“) fällt beim Üben weg, weil die Stufe schon oben in der Leiste markiert ist; so bekommt die Aufgabe mehr Höhe.
