@@ -1353,7 +1353,7 @@ function setSubject(subj){
   if(app.busy) return;
   settings.subject = subj; saveSettings(); leaveMode(); app.railGrp = null;
   if(subj === 'D'){ app.read.lvl ||= readDefaultLevel(); app.read.item = null; app.mode = 'read'; }
-  else { app.mode = settings.lastMath || 'number'; autoConf(app.mode); }
+  else { app.mode = homeMode(); if(!MODES[app.mode]) app.mode = 'number'; if(app.mode !== 'read') autoConf(app.mode); }
   render();
 }
 
@@ -1665,7 +1665,7 @@ function selectionHelp(ps){
 function pushHist(t){ t.hist.push(structuredClone({rows:t.rows, done:t.done})); if(t.hist.length > 50) t.hist.shift(); }
 function setupRows(t){
   t.rows = app.mode === 'add' ? [build(t.a,'a',app.range), build(t.b,'b',app.range)] : [build(t.a,'a',app.range)];
-  t.done = false; t.reveal = false; t.hist = []; t.check = null; t.tries = 0; t.findGuess = null; t.bpath = null; t.bview = null; app.sel.clear();
+  t.done = false; t.reveal = false; t.hist = []; t.check = null; t.tries = 0; t.findGuess = null; t.bpath = null; t.bview = null; t.lz = null; app.sel.clear();
 }
 function commitTask(){
   const t = task(), a = t.draft[0].trim() === '' ? NaN : Number(t.draft[0]), b = app.mode === 'number' ? 0 : t.draft[1].trim() === '' ? NaN : Number(t.draft[1]);
@@ -2874,6 +2874,8 @@ function randomAny(){ app.mode === 'written' ? wrRandom() : app.mode === 'times'
 const DATA_KEY = 'stufenweise.data';
 const data = (() => { try { return {profiles:[], current:null, log:{}, ...JSON.parse(localStorage.getItem(DATA_KEY) || '{}')}; } catch { return {profiles:[], current:null, log:{}}; } })();
 const saveData = () => { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch {} };
+/* Im Unterricht an der Tafel erscheinen keine Kindernamen (auch nicht bei den Arbeitsblättern) */
+const kids = () => app.ctx === 'class' ? [] : data.profiles;
 const curProfile = () => app.ctx === 'class' ? null : data.profiles.find(p => p.id === data.current) || null;
 /* Sicherung: Erinnerung nach 14 Tagen und Bitte an den Browser, die Daten nicht von selbst zu löschen */
 if(data.profiles.length && !data.firstUse){ data.firstUse = Date.now(); saveData(); }
@@ -5566,7 +5568,7 @@ const zsWin = () => app.nl.win || {L:0, H:app.nl.range};
 const zsX = v => { const {L, H} = zsWin(); return ZS.x0 + (ZS.x1 - ZS.x0)*(v - L)/(H - L); };
 const zsSteps = () => {
   const {L, H} = zsWin(), ppu = (ZS.x1 - ZS.x0)/(H - L), NICE = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
-  const lab = NICE.find(s => s*ppu >= (H > 100 ? 64 : 40)) || 1000;
+  const lab = NICE.find(s => s*ppu >= String(Math.round(H)).length*16 + 8) || 1000;
   const minor = NICE.find(s => s*ppu >= 7 && lab % s === 0) || lab;
   const mid = lab/2 >= minor && (lab/2) % minor === 0 && Number.isInteger(lab/2) ? lab/2 : 0;
   return {lab, minor, mid};
@@ -6202,7 +6204,7 @@ app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'
 function buildSheet(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
   const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : sj === 'H' ? H_SHEETS[key] : W_SHEETS[key];
-  const name = S.pid && S.pid !== 'none' ? (data.profiles.find(p => p.id === S.pid)?.name || '') : '';
+  const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : ['einmaleins', 'stellenwert'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
   const title = (key === 'schriftlich' ? (S.wop === 'add' ? 'Schriftlich plus' : S.wop === 'sub' ? 'Schriftlich minus' : def.name) : def.name) + sub;
   const fill = S.n === 'fill', cols = def.match ? 1 : (typeof def.cols === 'function' ? def.cols(S) : def.cols || 2);
@@ -6279,7 +6281,7 @@ function heftAdd(){
   renderSheets(true);
 }
 function buildHeft(){
-  const H = app.heft, kid = data.profiles.find(p => p.id === H.pid), name = kid ? kid.name : '';
+  const H = app.heft, kid = kids().find(p => p.id === H.pid), name = kid ? kid.name : '';
   const pages = H.items.map((it, i) => `<div class="page">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + 1} · `)}</div>`).join('');
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><span class="cv-dots"></span><span>${i + 1}</span></li>`).join('')}</ol></div>` : '';
   const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1><div class="cv-name">Name: <span>${escHtml(name)}</span></div>${toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
@@ -6315,9 +6317,9 @@ function renderHeft(){
   const H = app.heft;
   $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Titel <input id="hf-title" value="${escHtml(H.title)}" maxlength="40" style="flex:1;min-width:0"></label>
-    <label class="row">Name auf dem Titelblatt <select id="hf-kid">${[['none', 'leer lassen (zum Selbstschreiben)'], ...data.profiles.map(p => [p.id, escHtml(p.name)])].map(([v, n]) => `<option value="${v}" ${v === H.pid ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    <label class="row">Name auf dem Titelblatt <select id="hf-kid">${[['none', 'leer lassen (zum Selbstschreiben)'], ...kids().map(p => [p.id, escHtml(p.name)])].map(([v, n]) => `<option value="${v}" ${v === H.pid ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
     <label class="row cb"><input type="checkbox" id="hf-toc" ${H.toc ? 'checked' : ''}> Inhaltsverzeichnis auf dem Titelblatt</label>
-    ${(() => { const kid = data.profiles.find(p => p.id === H.pid); if(!kid) return data.profiles.length ? `<p class="note">Tipp: Wähle oben ein Kind – dann kann Stufenweise das Heft passend zu seiner Förderzone zusammenstellen.</p>` : ''; const zs = heftZones(kid.id);
+    ${(() => { const kid = kids().find(p => p.id === H.pid); if(!kid) return kids().length ? `<p class="note">Tipp: Wähle oben ein Kind – dann kann Stufenweise das Heft passend zu seiner Förderzone zusammenstellen.</p>` : ''; const zs = heftZones(kid.id);
       return zs.length ? `<div class="hf-zone"><b>Heft zur Förderzone von ${escHtml(kid.name)}</b><span class="note">${zs.map(z => escHtml(cellLabel(z.key))).join(' · ')}</span><div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><label class="row">Blätter je Stufe <select id="hf-per">${[1, 2].map(n => `<option value="${n}" ${n === (H.per || 1) ? 'selected' : ''}>${n}</option>`).join('')}</select></label><button class="icon-btn primary" id="hf-zone">${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'}</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>` : `<p class="note">Für ${escHtml(kid.name)} gibt es noch keine Förderzone mit passendem Arbeitsblatt. Zuerst einen Test machen.</p>`; })()}
     ${H.items.length ? `<ol class="hf-list">${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><button class="icon-btn" data-hf-up="${i}" ${i ? '' : 'disabled'} aria-label="nach oben">↑</button><button class="icon-btn" data-hf-down="${i}" ${i < H.items.length - 1 ? '' : 'disabled'} aria-label="nach unten">↓</button><button class="icon-btn" data-hf-del="${i}" aria-label="Seite entfernen">✕</button></li>`).join('')}</ol>` : `<p class="note"><b>Noch leer.</b> Wechsle zu „Einzelblatt“, stell ein Blatt zusammen und tippe auf „Ins Arbeitsheft“. Das wiederholst du für jede Seite.</p>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
@@ -6331,11 +6333,11 @@ const sheetModeSwitch = () => `<div class="seg sh-mode" role="group" aria-label=
 function renderSheets(keep){
   if(app.sheetMode === 'heft') return renderHeft();
   const S = app.sheet, isM = S.topic.startsWith('M:'), key = S.topic.split(':')[1];
-  const kid = data.profiles.find(p => p.id === S.pid);
+  const kid = kids().find(p => p.id === S.pid);
   const zones = kid ? ['M', 'L', 'W'].flatMap(sj => zoneReport(kid.id, sj).zones).filter(z => zoneToSheet(z.key)) : [];
   const sel = (id, opts, cur) => `<select id="${id}">${opts.map(([v, n]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
   $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
-    <label class="row">Kind ${sel('sh-kid', [['none', 'ohne Namen'], ...data.profiles.map(p => [p.id, escHtml(p.name)])], S.pid)}</label>
+    <label class="row">Kind ${sel('sh-kid', [['none', 'ohne Namen'], ...kids().map(p => [p.id, escHtml(p.name)])], S.pid)}</label>
     ${zones.length ? `<div class="sh-zones"><span class="note">Passend zur Förderzone:</span>${zones.map(z => `<button class="chip-toggle" data-shzone="${z.key}" aria-pressed="${(() => { const t = zoneToSheet(z.key); return t.topic === S.topic && (!t.zr || t.zr === S.zr) && (!t.ue || t.ue === S.ue); })()}">${escHtml(cellLabel(z.key).replace(/ \(.*\)$/, ''))}</button>`).join('')}</div>` : ''}
     <label class="row">Thema <select id="sh-topic">${sheetTopics().map(([g, opts]) => `<optgroup label="${g}">${opts.map(([v, n]) => `<option value="${v}" ${v === S.topic ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</optgroup>`).join('')}</select></label>
     ${isM && key === 'schriftlich' ? `<label class="row">Zahlenraum ${sel('sh-wzr', [[100, 'bis 100 (zweistellig)'], [1000, 'bis 1000 (dreistellig)'], [10000, 'bis 10 000 (vierstellig)']], S.wzr)}</label><label class="row">Rechenart ${sel('sh-wop', [['add', 'nur Plus'], ['sub', 'nur Minus'], ['both', 'gemischt']], S.wop)}</label>` : isM && !['einmaleins'].includes(key) ? `<label class="row">Zahlenraum ${sel('sh-zr', [10, 20, 100, 1000].map(z => [z, 'bis ' + z]), S.zr)}</label>` : ''}
@@ -6714,7 +6716,7 @@ $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings))
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.12.1 · 13.11.2026';
+const APP_VERSION = '0.12.2 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
