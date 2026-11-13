@@ -529,6 +529,12 @@ body.class-mode #controls button{min-height:58px}
 .nl-bundle{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);white-space:nowrap;padding:0 18px;min-height:48px;font-size:19px;font-weight:800;color:#1f6b3a;background:#e6f4ea;border:2px solid #1f7a45;border-radius:14px}
 /* Hundertertafel zum Färben */
 .hb2-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:4px}
+.tf-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10px}
+.tf-wrap svg{width:100%;height:100%;max-height:620px;touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer}
+.tf-eq{font-size:34px}.tf-hint{font-size:18px;color:var(--muted);font-weight:600}
+.tf-reveal{min-height:44px;min-width:58px;font-size:30px;font-weight:800;padding:0 12px;vertical-align:middle;border:2.5px dashed var(--focus);background:#fdf0dc}
+.tf-tools button{display:inline-flex;align-items:center;gap:8px;font-weight:700}
+.tf-dot{display:inline-block;width:20px;height:20px;border-radius:50%}.tf-x{color:#c9414a;font-size:20px}
 .hb2{display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(10,1fr);gap:0;border:3px solid #2b2930;border-radius:8px;overflow:hidden;background:#fff}
 .hb2 button{border:0;border-right:1.5px solid #cfc6b4;border-bottom:1.5px solid #cfc6b4;border-radius:0;min-height:0;padding:0;font:inherit;font-weight:800;background:#fff;box-shadow:none;color:var(--ink)}
 .hb2 button:nth-child(10n){border-right:0}.hb2 button:nth-child(n+91){border-bottom:0}
@@ -5675,6 +5681,7 @@ function wzGo(ds){
    ===================================================================== */
 const CLASS_TOOLS = [
   {k:'number', label:'Zahlen', sub:'mit Material zeigen'},
+  {k:'tfield', label:'Zwanzigerfeld', rail:'20er-Feld', sub:'legen und wegstreichen'},
   {k:'nline', label:'Zahlenstrahl', sub:'Sprünge zeigen'},
   {k:'hboard', label:'Hundertertafel', sub:'färben und abdecken'},
   {k:'free', label:'Frei legen', sub:'Würfel und Geld'},
@@ -5682,8 +5689,9 @@ const CLASS_TOOLS = [
   {k:'tclock', label:'Uhr', sub:'Zeiger stellen'},
   {k:'tword', label:'Wörter', sub:'groß zeigen, Silben'}
 ];
-const TOOL_MODES = ['nline', 'hboard', 'tclock', 'tword'];
+const TOOL_MODES = ['tfield', 'nline', 'hboard', 'tclock', 'tword'];
 const CT_ILL = {
+  tfield:`<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="3" y="12" width="74" height="32" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><path d="M3 28h74M40 12v32" stroke="#2b2930" stroke-width="1.8"/>${Array.from({length:12}, (_, i) => `<circle cx="${6.7 + (i % 10)*7.4}" cy="${20 + Math.floor(i/10)*16}" r="3.1" fill="${i < 7 ? '#2f5ea8' : '#e8890c'}"/>`).join('')}</svg>`,
   number:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="19" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="36" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="50" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="64" y="40" width="10" height="10" rx="2" fill="#27834b"/><text x="56" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#2b2930" font-family="Stufenfibel,sans-serif">23</text></svg>',
   nline:'<svg viewBox="0 0 80 56" aria-hidden="true"><path d="M4 42h70" stroke="#2b2930" stroke-width="3"/><path d="M74 42l-6-4v8z" fill="#2b2930"/><path d="M10 38v8M24 38v8M38 38v8M52 38v8M66 38v8" stroke="#2b2930" stroke-width="2"/><path d="M10 38Q24 6 38 38" fill="none" stroke="#346bc3" stroke-width="3.5"/><path d="M38 38Q45 22 52 38" fill="none" stroke="#27834b" stroke-width="3.5"/></svg>',
   hboard:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="14" y="2" width="52" height="52" rx="3" fill="#fff" stroke="#2b2930" stroke-width="2"/><path d="M14 15h52M14 28h52M14 41h52M27 2v52M40 2v52M53 2v52" stroke="#2b2930" stroke-width="1.4"/><rect x="40" y="2" width="13" height="13" fill="#f4b860"/><rect x="40" y="15" width="13" height="13" fill="#f4b860"/><rect x="40" y="28" width="13" height="13" fill="#f4b860"/><rect x="40" y="41" width="13" height="13" fill="#f4b860"/><rect x="14" y="28" width="13" height="13" fill="#8fb3ea"/></svg>',
@@ -5725,7 +5733,7 @@ function setTool(k){
   render();
 }
 function classRailHtml(){
-  return `<span class="rail-h">Unterricht</span>` + CLASS_TOOLS.map(t => `<button data-ctool="${t.k}" aria-pressed="${app.mode === t.k}"><b aria-hidden="true" class="ct-sym">${CT_ILL[t.k]}</b>${t.label}</button>`).join('') + `<button data-ctx-reset class="rail-guide">${icon('user')}<span>Üben</span></button>`;
+  return `<span class="rail-h">Unterricht</span>` + CLASS_TOOLS.map(t => `<button data-ctool="${t.k}" aria-pressed="${app.mode === t.k}"><b aria-hidden="true" class="ct-sym">${CT_ILL[t.k]}</b>${t.rail || t.label}</button>`).join('') + `<button data-ctx-reset class="rail-guide">${icon('user')}<span>Üben</span></button>`;
 }
 
 /* ---------- Zahlenstrahl-Werkzeug (Unterricht) ---------- */
@@ -5908,6 +5916,63 @@ function zsControl(b){
   if(b.id === 'nl-new'){ n.start = null; n.jumps = []; n.hist = []; n.shown = false; return renderNline(); }
 }
 
+/* ---------- Zehner- und Zwanzigerfeld (Unterricht) ----------
+   Wie mit Wendeplättchen: Gelegt wird zeilenweise – erst die obere Reihe ganz, dann die untere.
+   Plus: die zweite Zahl in der anderen Farbe legen. Minus: von hinten wegstreichen. Oben steht die passende Rechnung. */
+app.tf = {cap:20, dots:[], cross:0, tool:'b', hide:false, shown:false, hist:[]};
+const TF_COL = {b:'#2f5ea8', o:'#e8890c'};
+const tfSnap = () => ({dots:[...app.tf.dots], cross:app.tf.cross});
+function tfRuns(){ const out = []; for(const d of app.tf.dots){ const l = out.at(-1); if(l && l.c === d) l.n++; else out.push({c:d, n:1}); } return out; }
+function tfEquation(){
+  const t = app.tf, runs = tfRuns(); if(!runs.length) return '';
+  const total = t.dots.length, res = total - t.cross;
+  if(runs.length === 1 && !t.cross) return { txt:`${total}`, res:null };
+  const left = runs.map(x => x.n).join(' + ') + (t.cross ? ` − ${t.cross}` : '');
+  return { txt:left, res };
+}
+function tfSvg(){
+  const t = app.tf, cols = t.cap === 20 ? 10 : 5, C = 100, M = 14, W = cols*C, H = 2*C;
+  let s = `<rect x="${M}" y="${M}" width="${W}" height="${H}" rx="16" fill="#fff" stroke="#2b2930" stroke-width="5"/><path d="M${M} ${M + C}h${W}" stroke="#2b2930" stroke-width="2.5"/>`;
+  for(let c = 1; c < cols; c++) s += `<path d="M${M + c*C} ${M}v${H}" stroke="#2b2930" stroke-width="${c === 5 ? 5 : 1.6}" ${c === 5 ? '' : 'opacity=".45"'}/>`;
+  for(let i = 0; i < t.cap; i++){
+    const x = M + (i % cols)*C, y = M + Math.floor(i/cols)*C, cx = x + C/2, cy = y + C/2, d = t.dots[i];
+    if(d){ s += `<circle cx="${cx}" cy="${cy}" r="38" fill="${TF_COL[d]}"/>`; if(i >= t.dots.length - t.cross) s += `<path d="M${cx - 34} ${cy - 34}l68 68M${cx + 34} ${cy - 34}l-68 68" stroke="#c9414a" stroke-width="10" stroke-linecap="round"/>`; }
+    s += `<rect data-tfi="${i}" x="${x}" y="${y}" width="${C}" height="${C}" fill="transparent"/>`;
+  }
+  return `<svg id="tf-svg" viewBox="0 0 ${W + 2*M} ${H + 2*M}" role="img" aria-label="${t.cap === 20 ? 'Zwanzigerfeld' : 'Zehnerfeld'} mit ${t.dots.length - t.cross} Punkten">${s}</svg>`;
+}
+function renderTfield(){
+  const t = app.tf, eq = tfEquation();
+  $('#equation').innerHTML = '';
+  $('#prompt').innerHTML = eq ? `<span class="nl-path tf-eq">${escHtml(eq.txt)}${eq.res == null ? '' : ` = ${t.hide && !t.shown ? '<button class="tf-reveal" data-tf-reveal aria-label="Ergebnis zeigen">?</button>' : eq.res}`}</span>` : `<span class="tf-hint">Tippe ins Feld oder auf die Knöpfe, um Punkte zu legen.</span>`;
+  $('#stage').innerHTML = `<div class="tf-wrap">${tfSvg()}</div>`;
+  const n = t.dots.length, live = n - t.cross, st = t.tool === 'x';
+  const dot = c => `<i class="tf-dot" style="background:${TF_COL[c]}"></i>`;
+  $('#controls').innerHTML = `<div class="seg tf-tools" role="group" aria-label="Werkzeug"><button data-tft="b" aria-pressed="${t.tool === 'b'}">${dot('b')} Legen</button><button data-tft="o" aria-pressed="${t.tool === 'o'}">${dot('o')} Legen</button><button data-tft="x" aria-pressed="${st}"><b class="tf-x">✕</b> Wegstreichen</button></div>`
+    + `<div class="nl-jumps tf-steps">${(st ? [1, 5] : [1, 5, 10]).map(k => `<button data-tfk="${k}" ${st ? (live >= k ? '' : 'disabled') : (n + k <= t.cap ? '' : 'disabled')} style="--c:${st ? '#c9414a' : TF_COL[t.tool]}">${st ? '−' : '+'}${k}</button>`).join('')}</div>`
+    + toolBtn({id:'tf-undo', ic:'undo', label:'Zurück', disabled: !t.hist.length}) + toolBtn({id:'tf-new', ic:'trash', label:'Neu', disabled: !n});
+  setHint('');
+}
+function tfAdd(k){ const t = app.tf; if(t.cross){ t.cross = 0; } for(let j = 0; j < k && t.dots.length < t.cap; j++) t.dots.push(t.tool === 'x' ? 'b' : t.tool); }
+function tfieldClick(e){
+  const t = app.tf;
+  if(e.target.closest('[data-tf-reveal]')){ t.shown = true; return renderTfield(); }
+  const c = e.target.closest('[data-tfi]'); if(!c) return; const i = +c.dataset.tfi, n = t.dots.length;
+  t.hist.push(tfSnap()); t.shown = false;
+  if(t.tool === 'x'){ if(i < n){ const want = n - i; t.cross = t.cross === want ? want - 1 : want; } else t.hist.pop(); }
+  else if(i >= n) tfAdd(i + 1 - n);
+  else if(t.cross && i >= n - t.cross) t.cross = n - 1 - i;   /* durchgestrichenen Punkt antippen: wieder da */
+  else { t.dots = t.dots.slice(0, i); t.cross = 0; }        /* gelegten Punkt antippen: ab hier wegnehmen */
+  renderTfield();
+}
+function tfieldControl(b){
+  const t = app.tf;
+  if(b.dataset.tft){ t.tool = b.dataset.tft; return renderTfield(); }
+  if(b.dataset.tfk){ const k = +b.dataset.tfk; t.hist.push(tfSnap()); t.shown = false; if(t.tool === 'x') t.cross = Math.min(t.dots.length, t.cross + k); else tfAdd(k); return renderTfield(); }
+  if(b.id === 'tf-undo'){ const h = t.hist.pop(); if(h){ t.dots = h.dots; t.cross = h.cross; } t.shown = false; return renderTfield(); }
+  if(b.id === 'tf-new'){ t.hist.push(tfSnap()); t.dots = []; t.cross = 0; t.shown = false; t.tool = 'b'; return renderTfield(); }
+}
+
 /* ---------- Hundertertafel zum Färben und Abdecken ---------- */
 app.hb2 = {cells:{}, cover:new Set(), color:'o', tool:'paint'};
 const HB2_COL = {o:'#f4b860', b:'#8fb3ea', g:'#9fd3ae', r:'#ef9a9a'};
@@ -5995,6 +6060,12 @@ function renderTopTool(){
     $('#inputs').innerHTML = `<button class="chip-toggle" data-nle aria-pressed="${app.nl.empty}" title="Leerer Zahlenstrahl ohne Striche (Rechenstrich)">Rechenstrich</button><button class="chip-toggle" data-nlh aria-pressed="${app.nl.hide}" title="Das Ziel erst zeigen, wenn es angetippt wird">Ziel verdecken</button><button class="chip-toggle" data-nlm aria-pressed="${zsMerge()}" title="Gleiche Sprünge gleich addieren: +10 und +10 wird +20, +1 und +1 wird +2. Zehner und Einer bleiben getrennt.">Zusammenfassen</button>`;
     return true;
   }
+  if(m === 'tfield'){
+    $('#range-label').textContent = 'Feld bis';
+    $('#ranges').innerHTML = [10, 20].map(r => `<button data-tfr="${r}" aria-pressed="${app.tf.cap === r}">${r}</button>`).join('');
+    $('#inputs').innerHTML = `<button class="chip-toggle" data-tfh aria-pressed="${app.tf.hide}" title="Das Ergebnis erst zeigen, wenn es angetippt wird">Ergebnis verdecken</button>`;
+    return true;
+  }
   $('#range-label').textContent = ''; $('#ranges').innerHTML = '';
   if(m === 'tword'){ $('#inputs').innerHTML = `<label class="tw-in"><span>Wort oder Satz</span><input id="tw-text" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" value="${escHtml(app.tw.text)}"></label><button id="tw-go" class="primary">Zeigen</button>`; return true; }
   $('#inputs').innerHTML = '';
@@ -6043,6 +6114,7 @@ function picDecor(){
 }
 const picObs = new MutationObserver(() => picDecor());
 function renderTool(){
+  if(app.mode === 'tfield') return renderTfield();
   if(app.mode === 'nline') return renderNline();
   if(app.mode === 'hboard') return renderHboard();
   if(app.mode === 'tclock') return renderTclock();
@@ -6050,17 +6122,21 @@ function renderTool(){
 }
 document.addEventListener('click', e => {
   if(!TOOL_MODES.includes(app.mode)) return;
+  if(e.target.closest('[data-tf-reveal]')){ app.tf.shown = true; return renderTfield(); }
   const inStage = e.target.closest('#stage'), inCtl = e.target.closest('#controls'), inTop = e.target.closest('.toolbar');
-  if(inStage){ if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
+  if(inStage){ if(app.mode === 'tfield') tfieldClick(e); if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
   const b = e.target.closest('button'); if(!b || !(inCtl || inTop)) return;
   if(inTop){
     if(b.dataset.nlr){ app.nl = {...app.nl, range: +b.dataset.nlr, start:null, jumps:[], hist:[], shown:false, win:null}; return render(); }
     if(b.hasAttribute('data-nlm')){ settings.zsMerge = !zsMerge(); saveSettings(); return render(); }
     if(b.hasAttribute('data-nle')){ app.nl.empty = !app.nl.empty; return render(); }
     if(b.hasAttribute('data-nlh')){ app.nl.hide = !app.nl.hide; app.nl.shown = false; return render(); }
+    if(b.dataset.tfr){ const t = app.tf; t.cap = +b.dataset.tfr; t.hist.push(tfSnap()); t.dots = t.dots.slice(0, t.cap); t.cross = Math.min(t.cross, t.dots.length); t.shown = false; return render(); }
+    if(b.hasAttribute('data-tfh')){ app.tf.hide = !app.tf.hide; app.tf.shown = false; return render(); }
     if(b.id === 'tw-go'){ app.tw.text = $('#tw-text').value; return renderTword(); }
     return;
   }
+  if(app.mode === 'tfield') return tfieldControl(b);
   if(app.mode === 'nline') return zsControl(b);
   if(app.mode === 'hboard') return hboardControl(b);
   if(app.mode === 'tclock') return tclockControl(b);
@@ -7005,7 +7081,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.11 · 13.11.2026';
+const APP_VERSION = '0.14.0 · 14.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

@@ -17,7 +17,7 @@ Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, al
 - **Lernstand ermitteln:** kurze adaptive Tests in Mathe (zwei Teile), Lesen und Schreiben
 - **Förderzone zeigen:** Kompetenzmatrix, begründete Förderzone, ILEB-Formulierungsvorschläge und Ideen für die Förderung ohne Gerät
 - **Themenwelten GS, HS, BSS:** gleiche Stufen und Tests, aber Texte, Pläne und Sachaufgaben passend zur Schulstufe; Bildmodus für Kinder, die noch nicht lesen
-- **Unterricht an der Tafel:** Werkzeuge für die interaktive Tafel ohne Namen und ohne Speichern: Zahlenstrahl mit Sprüngen und Rechenstrich, Hundertertafel zum Färben und Abdecken, Uhr, Wörter mit Silben, Material frei legen
+- **Unterricht an der Tafel:** Werkzeuge für die interaktive Tafel ohne Namen und ohne Speichern: Zwanzigerfeld zum Legen und Wegstreichen, Zahlenstrahl mit Sprüngen und Rechenstrich, Hundertertafel zum Färben und Abdecken, Uhr, Wörter mit Silben, Material frei legen
 - **Selbstständig üben:** Übungen passend zur Stufe, mit Material wie Zehnerstangen, Hundertertafel, Tausenderbuch, Geld und Uhr; altersgerecht und ohne Spielmechanik
 - **Arbeit abnehmen:** Arbeitsblätter zur Förderzone, Elterninfo in einfacher Sprache, Klassenübersicht als Tabelle
 
