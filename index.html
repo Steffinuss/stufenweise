@@ -784,12 +784,19 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .wz-hero{display:flex;align-items:center;gap:12px}
 .wz-logo svg{width:56px;height:56px;display:block}
 .wz-brand{display:flex;flex-direction:column;align-items:flex-start;text-align:left;line-height:1.1}.wz-brand b{font-size:clamp(28px,3.2vw,38px);font-weight:800;letter-spacing:.01em}.wz-brand span{font-size:16px;color:var(--muted);font-weight:700}
-.wz-stair{list-style:none;display:flex;align-items:flex-end;gap:6px;margin:4px 0 2px;padding:0}
-.wz-stair button{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;box-shadow:none;min-height:0;padding:2px 4px;color:var(--muted);font-weight:700;font-size:14px}
+.wz-stair{list-style:none;display:flex;align-items:flex-end;gap:4px;margin:4px 0 2px;padding:0}
+.wz-stair button{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;box-shadow:none;min-height:0;padding:2px 2px;color:var(--muted);font-weight:700;font-size:14px;width:96px}
 .wz-stair button:disabled{opacity:1;cursor:default}
-.wz-blk{width:76px;height:calc(var(--h)*14px);border-radius:8px 8px 3px 3px;background:#e4dccb;transition:background .2s}
-.wz-stair li.done .wz-blk{background:var(--e)}.wz-stair li.now .wz-blk{background:var(--focus)}.wz-stair li.now button{color:var(--ink)}
-.wz-stair li.done button:hover .wz-blk{filter:brightness(1.1)}
+.wz-blk{width:88px;height:calc(40px + var(--h)*13px);border-radius:10px 10px 4px 4px;background:#f1ece1;border:2.5px solid #ddd3c0;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;transition:background .2s,border-color .2s}
+.wz-blk svg{width:56px;height:38px;display:block}
+.wz-blk .wz-ini{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#fff;border:2px solid var(--e);font-size:22px;color:var(--ink)}
+.wz-blk .wz-q{font-size:32px;line-height:38px;color:#b9ad97;font-weight:800}
+.wz-lbl{line-height:1.15;text-align:center;min-height:2.3em}
+.wz-stair li.done .wz-blk{background:#e6f4ea;border-color:var(--e)}
+.wz-stair li.now .wz-blk{background:#fdf0dc;border-color:var(--focus)}.wz-stair li.now .wz-q{color:var(--focus)}.wz-stair li.now button{color:var(--ink)}
+.wz-stair li.next .wz-blk svg{opacity:.45}
+.wz-stair li:last-child .wz-blk{border-style:dashed}.wz-stair li.now:last-child .wz-blk{border-style:solid}
+.wz-stair li.done button:hover .wz-blk{filter:brightness(1.04);border-width:3px}
 .wz-body{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;margin:auto 0}
 .wz-body h2{font-size:clamp(26px,3.2vw,38px)}
 .home.wz .home-subj button{width:210px;min-height:150px;gap:8px;font-size:24px}.home.wz .home-subj svg{width:140px;height:auto}.home.wz .home-cards+.home-sub+.home-subj button{min-height:110px;width:180px;font-size:20px}.home.wz .home-cards+.home-sub+.home-subj svg{width:96px}
@@ -5594,6 +5601,7 @@ const WZ_ILL = {
   M:'<svg viewBox="0 0 120 70" aria-hidden="true"><rect x="6" y="8" width="54" height="54" rx="4" fill="#c9414a"/><path d="M6 18.8h54M6 29.6h54M6 40.4h54M6 51.2h54M16.8 8v54M27.6 8v54M38.4 8v54M49.2 8v54" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/><rect x="70" y="8" width="11" height="54" rx="3" fill="#346bc3"/><path d="M70 18.8h11M70 29.6h11M70 40.4h11M70 51.2h11" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/><rect x="88" y="51" width="11" height="11" rx="2.5" fill="#27834b"/><rect x="103" y="51" width="11" height="11" rx="2.5" fill="#27834b"/></svg>',
   D:'<svg viewBox="0 0 120 70" aria-hidden="true"><text x="60" y="48" text-anchor="middle" font-size="44" font-weight="800" fill="#2b2930" font-family="Stufenfibel,system-ui,sans-serif">Abc</text><path d="M18 57q14 9 28 0" fill="none" stroke="#346bc3" stroke-width="4" stroke-linecap="round"/><path d="M52 57q17 9 34 0" fill="none" stroke="#c9414a" stroke-width="4" stroke-linecap="round"/><path d="M92 57q7 6 14 0" fill="none" stroke="#346bc3" stroke-width="4" stroke-linecap="round"/></svg>'
 };
+const WZ_FLAG = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M11 36V5" stroke="#2b2930" stroke-width="3.5" stroke-linecap="round"/><path d="M12.5 6h19l-5 7 5 7h-19z" fill="#e8962e"/></svg>';
 function homeAreas(subj){
   const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l), out = [];
   if(subj === 'M'){
@@ -5615,9 +5623,14 @@ function renderHome(){
   const needWho = data.profiles.length > 0;
   let step = W.step || (needWho && !p && !W.guest ? 'who' : 'subj');
   if(step === 'area' && !W.subj) step = 'subj';
-  const steps = [['ctx', 'Üben'], ...(needWho ? [['who', p ? escHtml(p.name) : W.guest ? 'Gast' : 'Wer übt?']] : []), ['subj', W.subj && step === 'area' ? (W.subj === 'M' ? 'Mathe' : 'Deutsch') : 'Fach'], ['area', 'Übung']];
+  /* Treppe: Jede Stufe zeigt, was schon gewählt ist (Bild + Wort). Oben wartet die Fahne: Dort geht das Üben los. */
+  const sj = W.subj && step === 'area' ? W.subj : null, Q = '<b class="wz-q">?</b>';
+  const steps = [['ctx', 'Üben', CTX_ILL.practice],
+    ...(needWho ? [['who', p ? escHtml(p.name) : W.guest ? 'Gast' : 'Wer übt?', p ? (p.sym && ICON[p.sym] ? iconSvg(p.sym, 40) : `<b class="wz-ini">${escHtml(p.name.slice(0, 1).toUpperCase())}</b>`) : W.guest ? '<b class="wz-ini">?</b>' : Q]] : []),
+    ['subj', sj ? (sj === 'M' ? 'Mathe' : 'Deutsch') : 'Mathe oder Deutsch?', sj ? WZ_ILL[sj] : Q],
+    ['area', 'Los geht\'s', WZ_FLAG]];
   const si = steps.findIndex(x => x[0] === step);
-  const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : ''}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben oder Unterricht wählen"' : `data-wz-step="${k}"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk"></span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
+  const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l, pic], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : 'next'}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben oder Unterricht wählen"' : `data-wz-step="${k}" title="Zurück zu diesem Schritt"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk">${pic}</span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
   let body = '';
   if(step === 'who'){
@@ -6994,7 +7007,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.8 · 13.11.2026';
+const APP_VERSION = '0.13.9 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

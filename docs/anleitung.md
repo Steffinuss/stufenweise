@@ -93,7 +93,7 @@ Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das
 
 Nach dem Test findet das Kind seine Übungen selbst. Das Stufen-Zeichen links oben führt zur Startseite.
 
-Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigen drei Treppenstufen, wo das Kind gerade ist; mit einem Tipp auf eine fertige Stufe geht es zurück.
+Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigt eine Treppe, wo das Kind gerade ist. Jede Stufe zeigt mit Bild und Wort, was schon gewählt ist (Üben, das Bild und der Name des Kindes, Mathe oder Deutsch). Die Stufe, die gerade dran ist, ist orange mit einem Fragezeichen. Oben wartet die Fahne „Los geht’s“: Dort beginnt das Üben. Mit einem Tipp auf eine grüne Stufe geht es zurück zu diesem Schritt.
 
 1. **Wer übt?** Das Kind tippt auf seinen Namen.
 2. **Fach:** Unter **Heute für dich** steht die passende Übung aus der Förderzone. Ein Tipp darauf startet sie sofort. Sonst wählt das Kind Mathe oder Deutsch.
