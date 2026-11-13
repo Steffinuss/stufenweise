@@ -48,6 +48,14 @@ Das neue Kind ist jetzt ausgewählt (dunkel hinterlegt). Darunter stehen die vie
 
 Tipp auf den Test, den das Kind jetzt machen soll. Mach Teil 1 und Teil 2 am besten an verschiedenen Tagen.
 
+### Themenwelt, Erkennungsbild und „ohne Lesen“
+
+Neben jedem Namen stehen (mit Lehrkraft-PIN) drei Einstellungen:
+
+- **Themenwelt GS, HS oder BSS:** Stufen, Tests und Kompetenzmatrix bleiben gleich. Es ändern sich nur die Inhalte: Lesetexte, Pläne, Sachaufgaben und Einkaufszettel. In der Grundstufe geht es zum Beispiel um Pause, Tiere, Geburtstag und Stundenplan, in der Hauptstufe um Freizeit, Einkaufen und Kino, in der Berufsschulstufe zusätzlich um Praktikum, Arbeit und Wohnen. Die Ergebnisse bleiben dadurch vergleichbar. Auch Arbeitsblätter für ein Kind nehmen seine Themenwelt. Für Gast und Unterricht stellst du die Themenwelt in den Einstellungen (Hilfen) ein, im Unterricht auch direkt auf der Startseite.
+- **Erkennungsbild:** ein Bild (Fisch, Ball, Sonne …), das auf der Startseite statt des Anfangsbuchstabens erscheint. So finden auch Kinder, die ihren Namen noch nicht lesen, ihr Feld.
+- **ohne Lesen (Bildmodus):** für Kinder, die (noch) nicht lesen. Über jeder Übung steht ein Bild, das zeigt, was zu tun ist (antippen, auswählen, legen, eintippen, Uhr stellen). Der Satz steht nur noch klein darunter, für Erwachsene. Rückmeldungen kommen als großes Zeichen: grüner Haken für richtig, orangefarbener Pfeil für „noch einmal“. Knöpfe zeigen nur ihre Symbole, und der Rückblick nach einer Runde hat drei Bildknöpfe (Treppe = schwerer, Kreispfeil = noch eine Runde, Haus = Pause). Im Test bleibt der Text normal groß, weil dort die Lehrkraft mitliest.
+
 ![Testkind A ist ausgewählt, Mathe Teil 1 ist markiert](bilder/04_tests.png)
 
 ## Schritt 3: Der Test

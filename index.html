@@ -453,6 +453,21 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 .mtable #mtab{width:100%;height:100%}
 
 .adapt-tip{position:absolute;right:18px;top:14px;z-index:20;display:flex;gap:8px;align-items:center;background:#fff;border-radius:16px;box-shadow:0 6px 24px #0002;padding:8px 10px 8px 14px;font-weight:700;font-size:15px;animation:tipIn .35s ease}
+.popts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.popts select{font:inherit;font-size:14px;padding:4px 6px;border-radius:8px;border:1.5px solid #ddd4c3;max-width:170px}
+.ppic{font-size:14px;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.prow{flex-wrap:wrap}
+.home-names button.has-sym{gap:6px}.kid-sym svg{display:block;width:64px;height:64px}
+.ct-world{display:flex;gap:4px;justify-content:center}.ct-world button{min-height:44px;padding:0 16px;font-weight:800}
+.pic-ic{display:block;margin:0 auto 2px;width:56px;height:56px}.pic-ic svg{width:100%;height:100%}
+.pic-mode .pic-txt,.pic-mode .pic-txt *{display:block;font-size:13px!important;line-height:1.3;color:var(--muted)!important;font-weight:600!important;opacity:.85}
+.pic-mode .wz .home-sub,.pic-mode .wz-body>p{display:none}
+.pic-fb{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;font-size:34px;font-weight:900;color:#fff;vertical-align:middle;margin-right:8px}
+.pic-fb.ok{background:#1f7a45}.pic-fb.bad{background:#e8890c}
+.pic-hint{font-size:13px;color:var(--muted);font-weight:600;vertical-align:middle}
+.pic-mode .tool .lbl{display:none}.pic-mode .tool{min-height:56px;min-width:60px}
+.round-card .acts button{display:flex;align-items:center;justify-content:center;gap:12px}
+.r-ic{display:flex;width:36px;justify-content:center}.r-tx{display:flex;flex-direction:column;align-items:flex-start}
+.pic-mode .round-card .r-tx small{display:none}.pic-mode .round-card p{display:none}.pic-mode .round-card .r-ic svg{width:44px;height:44px}.pic-mode .round-card .r-tx{display:none}.pic-mode .round-card .acts{flex-direction:row;justify-content:center}.pic-mode .round-card .acts button{min-width:92px;min-height:80px}
 .rail-guide{margin-top:auto}
 /* Start: Üben oder Unterricht */
 .ctx-tiles{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
@@ -816,6 +831,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <label class="row cb"><input type="checkbox" data-key="labels"> Texte unter den Knöpfen</label>
     <label class="row">Zifferntastatur auf dem Bildschirm <select data-key="numpad"><option value="auto">automatisch (Tablet)</option><option value="on">immer</option><option value="off">nie</option></select></label>
     <label class="row">Buchstabentastatur beim Schreiben <select data-key="kbd"><option value="qwertz">wie am Handy (QWERTZ)</option><option value="abc">nach dem ABC</option></select></label>
+    <label class="row">Themenwelt für Gast und Unterricht <select data-key="world"><option value="GS">Grundstufe (GS)</option><option value="HS">Hauptstufe (HS)</option><option value="BSS">Berufsschulstufe (BSS)</option></select></label>
     <label class="row">Beim Start <select data-key="startCtx"><option value="ask">fragen: Üben oder Unterricht</option><option value="practice">immer Üben</option><option value="class">immer Unterricht (Tafel)</option></select></label>
     <label class="row">Übungsrunde <select data-key="roundLen"><option value="5">5 Aufgaben</option><option value="10">10 Aufgaben</option><option value="15">15 Aufgaben</option><option value="0">ohne Ende</option></select></label>
   </fieldset>
@@ -899,7 +915,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', kbd:'qwertz', roundLen:'10', startCtx:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', kbd:'qwertz', roundLen:'10', startCtx:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -1159,7 +1175,15 @@ async function flip(root, before){
 }
 
 /* ---------- Kleine Helfer für die Oberfläche ---------- */
-function setHint(text, tone=''){ const h = $('#hint'); h.textContent = text || ''; h.className = 'hint' + (tone ? ' ' + tone : ''); }
+function setHint(text, tone=''){
+  const h = $('#hint'); h.className = 'hint' + (tone ? ' ' + tone : '');
+  if(typeof picMode === 'function' && picMode() && !['diag', 'home', 'map'].includes(app.mode)){
+    /* Bildmodus: ein großes Zeichen; der Satz steht klein darunter für Erwachsene */
+    const sym = tone === 'ok' || tone === 'good' ? '<span class="pic-fb ok" aria-hidden="true">✓</span>' : tone === 'bad' ? '<span class="pic-fb bad" aria-hidden="true">↻</span>' : '';
+    h.innerHTML = text ? `${sym}<small class="pic-hint">${escHtml(text)}</small>` : ''; return;
+  }
+  h.textContent = text || '';
+}
 let toastTimer;
 function toast(text){ document.querySelector('.toast')?.remove(); const t = document.createElement('div'); t.className = 'toast'; t.textContent = text; document.body.append(t); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.remove(), 2600); }
 /* Ruhige Erfolgs-Rückmeldung: Ring + kleine Material-Würfel in den Stellenwertfarben */
@@ -1391,7 +1415,7 @@ function guideFix(){
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
-function render(){ if(guideFix()) return; $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
+function render(){ if(guideFix()) return; queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
 /* Passt die Einstellungsleiste nicht neben die Knöpfe oben rechts, rückt sie in eine eigene Zeile (sonst verschwinden z. B. die 10er-Reihe oder „Kalender“) */
 function fitTop(){
   const tb = document.querySelector('.topbar'), t = tb?.querySelector('.toolbar'); if(!t) return;
@@ -2876,6 +2900,16 @@ const data = (() => { try { return {profiles:[], current:null, log:{}, ...JSON.p
 const saveData = () => { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch {} };
 /* Im Unterricht an der Tafel erscheinen keine Kindernamen (auch nicht bei den Arbeitsblättern) */
 const kids = () => app.ctx === 'class' ? [] : data.profiles;
+/* Themenwelten: Stufen und Tests bleiben gleich, nur Wörter, Texte und Sachaufgaben passen sich der Schulstufe an */
+const WORLDS = {GS:'Grundstufe', HS:'Hauptstufe', BSS:'Berufsschulstufe'};
+app.sheetKid = null;
+function world(){ const p = app.sheetKid || curProfile(); return WORLDS[p?.world] ? p.world : WORLDS[settings.world] ? settings.world : 'HS'; }
+const inWorld = x => !x?.w || x.w.includes(world());
+const forWorld = list => { const f = list.filter(inWorld); return f.length ? f : list; };
+const W3 = (gs, hs, bss = hs) => ({GS:gs, HS:hs, BSS:bss})[world()];
+/* Bildmodus: möglichst wenig Schrift für Kinder, die (noch) nicht lesen */
+const picMode = () => !!curProfile()?.pic;
+const KID_SYMS = ['Fisch', 'Ball', 'Sonne', 'Baum', 'Auto', 'Blume', 'Mond', 'Apfel', 'Hut', 'Zug', 'Uhr', 'Bus', 'Banane', 'Haus', 'Maus', 'Rad', 'Tomate', 'Pizza'];
 const curProfile = () => app.ctx === 'class' ? null : data.profiles.find(p => p.id === data.current) || null;
 /* Sicherung: Erinnerung nach 14 Tagen und Bitte an den Browser, die Daten nicht von selbst zu löschen */
 if(data.profiles.length && !data.firstUse){ data.firstUse = Date.now(); saveData(); }
@@ -2937,7 +2971,9 @@ function roundEnd(){
   const zk = activeZoneKey(), p = curProfile(), kurz = strong && !up && zk && p && guideOn() && guideZones(p.id, /^[LW]/.test(zk) ? 'D' : 'M').includes(zk);
   if(kurz){ document.querySelector('.lvlup')?.remove(); (app.offered ??= {})[zk] = true; }
   const msg = good === n ? 'Alles gleich richtig. Super!' : strong ? 'Fast alles gleich richtig. Stark!' : weak ? 'Das war nicht leicht. Gut, dass du drangeblieben bist.' : 'Gut gemacht!';
-  const btn = (id, label, sub, primary) => `<button data-round="${id}" class="${primary ? 'primary' : ''}">${label}${sub ? `<small>${escHtml(sub)}</small>` : ''}</button>`;
+  const sv = d => `<svg viewBox="0 0 32 32" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const RIC = {again: sv('<path d="M25 16a9 9 0 1 1-3-6.7"/><path d="M23 4v6h-6"/>'), up: sv('<path d="M4 27h7v-7h7v-7h7V6"/><path d="M21 9l4-4 4 4"/>'), down: sv('<path d="M4 6h7v7h7v7h7v6"/><path d="M21 23l4 4 4-4"/>'), pause: sv('<path d="M5 15L16 5l11 10"/><path d="M8 13v14h16V13"/>'), kurz: sv('<path d="M16 4l3.5 7.5 8 1-6 5.5 1.6 8L16 22l-7.1 4 1.6-8-6-5.5 8-1z"/>')};
+  const btn = (id, label, sub, primary) => `<button data-round="${id}" class="${primary ? 'primary' : ''}"><span class="r-ic" aria-hidden="true">${RIC[id]}</span><span class="r-tx">${label}${sub ? `<small>${escHtml(sub)}</small>` : ''}</span></button>`;
   const acts = [];
   if(kurz) acts.push(btn('kurz', 'Nächste Stufe probieren', 'kurzer Test mit 2 bis 3 Aufgaben', true));
   if(up && good >= Math.ceil(n*0.7)) acts.push(btn('up', 'Schwerer', up.text, strong));
@@ -3474,7 +3510,7 @@ const PRIVACY_BOX = `<div class="privacy-box" role="note"><h3>Bevor du Kinder an
 </ul><div class="row" style="justify-content:flex-start;gap:12px;flex-wrap:wrap"><button type="button" class="icon-btn primary" id="privacy-ok">Verstanden</button><button type="button" class="link-btn" data-legal>Impressum und Datenschutz</button></div></div>`;
 function renderProfiles(){
   const locked = !teacherOn();
-  $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
+  $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${p.sym && ICON[p.sym] ? iconSvg(p.sym, 26) + ' ' : ''}${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<span class="popts"><select data-pworld="${p.id}" aria-label="Themenwelt für ${escHtml(p.name)}" title="Themenwelt: Wörter, Texte und Sachaufgaben">${Object.entries(WORLDS).map(([k, v]) => `<option value="${k}" ${(p.world || settings.world || 'HS') === k ? 'selected' : ''}>${k} · ${v}</option>`).join('')}</select><select data-psym="${p.id}" aria-label="Erkennungsbild für ${escHtml(p.name)}" title="Erkennungsbild: So findet das Kind seinen Namen auch ohne Lesen"><option value="">Bild: keins</option>${KID_SYMS.filter(k => ICON[k]).map(k => `<option value="${k}" ${p.sym === k ? 'selected' : ''}>Bild: ${k}</option>`).join('')}</select><label class="ppic" title="Bildmodus: Anweisungen als Bilder, Rückmeldung als Zeichen – für Kinder, die (noch) nicht lesen"><input type="checkbox" data-ppic="${p.id}" ${p.pic ? 'checked' : ''}> ohne Lesen</label></span><button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
     (locked ? `<p class="note">Kinder anlegen, löschen und Tests starten kann nur die Lehrkraft. <button class="linkish" id="p-unlock">Lehrkraft-PIN eingeben</button></p>` : !settings.privacyAck ? PRIVACY_BOX : `<form id="padd" class="row" style="margin-top:12px"><input id="pname" maxlength="20" placeholder="Vorname oder Kürzel" style="flex:1"><button class="primary" type="submit">Hinzufügen</button></form>`) +
     `<div class="row" style="margin-top:14px;justify-content:flex-start;gap:8px"><button data-ptest="M1" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 1: Zahlen und Rechnen</span></button><button data-ptest="M2" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 2: Uhr, Größen, Hundertertafel</span></button><button data-ptest="L" class="icon-btn primary">${icon('target')}<span style="display:inline">Lese-Test</span></button>${typeof W_LEVELS !== 'undefined' ? `<button data-ptest="W" class="icon-btn primary">${icon('target')}<span style="display:inline">Schreib-Test</span></button>` : ''}<span class="note" style="align-self:center">für ${escHtml(curName())}</span></div>
     <p class="note" style="margin-top:12px">Namen und Ergebnisse bleiben nur auf diesem Gerät gespeichert. Am besten Vornamen oder Kürzel verwenden.</p>`;
@@ -3738,7 +3774,7 @@ const MATH = {
     100: [() => { const a = rnd(25, 55), b = a + rnd(12, 29); return {kern:true, type:'input', text:`Lea hat ${a} €. Tom hat ${b} €. Wie viel mehr hat Tom?`, prompt:'Wie viel mehr?', fields:[b - a], label:`Unterschied ${a} € und ${b} €`}; },
          () => { const a = rnd(1, 4)*10, b = a + rnd(3, 5)*10 + 5; return {type:'input', svg: lineSvg(100, {marks:[a, b], cls:'dg-line-static'}), prompt:`Wie weit liegen ${a} und ${b} auseinander?`, fields:[b - a], label:`Abstand ${a} und ${b}`}; },
          () => gleichItem(rnd(5, 9)*10 + rnd(1, 4), rnd(2, 4)*10 + 9, 1)],
-    1000: [() => { const a = rnd(3, 5)*100 + rnd(1, 9)*10, b = a + rnd(1, 3)*100 + rnd(1, 8)*10; return {kern:true, type:'input', text:`Lea verdient ${a} €. Tom verdient ${b} €. Wie viel mehr verdient Tom?`, prompt:'Wie viel mehr?', fields:[b - a], label:`Unterschied ${a} € und ${b} €`}; },
+    1000: [() => { const a = rnd(3, 5)*100 + rnd(1, 9)*10, b = a + rnd(1, 3)*100 + rnd(1, 8)*10; return {kern:true, type:'input', text: W3(`Lea sammelt ${a} Punkte. Tom sammelt ${b} Punkte. Wie viele Punkte hat Tom mehr?`, `Lea hat ${a} € gespart. Tom hat ${b} € gespart. Wie viel mehr hat Tom gespart?`, `Lea verdient ${a} €. Tom verdient ${b} €. Wie viel mehr verdient Tom?`), prompt:'Wie viel mehr?', fields:[b - a], label:`Unterschied ${a} € und ${b} €`}; },
          () => { const a = rnd(1, 3)*100, b = a + rnd(3, 6)*100 + 50; return {type:'input', svg: lineSvg(1000, {marks:[a, b], cls:'dg-line-static'}), prompt:`Wie weit liegen ${a} und ${b} auseinander?`, fields:[b - a], label:`Abstand ${a} und ${b}`}; },
          () => gleichItem(rnd(5, 9)*100 + rnd(1, 4)*10, rnd(2, 4)*100 + 90, 10)]
   })[zr]
@@ -3927,17 +3963,23 @@ function ynItem(){ let s, yes, n, t = 0; do { [s, yes, n] = factSentence(); t++;
 /* L7: Alltagstexte */
 const TEXTS = [
   {text:'Lea will Brot kaufen. Sie fährt mit dem Bus zum Laden. Der Bus kommt um 8 Uhr. Das Brot kostet 3 Euro.', qs:[['Womit fährt Lea zum Laden?', ['mit dem Bus', 'mit dem Rad', 'mit dem Auto']], ['Wann kommt der Bus?', ['um 8 Uhr', 'um 3 Uhr', 'um 10 Uhr']], ['Was will Lea kaufen?', ['Brot', 'Milch', 'Limo']]]},
-  {text:'Tom macht ein Praktikum in einer Werkstatt. Am Montag streicht er eine Tür. Dafür braucht er einen Pinsel. Am Dienstag repariert er einen Stuhl.', qs:[['Was braucht Tom zum Streichen?', ['einen Pinsel', 'einen Hammer', 'eine Lupe']], ['Was macht Tom am Dienstag?', ['Er repariert einen Stuhl.', 'Er streicht eine Tür.', 'Er kauft Brot.']], ['Wo macht Tom sein Praktikum?', ['in einer Werkstatt', 'in einem Laden', 'in der Kantine']]]},
-  {text:'In der Kantine gibt es heute Nudeln mit Tomatensoße. Das Essen kostet 4 Euro. Die Kantine ist von 12 bis 14 Uhr offen.', qs:[['Was kostet das Essen?', ['4 Euro', '12 Euro', '14 Euro']], ['Was gibt es heute?', ['Nudeln', 'Fisch', 'Pizza']], ['Wann macht die Kantine auf?', ['um 12 Uhr', 'um 4 Uhr', 'um 14 Uhr']]]},
-  {text:'Ali hat am Freitag Geburtstag. Er wird 16 Jahre alt. Er lädt seine Freunde zum Pizza-Essen ein. Die Feier beginnt um 18 Uhr.', qs:[['Wann hat Ali Geburtstag?', ['am Freitag', 'am Montag', 'am Sonntag']], ['Wie alt wird Ali?', ['16 Jahre', '18 Jahre', '6 Jahre']], ['Was gibt es zu essen?', ['Pizza', 'Kuchen', 'Suppe']]]},
-  {text:'Mia arbeitet im Supermarkt. Sie räumt Äpfel und Bananen in das Regal. Ihre Pause ist um 10 Uhr. Dann trinkt sie einen Tee.', qs:[['Wo arbeitet Mia?', ['im Supermarkt', 'in der Schule', 'im Kino']], ['Was räumt Mia ein?', ['Äpfel und Bananen', 'Hosen und Jacken', 'Bücher und Stifte']], ['Was trinkt Mia in der Pause?', ['einen Tee', 'eine Limo', 'einen Kaffee']]]},
+  {w:['HS','BSS'], text:'Tom macht ein Praktikum in einer Werkstatt. Am Montag streicht er eine Tür. Dafür braucht er einen Pinsel. Am Dienstag repariert er einen Stuhl.', qs:[['Was braucht Tom zum Streichen?', ['einen Pinsel', 'einen Hammer', 'eine Lupe']], ['Was macht Tom am Dienstag?', ['Er repariert einen Stuhl.', 'Er streicht eine Tür.', 'Er kauft Brot.']], ['Wo macht Tom sein Praktikum?', ['in einer Werkstatt', 'in einem Laden', 'in der Kantine']]]},
+  {w:['HS','BSS'], text:'In der Kantine gibt es heute Nudeln mit Tomatensoße. Das Essen kostet 4 Euro. Die Kantine ist von 12 bis 14 Uhr offen.', qs:[['Was kostet das Essen?', ['4 Euro', '12 Euro', '14 Euro']], ['Was gibt es heute?', ['Nudeln', 'Fisch', 'Pizza']], ['Wann macht die Kantine auf?', ['um 12 Uhr', 'um 4 Uhr', 'um 14 Uhr']]]},
+  {w:['HS','BSS'], text:'Ali hat am Freitag Geburtstag. Er wird 16 Jahre alt. Er lädt seine Freunde zum Pizza-Essen ein. Die Feier beginnt um 18 Uhr.', qs:[['Wann hat Ali Geburtstag?', ['am Freitag', 'am Montag', 'am Sonntag']], ['Wie alt wird Ali?', ['16 Jahre', '18 Jahre', '6 Jahre']], ['Was gibt es zu essen?', ['Pizza', 'Kuchen', 'Suppe']]]},
+  {w:['HS','BSS'], text:'Mia arbeitet im Supermarkt. Sie räumt Äpfel und Bananen in das Regal. Ihre Pause ist um 10 Uhr. Dann trinkt sie einen Tee.', qs:[['Wo arbeitet Mia?', ['im Supermarkt', 'in der Schule', 'im Kino']], ['Was räumt Mia ein?', ['Äpfel und Bananen', 'Hosen und Jacken', 'Bücher und Stifte']], ['Was trinkt Mia in der Pause?', ['einen Tee', 'eine Limo', 'einen Kaffee']]]},
   {text:'Heute regnet es. Ben zieht seine Jacke und seine Mütze an. Er nimmt den Bus zur Schule. Der Bus ist voll.', qs:[['Wie ist das Wetter?', ['Es regnet.', 'Die Sonne scheint.', 'Es schneit.']], ['Was zieht Ben an?', ['Jacke und Mütze', 'Hose und Hut', 'nur eine Jacke']], ['Wie ist der Bus?', ['voll', 'leer', 'kaputt']]]},
   {text:'Im Kino läuft ein lustiger Film. Die Karte kostet 7 Euro. Der Film fängt um 15 Uhr an. Sara kauft auch ein Eis.', qs:[['Was kostet die Karte?', ['7 Euro', '15 Euro', '5 Euro']], ['Wann fängt der Film an?', ['um 15 Uhr', 'um 7 Uhr', 'um 17 Uhr']], ['Was kauft Sara noch?', ['ein Eis', 'eine Pizza', 'ein Buch']]]},
-  {text:'Jonas hilft beim Umzug. Er trägt eine schwere Kiste. In der Kiste sind Bücher. Am Ende gibt es für alle Brote und Limo.', qs:[['Wobei hilft Jonas?', ['beim Umzug', 'beim Kochen', 'beim Einkaufen']], ['Was ist in der Kiste?', ['Bücher', 'Teller', 'Schuhe']], ['Was gibt es am Ende?', ['Brote und Limo', 'Pizza und Eis', 'nichts']]]},
-  {text:'Der Zug nach Ulm fährt um 9 Uhr ab. Er fährt von Gleis 3. Die Fahrkarte kostet 6 Euro. Nina sitzt am Fenster.', qs:[['Wohin fährt der Zug?', ['nach Ulm', 'nach Berlin', 'nach Hause']], ['Von welchem Gleis fährt der Zug?', ['Gleis 3', 'Gleis 9', 'Gleis 6']], ['Wo sitzt Nina?', ['am Fenster', 'an der Tür', 'im Bus']]]},
+  {w:['HS','BSS'], text:'Jonas hilft beim Umzug. Er trägt eine schwere Kiste. In der Kiste sind Bücher. Am Ende gibt es für alle Brote und Limo.', qs:[['Wobei hilft Jonas?', ['beim Umzug', 'beim Kochen', 'beim Einkaufen']], ['Was ist in der Kiste?', ['Bücher', 'Teller', 'Schuhe']], ['Was gibt es am Ende?', ['Brote und Limo', 'Pizza und Eis', 'nichts']]]},
+  {w:['HS','BSS'], text:'Der Zug nach Ulm fährt um 9 Uhr ab. Er fährt von Gleis 3. Die Fahrkarte kostet 6 Euro. Nina sitzt am Fenster.', qs:[['Wohin fährt der Zug?', ['nach Ulm', 'nach Berlin', 'nach Hause']], ['Von welchem Gleis fährt der Zug?', ['Gleis 3', 'Gleis 9', 'Gleis 6']], ['Wo sitzt Nina?', ['am Fenster', 'an der Tür', 'im Bus']]]},
+  {w:['GS'], text:'Emma hat einen Hund. Er heißt Bello. Jeden Tag geht Emma mit Bello in den Park. Bello spielt gern mit dem Ball.', qs:[['Wie heißt der Hund?', ['Bello', 'Emma', 'Max']], ['Wohin geht Emma mit Bello?', ['in den Park', 'in die Schule', 'in den Zoo']], ['Womit spielt Bello gern?', ['mit dem Ball', 'mit der Puppe', 'mit dem Auto']]]},
+  {w:['GS'], text:'In der Pause spielen die Kinder auf dem Hof. Finn klettert auf das Klettergerüst. Lina springt Seil. Nach der Pause haben alle Mathe.', qs:[['Wo spielen die Kinder?', ['auf dem Hof', 'im Klassenzimmer', 'im Garten']], ['Was macht Lina?', ['Sie springt Seil.', 'Sie klettert.', 'Sie malt.']], ['Was haben alle nach der Pause?', ['Mathe', 'Sport', 'Musik']]]},
+  {w:['GS'], text:'Max hat heute Geburtstag. Er wird 8 Jahre alt. Seine Mama backt einen Kuchen. Auf dem Kuchen sind 8 Kerzen.', qs:[['Wie alt wird Max?', ['8 Jahre', '10 Jahre', '6 Jahre']], ['Wer backt den Kuchen?', ['die Mama', 'der Papa', 'Max']], ['Wie viele Kerzen sind auf dem Kuchen?', ['8', '6', '10']]]},
+  {w:['GS'], text:'Die Klasse fährt mit dem Bus in den Zoo. Dort sehen die Kinder Affen und Elefanten. Die Affen essen Bananen. Zum Schluss bekommt jedes Kind ein Eis.', qs:[['Wohin fährt die Klasse?', ['in den Zoo', 'ins Kino', 'ins Schwimmbad']], ['Was essen die Affen?', ['Bananen', 'Äpfel', 'Brot']], ['Was bekommen die Kinder zum Schluss?', ['ein Eis', 'eine Pizza', 'einen Kuchen']]]},
+  {w:['GS'], text:'Heute ist Sport. Die Kinder ziehen ihre Turnschuhe an. Sie spielen mit einem großen Ball. Ole wirft den Ball in den Korb.', qs:[['Was ziehen die Kinder an?', ['Turnschuhe', 'Gummistiefel', 'Hausschuhe']], ['Wer wirft den Ball in den Korb?', ['Ole', 'Lina', 'Max']], ['Womit spielen die Kinder?', ['mit einem Ball', 'mit einem Seil', 'mit Reifen']]]},
+  {w:['GS'], text:'Lina malt ein Bild. Sie malt ein Haus und einen Baum. Die Sonne ist gelb. Das Bild hängt sie an die Wand.', qs:[['Was malt Lina?', ['ein Haus und einen Baum', 'ein Auto und einen Bus', 'einen Hund']], ['Welche Farbe hat die Sonne?', ['gelb', 'blau', 'grün']], ['Wohin hängt Lina das Bild?', ['an die Wand', 'an die Tür', 'an das Fenster']]]},
   {text:'Paul kocht heute Suppe. Er schneidet Tomaten mit dem Messer. Die Suppe muss 20 Minuten kochen. Dann essen alle zusammen.', qs:[['Was kocht Paul?', ['Suppe', 'Nudeln', 'Pizza']], ['Womit schneidet er die Tomaten?', ['mit dem Messer', 'mit der Schere', 'mit der Gabel']], ['Wie lange muss die Suppe kochen?', ['20 Minuten', '2 Minuten', '2 Stunden']]]}
 ];
-function textItem(kern){ const i = TEXTS.indexOf(pick(TEXTS.filter(t => !FRESH.used.has(t.text.slice(0, 12))))) ; const tx = TEXTS[i < 0 ? 0 : i]; FRESH.used.add(tx.text.slice(0, 12)); const [q, opts] = pick(tx.qs); return mkChoice({kern, layout:'col', text: tx.text, textCls:'rd-text', prompt:q, label:`Text: ${q}`}, opts); }
+function textItem(kern){ const pool = forWorld(TEXTS), avail = pool.filter(t => !FRESH.used.has(t.text.slice(0, 12))), tx = pick(avail.length ? avail : pool); FRESH.used.add(tx.text.slice(0, 12)); const [q, opts] = pick(tx.qs); return mkChoice({kern, layout:'col', text: tx.text, textCls:'rd-text', prompt:q, label:`Text: ${q}`}, opts); }
 /* ---------- Lesen L8: Pläne und Tabellen (nichtlineare Texte) ---------- */
 const tf = m => `${Math.floor(m/60)}:${String(m % 60).padStart(2, '0')}`;
 const WDAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
@@ -3974,7 +4016,7 @@ function docMenu(){
   const kinds = shuffle(['fisch', 'veg', 'veg', 'fleisch', 'fleisch']), used = new Set();
   const dish = kinds.map(k => { const d = pick(MEALS[k].filter(x => !used.has(x))); used.add(d); return d; });
   const price = shuffle([3.5, 3.8, 4.2, 4.5, 4.9]);
-  const html = dcBox('Speiseplan', 'Kantine · Speiseplan dieser Woche', dcTable(['Tag', 'Essen', 'Preis'], WDAYS.map((d, i) => [d, dish[i] + (kinds[i] === 'veg' ? ' <span class="dc-veg" title="vegetarisch">V</span>' : ''), euro(price[i])])), '<span class="dc-veg">V</span> = vegetarisch (ohne Fleisch und ohne Fisch)');
+  const html = dcBox('Speiseplan', W3('Mittagessen in der Schule', 'Mensa · Speiseplan dieser Woche', 'Kantine · Speiseplan dieser Woche'), dcTable(['Tag', 'Essen', 'Preis'], WDAYS.map((d, i) => [d, dish[i] + (kinds[i] === 'veg' ? ' <span class="dc-veg" title="vegetarisch">V</span>' : ''), euro(price[i])])), '<span class="dc-veg">V</span> = vegetarisch (ohne Fleisch und ohne Fisch)');
   const qs = [], fi = kinds.indexOf('fisch'), others = i => WDAYS.filter((_, j) => j !== i);
   qs.push(['info', 'An welchem Tag gibt es Fisch?', opt3(WDAYS[fi], others(fi))]);
   { const i = rnd(0, 4); qs.push(['info', `Was kostet das Essen am ${WDAYS[i]}?`, opt3(euro(price[i]), price.filter((_, j) => j !== i).map(euro))]); }
@@ -4003,9 +4045,9 @@ function docCinema(){
   return {title:'Kinoprogramm', html, qs};
 }
 
-const PLACES = [['Stadtbücherei', 'die Stadtbücherei'], ['Fahrradwerkstatt Speiche', 'die Fahrradwerkstatt'], ['Jugendhaus Mitte', 'das Jugendhaus'], ['Kleiderkammer', 'die Kleiderkammer']];
+const PLACES = [['Stadtbücherei', 'die Stadtbücherei'], ['Fahrradwerkstatt Speiche', 'die Fahrradwerkstatt'], ['Jugendhaus Mitte', 'das Jugendhaus', ['HS','BSS']], ['Kleiderkammer', 'die Kleiderkammer', ['HS','BSS']], ['Hallenbad Sonnental', 'das Hallenbad', ['GS']], ['Spielzeugladen Kunterbunt', 'der Spielzeugladen', ['GS']]];
 function docHours(){
-  const [name, the] = pick(PLACES), closed = rnd(0, 4); let half; do { half = rnd(0, 4); } while(half === closed);
+  const [name, the] = pick(forWorld(PLACES.map(x => ({x, w:x[2]}))).map(o => o.x)), closed = rnd(0, 4); let half; do { half = rnd(0, 4); } while(half === closed);
   const o1 = pick([8*60, 9*60, 10*60]), c1 = 12*60 + pick([0, 30]), o2 = pick([14*60, 15*60]), c2 = pick([17*60, 18*60, 19*60]);
   const iv = WDAYS.map((_, i) => i === closed ? [] : i === half ? [[o1, c1]] : [[o1, c1], [o2, c2]]);
   const txt = i => iv[i].length ? iv[i].map(([a, b]) => `${tf(a)} – ${tf(b)} Uhr`).join('<br>') : 'geschlossen';
@@ -4079,45 +4121,72 @@ function docPlan(){
   { const mx = work.reduce((a, b) => dur(b) > dur(a) ? b : a); qs.push(['schluss', `An welchem Tag arbeitet ${who} am längsten?`, opt3(WDAYS[mx], others(mx).filter(d => d !== WDAYS[school]), [WDAYS[school]])]); }
   return {title:'Praktikumsplan', html, qs};
 }
-const DOCS = {docBus, docMenu, docCinema, docHours, docJob, docRecipe, docWeather, docPlan};
+function docTimetable(){
+  const F = ['Deutsch', 'Mathe', 'Sachunterricht', 'Kunst', 'Musik'], sportDay = rnd(0, 4), musicDays = shuffle([0, 1, 2, 3, 4].filter(i => i !== sportDay)).slice(0, 2);
+  const plan = WDAYS.map((_, i) => { const r = ['Deutsch', 'Mathe', pick(['Sachunterricht', 'Kunst', 'Deutsch']), pick(['Mathe', 'Sachunterricht', 'Kunst'])]; if(i === sportDay) r[2] = r[3] = 'Sport'; if(musicDays.includes(i)) r[3] = 'Musik'; return r; });
+  const html = dcBox('Stundenplan', `Stundenplan Klasse ${pick(['2a', '3b', '4c', '2b'])}`, dcTable(['Tag', '1. Stunde', '2. Stunde', '3. Stunde', '4. Stunde'], WDAYS.map((d, i) => [d, ...plan[i]])), 'Sport ist in der Turnhalle. Bitte Turnbeutel mitbringen.');
+  const qs = [], others = i => WDAYS.filter((_, j) => j !== i), d2 = rnd(0, 4);
+  qs.push(['info', 'An welchem Tag ist Sport?', opt3(WDAYS[sportDay], others(sportDay))]);
+  qs.push(['info', `Was ist am ${WDAYS[d2]} in der 1. Stunde?`, opt3(plan[d2][0], ['Sport', 'Musik', 'Mathe', 'Kunst'])]);
+  qs.push(['info', 'Wie oft ist Musik in der Woche?', opt3('2-mal', ['1-mal', '3-mal', '5-mal'])]);
+  qs.push(['schluss', 'An welchem Tag brauchst du deinen Turnbeutel?', opt3(WDAYS[sportDay], others(sportDay))]);
+  return {title:'Stundenplan', html, qs};
+}
+function docInvite(){
+  const [nm, pr] = pick([['Mia', 'sie'], ['Paul', 'er'], ['Lena', 'sie'], ['Tim', 'er']]), age = rnd(7, 10), st = pick([14, 15]), du = pick([2, 3]);
+  const [where, bring] = pick([['im Schwimmbad Sonnental', 'Badesachen und ein Handtuch'], ['auf dem Spielplatz am Park', 'feste Schuhe und eine Regenjacke'], ['in der Trampolinhalle', 'Stoppersocken'], ['bei uns im Garten', 'ein Kuscheltier für die Schatzsuche']]);
+  const html = dcBox('Einladung', `${nm} wird ${age}!`, `<p class="dc-p">Liebe Freundinnen und Freunde,<br>ich lade euch zu meinem Geburtstag ein.</p>` + dcTable(null, [['Wann?', `am Samstag von ${st} bis ${st + du} Uhr`], ['Wo?', where], ['Bitte mitbringen', bring]]), `Sagt bitte bis Mittwoch Bescheid, ob ihr kommt. Euer${pr === 'sie' ? 'e' : ''} ${nm}`);
+  const qs = [['info', 'Wer hat Geburtstag?', opt3(nm, ['Mia', 'Paul', 'Lena', 'Tim'])], ['info', `Wie alt wird ${nm}?`, opt3(`${age} Jahre`, [`${age + 1} Jahre`, `${age - 1} Jahre`, `${age + 2} Jahre`])], ['info', 'Wann beginnt die Feier?', opt3(`um ${st} Uhr`, [`um ${st + du} Uhr`, `um ${st - 2} Uhr`, `um ${st + 1} Uhr`])],
+    ['rechnen', 'Wie lange dauert die Feier?', opt3(`${du} Stunden`, [`${du + 1} Stunden`, `${du + 2} Stunden`, '1 Stunde'])], ['info', 'Was sollst du mitbringen?', opt3(bring, ['Badesachen und ein Handtuch', 'feste Schuhe und eine Regenjacke', 'Stoppersocken', 'ein Kuscheltier für die Schatzsuche'])]];
+  return {title:'Einladung', html, qs};
+}
+const DOCS = {docBus, docMenu, docCinema, docHours, docJob, docRecipe, docWeather, docPlan, docTimetable, docInvite};
+const DOC_W = {docBus:['HS','BSS'], docCinema:['HS','BSS'], docJob:['HS','BSS'], docPlan:['BSS'], docTimetable:['GS','HS'], docInvite:['GS']};
+const docKeys = () => { const k = Object.keys(DOCS).filter(x => inWorld({w: DOC_W[x]})); return k.length ? k : Object.keys(DOCS); };
 
 /* ---------- Lesen L9: Längere Texte verstehen (Zusammenhänge, Schlussfolgern) ---------- */
 /* q: [Art, Abschnitt (0 = ganzer Text), Frage, richtig, falsch, falsch] */
 const LONG = [
-  {g:'Erzählung', t:'Emres Praktikum', p:['Emre macht seit Montag ein Praktikum in der Gärtnerei Blum. Er steht jeden Morgen um 6 Uhr auf, denn die Arbeit beginnt schon um 7 Uhr. Am ersten Tag zeigt ihm Herr Blum die Gewächshäuser. Dort wachsen Tomaten, Gurken und viele Blumen.', 'Am Dienstag soll Emre die Pflanzen gießen. Er nimmt den großen Schlauch und gießt alles sehr gründlich. Später sieht er, dass bei den Kakteen Wasser auf dem Boden steht. Herr Blum lacht und sagt: „Kakteen brauchen nur ganz wenig Wasser.“ Emre schreibt sich das in sein Heft.', 'Am Freitag darf Emre zum ersten Mal allein Blumen an eine Kundin verkaufen. Abends erzählt er seiner Mutter davon und grinst dabei die ganze Zeit.'],
+  {w:['HS','BSS'], g:'Erzählung', t:'Emres Praktikum', p:['Emre macht seit Montag ein Praktikum in der Gärtnerei Blum. Er steht jeden Morgen um 6 Uhr auf, denn die Arbeit beginnt schon um 7 Uhr. Am ersten Tag zeigt ihm Herr Blum die Gewächshäuser. Dort wachsen Tomaten, Gurken und viele Blumen.', 'Am Dienstag soll Emre die Pflanzen gießen. Er nimmt den großen Schlauch und gießt alles sehr gründlich. Später sieht er, dass bei den Kakteen Wasser auf dem Boden steht. Herr Blum lacht und sagt: „Kakteen brauchen nur ganz wenig Wasser.“ Emre schreibt sich das in sein Heft.', 'Am Freitag darf Emre zum ersten Mal allein Blumen an eine Kundin verkaufen. Abends erzählt er seiner Mutter davon und grinst dabei die ganze Zeit.'],
    q:[['info', 1, 'Wann beginnt die Arbeit in der Gärtnerei?', 'um 7 Uhr', 'um 6 Uhr', 'um 8 Uhr'], ['warum', 2, 'Warum lacht Herr Blum?', 'Emre hat die Kakteen viel zu stark gegossen.', 'Emre hat den Schlauch vergessen.', 'Die Tomaten sind schon reif.'], ['schluss', 2, 'Warum schreibt Emre den Satz in sein Heft?', 'Er will den Fehler nicht noch einmal machen.', 'Herr Blum will das Heft einsammeln.', 'Er muss eine Hausaufgabe machen.'], ['schluss', 3, 'Wie fühlt sich Emre am Freitagabend?', 'Er ist stolz und froh.', 'Er ist traurig.', 'Er ist wütend.'], ['thema', 0, 'Worum geht es in dem Text?', 'um Emres erste Woche im Praktikum', 'darum, wie man Tomaten pflanzt', 'um Emres Mutter, die Blumen kauft']]},
-  {g:'Nachrichten', t:'Chat zwischen Sara und Ali', chat:[['Sara', 'Hallo Ali! Gehen wir am Samstag zusammen ins Schwimmbad?'], ['Ali', 'Ja, gern! Wann und wo treffen wir uns?', 1], ['Sara', 'Um 14 Uhr an der Bushaltestelle vor der Schule.'], ['Ali', 'Um 14 Uhr habe ich noch Fußballtraining. Geht es auch eine Stunde später?', 1], ['Sara', 'Klar, kein Problem. Vergiss dein Handtuch nicht! Ich habe letztes Mal meins vergessen und musste nass in den Bus.'], ['Ali', 'Haha, okay. Bis Samstag!', 1]],
+  {w:['HS','BSS'], g:'Nachrichten', t:'Chat zwischen Sara und Ali', chat:[['Sara', 'Hallo Ali! Gehen wir am Samstag zusammen ins Schwimmbad?'], ['Ali', 'Ja, gern! Wann und wo treffen wir uns?', 1], ['Sara', 'Um 14 Uhr an der Bushaltestelle vor der Schule.'], ['Ali', 'Um 14 Uhr habe ich noch Fußballtraining. Geht es auch eine Stunde später?', 1], ['Sara', 'Klar, kein Problem. Vergiss dein Handtuch nicht! Ich habe letztes Mal meins vergessen und musste nass in den Bus.'], ['Ali', 'Haha, okay. Bis Samstag!', 1]],
    q:[['info', 0, 'Wohin wollen Sara und Ali gehen?', 'ins Schwimmbad', 'zum Fußballtraining', 'in die Schule'], ['schluss', 0, 'Um wie viel Uhr treffen sie sich jetzt?', 'um 15 Uhr', 'um 14 Uhr', 'um 13 Uhr'], ['warum', 0, 'Warum kann Ali nicht um 14 Uhr?', 'Er hat Fußballtraining.', 'Er muss in die Schule.', 'Er hat kein Handtuch.'], ['info', 0, 'Was ist Sara beim letzten Mal passiert?', 'Sie hatte ihr Handtuch vergessen.', 'Sie hat den Bus verpasst.', 'Sie kam zu spät.']]},
-  {g:'E-Mail', t:'Einladung zum Schulfest', head:'Von: Frau Weber · An: Klasse 9b · Betreff: Schulfest', p:['Liebe Klasse 9b, am Freitag, den 4. Juli, feiern wir unser Schulfest. Es beginnt um 15 Uhr auf dem Schulhof. Alle Eltern und Geschwister sind eingeladen.', 'Unsere Klasse verkauft Waffeln. Dafür brauchen wir eure Hilfe: Wer kann Eier, Mehl oder Milch mitbringen? Bitte tragt euch bis Mittwoch in die Liste an der Klassentür ein. Das Geld aus dem Verkauf ist für unseren Ausflug in den Kletterpark.', 'Wenn es regnet, feiern wir in der Turnhalle. Viele Grüße, Frau Weber'],
+  {w:['HS','BSS'], g:'E-Mail', t:'Einladung zum Schulfest', head:'Von: Frau Weber · An: Klasse 9b · Betreff: Schulfest', p:['Liebe Klasse 9b, am Freitag, den 4. Juli, feiern wir unser Schulfest. Es beginnt um 15 Uhr auf dem Schulhof. Alle Eltern und Geschwister sind eingeladen.', 'Unsere Klasse verkauft Waffeln. Dafür brauchen wir eure Hilfe: Wer kann Eier, Mehl oder Milch mitbringen? Bitte tragt euch bis Mittwoch in die Liste an der Klassentür ein. Das Geld aus dem Verkauf ist für unseren Ausflug in den Kletterpark.', 'Wenn es regnet, feiern wir in der Turnhalle. Viele Grüße, Frau Weber'],
    q:[['info', 1, 'Wann beginnt das Schulfest?', 'um 15 Uhr', 'um 4 Uhr', 'am Mittwoch'], ['info', 2, 'Was verkauft die Klasse 9b?', 'Waffeln', 'Eier', 'Getränke'], ['warum', 2, 'Wofür ist das Geld aus dem Verkauf?', 'für den Ausflug in den Kletterpark', 'für neue Bücher', 'für ein Geschenk für Frau Weber'], ['schluss', 3, 'Am 4. Juli regnet es. Wo findet das Fest statt?', 'in der Turnhalle', 'auf dem Schulhof', 'im Kletterpark'], ['info', 2, 'Bis wann soll man sich in die Liste eintragen?', 'bis Mittwoch', 'bis Freitag', 'bis zum 4. Juli']]},
   {g:'Zeitungsmeldung', t:'Hund Bruno ist wieder zu Hause', p:['Ulm. Drei Tage lang war der Hund Bruno verschwunden. Seine Besitzerin, Frau Demir, hatte überall Zettel mit seinem Foto aufgehängt. Viele Menschen haben nach dem braunen Hund gesucht.', 'Am Donnerstag hörte ein Mann im Stadtpark leises Bellen. Bruno saß in einem alten Gartenhaus fest. Die Tür war hinter ihm zugefallen. Der Mann rief sofort die Nummer auf dem Zettel an.', 'Bruno war hungrig, aber gesund. Frau Demir will dem Finder als Dank einen Kuchen backen.'],
    q:[['info', 1, 'Wie lange war Bruno weg?', 'drei Tage', 'eine Woche', 'einen Tag'], ['warum', 2, 'Warum konnte Bruno nicht nach Hause laufen?', 'Die Tür vom Gartenhaus war zugefallen.', 'Er hatte sich am Bein verletzt.', 'Er hatte Angst vor dem Mann.'], ['schluss', 2, 'Woher hatte der Mann die Telefonnummer?', 'von einem Zettel mit Brunos Foto', 'aus dem Telefonbuch', 'von der Polizei'], ['schluss', 3, 'Was empfindet Frau Demir für den Finder?', 'Sie ist ihm dankbar.', 'Sie ist böse auf ihn.', 'Er ist ihr egal.'], ['thema', 0, 'Welche Überschrift passt auch gut zu dem Text?', 'Vermisster Hund im Gartenhaus gefunden', 'Neues Gartenhaus im Stadtpark', 'Frau Demir backt gern Kuchen']]},
   {g:'Sachtext', t:'Warum Bienen so wichtig sind', p:['Bienen fliegen von Blüte zu Blüte und sammeln Nektar. Daraus machen sie Honig. Dabei bleibt Blütenstaub an ihren Beinen hängen. Diesen Blütenstaub tragen sie zur nächsten Blüte.', 'Nur wenn Blütenstaub auf eine andere Blüte kommt, kann daraus eine Frucht wachsen. Ohne Bienen gäbe es also viel weniger Äpfel, Kirschen und Erdbeeren.', 'Heute gibt es weniger Bienen als früher. In Städten finden sie oft zu wenig Blumen. Jeder kann helfen: Wer auf dem Balkon Blumen pflanzt, gibt den Bienen Futter.'],
    q:[['info', 1, 'Was machen Bienen aus Nektar?', 'Honig', 'Blütenstaub', 'Äpfel'], ['warum', 2, 'Warum sind Bienen wichtig für Äpfel und Kirschen?', 'Sie bringen Blütenstaub von Blüte zu Blüte.', 'Sie fressen die schlechten Früchte.', 'Sie machen die Früchte süß.'], ['warum', 3, 'Warum gibt es in Städten weniger Bienen?', 'Sie finden dort zu wenig Blumen.', 'Sie machen dort zu viel Honig.', 'Dort gibt es zu viele Äpfel.'], ['schluss', 3, 'Tim pflanzt Blumen auf seinem Balkon. Was bewirkt das?', 'Bienen finden dort Futter.', 'Tim bekommt dafür Honig geschenkt.', 'Es kommen weniger Bienen.'], ['thema', 0, 'Was ist die wichtigste Aussage des Textes?', 'Bienen helfen, dass Obst wachsen kann.', 'Bienen können gefährlich stechen.', 'Honig ist sehr gesund.']]},
-  {g:'Erzählung', t:'Ein schwieriger Morgen', p:['Lea macht ein Praktikum in einem Altenheim. Um 8 Uhr soll sie dort sein. Heute klingelt ihr Wecker nicht, weil der Akku von ihrem Handy leer ist. Sie wacht erst um 7:30 Uhr auf.', 'Lea zieht sich schnell an und rennt zur Haltestelle. Aber der Bus fährt ihr direkt vor der Nase weg. Der nächste Bus kommt erst in 20 Minuten.', 'Lea überlegt kurz. Dann ruft sie im Altenheim an und sagt, dass sie später kommt. Ihre Chefin, Frau Roth, sagt: „Gut, dass du Bescheid sagst. Bis gleich!“ Am Abend legt Lea ihr Handy vor dem Schlafen ans Ladekabel.'],
+  {w:['HS','BSS'], g:'Erzählung', t:'Ein schwieriger Morgen', p:['Lea macht ein Praktikum in einem Altenheim. Um 8 Uhr soll sie dort sein. Heute klingelt ihr Wecker nicht, weil der Akku von ihrem Handy leer ist. Sie wacht erst um 7:30 Uhr auf.', 'Lea zieht sich schnell an und rennt zur Haltestelle. Aber der Bus fährt ihr direkt vor der Nase weg. Der nächste Bus kommt erst in 20 Minuten.', 'Lea überlegt kurz. Dann ruft sie im Altenheim an und sagt, dass sie später kommt. Ihre Chefin, Frau Roth, sagt: „Gut, dass du Bescheid sagst. Bis gleich!“ Am Abend legt Lea ihr Handy vor dem Schlafen ans Ladekabel.'],
    q:[['warum', 1, 'Warum klingelt Leas Wecker nicht?', 'Der Akku von ihrem Handy ist leer.', 'Lea hat den Wecker ausgeschaltet.', 'Es ist Sonntag.'], ['info', 2, 'Wann kommt der nächste Bus?', 'in 20 Minuten', 'um 8 Uhr', 'in 2 Minuten'], ['schluss', 3, 'Wie findet Frau Roth Leas Anruf?', 'Sie findet es gut, dass Lea Bescheid sagt.', 'Sie ist wütend auf Lea.', 'Sie versteht Lea nicht.'], ['schluss', 3, 'Warum legt Lea am Abend ihr Handy ans Ladekabel?', 'Damit der Wecker am nächsten Morgen klingelt.', 'Weil sie abends noch telefonieren will.', 'Weil Frau Roth es ihr befohlen hat.'], ['folge', 0, 'Was passiert zuerst?', 'Der Bus fährt Lea vor der Nase weg.', 'Lea ruft im Altenheim an.', 'Lea legt ihr Handy ans Ladekabel.']]},
-  {g:'Erzählung', t:'Das Geheimnis', p:['Nina und Selin sind seit der ersten Klasse beste Freundinnen. In der Pause erzählt Selin Nina ein Geheimnis: Sie findet Marco aus der Parallelklasse sehr nett. „Sag es bitte niemandem!“, bittet sie.', 'Am nächsten Tag kichern zwei Mädchen, als Selin vorbeigeht. Eine ruft: „Na, wo ist denn Marco?“ Selin wird rot. In der Pause geht sie allein auf den Schulhof und spricht nicht mehr mit Nina.', 'Nach der Schule wartet Nina am Tor. „Es tut mir leid“, sagt sie leise. „Ich habe es nur Jana erzählt. Ich dachte, sie sagt es nicht weiter.“ Selin schweigt lange. Dann sagt sie: „Okay. Aber nächstes Mal behältst du es für dich.“'],
+  {w:['HS','BSS'], g:'Erzählung', t:'Das Geheimnis', p:['Nina und Selin sind seit der ersten Klasse beste Freundinnen. In der Pause erzählt Selin Nina ein Geheimnis: Sie findet Marco aus der Parallelklasse sehr nett. „Sag es bitte niemandem!“, bittet sie.', 'Am nächsten Tag kichern zwei Mädchen, als Selin vorbeigeht. Eine ruft: „Na, wo ist denn Marco?“ Selin wird rot. In der Pause geht sie allein auf den Schulhof und spricht nicht mehr mit Nina.', 'Nach der Schule wartet Nina am Tor. „Es tut mir leid“, sagt sie leise. „Ich habe es nur Jana erzählt. Ich dachte, sie sagt es nicht weiter.“ Selin schweigt lange. Dann sagt sie: „Okay. Aber nächstes Mal behältst du es für dich.“'],
    q:[['info', 1, 'Was erzählt Selin in der Pause?', 'Sie findet Marco sehr nett.', 'Sie will die Schule wechseln.', 'Sie hat Streit mit Jana.'], ['schluss', 2, 'Warum spricht Selin nicht mehr mit Nina?', 'Sie merkt, dass Nina das Geheimnis weitererzählt hat.', 'Nina hat sie auf dem Schulhof geschubst.', 'Selin ist krank.'], ['schluss', 2, 'Wie fühlt sich Selin, als die Mädchen kichern?', 'Es ist ihr peinlich.', 'Sie freut sich.', 'Sie ist müde.'], ['schluss', 3, 'Wie endet die Geschichte?', 'Selin verzeiht Nina, ist aber noch vorsichtig.', 'Selin und Nina sind keine Freundinnen mehr.', 'Nina erzählt das Geheimnis Marco.'], ['wort', 3, '„Selin schweigt lange.“ Was bedeutet „schweigen“?', 'nichts sagen', 'laut lachen', 'schnell weggehen']]},
-  {g:'Anleitung', t:'So wäschst du deine Kleidung', p:['Sortiere zuerst die Wäsche. Helle und dunkle Sachen wäschst du getrennt. Sonst kann ein rotes T-Shirt die weißen Socken rosa färben.', 'Schau dann auf das kleine Schild in der Kleidung. Dort steht, wie heiß du sie waschen darfst. Die meisten T-Shirts wäschst du bei 40 Grad. Handtücher und Bettwäsche darf man meistens heißer waschen.', 'Gib nun die Wäsche in die Maschine und fülle Waschmittel ein. Stelle das Programm ein und drücke auf Start. Wenn die Maschine fertig ist, hängst du die Wäsche sofort auf. Sonst riecht sie muffig.'],
+  {w:['HS','BSS'], g:'Anleitung', t:'So wäschst du deine Kleidung', p:['Sortiere zuerst die Wäsche. Helle und dunkle Sachen wäschst du getrennt. Sonst kann ein rotes T-Shirt die weißen Socken rosa färben.', 'Schau dann auf das kleine Schild in der Kleidung. Dort steht, wie heiß du sie waschen darfst. Die meisten T-Shirts wäschst du bei 40 Grad. Handtücher und Bettwäsche darf man meistens heißer waschen.', 'Gib nun die Wäsche in die Maschine und fülle Waschmittel ein. Stelle das Programm ein und drücke auf Start. Wenn die Maschine fertig ist, hängst du die Wäsche sofort auf. Sonst riecht sie muffig.'],
    q:[['folge', 0, 'Was machst du als Erstes?', 'die Wäsche sortieren', 'Waschmittel einfüllen', 'auf Start drücken'], ['warum', 1, 'Warum wäschst du helle und dunkle Sachen getrennt?', 'Die Farbe kann auf andere Sachen abfärben.', 'Sonst ist die Maschine zu voll.', 'Dunkle Sachen brauchen kein Waschmittel.'], ['info', 2, 'Wo steht, wie heiß du ein Kleidungsstück waschen darfst?', 'auf dem Schild in der Kleidung', 'auf der Waschmaschine', 'auf dem Waschmittel'], ['schluss', 3, 'Kevin lässt die nasse Wäsche über Nacht in der Maschine. Was passiert wahrscheinlich?', 'Die Wäsche riecht muffig.', 'Die Wäsche wird rosa.', 'Die Wäsche ist morgens trocken.'], ['wort', 3, 'Was bedeutet „muffig“?', 'Es riecht unangenehm.', 'Es ist sehr sauber.', 'Es ist zu klein.']]},
-  {g:'Erzählung', t:'Ein Tag in der Kantine', p:['Jonas arbeitet seit einer Woche in der Kantine einer großen Firma. Um 9 Uhr zieht er seine weiße Kleidung und ein Haarnetz an. Dann wäscht er sich gründlich die Hände.', 'Bis zum Mittag schneidet er Gemüse für den Salat und füllt die Getränke auf. Um 11:30 Uhr kommen die ersten Gäste. Dann wird es laut und hektisch. Jonas räumt leere Tabletts ab und wischt die Tische.', 'Um 14 Uhr ist die Kantine wieder leer. Jonas setzt sich mit seinen Kollegen an einen Tisch. Endlich kann auch er essen. Heute gibt es Gemüsecurry. Seine Füße tun weh, aber er lächelt.'],
+  {w:['BSS'], g:'Erzählung', t:'Ein Tag in der Kantine', p:['Jonas arbeitet seit einer Woche in der Kantine einer großen Firma. Um 9 Uhr zieht er seine weiße Kleidung und ein Haarnetz an. Dann wäscht er sich gründlich die Hände.', 'Bis zum Mittag schneidet er Gemüse für den Salat und füllt die Getränke auf. Um 11:30 Uhr kommen die ersten Gäste. Dann wird es laut und hektisch. Jonas räumt leere Tabletts ab und wischt die Tische.', 'Um 14 Uhr ist die Kantine wieder leer. Jonas setzt sich mit seinen Kollegen an einen Tisch. Endlich kann auch er essen. Heute gibt es Gemüsecurry. Seine Füße tun weh, aber er lächelt.'],
    q:[['info', 1, 'Was zieht Jonas zur Arbeit an?', 'weiße Kleidung und ein Haarnetz', 'seine Sportsachen', 'eine Jacke und eine Mütze'], ['schluss', 1, 'Warum trägt Jonas wohl ein Haarnetz?', 'Damit keine Haare ins Essen fallen.', 'Weil es in der Küche kalt ist.', 'Weil es ihm gut steht.'], ['info', 2, 'Was macht Jonas, wenn die Gäste da sind?', 'Er räumt Tabletts ab und wischt Tische.', 'Er schneidet Gemüse.', 'Er isst Gemüsecurry.'], ['schluss', 3, 'Warum tun Jonas die Füße weh?', 'Er war viele Stunden auf den Beinen.', 'Seine Schuhe sind zu groß.', 'Er ist hingefallen.'], ['wort', 2, 'Was bedeutet „hektisch“?', 'Alle haben es sehr eilig.', 'Es ist ganz ruhig.', 'Das Essen ist kalt.']]},
   {g:'Notiz', t:'Zettel am Kühlschrank', p:['Hallo Ben, ich komme heute erst um 19 Uhr nach Hause, weil ich länger arbeiten muss. Im Kühlschrank steht Nudelsalat für dich.', 'Bitte iss nicht den Kuchen! Der ist für Omas Geburtstag morgen.', 'Kannst du um 17 Uhr deine kleine Schwester Mila vom Kindergarten abholen? Papa schafft es heute nicht. Danke! Mama'],
    q:[['warum', 1, 'Warum kommt Mama heute später?', 'Sie muss länger arbeiten.', 'Sie ist bei Oma.', 'Sie holt Mila ab.'], ['info', 1, 'Was darf Ben essen?', 'den Nudelsalat', 'den Kuchen', 'gar nichts'], ['schluss', 2, 'Für wen ist der Kuchen?', 'für Oma', 'für Ben', 'für Mila'], ['info', 3, 'Was soll Ben um 17 Uhr tun?', 'Mila vom Kindergarten abholen', 'einen Kuchen backen', 'Papa anrufen'], ['schluss', 3, 'Was weißt du über Mila?', 'Sie ist noch ein kleines Kind.', 'Sie ist älter als Ben.', 'Sie arbeitet mit Mama.']]},
   {g:'Sachtext', t:'Kleine Wunden richtig versorgen', p:['Beim Basteln oder in der Küche schneidet man sich schnell in den Finger. Meist ist das nicht schlimm. Trotzdem sollte man die Wunde gut versorgen, damit kein Schmutz hineinkommt.', 'Halte die Wunde kurz unter sauberes, kaltes Wasser. Tupfe sie danach vorsichtig trocken. Dann klebst du ein Pflaster darauf. Das Pflaster schützt die Wunde vor Schmutz.', 'Wenn eine Wunde stark blutet oder sehr tief ist, brauchst du Hilfe. Sag sofort einem Erwachsenen Bescheid oder ruf die 112 an.'],
    q:[['warum', 1, 'Warum soll man auch kleine Wunden versorgen?', 'Damit kein Schmutz hineinkommt.', 'Damit es stärker blutet.', 'Weil es sonst sehr weh tut.'], ['folge', 2, 'Was machst du, nachdem du die Wunde unter Wasser gehalten hast?', 'Ich tupfe sie vorsichtig trocken.', 'Ich rufe die 112 an.', 'Ich bastle weiter.'], ['schluss', 3, 'Aylin hat sich tief geschnitten. Es blutet sehr stark. Was ist richtig?', 'Sofort einen Erwachsenen holen oder die 112 anrufen.', 'Nur ein kleines Pflaster daraufkleben.', 'Abwarten, bis es von allein aufhört.'], ['info', 2, 'Wozu ist das Pflaster da?', 'Es schützt die Wunde vor Schmutz.', 'Es kühlt die Wunde.', 'Es stoppt jede starke Blutung.']]},
-  {g:'Erzählung', t:'Einkaufen mit 10 Euro', p:['Hanna hat 10 Euro. Sie soll für das Frühstück in der Wohngruppe einkaufen: Brot, Butter und Marmelade. Auf dem Weg zum Supermarkt sieht sie ein Plakat: „Heute Erdbeeren im Angebot – nur 2 Euro!“', 'Im Laden legt Hanna Brot für 3 Euro, Butter für 2 Euro und Marmelade für 2 Euro in den Korb. Dann geht sie zu den Erdbeeren. Sie rechnet kurz nach und nimmt eine Schale mit.', 'An der Kasse bezahlt sie mit ihrem Schein. Die Verkäuferin gibt ihr 1 Euro zurück. Beim Frühstück freuen sich alle über die Erdbeeren.'],
+  {w:['BSS'], g:'Erzählung', t:'Einkaufen mit 10 Euro', p:['Hanna hat 10 Euro. Sie soll für das Frühstück in der Wohngruppe einkaufen: Brot, Butter und Marmelade. Auf dem Weg zum Supermarkt sieht sie ein Plakat: „Heute Erdbeeren im Angebot – nur 2 Euro!“', 'Im Laden legt Hanna Brot für 3 Euro, Butter für 2 Euro und Marmelade für 2 Euro in den Korb. Dann geht sie zu den Erdbeeren. Sie rechnet kurz nach und nimmt eine Schale mit.', 'An der Kasse bezahlt sie mit ihrem Schein. Die Verkäuferin gibt ihr 1 Euro zurück. Beim Frühstück freuen sich alle über die Erdbeeren.'],
    q:[['info', 1, 'Was soll Hanna einkaufen?', 'Brot, Butter und Marmelade', 'nur Erdbeeren', 'Brot und Milch'], ['schluss', 2, 'Warum rechnet Hanna nach, bevor sie die Erdbeeren nimmt?', 'Sie will wissen, ob ihr Geld reicht.', 'Sie will die Erdbeeren zählen.', 'Sie hat die Preise vergessen.'], ['info', 3, 'Wie viel Geld bekommt Hanna zurück?', '1 Euro', '2 Euro', '10 Euro'], ['schluss', 3, 'Wie finden die anderen Hannas Idee mit den Erdbeeren?', 'Sie finden die Idee gut.', 'Sie ärgern sich.', 'Sie merken es nicht.']]},
   {g:'Zeitungsmeldung', t:'Lindenschule gewinnt Fußballturnier', p:['Am Samstag fand in der Sporthalle Nord das Fußballturnier der Schulen statt. Acht Mannschaften waren dabei. Jedes Spiel dauerte zehn Minuten.', 'Das Team der Lindenschule verlor das erste Spiel mit 0:2. Danach gewann es alle weiteren Spiele. Im Finale stand es lange 1:1. Kurz vor dem Ende schoss Kapitänin Julia das entscheidende Tor.', 'Der Pokal steht jetzt im Eingang der Schule. Trainer Herr Kaya sagt: „Nach der ersten Niederlage haben wir nicht aufgegeben. Darauf bin ich stolz.“'],
    q:[['info', 1, 'Wie viele Mannschaften waren beim Turnier?', 'acht', 'zehn', 'zwei'], ['info', 2, 'Wie ging das erste Spiel der Lindenschule aus?', 'Sie verlor 0:2.', 'Es stand 1:1.', 'Sie gewann 2:0.'], ['schluss', 2, 'Wie endete das Finale?', 'Die Lindenschule gewann 2:1.', 'Es blieb beim 1:1.', 'Die Lindenschule verlor.'], ['warum', 3, 'Worauf ist Herr Kaya stolz?', 'Das Team hat nach der Niederlage nicht aufgegeben.', 'Das Team hat jedes Spiel gewonnen.', 'Er hat selbst ein Tor geschossen.'], ['wort', 2, 'Das „entscheidende Tor“ ist das Tor, …', '… mit dem das Spiel gewonnen wurde.', '… das als Erstes fiel.', '… das nicht gezählt hat.']]},
-  {g:'Sachtext', t:'Gut schlafen – was hilft?', p:['Jugendliche brauchen ungefähr neun Stunden Schlaf. Viele schlafen aber weniger. Sie sind dann am nächsten Tag müde und können sich schlecht konzentrieren.', 'Ein Grund ist oft das Handy. Das helle Licht vom Bildschirm sagt dem Körper: „Es ist noch Tag!“ Dann wird man nicht richtig müde. Außerdem will man noch schnell ein Video sehen – und dann noch eins.', 'Ein Tipp: Leg das Handy eine Stunde vor dem Schlafen weg. Lies lieber ein Buch oder hör ruhige Musik. Am besten liegt das Handy in der Nacht gar nicht neben dem Bett.'],
+  {w:['HS','BSS'], g:'Sachtext', t:'Gut schlafen – was hilft?', p:['Jugendliche brauchen ungefähr neun Stunden Schlaf. Viele schlafen aber weniger. Sie sind dann am nächsten Tag müde und können sich schlecht konzentrieren.', 'Ein Grund ist oft das Handy. Das helle Licht vom Bildschirm sagt dem Körper: „Es ist noch Tag!“ Dann wird man nicht richtig müde. Außerdem will man noch schnell ein Video sehen – und dann noch eins.', 'Ein Tipp: Leg das Handy eine Stunde vor dem Schlafen weg. Lies lieber ein Buch oder hör ruhige Musik. Am besten liegt das Handy in der Nacht gar nicht neben dem Bett.'],
    q:[['info', 1, 'Wie viel Schlaf brauchen Jugendliche?', 'ungefähr neun Stunden', 'ungefähr fünf Stunden', 'ungefähr zwölf Stunden'], ['warum', 2, 'Warum wird man durch das Licht vom Handy nicht richtig müde?', 'Der Körper denkt, es ist noch Tag.', 'Das Licht ist zu dunkel.', 'Das Handy ist zu laut.'], ['schluss', 1, 'Marco hat nur fünf Stunden geschlafen. Wie geht es ihm wahrscheinlich in der Schule?', 'Er ist müde und kann sich schlecht konzentrieren.', 'Er ist besonders wach.', 'Er hat großen Hunger.'], ['info', 3, 'Was soll man eine Stunde vor dem Schlafen tun?', 'das Handy weglegen', 'noch ein Video ansehen', 'Sport machen'], ['thema', 0, 'Worum geht es in dem Text?', 'wie das Handy den Schlaf stört und was hilft', 'welche Handys am besten sind', 'warum Bücher langweilig sind']]},
-  {g:'Erzählung', t:'Kevin zieht um', p:['Kevin ist 17 Jahre alt. Nächsten Monat zieht er von zu Hause aus in eine Wohngruppe. Dort wohnen sechs junge Leute. Jeder hat ein eigenes Zimmer, aber Küche und Bad teilen sich alle.', 'Kevin freut sich, aber er ist auch ein bisschen nervös. Er kennt die anderen noch nicht. Und kochen kann er bis jetzt nur Spiegeleier.', 'Deshalb übt er jetzt jeden Samstag mit seinem Vater. Letzte Woche haben sie Spaghetti gekocht. Diese Woche probieren sie eine Gemüsesuppe.'],
+  {w:['BSS'], g:'Erzählung', t:'Kevin zieht um', p:['Kevin ist 17 Jahre alt. Nächsten Monat zieht er von zu Hause aus in eine Wohngruppe. Dort wohnen sechs junge Leute. Jeder hat ein eigenes Zimmer, aber Küche und Bad teilen sich alle.', 'Kevin freut sich, aber er ist auch ein bisschen nervös. Er kennt die anderen noch nicht. Und kochen kann er bis jetzt nur Spiegeleier.', 'Deshalb übt er jetzt jeden Samstag mit seinem Vater. Letzte Woche haben sie Spaghetti gekocht. Diese Woche probieren sie eine Gemüsesuppe.'],
    q:[['info', 1, 'Was teilen sich alle in der Wohngruppe?', 'Küche und Bad', 'ihre Zimmer', 'ihre Handys'], ['warum', 2, 'Warum ist Kevin nervös?', 'Er kennt die anderen noch nicht.', 'Er mag keine Spiegeleier.', 'Sein Vater zieht auch um.'], ['schluss', 3, 'Warum kocht Kevin jeden Samstag mit seinem Vater?', 'Er will kochen lernen, bevor er umzieht.', 'Sein Vater kann nicht kochen.', 'Samstags gibt es sonst nichts zu essen.'], ['folge', 3, 'Was kochen die beiden diese Woche?', 'eine Gemüsesuppe', 'Spaghetti', 'Spiegeleier']]},
-  {g:'Aushang', t:'Regeln in unserer Wohngruppe', p:['Ruhezeit ist von 22 Uhr bis 7 Uhr. In dieser Zeit hören wir Musik nur mit Kopfhörern.', 'Jeder räumt sein Geschirr nach dem Essen selbst in die Spülmaschine. Der Küchendienst wechselt jede Woche. Wer Dienst hat, wischt abends die Tische und bringt den Müll raus.', 'Besuch ist bis 21 Uhr erlaubt. Wenn jemand übernachten möchte, fragt man vorher die Betreuer.'],
+  {w:['BSS'], g:'Aushang', t:'Regeln in unserer Wohngruppe', p:['Ruhezeit ist von 22 Uhr bis 7 Uhr. In dieser Zeit hören wir Musik nur mit Kopfhörern.', 'Jeder räumt sein Geschirr nach dem Essen selbst in die Spülmaschine. Der Küchendienst wechselt jede Woche. Wer Dienst hat, wischt abends die Tische und bringt den Müll raus.', 'Besuch ist bis 21 Uhr erlaubt. Wenn jemand übernachten möchte, fragt man vorher die Betreuer.'],
    q:[['schluss', 1, 'Ali will um 23 Uhr Musik hören. Was ist erlaubt?', 'Musik mit Kopfhörern', 'laute Musik im Zimmer', 'Musik in der Küche'], ['info', 2, 'Was macht die Person mit Küchendienst am Abend?', 'Tische wischen und Müll rausbringen', 'für alle kochen', 'alle Zimmer putzen'], ['schluss', 3, 'Ein Freund will bei Lukas übernachten. Was muss Lukas tun?', 'vorher die Betreuer fragen', 'nichts, das ist immer erlaubt', 'bis 22 Uhr warten'], ['info', 3, 'Bis wann ist Besuch erlaubt?', 'bis 21 Uhr', 'bis 22 Uhr', 'bis 7 Uhr']]},
-  {g:'Erzählung', t:'Ausverkauft', p:['Tim und Hanna wollen am Freitag ins Kino. Sie möchten den neuen Film „Die Insel der Wölfe“ sehen. Sie fahren mit dem Rad zum Kino und kommen um 19:50 Uhr an. Der Film beginnt um 20 Uhr.', 'An der Kasse hängt ein Schild: „Ausverkauft“. Hanna ist enttäuscht. „Hätten wir die Karten doch im Internet gekauft!“, sagt sie.', 'Tim schaut auf das Programm. „Um 20:15 Uhr läuft eine Komödie. Die soll lustig sein.“ Hanna überlegt kurz und nickt. Später lachen beide so viel, dass ihnen der Bauch weh tut.'],
+  {w:['HS','BSS'], g:'Erzählung', t:'Ausverkauft', p:['Tim und Hanna wollen am Freitag ins Kino. Sie möchten den neuen Film „Die Insel der Wölfe“ sehen. Sie fahren mit dem Rad zum Kino und kommen um 19:50 Uhr an. Der Film beginnt um 20 Uhr.', 'An der Kasse hängt ein Schild: „Ausverkauft“. Hanna ist enttäuscht. „Hätten wir die Karten doch im Internet gekauft!“, sagt sie.', 'Tim schaut auf das Programm. „Um 20:15 Uhr läuft eine Komödie. Die soll lustig sein.“ Hanna überlegt kurz und nickt. Später lachen beide so viel, dass ihnen der Bauch weh tut.'],
    q:[['warum', 2, 'Warum können Tim und Hanna „Die Insel der Wölfe“ nicht sehen?', 'Es gibt keine Karten mehr.', 'Sie kommen zu spät.', 'Das Kino ist geschlossen.'], ['schluss', 2, 'Was wollen die beiden beim nächsten Mal wohl anders machen?', 'Die Karten vorher im Internet kaufen.', 'Mit dem Bus fahren.', 'Nie mehr ins Kino gehen.'], ['info', 3, 'Welchen Film sehen die beiden am Ende?', 'eine Komödie', '„Die Insel der Wölfe“', 'gar keinen Film'], ['schluss', 3, 'Wie hat ihnen der Film gefallen?', 'sehr gut', 'gar nicht', 'Er war langweilig.']]},
+  {w:['GS'], g:'Erzählung', t:'Der verlorene Turnbeutel', p:['Heute hat die Klasse 2b Sport. Leo sucht seinen Turnbeutel. Er hängt nicht an seinem Haken. Leo ist traurig, denn ohne Turnschuhe darf er nicht mitturnen.', 'Frau Kaya hilft ihm beim Suchen. Sie schauen unter die Bänke und in den Schrank. Da klopft es an der Tür. Der Busfahrer bringt den Turnbeutel: Leo hat ihn am Morgen im Schulbus vergessen.', 'Jetzt hängt Leo seinen Turnbeutel immer sofort an den Haken. So geht er nicht mehr verloren.'],
+   q:[['info', 1, 'Was sucht Leo?', 'seinen Turnbeutel', 'seine Jacke', 'sein Heft'], ['warum', 1, 'Warum ist Leo traurig?', 'Ohne Turnschuhe darf er nicht mitturnen.', 'Er hat Bauchweh.', 'Er mag keinen Sport.'], ['info', 2, 'Wo war der Turnbeutel?', 'im Schulbus', 'im Schrank', 'unter der Bank'], ['schluss', 3, 'Was macht Leo jetzt anders?', 'Er hängt den Turnbeutel sofort an den Haken.', 'Er lässt den Turnbeutel zu Hause.', 'Er fährt nicht mehr mit dem Bus.']]},
+  {w:['GS'], g:'Aushang', t:'Regeln auf dem Pausenhof', p:['Wir spielen fair und tun niemandem weh.', 'Wenn es klingelt, stellen wir uns in einer Reihe an der Tür auf.', 'Die Bälle holen wir aus der Spielekiste. Am Ende der Pause räumen wir sie wieder ein.', 'Auf das Klettergerüst dürfen nur fünf Kinder gleichzeitig.', 'Bei Regen bleiben wir unter dem Dach.'],
+   q:[['info', 2, 'Was machen die Kinder, wenn es klingelt?', 'Sie stellen sich in einer Reihe an der Tür auf.', 'Sie spielen weiter.', 'Sie gehen nach Hause.'], ['info', 3, 'Wo sind die Bälle?', 'in der Spielekiste', 'im Klassenzimmer', 'auf dem Klettergerüst'], ['schluss', 4, 'Auf dem Klettergerüst sind schon fünf Kinder. Was macht Tim?', 'Er wartet, bis ein Kind herunterklettert.', 'Er klettert auch hinauf.', 'Er geht nach Hause.'], ['schluss', 5, 'Es regnet. Wo spielen die Kinder?', 'unter dem Dach', 'auf der Wiese', 'am Klettergerüst']]},
+  {w:['GS'], g:'Sachtext', t:'Der Igel im Herbst', p:['Igel haben viele Stacheln auf dem Rücken. Wenn sie Angst haben, rollen sie sich zu einer Kugel zusammen.', 'Im Herbst fressen Igel sehr viel. Sie suchen Käfer, Würmer und Schnecken. So werden sie dick und rund.', 'Im Winter schläft der Igel. Er baut sich ein Nest aus Blättern und schläft dort bis zum Frühling. Darum soll man Laubhaufen im Garten liegen lassen.'],
+   q:[['info', 1, 'Was macht ein Igel, wenn er Angst hat?', 'Er rollt sich zu einer Kugel zusammen.', 'Er läuft schnell weg.', 'Er klettert auf einen Baum.'], ['info', 2, 'Was frisst der Igel?', 'Käfer, Würmer und Schnecken', 'Äpfel und Nüsse', 'Gras und Blumen'], ['warum', 2, 'Warum frisst der Igel im Herbst so viel?', 'Er muss für den Winter dick werden.', 'Er hat im Herbst Geburtstag.', 'Im Herbst gibt es nur Schnecken.'], ['schluss', 3, 'Warum soll man Laubhaufen liegen lassen?', 'Dort kann ein Igel im Winter schlafen.', 'Das Laub ist schön bunt.', 'Dann muss man nicht kehren.']]},
   {g:'Sachtext', t:'Müll richtig trennen', p:['In Deutschland trennen wir den Müll. Dafür gibt es verschiedene Tonnen. In die blaue Tonne kommt Papier, zum Beispiel alte Zeitungen und Kartons.', 'In den gelben Sack kommen Verpackungen aus Plastik und Metall, zum Beispiel Joghurtbecher und Dosen. Essensreste und Obstschalen gehören in die braune Tonne. Daraus wird später Erde für Gärten gemacht.', 'Alles andere kommt in die schwarze Tonne für den Restmüll. Glas bringt man zum Glascontainer. Wer Müll trennt, hilft mit, dass Stoffe wieder verwendet werden können.'],
    q:[['info', 1, 'Was kommt in die blaue Tonne?', 'Papier', 'Glas', 'Essensreste'], ['schluss', 2, 'Wohin gehört ein leerer Joghurtbecher?', 'in den gelben Sack', 'in die braune Tonne', 'in die blaue Tonne'], ['schluss', 2, 'Selin hat eine Bananenschale. Wohin gehört sie?', 'in die braune Tonne', 'in den gelben Sack', 'zum Glascontainer'], ['info', 2, 'Was wird aus Essensresten gemacht?', 'Erde für Gärten', 'neues Papier', 'neue Dosen'], ['thema', 3, 'Warum soll man Müll trennen?', 'Damit Stoffe wieder verwendet werden können.', 'Damit die Tonnen schöner aussehen.', 'Damit man weniger einkaufen muss.']]}
 ];
@@ -4139,8 +4208,8 @@ function seriesItem(lvl, kern){
   const practice = app.mode === 'read';
   if(!(practice && SERIES.key === lvl && SERIES.qs.length)){
     let src;
-    if(lvl === 'L8'){ const g = fresh(Object.keys(DOCS)); src = DOCS[g](); src.qs = src.qs.map(([k, q, o]) => ({k, q, o})); }
-    else { const t = fresh(LONG.map(x => x.t)), tx = LONG.find(x => x.t === t); src = {title: tx.t, html: longHtml(tx), qs: tx.q.map(([k, w, q, ...o]) => ({k, w, q, o}))}; }
+    if(lvl === 'L8'){ const g = fresh(docKeys()); src = DOCS[g](); src.qs = src.qs.map(([k, q, o]) => ({k, q, o})); }
+    else { const t = fresh(forWorld(LONG).map(x => x.t)), tx = LONG.find(x => x.t === t); src = {title: tx.t, html: longHtml(tx), qs: tx.q.map(([k, w, q, ...o]) => ({k, w, q, o}))}; }
     let qs = shuffle(src.qs);
     if(kern){ const i = qs.findIndex(x => x.k === 'schluss'); if(i > 0) qs.unshift(...qs.splice(i, 1)); }
     Object.assign(SERIES, {key: lvl, src, qs, n:0, total: Math.min(qs.length, 4)});
@@ -4479,7 +4548,8 @@ const CLOCK = {
 const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const WD7 = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 const wdIdx = (y, mo, d) => (new Date(y, mo, d).getDay() + 6) % 7;
-const TERMINE = ['Zahnarzt', 'Praktikum', 'Ausflug', 'Oma hat Geburtstag', 'Schwimmen', 'Kino', 'Fußballturnier', 'Friseur', 'Elternabend', 'Klassenfest'];
+const TERMINE_ALL = {GS:['Zahnarzt', 'Ausflug', 'Oma hat Geburtstag', 'Schwimmen', 'Sportfest', 'Laternenlauf', 'Fußballturnier', 'Friseur', 'Kindergeburtstag', 'Klassenfest'], HS:['Zahnarzt', 'Praktikum', 'Ausflug', 'Oma hat Geburtstag', 'Schwimmen', 'Kino', 'Fußballturnier', 'Friseur', 'Elternabend', 'Klassenfest'], BSS:['Zahnarzt', 'Praktikum', 'Arbeitsamt', 'Oma hat Geburtstag', 'Schwimmen', 'Kino', 'Fußballturnier', 'Friseur', 'Wohnungsbesichtigung', 'Klassenfest']};
+const termine = () => TERMINE_ALL[world()];
 function calMonth(){ const y = pick([2026, 2027]), mo = rnd(0, 11); return {y, mo, n: new Date(y, mo + 1, 0).getDate()}; }
 function calHtml(y, mo, {marks = {}, today = 0} = {}){
   const n = new Date(y, mo + 1, 0).getDate(), off = wdIdx(y, mo, 1), cells = [];
@@ -4492,7 +4562,7 @@ function calHtml(y, mo, {marks = {}, today = 0} = {}){
   const rows = []; for(let i = 0; i < cells.length; i += 7) rows.push(`<tr>${cells.slice(i, i + 7).join('')}</tr>`);
   return `<span class="dc-g">Kalender</span><h3 class="dc-h">${MONATE[mo]} ${y}</h3><table class="cal"><thead><tr>${WD7.map(w => `<th>${w.slice(0, 2)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>${today ? '<p class="dc-note">Heute ist rot umkreist.</p>' : ''}`;
 }
-const calPair = c => { const t = rnd(1, c.n - 8), e = t + rnd(3, 8), e2 = (() => { let x; do { x = rnd(1, c.n); } while(Math.abs(x - e) < 2 || x === t); return x; })(); const [n1, n2] = shuffle(TERMINE).slice(0, 2); return {t, e, e2, n1, n2}; };
+const calPair = c => { const t = rnd(1, c.n - 8), e = t + rnd(3, 8), e2 = (() => { let x; do { x = rnd(1, c.n); } while(Math.abs(x - e) < 2 || x === t); return x; })(); const [n1, n2] = shuffle(termine()).slice(0, 2); return {t, e, e2, n1, n2}; };
 CLOCK.U6 = [
   () => { const c = calMonth(), d = rnd(1, c.n), i = wdIdx(c.y, c.mo, d); return mkChoice({kern:true, layout:'side', html: calHtml(c.y, c.mo), q:`Welcher Wochentag ist der ${d}. ${MONATE[c.mo]}?`, prompt:'Schau in den Kalender. Beantworte dann die Frage.', label:`Kalender: Wochentag am ${d}.${c.mo + 1}.`, tip:'Noch nicht. Suche die Zahl im Kalender. Fahre dann nach oben zum Wochentag.'}, opt3(WD7[i], [WD7[(i + 1) % 7], WD7[(i + 6) % 7], WD7[(i + 2) % 7]])); },
   () => { const c = calMonth(), p = calPair(c); return mkChoice({layout:'side', html: calHtml(c.y, c.mo, {marks:{[p.e]: p.n1, [p.e2]: p.n2}, today:p.t}), q:`In wie vielen Tagen ist „${p.n1}“?`, prompt:'Schau in den Kalender. Beantworte dann die Frage.', label:`Kalender: Tage bis Termin (${p.e - p.t})`, tip:'Noch nicht. Zähle die Tage von heute bis zum Termin. Den heutigen Tag zählst du nicht mit.'}, opt3(`in ${p.e - p.t} Tagen`, [`in ${p.e - p.t + 1} Tagen`, `in ${p.e - p.t - 1} Tagen`, `in ${p.e} Tagen`])); },
@@ -4513,21 +4583,21 @@ const R_ITEMS = {
        () => { const a = rnd(2, 5), b = rnd(2, 4); return sach(`Ali hat ${a} €. Er bekommt ${b} € dazu. Wie viel Geld hat er jetzt?`, a + b, `Sachaufgabe ${a} + ${b} €`); }],
   R2: [() => { const a = rnd(11, 15), b = rnd(1, 19 - a), c = rnd(15, 19), d = rnd(1, c - 11); return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d}`, {kern:true}); },
        () => { const a = rnd(2, 9), c = rnd(12, 19); return calc2(`10 + ${a}`, 10 + a, `${c} − 10`, c - 10, `10 + ${a} und ${c} − 10`); },
-       () => { const a = rnd(12, 15), b = rnd(2, 4); return sach(`In der Kiste sind ${a} Flaschen. Du stellst ${b} dazu. Wie viele sind es jetzt?`, a + b, `Sachaufgabe ${a} + ${b}`); }],
+       () => { const a = rnd(12, 15), b = rnd(2, 4); return sach(W3(`In der Dose sind ${a} Murmeln. Du legst ${b} dazu. Wie viele sind es jetzt?`, `In der Kiste sind ${a} Flaschen. Du stellst ${b} dazu. Wie viele sind es jetzt?`), a + b, `Sachaufgabe ${a} + ${b}`); }],
   R3: [() => { const a = rnd(6, 9), b = rnd(11 - a, 9), c = rnd(11, 16), d = rnd(c - 9, 9); return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d} (Zehnerübergang)`, {kern:true}); },
        () => { const a = rnd(5, 9), c = rnd(12, 15), d = rnd(c - 9, 8); return calc2(`${a} + ${a}`, 2*a, `${c} − ${d}`, c - d, `${a} + ${a} und ${c} − ${d}`); },
        () => { const a = rnd(7, 9), b = rnd(4, 8); return sach(`Selin hat ${a} Sticker. Sie bekommt ${b} Sticker dazu. Wie viele hat sie jetzt?`, a + b, `Sachaufgabe ${a} + ${b} (über 10)`); }],
   R4: [() => { const a = rnd(2, 6)*10, b = rnd(1, 3)*10, c = rnd(3, 8)*10 + rnd(1, 4), d = rnd(1, 4) ; return calc2(`${a} + ${b}`, a + b, `${c + d} − ${d}`, c, `${a} + ${b} und ${c + d} − ${d}`, {kern:true}); },
        () => { const a = rnd(2, 6)*10 + rnd(1, 4), b = rnd(1, 3)*10 + rnd(1, 4), c = rnd(5, 9)*10 + rnd(5, 9), d = rnd(1, 4)*10 + rnd(1, 4); return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d}`); },
-       () => { const a = rnd(3, 6)*10, b = rnd(1, 3)*10 + 5; return sach(`Eine Hose kostet ${a} €. Ein T-Shirt kostet ${b} €. Wie viel kostet beides zusammen?`, a + b, `Sachaufgabe ${a} + ${b} €`); }],
+       () => { const a = rnd(3, 6)*10, b = rnd(1, 3)*10 + 5; return sach(W3(`Auf dem Schulhof spielen ${a} Kinder. Dann kommen noch ${b} Kinder dazu. Wie viele Kinder sind jetzt auf dem Schulhof?`, `Eine Hose kostet ${a} €. Ein T-Shirt kostet ${b} €. Wie viel kostet beides zusammen?`), a + b, `Sachaufgabe ${a} + ${b}${world() === 'GS' ? '' : ' €'}`); }],
   R5: [() => { const a = rnd(2, 6)*10 + rnd(5, 9), b = rnd(10 - a % 10 + 1, 9), c = rnd(3, 8)*10 + rnd(1, 4), d = rnd(c % 10 + 1, 9); return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d} (Zehnerübergang)`, {kern:true}); },
        () => { const a = rnd(2, 4)*10 + rnd(5, 9), b = rnd(1, 3)*10 + rnd(10 - a % 10 + 1, 9), c = rnd(6, 9)*10 + rnd(1, 4), d = rnd(1, 3)*10 + rnd(c % 10 + 1, 9); return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d}`); },
-       () => { const p = rnd(3, 6)*10 + rnd(1, 4); return sach(`Du bezahlst ${p} € mit einem 100-€-Schein. Wie viel Rückgeld bekommst du?`, 100 - p, `Rückgeld 100 − ${p}`); }],
+       () => { const p = rnd(3, 6)*10 + rnd(1, 4); return sach(W3(`Die Klasse hat 100 Sticker. ${p} Sticker sind schon verteilt. Wie viele sind noch übrig?`, `Du bezahlst ${p} € mit einem 100-€-Schein. Wie viel Rückgeld bekommst du?`), 100 - p, `${world() === 'GS' ? 'Rest' : 'Rückgeld'} 100 − ${p}`); }],
   R6: [() => { const a = rnd(2, 5)*100 + rnd(1, 4)*10, b = rnd(1, 3)*100 + rnd(1, 4)*10, c = rnd(5, 9)*100 + rnd(5, 9)*10, d = rnd(1, 4)*100 + rnd(1, 4)*10; return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d}`, {kern:true}); },
        () => { const a = rnd(2, 6)*100 + rnd(5, 9)*10, b = rnd(3, 6)*10, c = rnd(4, 8)*100 + rnd(1, 3)*10, d = rnd(4, 8)*10; return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d} (Hunderterübergang)`); },
        () => { const a = rnd(2, 4)*100 + 50, b = rnd(1, 3)*100 + rnd(1, 9)*10; return sach(`Ein Fahrrad kostet ${a} €. Ein Helm und ein Schloss kosten zusammen ${b} €. Wie viel kostet alles zusammen?`, a + b, `Sachaufgabe ${a} + ${b} €`); }],
   R7: [() => { const a = pick([2, 5, 10]), b = rnd(3, 9), c = pick([2, 5, 10].filter(x => x !== a)), d = rnd(2, 9); return calc2(`${a} · ${b}`, a*b, `${c} · ${d}`, c*d, `${a} · ${b} und ${c} · ${d} (Kernaufgaben)`, {kern:true}); },
-       () => { const n = rnd(3, 6), k = pick([2, 5, 10]); return sach(`${n} Packungen. In jeder Packung sind ${k} Eier. Wie viele Eier sind es zusammen?`, n*k, `Sachaufgabe ${n} · ${k}`); },
+       () => { const n = rnd(3, 6), k = pick([2, 5, 10]); return sach(W3(`${n} Schachteln. In jeder Schachtel sind ${k} Stifte. Wie viele Stifte sind es zusammen?`, `${n} Packungen. In jeder Packung sind ${k} Eier. Wie viele Eier sind es zusammen?`), n*k, `Sachaufgabe ${n} · ${k}`); },
        () => { const k = pick([2, 5, 10]), n = rnd(3, 8); return calc2(`${n*k} : ${k}`, n, `${k} · ${n}`, k*n, `${n*k} : ${k} und ${k} · ${n}`); }]
 };
 const R_INFO = {
@@ -4596,10 +4666,11 @@ const G_ITEMS = {
   G4: [() => goodsItem(true), () => goodsItem(false), () => goodsItem(false)]
 };
 /* G4 Einkaufen: Kassenbon, Angebot, Preisschild – Text lesen und rechnen */
+const BON_GOODS_GS = [['Brezel', .8], ['Apfel', .5], ['Milch', 1], ['Wasser', .7], ['Müsliriegel', .6], ['Kakao', 1.2], ['Brötchen', .4], ['Muffin', 1.5]];
 const BON_GOODS = [['Brot', 2.5], ['Milch', 1], ['Butter', 2], ['Äpfel (1 kg)', 3], ['Käse', 3.5], ['Nudeln', 1.5], ['Saft', 2], ['Joghurt', .5], ['Bananen', 2], ['Eier (10 Stück)', 3], ['Tomaten', 2.5], ['Müsli', 4]];
 function docBon(){
-  const items = shuffle(BON_GOODS).slice(0, 4), sum = items.reduce((a, [, p]) => a + p, 0), paid = sum <= 10 ? 10 : 20;
-  const html = dcBox('Kassenbon', 'Supermarkt Frisch', `<div class="dc-bon">${items.map(([n, p]) => `<div><span>${n}</span><span>${euro(p)}</span></div>`).join('')}<div class="dc-bon-sum"><span>SUMME</span><span>${euro(sum)}</span></div><div><span>Gegeben bar</span><span>${euro(paid)}</span></div><div><span>Rückgeld</span><span>?</span></div></div>`);
+  const gs = world() === 'GS', items = shuffle(gs ? BON_GOODS_GS : BON_GOODS).slice(0, 4), sum = items.reduce((a, [, p]) => a + p, 0), paid = gs && sum <= 5 ? 5 : sum <= 10 ? 10 : 20;
+  const html = dcBox('Kassenbon', gs ? 'Bäckerei Sonnenschein' : 'Supermarkt Frisch', `<div class="dc-bon">${items.map(([n, p]) => `<div><span>${n}</span><span>${euro(p)}</span></div>`).join('')}<div class="dc-bon-sum"><span>SUMME</span><span>${euro(sum)}</span></div><div><span>Gegeben bar</span><span>${euro(paid)}</span></div><div><span>Rückgeld</span><span>?</span></div></div>`);
   const mx = items.reduce((a, b) => b[1] > a[1] ? b : a), mn = items.reduce((a, b) => b[1] < a[1] ? b : a);
   const qs = [['info', 'Wie viel hat der Einkauf zusammen gekostet?', opt3(euro(sum), [euro(paid), euro(sum + 1), euro(mx[1])])],
     ['rechnen', `Es wurde mit ${paid} € bezahlt. Wie viel Rückgeld gibt es?`, opt3(euro(paid - sum), [euro(paid - sum + 1), euro(sum), euro(paid - sum - .5 >= 0 ? paid - sum - .5 : paid - sum + 2)])]];
@@ -4608,7 +4679,7 @@ function docBon(){
   return {title:'Kassenbon', html, qs};
 }
 function docOffer(){
-  const [n, old, now] = pick([['Äpfel (1 kg)', 3, 2], ['Pizza', 4, 2.5], ['Saft', 2.5, 1.5], ['Schokolade', 1.5, 1], ['Kaffee', 7, 5], ['Waschmittel', 9, 6], ['Shampoo', 3.5, 2.5]]), k = rnd(2, 3);
+  const [n, old, now] = pick(W3([['Malstifte', 4, 3], ['Seifenblasen', 2, 1.5], ['Sticker', 1.5, 1], ['Saft', 2.5, 1.5], ['Schokolade', 1.5, 1], ['Knete', 3, 2]], [['Äpfel (1 kg)', 3, 2], ['Pizza', 4, 2.5], ['Saft', 2.5, 1.5], ['Schokolade', 1.5, 1], ['Shampoo', 3.5, 2.5]], [['Äpfel (1 kg)', 3, 2], ['Pizza', 4, 2.5], ['Saft', 2.5, 1.5], ['Kaffee', 7, 5], ['Waschmittel', 9, 6], ['Shampoo', 3.5, 2.5]])), k = rnd(2, 3);
   const html = dcBox('Angebot', 'Nur diese Woche!', `<div class="dc-offer"><b>${n}</b><span class="dc-old">statt ${euro(old)}</span><span class="dc-new">nur ${euro(now)}</span></div>`);
   return {title:'Angebot', html, qs:[['info', 'Was kostet es jetzt im Angebot?', opt3(euro(now), [euro(old), euro(old - now), euro(now + .5)])], ['rechnen', 'Wie viel sparst du bei einem Stück?', opt3(euro(old - now), [euro(old), euro(now), euro(old - now + .5)])], ['rechnen', `Du kaufst ${k} Stück im Angebot. Was zahlst du?`, opt3(euro(k*now), [euro(k*old), euro(now), euro(k*now + 1)])]]};
 }
@@ -5461,7 +5532,7 @@ function renderHome(){
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
   let body = '';
   if(step === 'who'){
-    body = `<h2>Wer übt heute?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}"><b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div>`;
+    body = `<h2>Wer übt heute?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}" class="${q.sym && ICON[q.sym] ? 'has-sym' : ''}">${q.sym && ICON[q.sym] ? `<i class="kid-sym">${iconSvg(q.sym, 64)}</i>` : `<b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>`}${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div>`;
   } else if(step === 'subj'){
     const cards = [];
     if(p) for(const subj of ['M', 'L', 'W']){
@@ -5541,7 +5612,8 @@ function renderClassHome(){
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Unterricht an der Tafel</span></div></header>`;
   $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}</div><section class="wz-body"><h2>Was zeigen wir?</h2>
     <div class="ct-tiles">${CLASS_TOOLS.map(t => `<button class="ct-tile" data-ctool="${t.k}">${CT_ILL[t.k]}<b>${t.label}</b><span>${t.sub}</span></button>`).join('')}</div>
-    <p class="home-sub ct-note">Im Unterricht wird nichts gespeichert: keine Namen, keine Ergebnisse.</p>
+    <div class="ct-world seg" role="group" aria-label="Themenwelt">${Object.entries(WORLDS).map(([k, v]) => `<button data-ctworld="${k}" aria-pressed="${world() === k}" title="${v}">${k}</button>`).join('')}</div>
+    <p class="home-sub ct-note">Themenwelt für Wörter und Texte. Im Unterricht wird nichts gespeichert: keine Namen, keine Ergebnisse.</p>
     <button class="linkish wz-back" data-ctx-reset>← Zum Üben mit Namen</button></section>
     <button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
 }
@@ -5618,7 +5690,9 @@ function zsSvg(){
       const a = cur, b = cur + g.d, xa = zsX(a), xb = zsX(b), w = Math.abs(xb - xa), hgt = Math.min(150, 26 + w*0.45);
       const mx = (xa + xb)/2, dir = Math.sign(xb - xa);
       s += `<path d="M${xa} ${y - 6}Q${mx} ${y - 6 - hgt*2} ${xb} ${y - 6}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"/>`;
-      s += `<path d="M${xb} ${y - 6}l${-dir*11} -14l${dir*3} 15z" fill="${col}"/>`;
+      /* Pfeilspitze in Richtung der Tangente am Bogenende */
+      const cyq = y - 6 - hgt*2, tx = xb - mx, ty = (y - 6) - cyq, tl = Math.hypot(tx, ty) || 1, ux = tx/tl, uy = ty/tl, al = Math.min(18, Math.max(10, w*0.4)), ax = xb - ux*al, ay = y - 6 - uy*al, aw = al*0.55;
+      s += `<path d="M${xb} ${y - 6}L${ax - uy*aw} ${ay + ux*aw}L${ax + uy*aw} ${ay - ux*aw}z" fill="${col}"/>`;
       cur = b; pts.push(b);
     }
     const xa = zsX(g.from), xb = zsX(cur), w = Math.abs(xb - xa), hgt = Math.min(150, 26 + (g.n > 1 ? Math.abs(g.d)*unit : w)*0.45);
@@ -5808,6 +5882,48 @@ function renderTopTool(){
   $('#inputs').innerHTML = '';
   return true;
 }
+/* Bild-Anweisungen für den Bildmodus (ohne Schrift) */
+const PIC_I = {
+  tap:'<svg viewBox="0 0 64 64"><circle cx="14" cy="16" r="6" fill="#2b2930"/><circle cx="32" cy="12" r="6" fill="#e8890c"/><circle cx="50" cy="18" r="6" fill="#2b2930"/><circle cx="22" cy="34" r="6" fill="#2b2930"/><path d="M38 60V36a4 4 0 0 1 8 0v10l8 2a4 4 0 0 1 3 5l-3 7z" fill="#f2c9a0" stroke="#2b2930" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+  choose:'<svg viewBox="0 0 64 64"><rect x="3" y="8" width="17" height="17" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><rect x="23.5" y="8" width="17" height="17" rx="4" fill="#ffe2b8" stroke="#e8890c" stroke-width="3"/><rect x="44" y="8" width="17" height="17" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><path d="M28 62V36a4 4 0 0 1 8 0v10l8 2a4 4 0 0 1 3 5l-3 9z" fill="#f2c9a0" stroke="#2b2930" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+  keypad:'<svg viewBox="0 0 64 64"><rect x="10" y="4" width="44" height="56" rx="8" fill="#2b2930"/>' + [0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${16 + c*12}" y="${10 + r*12}" width="9" height="9" rx="2" fill="#fff"/>`).join('')).join('') + '<rect x="16" y="46" width="21" height="9" rx="2" fill="#fff"/><rect x="40" y="46" width="9" height="9" rx="2" fill="#1f7a45"/></svg>',
+  keys:'<svg viewBox="0 0 64 64"><rect x="2" y="16" width="60" height="34" rx="6" fill="#2b2930"/>' + [0, 1, 2, 3, 4].map(c => `<rect x="${7 + c*11}" y="21" width="8" height="8" rx="2" fill="#fff"/>`).join('') + [0, 1, 2, 3].map(c => `<rect x="${12 + c*11}" y="32" width="8" height="8" rx="2" fill="#fff"/>`).join('') + '<rect x="18" y="43" width="28" height="4" rx="2" fill="#fff"/></svg>',
+  coin:'<svg viewBox="0 0 64 64"><rect x="2" y="40" width="60" height="18" rx="4" fill="#e9d3ad"/><circle cx="22" cy="20" r="13" fill="#d5b75a" stroke="#9c8433" stroke-width="3"/><circle cx="22" cy="20" r="7" fill="#c9cdd3"/><path d="M38 20h14m0 0l-5-5m5 5l-5 5" stroke="#2b2930" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="48" r="7" fill="#d5b75a" stroke="#9c8433" stroke-width="2"/></svg>',
+  clock:'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#fff" stroke="#2b2930" stroke-width="3.5"/><path d="M32 32V12" stroke="#346bc3" stroke-width="4" stroke-linecap="round"/><path d="M32 32l12 8" stroke="#c9414a" stroke-width="5" stroke-linecap="round"/><path d="M50 8a30 30 0 0 1 10 14" fill="none" stroke="#e8890c" stroke-width="3.5" stroke-linecap="round"/><path d="M60 22l-7-2m7 2l2-7" stroke="#e8890c" stroke-width="3.5" stroke-linecap="round"/></svg>',
+  cubes:'<svg viewBox="0 0 64 64"><rect x="6" y="6" width="10" height="52" rx="2" fill="#346bc3"/><rect x="20" y="6" width="10" height="52" rx="2" fill="#346bc3"/><rect x="36" y="46" width="10" height="10" rx="2" fill="#27834b"/><rect x="50" y="46" width="10" height="10" rx="2" fill="#27834b"/><rect x="43" y="32" width="10" height="10" rx="2" fill="#27834b"/></svg>',
+  grid:'<svg viewBox="0 0 64 64"><rect x="4" y="4" width="44" height="44" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><path d="M4 15h44M4 26h44M4 37h44M15 4v44M26 4v44M37 4v44" stroke="#2b2930" stroke-width="1.4"/><rect x="26" y="15" width="11" height="11" fill="#f4b860"/><path d="M40 62V40a4 4 0 0 1 8 0v8l8 2a4 4 0 0 1 3 5l-3 7z" fill="#f2c9a0" stroke="#2b2930" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+  eye:'<svg viewBox="0 0 64 64"><path d="M4 32q28-30 56 0q-28 30-56 0z" fill="#fff" stroke="#2b2930" stroke-width="3.5"/><circle cx="32" cy="32" r="10" fill="#346bc3"/><circle cx="32" cy="32" r="4" fill="#2b2930"/></svg>',
+  line:'<svg viewBox="0 0 64 64"><path d="M2 46h58" stroke="#2b2930" stroke-width="3.5"/><path d="M8 40v12M22 40v12M36 40v12M50 40v12" stroke="#2b2930" stroke-width="2.5"/><path d="M8 40Q22 6 36 40" fill="none" stroke="#346bc3" stroke-width="4"/><path d="M36 40l-7-4m7 4l1-8" stroke="#346bc3" stroke-width="4" stroke-linecap="round"/></svg>',
+  cards:'<svg viewBox="0 0 64 64"><rect x="2" y="22" width="18" height="16" rx="3" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><rect x="23" y="22" width="18" height="16" rx="3" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><rect x="44" y="22" width="18" height="16" rx="3" fill="#ffe2b8" stroke="#e8890c" stroke-width="3"/><path d="M8 50h48m0 0l-6-5m6 5l-6 5" stroke="#2b2930" stroke-width="3" fill="none" stroke-linecap="round"/></svg>'
+};
+function picKey(){
+  const m = app.mode;
+  const it = m === 'read' ? app.read.item : m === 'diag' ? app.diag?.items?.[app.diag.idx] : null;
+  if(it){
+    if(it.type === 'scatter') return 'tap';
+    if(it.type === 'choice' || it.type === 'pairs') return 'choose';
+    if(it.type === 'write') return it.tiles ? 'cards' : 'keys';
+    if(it.type === 'sent') return 'cards';
+    if(it.type === 'money') return 'coin';
+    if(it.type === 'clockset') return 'clock';
+    if(it.type === 'board') return 'grid';
+    if(it.type === 'build') return 'cubes';
+    if(it.type === 'line') return 'line';
+    if(it.type === 'flash') return 'eye';
+    return 'keypad';
+  }
+  return {number:'cubes', add:'cubes', sub:'cubes', written:'keypad', times:'grid', money:'coin', blitz:'eye'}[m] || null;
+}
+function picDecor(){
+  const pm = $('#prompt'); if(!pm) return;
+  document.body.classList.toggle('pic-mode', picMode());
+  if(!picMode() || ['home', 'map', 'diag'].includes(app.mode) || pm.querySelector('.pic-ic')) return;
+  const k = picKey(); if(!k || !pm.textContent.trim()) return;
+  picObs.disconnect();
+  pm.innerHTML = `<span class="pic-ic" aria-hidden="true">${PIC_I[k]}</span><span class="pic-txt">${pm.innerHTML}</span>`;
+  picObs.observe(pm, {childList:true});
+}
+const picObs = new MutationObserver(() => picDecor());
 function renderTool(){
   if(app.mode === 'nline') return renderNline();
   if(app.mode === 'hboard') return renderHboard();
@@ -5836,6 +5952,7 @@ function homeClick(e){
   const cx = e.target.closest('[data-ctx]'); if(cx){ setCtx(cx.dataset.ctx); return; }
   if(e.target.closest('[data-ctx-reset]')){ setCtx(null); return; }
   const ct = e.target.closest('[data-ctool]'); if(ct){ setTool(ct.dataset.ctool); return; }
+  const cw = e.target.closest('[data-ctworld]'); if(cw){ settings.world = cw.dataset.ctworld; saveSettings(); renderHome(); return; }
   const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; app.wz = {step:'subj', guest: !data.current}; saveData(); renderProfiles(); render(); return; }
   if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {step:'who'}; saveData(); renderProfiles(); render(); return; }
   const ws = e.target.closest('[data-wz-step]'); if(ws){ app.wz = {...app.wz, step: ws.dataset.wzStep}; renderHome(); return; }
@@ -6083,9 +6200,9 @@ const R_SHEETS = {
                                           () => { const k = fresh(LONG_POOL), dis = others(LONG_POOL, [k], 2); return T_(['lies', 'kreise'], 'Lies das Wort. Kreise das Bild ein.', `<p class="ab-word">${k}</p><p class="ab-row">${shuffle([k, ...dis]).map(x => iconP(x, 17)).join(' ')}</p>`, k); }]},
   L6: {name:'Sätze verstehen', cols:1, gens:[() => { const o = fresh(Object.keys(SCENE_OBJ)), pos = pick(['auf', 'unter', 'neben']); return T_(['lies', 'kreise'], 'Lies den Satz. Kreise das passende Bild ein.', `<p class="ab-sent">${cap(art(o))} ${o} ${SCENE_OBJ[o]} ${pos} dem Tisch.</p><p class="ab-row">${shuffle(['auf', 'unter', 'neben']).map(p => `<span class="ab-ic" style="width:32mm">${tableScene(p, o)}</span>`).join(' ')}</p>`, `${o} ${pos} dem Tisch`); },
                                          () => { let s, yes, n, t = 0; do { [s, yes, n] = factSentence(); t++; } while(FRESH.used.has(s) && t < 20); FRESH.used.add(s); return T_(['lies', 'kreuze'], 'Lies den Satz. Stimmt das?', `<p class="ab-sent">${s}</p><p class="ab-row yn">☐ ja <span style="width:12mm"></span> ☐ nein</p>`, yes ? 'ja' : 'nein'); }]},
-  L7: {name:'Texte lesen und verstehen', cols:1, gens:[() => { const tx = TEXTS.find(t => !FRESH.used.has(t.text)) || pick(TEXTS); FRESH.used.add(tx.text); return T_(['lies', 'kreuze'], 'Lies den Text. Kreuze die richtige Antwort an.', `<p class="ab-text">${tx.text}</p>${tx.qs.map(([q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, tx.qs.map(([q, o]) => `${q} ${o[0]}`).join('; ')); }]},
-  L8: {name:'Pläne und Tabellen lesen', cols:1, max:3, gens:[() => { const g = fresh(Object.keys(DOCS)), d = DOCS[g](); return T_(['lies', 'kreuze'], 'Lies genau. Kreuze die richtige Antwort an.', `<div class="ab-doc">${d.html}</div>${d.qs.slice(0, 4).map(([k, q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, `${d.title}: ` + d.qs.slice(0, 4).map(([k, q, o]) => o[0]).join(' · ')); }]},
-  L9: {name:'Längere Texte verstehen', cols:1, max:2, gens:[() => { const t = fresh(LONG.map(x => x.t)), tx = LONG.find(x => x.t === t); return T_(['lies', 'kreuze'], 'Lies den Text. Kreuze die richtige Antwort an.', `<div class="ab-doc">${longHtml(tx)}</div>${tx.q.map(([k, w, q, ...o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, `${tx.t}: ` + tx.q.map(q => q[3]).join(' · ')); }]}
+  L7: {name:'Texte lesen und verstehen', cols:1, gens:[() => { const tx = shuffle(forWorld(TEXTS)).find(t => !FRESH.used.has(t.text)) || pick(forWorld(TEXTS)); FRESH.used.add(tx.text); return T_(['lies', 'kreuze'], 'Lies den Text. Kreuze die richtige Antwort an.', `<p class="ab-text">${tx.text}</p>${tx.qs.map(([q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, tx.qs.map(([q, o]) => `${q} ${o[0]}`).join('; ')); }]},
+  L8: {name:'Pläne und Tabellen lesen', cols:1, max:3, gens:[() => { const g = fresh(docKeys()), d = DOCS[g](); return T_(['lies', 'kreuze'], 'Lies genau. Kreuze die richtige Antwort an.', `<div class="ab-doc">${d.html}</div>${d.qs.slice(0, 4).map(([k, q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, `${d.title}: ` + d.qs.slice(0, 4).map(([k, q, o]) => o[0]).join(' · ')); }]},
+  L9: {name:'Längere Texte verstehen', cols:1, max:2, gens:[() => { const t = fresh(forWorld(LONG).map(x => x.t)), tx = LONG.find(x => x.t === t); return T_(['lies', 'kreuze'], 'Lies den Text. Kreuze die richtige Antwort an.', `<div class="ab-doc">${longHtml(tx)}</div>${tx.q.map(([k, w, q, ...o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, `${tx.t}: ` + tx.q.map(q => q[3]).join(' · ')); }]}
 };
 const W_SHEETS = {
   WX: {name:'Meine Wörter (nachspuren und schreiben)', cols:2, gens:[() => { const ws = ownWords(), k = fresh(ws.length ? ws : ['Name', 'Schule', 'Montag', 'Arbeit']); return T_(['lies', 'schreibe'], 'Spure nach. Schreibe dann selbst.', `<p class="ab-trace">${escHtml(k)}</p>${lineW(2)}`, k); }]},
@@ -6202,6 +6319,10 @@ function zoneToSheet(key){
 }
 app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false};
 function buildSheet(limit){
+  const S0 = app.sheet; app.sheetKid = S0.pid && S0.pid !== 'none' ? kids().find(p => p.id === S0.pid) || null : null;
+  try { return buildSheet0(limit); } finally { app.sheetKid = null; }
+}
+function buildSheet0(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
   const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : sj === 'H' ? H_SHEETS[key] : W_SHEETS[key];
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
@@ -6713,10 +6834,16 @@ dlgSet.addEventListener('change', e => {
 let holdTimer = null;
 const openSettings = () => { syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
 $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings));
+document.addEventListener('change', e => {
+  const t = e.target, pid = t.dataset?.pworld || t.dataset?.psym || t.dataset?.ppic; if(!pid || !teacherOn()) return;
+  const p = data.profiles.find(x => x.id === pid); if(!p) return;
+  if(t.dataset.pworld) p.world = t.value; if(t.dataset.psym) p.sym = t.value || null; if(t.dataset.ppic) p.pic = t.checked;
+  saveData(); renderProfiles(); render();
+});
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.12.2 · 13.11.2026';
+const APP_VERSION = '0.13.0 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -6851,7 +6978,7 @@ $('#dlg-profile').addEventListener('click', e => {
 });
 $('#dlg-profile').addEventListener('submit', e => {
   e.preventDefault(); if(!teacherOn()) return; const n = $('#pname').value.trim(); if(!n) return;
-  const p = {id: 'p' + Date.now().toString(36), name: n, created: Date.now(), rec: null, screening: null};
+  const p = {id: 'p' + Date.now().toString(36), name: n, created: Date.now(), rec: null, screening: null, world: settings.world || 'HS'};
   data.profiles.push(p); data.current = p.id; data.firstUse ||= Date.now(); saveData(); renderProfiles(); render();
 });
 $('#dlg-stats').addEventListener('change', e => { if(e.target.id === 'stats-who'){ statsId = e.target.value; renderStats(); } });
@@ -6923,6 +7050,7 @@ $('#help-content').innerHTML = [
 if('speechSynthesis' in window) speechSynthesis.getVoices();
 renderProfiles();
 if(curProfile()?.rec != null) applyRec(curProfile().rec);
+picObs.observe($('#prompt'), {childList:true});
 app.mode = 'home';
 app.ctx = settings.startCtx === 'class' ? 'class' : settings.startCtx === 'practice' ? 'practice' : null;
 render();
