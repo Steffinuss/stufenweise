@@ -41,7 +41,7 @@ select,input{border:2px solid var(--line);border-radius:12px;background:#fff;pad
 input:focus{border-color:var(--ink);outline:none}
 
 .shell{display:grid;grid-template-columns:auto minmax(0,1fr);height:100vh;height:100dvh}
-.rail{display:flex;flex-direction:column;gap:10px;padding:12px 4px 12px 12px;width:112px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.rail{display:flex;flex-direction:column;gap:10px;padding:10px 4px 10px 8px;width:104px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
 main{padding:12px 18px 12px 10px;height:100%;min-height:0;min-width:0;display:flex;flex-direction:column;gap:10px}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .topbar{display:flex;align-items:flex-start;gap:12px}.topbar.stack{flex-direction:column-reverse;align-items:stretch;gap:6px}.topbar.stack .top-tools{justify-content:flex-end}
@@ -469,6 +469,13 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 .r-ic{display:flex;width:36px;justify-content:center}.r-tx{display:flex;flex-direction:column;align-items:flex-start}
 .pic-mode .round-card .r-tx small{display:none}.pic-mode .round-card p{display:none}.pic-mode .round-card .r-ic svg{width:44px;height:44px}.pic-mode .round-card .r-tx{display:none}.pic-mode .round-card .acts{flex-direction:row;justify-content:center}.pic-mode .round-card .acts button{min-width:92px;min-height:80px}
 .rail-guide{margin-top:auto}
+.rail-toggle{flex:none;min-height:36px;font-size:22px;font-weight:800;color:var(--muted);background:transparent;box-shadow:none;border:0;margin-top:auto}
+.rail-guide~.rail-toggle,#modes:has(.rail-guide)+.rail-toggle{margin-top:4px}
+.rail-show{display:none;position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:55;width:30px;height:74px;padding:0;border-radius:0 14px 14px 0;font-size:24px;font-weight:800;background:#fff;box-shadow:0 4px 14px #0002}
+body.rail-off .rail{display:none}
+body.rail-off .shell{grid-template-columns:minmax(0,1fr)}
+body.rail-off .rail-show{display:block}
+@media(max-width:760px){ .rail-toggle,.rail-show{display:none!important} body.rail-off .rail{display:flex} }
 /* Start: Üben oder Unterricht */
 .ctx-tiles{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
 .ctx-tile{width:min(300px,42vw);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:26px;border:3px solid transparent;padding:18px}
@@ -625,7 +632,12 @@ body.np-open.np-left main{padding-right:12px;padding-left:250px}
 #numpad.left{right:auto;left:14px}
 #numpad button{min-height:58px;font-size:28px;font-weight:700;border-radius:14px;padding:0;box-shadow:none}
 #numpad .np-ok{background:#1f7a45;color:#fff}
-#numpad .np-side{grid-column:span 3;min-height:30px;font-size:16px;background:#ffffff22;color:#fff}
+#numpad .np-side{grid-column:span 2;min-height:34px;font-size:16px;background:#ffffff22;color:#fff}
+#numpad .np-min{grid-column:span 1;font-size:18px}
+#numpad .np-max{display:none}
+#numpad.min{grid-template-columns:auto;padding:6px}
+#numpad.min>button{display:none}
+#numpad.min>.np-max{display:block;min-height:52px;padding:0 18px;font-size:20px;background:#fff;color:var(--ink)}
 
 /* Uhr */
 .dig-time{font-family:"Courier New",monospace;font-size:36px;font-weight:700;letter-spacing:2px;background:#2b2930;color:#9ef0b0;border-radius:8px;padding:2px 12px}
@@ -773,7 +785,9 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 <aside class="rail">
   <button class="brand" id="btn-home" aria-label="Startseite" title="Startseite"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="26.0" width="10" height="9.5" rx="1.6" fill="#27834b"/><rect x="15" y="26.0" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="15" y="15.5" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="26" y="26.0" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="15.5" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="5.0" width="10" height="9.5" rx="1.6" fill="#c9414a"/><path d="M2.5 37.8h35" stroke="#2b2930" stroke-width="2.2" stroke-linecap="round"/></svg><span class="brand-name">Stufenweise</span><h1 class="vh">Stufenweise</h1></button>
   <nav id="modes" class="seg" aria-label="Bereich wählen"></nav>
+  <button id="btn-rail" class="rail-toggle" aria-label="Leiste ausblenden" title="Leiste ausblenden – mehr Platz für die Aufgabe">‹</button>
 </aside>
+<button id="btn-rail-show" class="rail-show" aria-label="Leiste einblenden" title="Leiste einblenden">›</button>
 <main>
   <div class="topbar">
     <section class="toolbar" aria-label="Aufgabe einstellen">
@@ -1415,7 +1429,7 @@ function guideFix(){
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
-function render(){ if(guideFix()) return; queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
+function render(){ if(guideFix()) return; document.body.classList.toggle('rail-off', !!settings.railOff); queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
 /* Passt die Einstellungsleiste nicht neben die Knöpfe oben rechts, rückt sie in eine eigene Zeile (sonst verschwinden z. B. die 10er-Reihe oder „Kalender“) */
 function fitTop(){
   const tb = document.querySelector('.topbar'), t = tb?.querySelector('.toolbar'); if(!t) return;
@@ -1588,7 +1602,7 @@ function checkBox(t){
 function renderTaskControls(t){
   if(t.view === 'board'){
     const c = [viewButtons(t)];
-    if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
+    if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findmore', ic:'eye', label:'Mehr Zahlen', pressed: !!settings.findMore}), toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
     else {
       const sg = app.mode === 'add' ? '+' : '−', k = app.mode === 'add' ? 1 : -1, done = t.check === 'ok';
       c.push('<span class="sep"></span>');
@@ -1601,7 +1615,7 @@ function renderTaskControls(t){
   }
   if(t.view === 'line'){
     const c = [viewButtons(t)];
-    if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
+    if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findmore', ic:'eye', label:'Mehr Zahlen', pressed: !!settings.findMore}), toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
     if(app.mode !== 'number'){ c.push('<span class="sep"></span>', checkBox(t)); if(resultsOn()) c.push(toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'})); }
     $('#controls').innerHTML = c.join('');
     return;
@@ -3011,7 +3025,7 @@ const TIMES_ORDER = [2, 5, 10, 1, 3, 4, 9, 6, 7, 8];
 function adaptKey(e){ const m = e.mode === 'find' ? 'number' : e.mode; return ['number', 'add', 'sub', 'written', 'times', 'money', 'blitz'].includes(m) ? m : null; }
 function adaptStep(mode, dir){
   const nextIn = (list, v) => { const i = list.indexOf(v); const j = i + dir; return i >= 0 && j >= 0 && j < list.length ? list[j] : null; };
-  if(['number', 'add', 'sub'].includes(mode)){ const r = nextIn([10, 20, 100, 1000], app.range); return r && {text: `Zahlenraum bis ${r}`, apply(){ app.range = r; for(const k of Object.keys(app.tasks)) app.tasks[k] = blankTask(); app.mode = mode; startRandom(); }}; }
+  if(['number', 'add', 'sub'].includes(mode)){ const r = nextIn([10, 20, 100, 1000], app.range); return r && {text: `Zahlenraum bis ${r}`, apply(){ const keepFind = mode === 'number' && app.tasks.number?.find; app.range = r; for(const k of Object.keys(app.tasks)) app.tasks[k] = blankTask(); app.mode = mode; if(keepFind) Object.assign(app.tasks.number, {find:true, view:'line'}); startRandom(); }}; }
   if(mode === 'written'){ const w = app.written, r = nextIn([100, 1000, 10000], w.range); return r && {text: `Schriftlich bis ${r}`, apply(){ w.range = r; w.ready = false; wrRandom(); }}; }
   if(mode === 'money'){ const g = app.money; if(dir > 0 && g.range === 100 && !g.cents) return {text:'Geld mit Cent', apply(){ g.cents = true; moneyNew(); }}; if(dir > 0 && g.cents && !g.exact) return {text:'Geld auf den Cent genau (mit 1, 2 und 5 Cent)', apply(){ g.exact = true; moneyNew(); }}; if(dir < 0 && g.exact) return {text:'Geld in 10-Cent-Schritten', apply(){ g.exact = false; moneyNew(); }}; if(dir < 0 && g.cents) return {text:'Geld ohne Cent', apply(){ g.cents = false; moneyNew(); }}; const r = nextIn([10, 20, 100], g.range); return r && {text:`Geld bis ${r} €`, apply(){ g.range = r; moneyNew(); }}; }
   if(mode === 'blitz'){ const b = app.blitz; if(blitzAdaptive() && dir > 0) return null; if(dir > 0 && b.range === 100 && b.dur > 1) return {text:'Blitzblick kürzer zeigen', apply(){ b.dur--; render(); }}; const r = nextIn([6, 10, 20, 100], b.range); return r && {text:`Mengen bis ${r}`, apply(){ b.range = r; b.phase = 'idle'; render(); }}; }
@@ -3240,7 +3254,8 @@ function blitzControl(btn){
 function drawFindLine(t){
   const range = app.range, W = 1000, M = 50, Y = 150, X = v => M + v/range*(W - 2*M);
   const tick = range <= 20 ? 1 : range <= 100 ? 10 : 100, small = range <= 20 ? 0 : tick/2;
-  const labels = range <= 10 ? [0, range/2, range].filter(Number.isInteger) : [0, range/2, range];
+  /* „Mehr Zahlen“: jede Hauptmarke beschriftet (Hilfe für schwächere Schüler*innen) */
+  const labels = settings.findMore ? Array.from({length: range/tick + 1}, (_, i) => i*tick) : range <= 10 ? [0, range/2, range].filter(Number.isInteger) : [0, range/2, range];
   let s = `<rect class="find-hit" x="0" y="40" width="${W}" height="190" fill="transparent"/>`;
   s += `<line x1="${X(0) - 18}" y1="${Y}" x2="${X(range) + 22}" y2="${Y}" stroke="#2b2930" stroke-width="3" stroke-linecap="round" pointer-events="none"/><path d="M${X(range)+30} ${Y} l-12 -7 v14 z" fill="#2b2930"/>`;
   for(let v = 0; v <= range; v += tick) s += `<line x1="${X(v)}" y1="${Y - 14}" x2="${X(v)}" y2="${Y + 14}" stroke="#2b2930" stroke-width="2" pointer-events="none"/>`;
@@ -4737,9 +4752,12 @@ function boardHtml(bd, o = {}){
 function hbFit(){
   for(const hb of document.querySelectorAll('#stage .hb')){
     const wrap = hb.closest('.it-wrap, .hb-task, .blitz'); if(!wrap) continue;
-    hb.style.removeProperty('--hs');
-    let hs = parseFloat(getComputedStyle(hb).getPropertyValue('--hs')) || hb.querySelector('.hb-c')?.getBoundingClientRect().width || 40;
-    for(let i = 0; i < 30 && hs > 18 && (wrap.scrollHeight > wrap.clientHeight + 1 || wrap.scrollWidth > wrap.clientWidth + 1); i++){ hs -= 1.5; hb.style.setProperty('--hs', hs + 'px'); }
+    /* größte Feldgröße suchen, bei der alles ohne Scrollen passt (wächst auch, wenn Platz ist) */
+    const fits = () => wrap.scrollHeight <= wrap.clientHeight + 1 && wrap.scrollWidth <= wrap.clientWidth + 1;
+    const big = hb.closest('.side-doc') ? 44 : 58;
+    let lo = 14, hi = big;
+    for(let i = 0; i < 9; i++){ const mid = (lo + hi)/2; hb.style.setProperty('--hs', mid + 'px'); if(fits()) lo = mid; else hi = mid; }
+    hb.style.setProperty('--hs', Math.floor(lo*2)/2 + 'px');
   }
 }
 addEventListener('resize', () => { clearTimeout(hbFit.t); hbFit.t = setTimeout(hbFit, 120); });
@@ -4791,7 +4809,7 @@ const H_ITEMS = {
     () => { const n = hDecade(); return hBoard({side:true, svg: hdotsSvg(n), prompt:'Wie viele Punkte sind blau? Tippe die Zahl in der Tafel an.', label:`Hunderterfeld ${n} → Tafel`, tip:'Noch nicht. Jede volle Reihe sind 10. Zähle die vollen Reihen, dann die Punkte in der letzten Reihe.'}, {cls:'mid'}, 'tap', {target:n}); },
     () => { const n = hDecade(); return hBoard({prompt:`Tippe auf: ${numberWord(n)}`, label:`Zahlwort „${numberWord(n)}“ → Tafel`, tip:`Noch nicht. Im Zahlwort hörst du die Einer zuerst. Geschrieben kommen die Zehner zuerst.`}, {}, 'tap', {target:n}); },
     () => { const z = rnd(1, 9); let e; do e = rnd(1, 9); while(e === z); const n = z*10 + e, mat = (a, b) => ({h:`<span class="hb-mat">${materialSvg(a, b)}</span>`, a:`${a} Zehner ${b} Einer`});
-      return mkChoice({layout:'side', html: boardHtml({cls:'mid', marks:{[n]:'mk'}}), q:`Welches Material passt zur ${n}?`, prompt:`Welches Material passt zur markierten Zahl ${n}?`, label:`Tafel ${n} → Material`, tip:'Noch nicht. Die erste Ziffer sagt die Zehner, die zweite die Einer.'}, [mat(z, e), mat(e, z), mat(z, Math.max(0, e - 1) || e + 1)]); }
+      return mkChoice({layout:'side', html: boardHtml({cls:'mid', marks:{[n]:'mk'}}), q:'', prompt:`Welches Material passt zur markierten Zahl ${n}?`, label:`Tafel ${n} → Material`, tip:'Noch nicht. Die erste Ziffer sagt die Zehner, die zweite die Einer.'}, [mat(z, e), mat(e, z), mat(z, Math.max(0, e - 1) || e + 1)]); }
   ],
   H3: [
     () => { const down = Math.random() < .5, n = down ? hAt(0, rnd(0, 8), rnd(0, 9)) : hAt(0, rnd(1, 9), rnd(0, 9)), t = n + (down ? 10 : -10);
@@ -5162,7 +5180,7 @@ function itemStage(it, r, opt = {}){
     }
     case 'choice': {
       const st = i => opt.feedback && opt.feedback.choice === i ? (opt.feedback.ok ? ' fb-ok' : ' fb-no') : '';
-      if(it.layout === 'side') return `<div class="it-wrap side"><div class="side-doc">${head}</div><div class="side-ans">${it.series ? `<span class="side-n">Frage ${it.series}</span>` : ''}<p class="side-q">${escHtml(it.q)}</p><div class="dg-choice">${it.options.map((o, i) => `<button data-dgc="${i}" aria-pressed="${r.choice === i}" aria-label="${escHtml(o.a)}" class="${st(i)}">${o.h}</button>`).join('')}</div></div></div>`;
+      if(it.layout === 'side') return `<div class="it-wrap side"><div class="side-doc">${head}</div><div class="side-ans">${it.series ? `<span class="side-n">Frage ${it.series}</span>` : ''}${it.q ? `<p class="side-q">${escHtml(it.q)}</p>` : ''}<div class="dg-choice">${it.options.map((o, i) => `<button data-dgc="${i}" aria-pressed="${r.choice === i}" aria-label="${escHtml(o.a)}" class="${st(i)}">${o.h}</button>`).join('')}</div></div></div>`;
       return `<div class="it-wrap">${head}${qBelow(it) ? `<p class="side-q it-q">${escHtml(it.prompt)}</p>` : ''}<div class="dg-choice ${it.layout === 'row' ? 'row' : ''}">${it.options.map((o, i) => `<button data-dgc="${i}" aria-pressed="${r.choice === i}" aria-label="${escHtml(o.a)}" class="${st(i)}">${o.word && opt.colored ? rdWordHtml(o.word, true) : o.h}</button>`).join('')}</div></div>`;
     }
     case 'pairs': r.sel ||= []; return `<div class="dg-pairs">${it.pairs.map((p, i) => `<div class="dg-pair"><button data-dgp="${i},0" aria-pressed="${r.sel[i] === 0}">${p[0]}</button><span class="oder">oder</span><button data-dgp="${i},1" aria-pressed="${r.sel[i] === 1}">${p[1]}</button></div>`).join('')}</div>`;
@@ -6521,24 +6539,37 @@ function npPrep(root){
 function npBuild(){
   if(NP.el) return NP.el;
   const d = document.createElement('div'); d.id = 'numpad'; d.setAttribute('role', 'group'); d.setAttribute('aria-label', 'Zifferntastatur');
-  d.innerHTML = `<button class="np-side" data-np="side" aria-label="Tastatur auf die andere Seite">⇆</button>${['7','8','9','4','5','6','1','2','3'].map(k => `<button data-np="${k}">${k}</button>`).join('')}<button data-np="del" aria-label="Löschen">⌫</button><button data-np="0">0</button><button data-np="ok" class="np-ok" aria-label="Fertig">✓</button>`;
+  d.innerHTML = `<button class="np-max" data-np="max" aria-label="Zifferntastatur ausklappen">123 ▴</button><button class="np-side" data-np="side" aria-label="Tastatur auf die andere Seite">⇆</button><button class="np-side np-min" data-np="min" aria-label="Tastatur einrollen">▾</button>${['7','8','9','4','5','6','1','2','3'].map(k => `<button data-np="${k}">${k}</button>`).join('')}<button data-np="del" aria-label="Löschen">⌫</button><button data-np="0">0</button><button data-np="ok" class="np-ok" aria-label="Fertig">✓</button>`;
   d.addEventListener('pointerdown', e => e.preventDefault());
   d.addEventListener('click', e => { const b = e.target.closest('[data-np]'); if(b) npKey(b.dataset.np); });
   document.body.append(d); NP.el = d; return d;
 }
-function npShow(){ const d = npBuild(); d.classList.toggle('left', NP.side === 'left'); d.hidden = false; document.body.classList.add('np-open'); document.body.classList.toggle('np-left', NP.side === 'left'); }
+function npShow(){ const d = npBuild(); d.classList.toggle('left', NP.side === 'left'); d.classList.toggle('min', !!NP.min); d.hidden = false; document.body.classList.toggle('np-open', !NP.min); document.body.classList.toggle('np-left', NP.side === 'left' && !NP.min); }
+/* Ein anderes Ziffernfeld auf dem Bildschirm, falls das bisherige verschwunden ist */
+const npFirst = () => [...document.querySelectorAll('main input')].find(el => npEligible(el) && el.offsetParent);
 function npHide(){ if(NP.el) NP.el.hidden = true; NP.target = null; document.body.classList.remove('np-open', 'np-left'); }
 function npKey(k){
   if(k === 'side'){ NP.side = NP.side === 'right' ? 'left' : 'right'; return npShow(); }
+  if(k === 'min' || k === 'max'){ NP.min = k === 'min'; return npShow(); }
   const el = NP.target; if(!el || !document.contains(el)) return npHide();
   if(k === 'ok'){ el.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true, cancelable:true})); return; }
   if(k === 'del') el.value = String(el.value).slice(0, -1);
   else { const max = el.maxLength > 0 ? el.maxLength : 6; if(String(el.value).length >= max) return; el.value = String(el.value) + k; }
   el.dispatchEvent(new Event('input', {bubbles:true}));
 }
-new MutationObserver(ms => { if(!npWanted()) return; for(const m of ms) for(const n of m.addedNodes) if(n.nodeType === 1){ if(n.tagName === 'INPUT') npPrep(n.parentNode); else npPrep(n); } }).observe(document.body, {childList:true, subtree:true});
+new MutationObserver(ms => {
+  if(!npWanted()) return;
+  for(const m of ms) for(const n of m.addedNodes) if(n.nodeType === 1){ if(n.tagName === 'INPUT') npPrep(n.parentNode); else npPrep(n); }
+  /* Tastatur bleibt stehen, solange es ein Ziffernfeld gibt – so springt der Bildschirm nicht */
+  if(NP.el && !NP.el.hidden && (!NP.target || !document.contains(NP.target))){ const alt = npFirst(); if(alt) NP.target = alt; else npHide(); }
+}).observe(document.body, {childList:true, subtree:true});
 document.addEventListener('focusin', e => { if(!npWanted() || !npEligible(e.target)) return; e.target.setAttribute('inputmode', 'none'); NP.target = e.target; npShow(); });
-document.addEventListener('focusout', () => setTimeout(() => { if(!npEligible(document.activeElement)) npHide(); }, 60));
+document.addEventListener('focusout', () => setTimeout(() => {
+  if(npEligible(document.activeElement)) return;
+  if(NP.target && document.contains(NP.target) && NP.target.offsetParent) return;
+  const alt = npFirst(); if(alt){ NP.target = alt; return; }
+  npHide();
+}, 60));
 
 /* =====================================================================
    Ich-kann-Sätze, Lernlandkarte (Schülersicht), Berichte (ILEB, Eltern)
@@ -6653,6 +6684,8 @@ function renderReport(){
 }
 
 /* ---------- Ereignisse ---------- */
+$('#btn-rail').addEventListener('click', () => { settings.railOff = true; saveSettings(); render(); requestAnimationFrame(hbFit); });
+$('#btn-rail-show').addEventListener('click', () => { settings.railOff = false; saveSettings(); render(); requestAnimationFrame(hbFit); });
 $('#modes').addEventListener('click', e => {
   const ctb = e.target.closest('[data-ctool]'); if(ctb){ if(ctb.dataset.ctool !== app.mode) setTool(ctb.dataset.ctool); return; }
   if(e.target.closest('[data-ctx-reset]')){ setCtx(null); return; }
@@ -6677,6 +6710,7 @@ $('#ranges').addEventListener('click', e => {
   const wr = e.target.closest('[data-wrange]');
   if(wr){ const w = app.written; w.range = +wr.dataset.wrange; if(w.ready && !wrValid(w.a, w.b, w.op, w.range)) w.ready = false; $('#error').hidden = true; render(); return; }
   const el = e.target.closest('[data-range]'); if(!el || app.busy) return;
+  const keepFind = app.mode === 'number' && task().find;
   app.range = Number(el.dataset.range);
   for(const [mode, t] of Object.entries(app.tasks)){
     if(t.ready && !validTask(mode, t.a, t.b, app.range)) app.tasks[mode] = blankTask();
@@ -6684,6 +6718,8 @@ $('#ranges').addEventListener('click', e => {
   }
   app.sel.clear(); $('#error').hidden = true; $('#stage').innerHTML = '';
   if(['number', 'add', 'sub'].includes(app.mode) && task().ready && task().view === 'board') return startRandom();
+  /* „Zahl suchen“ bleibt beim Wechsel des Zahlenraums an und bekommt gleich eine neue Zahl */
+  if(keepFind){ Object.assign(task(), {find:true, view:'line', findGuess:null}); return startRandom(); }
   render();
 });
 $('#inputs').addEventListener('input', () => { const t = draftOwner(); t.draft = [$('#in-a')?.value ?? '', $('#in-b')?.value ?? '']; $('#error').hidden = true; });
@@ -6781,6 +6817,7 @@ $('#controls').addEventListener('click', e => {
   const t = task();
   if(btn.id === 'c-find'){ t.find = !t.find; t.findGuess = null; if(t.find) return startRandom(); return renderWork(); }
   if(btn.id === 'c-findnext') return startRandom();
+  if(btn.id === 'c-findmore'){ settings.findMore = !settings.findMore; saveSettings(); return renderWork(); }
   if(btn.dataset.view){ t.view = btn.dataset.view; app.sel.clear(); t.check = t.check === 'ok' ? 'ok' : null; return renderWork(); }
   if(btn.dataset.move) return tradeButton(btn.dataset.move);
   if(btn.dataset.tbj) return tbJump(t, +btn.dataset.tbj);
@@ -6843,7 +6880,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.0 · 13.11.2026';
+const APP_VERSION = '0.13.1 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

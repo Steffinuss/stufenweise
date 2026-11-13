@@ -66,7 +66,7 @@ Zuerst sieht das Kind eine ermutigende Begrüßung. Lies sie bei Bedarf vor und 
 
 ![Begrüßung vor dem Mathe-Test](bilder/05_intro.png)
 
-Bei jeder Aufgabe steht oben, was zu tun ist. Zahlen gibt das Kind über die Zifferntastatur ein. Kennt es eine Aufgabe nicht, tippt es auf **Weiß ich nicht**. Das ist ausdrücklich erlaubt und verfälscht nichts.
+Bei jeder Aufgabe steht oben, was zu tun ist. Zahlen gibt das Kind über die Zifferntastatur ein. Kennt es eine Aufgabe nicht, tippt es auf **Weiß ich nicht**. Das ist ausdrücklich erlaubt und verfälscht nichts. Die Zifferntastatur bleibt stehen, solange es auf dem Bildschirm ein Zahlenfeld gibt, auch wenn das Kind zwischendurch etwas antippt (z. B. die Schrauben beim Zählen). So verrutscht nichts. Mit **▾** rollt man sie zu einem kleinen Knopf „123“ ein, mit **⇆** wechselt sie die Seite.
 
 ![Testaufgabe mit Zifferntastatur und dem Knopf „Weiß ich nicht“](bilder/06_aufgabe.png)
 
@@ -137,6 +137,12 @@ Links unter **Tafel** übt das Kind mit der Hundertertafel (1 bis 100) in sieben
 Bei **Zahlen**, **Plus** und **Minus** gibt es im Zahlenraum bis 100 außerdem die Ansicht **Tafel** (bis 1000: **Tausenderbuch**). Der Start ist orange markiert. Das Kind springt mit den Knöpfen +10 und +1 (bei Minus −10 und −1, bis 1000 auch ±100) oder tippt ein Feld in seiner Spalte (Zehner) oder ein paar Felder weiter (Einer) an. Schräge Sprünge lässt die App nicht zu. Der Weg bleibt sichtbar, darunter steht er als Rechnung, zum Beispiel „Start 52 · +10 +10 +10 +10 · 3-mal +1 = 95“. Bei jeder neuen Aufgabe beginnt der Weg neu.
 
 Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901–1000). Ein orangefarbener Punkt markiert die Startseite, ein blauer die Seite, auf der das Kind gerade ist. Mit einem Tipp auf eine Seite kann es blättern. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet; im Tausenderbuch muss das Kind zuerst die richtige Seite aufschlagen.
+
+## Mehr Platz auf dem Bildschirm
+
+Ganz unten in der linken Leiste blendet **‹** die Leiste aus. Die Aufgabe bekommt dann die ganze Breite. Am linken Rand erscheint ein kleiner Knopf **›**, der die Leiste wieder einblendet. Die Einstellung bleibt auf dem Gerät gespeichert.
+
+Beim Zahlenstrahl mit **Zahl suchen** bleibt die Übung an, wenn du den Zahlenraum wechselst; es kommt gleich eine neue Zahl im neuen Zahlenraum. **Mehr Zahlen** beschriftet jede Hauptmarke (bis 100 alle Zehnerzahlen, bis 1000 alle Hunderterzahlen) – eine Hilfe für Kinder, die sich am Strahl noch schwer orientieren.
 
 ## Unterricht an der Tafel
 
