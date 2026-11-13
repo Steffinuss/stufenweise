@@ -455,6 +455,14 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 .adapt-tip{position:absolute;right:18px;top:14px;z-index:20;display:flex;gap:8px;align-items:center;background:#fff;border-radius:16px;box-shadow:0 6px 24px #0002;padding:8px 10px 8px 14px;font-weight:700;font-size:15px;animation:tipIn .35s ease}
 .popts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.popts select{font:inherit;font-size:14px;padding:4px 6px;border-radius:8px;border:1.5px solid #ddd4c3;max-width:170px}
 .ppic{font-size:14px;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.psym{position:relative}
+.psym-btn{min-width:48px;min-height:40px;padding:2px 6px;border:1.5px solid #ddd4c3;border-radius:10px;background:#fff;box-shadow:none}
+.psym-btn svg{display:block}
+.psym-grid{position:absolute;z-index:20;top:calc(100% + 4px);left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(5,50px);gap:6px;padding:8px;background:#fff;border-radius:14px;box-shadow:0 8px 26px #0003}
+.psym-grid[hidden]{display:none}
+.psym-grid button{width:50px;height:50px;min-height:0;padding:4px;display:flex;align-items:center;justify-content:center;border:2px solid transparent;border-radius:10px;background:#faf7f1;box-shadow:none;font-size:20px;color:var(--muted)}
+.psym-grid button.on{border-color:var(--ink)}
+body:has(dialog[open]) #numpad{display:none}
 .prow{flex-wrap:wrap}
 .home-names button.has-sym{gap:6px}.kid-sym svg{display:block;width:64px;height:64px}
 .ct-world{display:flex;gap:4px;justify-content:center}.ct-world button{min-height:44px;padding:0 16px;font-weight:800}
@@ -3209,7 +3217,7 @@ function drawQty(n, range){
     let s = ''; const W = nc*P + (nc > 5 ? gap : 0) + 24, H = nr*P + 24;
     for(let r=0;r<nr;r++) for(let c=0;c<nc;c++){
       const i = r*nc + c, x = 12 + c*P + (c >= 5 ? gap : 0) + P/2, y = 12 + r*P + P/2;
-      s += `<circle cx="${x}" cy="${y}" r="${R}" fill="${i < n ? (r === 0 ? PLACE.h : PLACE.z) : '#fff'}" stroke="${i < n ? '#0004' : '#cfc6b4'}" stroke-width="1.5"/>`;
+      s += `<circle cx="${x}" cy="${y}" r="${R}" fill="${i < n ? PLACE.z : '#fff'}" stroke="${i < n ? '#0004' : '#cfc6b4'}" stroke-width="1.5"/>`;
     }
     return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Punktefeld"><rect x="2" y="2" width="${W - 4}" height="${H - 4}" rx="14" fill="#fff" stroke="#e4dccb" stroke-width="2"/>${s}</svg>`;
   }
@@ -3543,7 +3551,7 @@ const PRIVACY_BOX = `<div class="privacy-box" role="note"><h3>Bevor du Kinder an
 </ul><div class="row" style="justify-content:flex-start;gap:12px;flex-wrap:wrap"><button type="button" class="icon-btn primary" id="privacy-ok">Verstanden</button><button type="button" class="link-btn" data-legal>Impressum und Datenschutz</button></div></div>`;
 function renderProfiles(){
   const locked = !teacherOn();
-  $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${p.sym && ICON[p.sym] ? iconSvg(p.sym, 26) + ' ' : ''}${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<span class="popts"><select data-pworld="${p.id}" aria-label="Themenwelt für ${escHtml(p.name)}" title="Themenwelt: Wörter, Texte und Sachaufgaben">${Object.entries(WORLDS).map(([k, v]) => `<option value="${k}" ${(p.world || settings.world || 'HS') === k ? 'selected' : ''}>${k} · ${v}</option>`).join('')}</select><select data-psym="${p.id}" aria-label="Erkennungsbild für ${escHtml(p.name)}" title="Erkennungsbild: So findet das Kind seinen Namen auch ohne Lesen"><option value="">Bild: keins</option>${KID_SYMS.filter(k => ICON[k]).map(k => `<option value="${k}" ${p.sym === k ? 'selected' : ''}>Bild: ${k}</option>`).join('')}</select><label class="ppic" title="Bildmodus: Anweisungen als Bilder, Rückmeldung als Zeichen – für Kinder, die (noch) nicht lesen"><input type="checkbox" data-ppic="${p.id}" ${p.pic ? 'checked' : ''}> ohne Lesen</label></span><button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
+  $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${p.sym && ICON[p.sym] ? iconSvg(p.sym, 26) + ' ' : ''}${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<span class="popts"><select data-pworld="${p.id}" aria-label="Themenwelt für ${escHtml(p.name)}" title="Themenwelt: Wörter, Texte und Sachaufgaben">${Object.entries(WORLDS).map(([k, v]) => `<option value="${k}" ${(p.world || settings.world || 'HS') === k ? 'selected' : ''}>${k} · ${v}</option>`).join('')}</select><span class="psym"><button type="button" class="psym-btn" data-psym-open="${p.id}" aria-expanded="false" aria-label="Erkennungsbild für ${escHtml(p.name)} wählen" title="Erkennungsbild: So findet das Kind seinen Namen auch ohne Lesen">${p.sym && ICON[p.sym] ? iconSvg(p.sym, 30) : '<small>Bild</small>'}</button><span class="psym-grid" hidden><button type="button" data-psym-set="${p.id}" data-v="" aria-label="kein Bild" class="${p.sym ? '' : 'on'}">✕</button>${KID_SYMS.filter(k => ICON[k]).map(k => `<button type="button" data-psym-set="${p.id}" data-v="${k}" aria-label="${k}" title="${k}" class="${p.sym === k ? 'on' : ''}">${iconSvg(k, 34)}</button>`).join('')}</span></span><label class="ppic" title="Bildmodus: Anweisungen als Bilder, Rückmeldung als Zeichen – für Kinder, die (noch) nicht lesen"><input type="checkbox" data-ppic="${p.id}" ${p.pic ? 'checked' : ''}> ohne Lesen</label></span><button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
     (locked ? `<p class="note">Kinder anlegen, löschen und Tests starten kann nur die Lehrkraft. <button class="linkish" id="p-unlock">Lehrkraft-PIN eingeben</button></p>` : !settings.privacyAck ? PRIVACY_BOX : `<form id="padd" class="row" style="margin-top:12px"><input id="pname" maxlength="20" placeholder="Vorname oder Kürzel" style="flex:1"><button class="primary" type="submit">Hinzufügen</button></form>`) +
     `<div class="row" style="margin-top:14px;justify-content:flex-start;gap:8px"><button data-ptest="M1" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 1: Zahlen und Rechnen</span></button><button data-ptest="M2" class="icon-btn primary">${icon('target')}<span style="display:inline">Mathe Teil 2: Uhr, Größen, Hundertertafel</span></button><button data-ptest="L" class="icon-btn primary">${icon('target')}<span style="display:inline">Lese-Test</span></button>${typeof W_LEVELS !== 'undefined' ? `<button data-ptest="W" class="icon-btn primary">${icon('target')}<span style="display:inline">Schreib-Test</span></button>` : ''}<span class="note" style="align-self:center">für ${escHtml(curName())}</span></div>
     <p class="note" style="margin-top:12px">Namen und Ergebnisse bleiben nur auf diesem Gerät gespeichert. Am besten Vornamen oder Kürzel verwenden.</p>`;
@@ -6715,6 +6723,13 @@ function renderReport(){
 }
 
 /* ---------- Ereignisse ---------- */
+document.addEventListener('click', e => {
+  const op = e.target.closest('[data-psym-open]');
+  if(op){ const g = op.nextElementSibling, open = g.hidden; document.querySelectorAll('.psym-grid').forEach(x => { x.hidden = true; x.previousElementSibling?.setAttribute('aria-expanded', 'false'); }); g.hidden = !open; op.setAttribute('aria-expanded', open); return; }
+  const st = e.target.closest('[data-psym-set]');
+  if(st){ if(!teacherOn()) return; const p = data.profiles.find(x => x.id === st.dataset.psymSet); if(!p) return; p.sym = st.dataset.v || null; saveData(); renderProfiles(); render(); return; }
+  if(!e.target.closest('.psym')) document.querySelectorAll('.psym-grid').forEach(x => x.hidden = true);
+});
 $('#btn-more').addEventListener('click', e => { e.stopPropagation(); const m = $('#more-menu'), open = m.hidden; m.hidden = !open; $('#btn-more').setAttribute('aria-expanded', open); });
 document.addEventListener('click', e => { const m = $('#more-menu'); if(!m.hidden && (!e.target.closest('#more-menu') || e.target.closest('button'))){ m.hidden = true; $('#btn-more').setAttribute('aria-expanded', 'false'); } }, true);
 $('#btn-rail').addEventListener('click', () => { settings.railOff = true; saveSettings(); render(); requestAnimationFrame(hbFit); });
@@ -6905,15 +6920,15 @@ let holdTimer = null;
 const openSettings = () => { syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
 $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings));
 document.addEventListener('change', e => {
-  const t = e.target, pid = t.dataset?.pworld || t.dataset?.psym || t.dataset?.ppic; if(!pid || !teacherOn()) return;
+  const t = e.target, pid = t.dataset?.pworld || t.dataset?.ppic; if(!pid || !teacherOn()) return;
   const p = data.profiles.find(x => x.id === pid); if(!p) return;
-  if(t.dataset.pworld) p.world = t.value; if(t.dataset.psym) p.sym = t.value || null; if(t.dataset.ppic) p.pic = t.checked;
+  if(t.dataset.pworld) p.world = t.value; if(t.dataset.ppic) p.pic = t.checked;
   saveData(); renderProfiles(); render();
 });
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.13.2 · 13.11.2026';
+const APP_VERSION = '0.13.3 · 13.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
