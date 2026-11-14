@@ -81,6 +81,11 @@ main{padding:12px 18px 12px 10px;height:100%;min-height:0;min-width:0;display:fl
 .equation .dh{color:var(--h)}.equation .dz{color:var(--z)}.equation .de{color:var(--e)}
 .equation .res{display:inline-block;min-width:1.2em;padding:0 .2em;border-bottom:4px dotted #cfc6b4}
 .equation .res.ok{color:var(--ok);border-bottom-color:transparent}
+.equation .eq-slot{border-bottom:0;padding:0;vertical-align:middle}
+.equation .eq-in{width:calc(var(--w)*.68em + .5em);font:inherit;font-size:1em;text-align:center;padding:0 .1em;line-height:1.1;border:3px dashed #cfc6b4;border-radius:12px;background:#fff;color:var(--ink);height:1.3em;vertical-align:middle}
+.equation .eq-in:focus{border-style:solid;border-color:var(--focus);outline:none}
+.equation .eq-check{min-height:0;height:1.3em;width:1.4em;padding:0;margin-left:.25em;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;border-radius:12px}
+.equation .eq-check svg{width:.65em;height:.65em}
 .say{min-height:46px;min-width:46px;padding:6px;border-radius:50%}
 .say svg{width:24px;height:24px}
 .words{text-align:center;font-size:24px;font-weight:700;margin:0;letter-spacing:.3px}
@@ -1637,7 +1642,7 @@ function renderTask(before){
   const t = task(), {a, b} = t, res = resultOf(app.mode, a, b);
   const showRes = (resultsOn() && t.reveal) || t.check === 'ok';
   $('#equation').innerHTML = app.mode === 'number' ? numHtml(a,'ca') :
-    `${numHtml(a,'ca')}<span class="op">${MODES[app.mode].sym}</span>${numHtml(b, app.mode==='add' ? 'cb' : '')}<span class="op">=</span><span class="res ${t.check==='ok' ? 'ok' : ''}">${showRes ? res : '?'}${t.check==='ok' ? okCheck : ''}</span>`;
+    `${numHtml(a,'ca')}<span class="op">${MODES[app.mode].sym}</span>${numHtml(b, app.mode==='add' ? 'cb' : '')}<span class="op">=</span>${!showRes && guessHere(t) ? eqGuess(t, String(app.range).length) : `<span class="res ${t.check==='ok' ? 'ok' : ''}">${showRes ? res : '?'}${t.check==='ok' ? okCheck : ''}</span>`}`;
   $('#words').hidden = !(app.mode === 'number' && settings.numberWords);
   $('#words').innerHTML = wordHtml(a);
   $('#prompt').textContent = taskPrompt(t);
@@ -1662,6 +1667,12 @@ function viewButtons(t){
 function checkBox(t){
   return `<div class="check"><label for="guess">Ergebnis</label><input id="guess" type="number" inputmode="numeric" min="0" ${t.check==='ok' ? 'disabled' : ''}><button id="c-check" class="primary" aria-label="Prüfen">${icon('check','ic')}</button></div>`;
 }
+/* Ergebnis direkt oben in die Rechnung schreiben (statt in ein Feld unten) */
+const guessHere = t => app.mode === 'times' || (app.mode !== 'number' && (t.view === 'board' || t.view === 'line' || t.done));
+function eqGuess(t, maxDigits){
+  const w = Math.max(2, maxDigits);
+  return `<span class="res eq-slot"><input id="guess" class="eq-in" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="${w}" aria-label="Ergebnis" style="--w:${w}" value="${escHtml(t.guessVal || '')}"></span><button id="c-check" class="primary eq-check" aria-label="Prüfen">${icon('check','ic')}</button>`;
+}
 function renderTaskControls(t){
   if(t.view === 'board'){
     const c = [viewButtons(t)];
@@ -1671,7 +1682,7 @@ function renderTaskControls(t){
       c.push('<span class="sep"></span>');
       for(const d of app.range === 1000 ? [100, 10, 1] : [10, 1]) c.push(`<button class="tb-jump" data-tbj="${k*d}" aria-label="${sg}${d}" ${done ? 'disabled' : ''}>${sg}${d}</button>`);
       c.push(toolBtn({id:'c-tbundo', ic:'undo', label:'Zurück', disabled: done || (t.bpath || []).length < 2}));
-      c.push('<span class="sep"></span>', checkBox(t)); if(resultsOn()) c.push(toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
+      if(resultsOn()) c.push('<span class="sep"></span>', toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
     }
     $('#controls').innerHTML = c.join('');
     return;
@@ -1679,7 +1690,7 @@ function renderTaskControls(t){
   if(t.view === 'line'){
     const c = [viewButtons(t)];
     if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findmore', ic:'eye', label:'Mehr Zahlen', pressed: !!settings.findMore}), toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
-    if(app.mode !== 'number'){ c.push('<span class="sep"></span>', checkBox(t)); if(resultsOn()) c.push(toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'})); }
+    if(app.mode !== 'number' && resultsOn()) c.push('<span class="sep"></span>', toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
     $('#controls').innerHTML = c.join('');
     return;
   }
@@ -1705,7 +1716,6 @@ function renderTaskControls(t){
   if(t.view === 'dice'){ c.splice(2); }
   if(c.length > 2) c.push('<span class="sep"></span>');
   if(app.mode !== 'number' && t.done){
-    c.push(checkBox(t));
     if(resultsOn()) c.push(toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
   }
   c.push(toolBtn({id:'c-undo', ic:'undo', label:'Zurück', disabled: !t.hist.length}));
@@ -1717,7 +1727,7 @@ function taskHint(t){
   if(t.view === 'board'){
     if(app.mode === 'number') return t.find && t.findGuess != null ? undefined : setHint(t.find && app.range === 1000 ? 'Suche zuerst die richtige Seite. Dann tippe das Feld an.' : '');
     if(!settings.help || t.check === 'ok') return t.check === 'ok' ? undefined : setHint('');
-    if((t.bpath || []).length > 1 && tbPos(t) === resultOf(app.mode, t.a, t.b)) return setHint(`Du bist bei ${tbPos(t)} angekommen. Schreibe das Ergebnis ins Feld.`, 'good');
+    if((t.bpath || []).length > 1 && tbPos(t) === resultOf(app.mode, t.a, t.b)) return setHint(`Du bist bei ${tbPos(t)} angekommen. Schreibe das Ergebnis oben in die Rechnung.`, 'good');
     const sg = app.mode === 'add' ? '+' : '−', h = Math.floor(t.b/100), z = Math.floor(t.b/10) % 10, e = t.b % 10, parts = [];
     if(h) parts.push(`${h}-mal ${sg}100`); if(z) parts.push(`${z}-mal ${sg}10`); if(e) parts.push(`${e}-mal ${sg}1`);
     return setHint(`${app.mode === 'add' ? 'Unten +10, rechts +1' : 'Oben −10, links −1'}${app.range === 1000 ? `, eine Seite ${app.mode === 'add' ? 'weiter' : 'zurück'} ${sg}100` : ''}. Für ${sg}${t.b}: ${parts.join(', dann ')}.`);
@@ -1766,7 +1776,7 @@ function selectionHelp(ps){
 function pushHist(t){ t.hist.push(structuredClone({rows:t.rows, done:t.done})); if(t.hist.length > 50) t.hist.shift(); }
 function setupRows(t){
   t.rows = app.mode === 'add' ? [build(t.a,'a',app.range), build(t.b,'b',app.range)] : [build(t.a,'a',app.range)];
-  t.done = false; t.reveal = false; t.hist = []; t.check = null; t.tries = 0; t.findGuess = null; t.bpath = null; t.bview = null; t.lz = null; app.sel.clear();
+  t.done = false; t.reveal = false; t.hist = []; t.check = null; t.tries = 0; t.guessVal = ''; t.findGuess = null; t.bpath = null; t.bview = null; t.lz = null; app.sel.clear();
 }
 function commitTask(){
   const t = task(), a = t.draft[0].trim() === '' ? NaN : Number(t.draft[0]), b = app.mode === 'number' ? 0 : t.draft[1].trim() === '' ? NaN : Number(t.draft[1]);
@@ -2830,7 +2840,7 @@ function popIn(svg, keys, base = 200){
 /* ---------- Einmaleins ---------- */
 app.times = {a:null, b:null, ready:false, draft:['',''], check:null, reveal:false, help:false};
 function timesStart(a, b, quiet){
-  Object.assign(app.times, {a, b, ready:true, check:null, reveal:false, tries:0, draft:[String(a), String(b)]});
+  Object.assign(app.times, {a, b, ready:true, check:null, reveal:false, tries:0, guessVal:'', draft:[String(a), String(b)]});
   render(); if(!quiet) speak(`${a} mal ${b}`);
 }
 function timesRandom(){
@@ -2892,7 +2902,7 @@ function renderTimes(){
   $('#words').hidden = true;
   if(!t.ready) return renderWelcome();
   const {a, b} = t, res = a*b, showRes = (resultsOn() && t.reveal) || t.check === 'ok';
-  $('#equation').innerHTML = `${a}<span class="op">·</span>${b}<span class="op">=</span><span class="res ${t.check === 'ok' ? 'ok' : ''}">${showRes ? res : '?'}${t.check === 'ok' ? okCheck : ''}</span>`;
+  $('#equation').innerHTML = `${a}<span class="op">·</span>${b}<span class="op">=</span>${showRes ? `<span class="res ${t.check === 'ok' ? 'ok' : ''}">${res}${t.check === 'ok' ? okCheck : ''}</span>` : eqGuess(t, 3)}`;
   $('#prompt').textContent = `${a}-mal die ${b}: ${a} ${a === 1 ? 'Reihe' : 'Reihen'} mit je ${b}.`;
   $('#stage').innerHTML = drawTimes(t);
   const key = `${a}x${b}`;
@@ -2909,7 +2919,6 @@ function renderTimes(){
   }
   t.bundleKey = t.bundle ? key : null;
   const c = [];
-  c.push(checkBox(t));
   if(resultsOn()) c.push(toolBtn({id:'t-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
   c.push('<span class="sep"></span>');
   c.push(toolBtn({id:'t-help', ic:'count', label:'Zählhilfe', pressed: t.help}));
@@ -7490,6 +7499,15 @@ $('#controls').addEventListener('keydown', e => {
 function dgEnter(e){ e.preventDefault(); const ins = [...document.querySelectorAll('#stage .dg-in, #controls .dg-in')], i = ins.indexOf(e.target); if(i < ins.length - 1) ins[i + 1].focus(); else if(app.mode === 'diag') diagAnswer(false); }
 $('#stage').addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.classList.contains('dg-in')) dgEnter(e); });
 $('#controls').addEventListener('input', e => { if(['blitz','screen','money','diag'].includes(app.mode)) return; const t = app.mode === 'times' ? app.times : task(); if(e.target.id === 'guess' && t.check === 'no'){ t.check = null; setHint(''); } });
+/* Ergebnisfeld oben in der Rechnung */
+const eqTask = () => app.mode === 'times' ? app.times : ['add', 'sub'].includes(app.mode) ? task() : null;
+$('#equation').addEventListener('input', e => {
+  if(e.target.id !== 'guess') return; const t = eqTask(); if(!t) return;
+  const v = e.target.value.replace(/\D/g, ''); if(v !== e.target.value) e.target.value = v;
+  t.guessVal = v; if(t.check === 'no'){ t.check = null; setHint(''); }
+});
+$('#equation').addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.id === 'guess'){ e.preventDefault(); app.mode === 'times' ? timesCheck() : checkGuess(); } });
+$('#equation').addEventListener('click', e => { if(e.target.closest('#c-check')){ app.mode === 'times' ? timesCheck() : checkGuess(); } });
 
 /* Einstellungen */
 const dlgSet = $('#dlg-settings'), dlgHelp = $('#dlg-help');
@@ -7527,7 +7545,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.15.0 · 14.11.2026';
+const APP_VERSION = '0.15.1 · 14.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
