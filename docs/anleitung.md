@@ -99,7 +99,7 @@ Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigt eine Treppe, 
 2. **Fach:** Unter **Heute für dich** steht die passende Übung aus der Förderzone. Ein Tipp darauf startet sie sofort. Sonst wählt das Kind Mathe oder Deutsch.
 3. **Übung:** Das Kind wählt einen Bereich, zum Beispiel Plus oder Hundertertafel. Oben steht wieder „Für dich“ mit der passenden Übung.
 
-Bei Plus, Minus und dem Einmaleins schreibt das Kind das Ergebnis direkt oben in die Rechnung, dort, wo vorher das Fragezeichen stand, und prüft mit dem Haken daneben (oder mit ✓ auf der Zifferntastatur). Beim Legen mit Material erscheint das Feld, sobald die Mengen zusammengelegt sind.
+Bei Plus, Minus und dem Einmaleins schreibt das Kind das Ergebnis direkt oben in die Rechnung, dort, wo vorher das Fragezeichen stand, und prüft mit dem Haken daneben (oder mit ✓ auf der Zifferntastatur). Beim Legen mit Material erscheint das Feld, sobald die Mengen zusammengelegt sind. Auch im Test steht das Antwortfeld direkt in der Aufgabe (zum Beispiel „8 = 6 + ☐“) oder gleich darunter.
 
 Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.
 

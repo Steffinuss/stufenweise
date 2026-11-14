@@ -254,7 +254,9 @@ legend{font-weight:700;padding:0;float:left;margin-bottom:2px;font-size:17px}
 body.screening .toolbar{visibility:hidden}
 /* Niveau-Test */
 .dg-prompt{font-size:22px;font-weight:700;color:var(--ink)}
-.dg-stage>svg{max-height:380px}
+.dg-stage>svg,.dg-stage>.dg-item>svg{max-height:380px}
+.dg-item{display:contents}
+.dg-ans{margin-top:16px}.dg-ans .check{padding:10px 16px;gap:12px}.dg-ans .dg-in{width:130px;font-size:34px;border:3px dashed #cfc6b4;border-radius:12px}.dg-ans .dg-in:focus{border-style:solid;border-color:var(--focus);outline:none}.dg-ans .dg-lbl{font-size:18px}
 .screw{cursor:pointer}
 .dg-choice{display:flex;flex-direction:column;gap:12px;min-width:min(420px,90%)}
 .dg-choice button,.dg-pair button{font-size:28px;font-weight:700;min-height:70px;padding:8px 24px;font-variant-numeric:tabular-nums}
@@ -358,6 +360,8 @@ body.screening .toolbar{visibility:hidden}
 .it-svg{width:100%;display:flex;justify-content:center}.it-svg>svg{max-width:100%;max-height:300px}
 .it-icon svg{display:block;filter:drop-shadow(0 2px 3px #0002)}
 .it-word{font-size:clamp(44px,7vw,72px);font-weight:700;letter-spacing:.04em;background:#fff;border-radius:18px;padding:6px 34px;box-shadow:var(--shadow)}
+.it-text .it-in{width:2.6em;font:inherit;font-weight:700;text-align:center;padding:0 .1em;margin:0 .05em;height:1.35em;border:3px dashed #cfc6b4;border-radius:12px;background:#fdfbf6;color:var(--ink);vertical-align:middle}
+.it-text .it-in:focus{border-style:solid;border-color:var(--focus);outline:none;background:#fff}
 .it-text{font-size:clamp(26px,3.4vw,36px);font-weight:600;line-height:1.35;background:#fff;border-radius:18px;padding:14px 26px;box-shadow:var(--shadow);max-width:900px;text-align:center}
 .row.col{flex-direction:column;align-items:stretch;text-align:left}
 .sz-svg{width:min(640px,100%);height:auto;display:block;margin:0 auto}
@@ -5264,11 +5268,16 @@ function moneyRowSvg(list, tap){
   return `<svg viewBox="0 0 ${x + 10} ${list.some(c => c >= 10000) ? 120 : 110}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Geld">${s}</svg>`;
 }
 
+/* Antwortfelder direkt in die Aufgabe setzen, wo ein einzelnes „?“ steht (z. B. „8 = 6 + ?“) */
+const Q_RE = /(^|\s)\?(?=\s|$)/g;
+const inlineQ = it => it.type === 'input' && !!it.text && !it.svg && (it.text.match(Q_RE) || []).length === it.fields?.length;
 function itemStage(it, r, opt = {}){
+  const inl = opt.inline && inlineQ(it); let qk = 0;
+  const qIn = () => `<input class="dg-in it-in" type="number" inputmode="numeric" placeholder=" " aria-label="${escHtml((it.fieldLabels || [])[qk] || 'Antwort ' + (qk + 1))}" data-q="${qk++}">`;
   const head = (it.svg && it.type !== 'flash' ? `<div class="it-svg">${it.svg}</div>` : '') +
     (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 150)}</div>` : '') +
     (it.word ? `<div class="it-word">${rdWordHtml(it.word, opt.colored && it.colored !== false)}</div>` : '') +
-    (it.text ? `<div class="it-text ${it.textCls || ''}">${it.text.split(/ {3,}/).map(opt.colored ? sylText : escHtml).join('<span class="it-gap" aria-hidden="true"></span>')}</div>` : '') +
+    (it.text ? `<div class="it-text ${it.textCls || ''}">${it.text.split(/ {3,}/).map(inl ? (x => escHtml(x).replace(Q_RE, (m, pre) => pre + qIn())) : opt.colored ? sylText : escHtml).join('<span class="it-gap" aria-hidden="true"></span>')}</div>` : '') +
     (it.html ? `<div class="it-doc">${it.html}</div>` : '') +
 ''
   if(it.type === 'write') return writeStage(it, r, opt);
@@ -5382,10 +5391,11 @@ function renderDiag(){
   const it = d.items[d.idx], r = d.resp ||= {};
   $('#equation').innerHTML = `<span class="screen-step">${title}${d.re ? ' · Re-Diagnose' : ''} · Aufgabe ${d.nItems + 1}${d.warm ? ' von ' + d.items.length : ''}</span>`;
   $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
-  $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, r)}</div>`;
+  /* Antwortfelder gehören zur Aufgabe: im „?“ der Rechnung oder direkt darunter – nicht unten in der Leiste */
+  const ans = needsFields(it, r) && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : '';
+  $('#stage').innerHTML = `<div class="blitz dg-stage"><div class="dg-item">${itemStage(it, r, {inline:true})}</div>${ans}</div>`;
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   let c = '';
-  if(needsFields(it, r)) c += fieldsHtml(it);
   if(it.type === 'flash' && r.hidden) c += toolBtn({id:'d-again', ic:'eye', label:'Nochmal zeigen'});
   if(it.type !== 'flash' || r.hidden) c += toolBtn({id:'d-next', ic:'next', label:'Weiter', primary:true});
   c += toolBtn({id:'d-skip', ic:'help', label: d.warm ? 'Überspringen' : 'Weiß ich nicht'}) + '<span class="sep"></span>' + toolBtn({id:'d-close', ic:'close', label:'Abbrechen'});
@@ -5400,7 +5410,7 @@ function renderDiag(){
 function diagStageClick(e){
   const d = app.diag; if(!d || d.done) return;
   const it = d.items[d.idx], r = d.resp ||= {};
-  if(itemClick(e, it, r)){ $('#stage .dg-stage').innerHTML = itemStage(it, r); if(it.type === 'board') hbFit(); }
+  if(itemClick(e, it, r)){ $('#stage .dg-item').innerHTML = itemStage(it, r, {inline:true}); if(it.type === 'board') hbFit(); }
 }
 function diagControl(btn){
   const d = app.diag;
@@ -7545,7 +7555,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.15.1 · 14.11.2026';
+const APP_VERSION = '0.15.2 · 14.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
