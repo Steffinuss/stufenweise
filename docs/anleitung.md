@@ -215,9 +215,24 @@ In Safari auf „Teilen“ → „Zum Home-Bildschirm“ tippen. Stufenweise sta
 
 iPadOS lädt eine solche App beim Öffnen oft nicht neu. Deshalb prüft Stufenweise selbst, ob es eine neue Version gibt: beim Öffnen, beim Zurückkehren in die App und alle 30 Minuten. Gibt es eine, erscheint oben der Hinweis „Neue Version … ist da“ mit dem Knopf **Jetzt aktualisieren**. Von Hand geht es in den Einstellungen („Nach neuer Version suchen“) oder in der Anleitung neben der Versionsnummer („Aktualisieren“). Namen, Ergebnisse und Einstellungen bleiben dabei erhalten.
 
+**Ohne Internet:** Wurde Stufenweise einmal mit Internet geöffnet, startet es danach auch ohne WLAN (mit der zuletzt geladenen Version). Sobald wieder Internet da ist, kommt die neueste Version wie gewohnt.
+
 ### Daten sichern
 
 Alle Namen und Ergebnisse liegen nur auf diesem Gerät, und zwar getrennt für jede Adresse und für die App auf dem Home-Bildschirm. Wer das Symbol vom Home-Bildschirm löscht oder in Safari die Websitedaten löscht, löscht auch die Ergebnisse. Deshalb: Einstellungen → „Daten sichern“ → **Sicherung speichern**. Die Datei landet in der Dateien-App und kann mit „Sicherung laden“ zurückgeholt oder auf ein anderes Gerät gebracht werden. Ist die letzte Sicherung 14 Tage oder länger her, erinnert der Lernstand mit einem Hinweis „Jetzt sichern“. Die App bittet das iPad außerdem, ihre Daten dauerhaft aufzubewahren.
+
+### Geräteumzug per QR-Code
+
+So kommen Kinder ohne Datei und ohne Internet auf ein anderes Gerät, zum Beispiel vom Lehrer-iPad auf ein Schüler-iPad:
+
+1. Auf dem **alten Gerät**: Einstellungen → Daten sichern → **Per QR-Code senden**. Kinder ankreuzen (auf Wunsch auch die Einstellungen, die PIN wird nie übertragen) und **QR-Codes zeigen** tippen.
+2. Auf dem **neuen Gerät**: Einstellungen → Daten sichern → **Per QR-Code empfangen**. Beim ersten Mal fragt das iPad, ob Stufenweise die Kamera benutzen darf: erlauben.
+3. Die Kamera des neuen Geräts auf den Bildschirm des alten halten. Bei vielen Daten wechseln die QR-Codes von selbst; die Reihenfolge ist egal, kleine Kästchen zeigen, welche Teile schon angekommen sind. Meist dauert das zehn bis zwanzig Sekunden.
+4. Zum Schluss zeigt das neue Gerät, welche Kinder angekommen sind. **Übernehmen** tippen.
+
+Ist ein Kind auf beiden Geräten schon da, wird zusammengeführt: Die Übungen beider Geräte bleiben erhalten, bei Name, Bild und Lernstand gilt der neuere Stand. Bei sehr vielen Übungen werden per QR-Code nur die neuesten übertragen (die App sagt dann, wie viele); den ganzen Verlauf bringt die Sicherungsdatei mit.
+
+Tipps: Den Bildschirm des alten Geräts hell stellen, die Kamera etwa 20 bis 30 Zentimeter davor halten und Spiegelungen vermeiden. Die QR-Codes enthalten Namen und Lernstände: nur zwischen Schulgeräten im selben Raum verwenden und nicht fotografieren.
 
 ## Über Stufenweise: Lizenz und Danke
 
