@@ -111,7 +111,7 @@ Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Lin
 
 ### Übungsrunden
 
-Geübt wird in Runden zu 10 Aufgaben. Oben links zeigt eine kleine Treppe, wie weit das Kind in der Runde ist: grün heißt gleich richtig, gelb heißt nach einem zweiten Versuch richtig. Nach der letzten Aufgabe kommt ein kurzer Rückblick („Geschafft! 10 Aufgaben – 8 davon gleich richtig“) mit großen Knöpfen:
+Geübt wird in Runden zu 10 Aufgaben. Oben links zeigt eine kleine Treppe, wie weit das Kind in der Runde ist: grün heißt gleich richtig, gelb heißt nach einem zweiten Versuch richtig. Wer mit dem Pfeil zur nächsten Aufgabe springt, ohne die Aufgabe gelöst zu haben, verbraucht trotzdem eine Stufe: Sie wird gestreift (übersprungen) und zählt nicht als richtig. Auch ein Wechsel zwischen den Stufen oben (etwa von „Tausender“ zu „Finden“) beginnt keine neue Runde. So lassen sich schwere Aufgaben nicht wegklicken, und der Rückblick zeigt ehrlich, was gelöst wurde („… 1 übersprungen“). Nach der letzten Aufgabe kommt ein kurzer Rückblick („Geschafft! 10 Aufgaben – 8 davon gleich richtig“) mit großen Knöpfen:
 
 - **Schwerer** (mit Angabe, was als Nächstes kommt), wenn mindestens 7 Aufgaben gleich richtig waren. Bei 9 oder 10 ist der Knopf hervorgehoben.
 - **Leichter**, wenn weniger als die Hälfte gleich richtig war.

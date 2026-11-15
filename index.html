@@ -586,6 +586,7 @@ body.class-mode #controls button{min-height:58px}
 .adapt-tip.up{border:2px solid #1f7a45}
 .round-bar{position:absolute;left:18px;top:12px;z-index:5;display:flex;align-items:flex-end;gap:3px;height:34px;pointer-events:none}
 .round-bar i{width:9px;border-radius:3px 3px 1px 1px;background:#e7dfd0}
+.round-bar i.skip{background:repeating-linear-gradient(135deg,#cfc5b2 0 3px,#efe8da 3px 6px)}
 .round-bar i.ok{background:#1f7a45}.round-bar i.late{background:#e8b45c}.round-bar i.now{outline:2px solid #e8890c;outline-offset:1px}
 .round-end{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:#fdfbf6e8;border-radius:24px;animation:tipIn .3s ease}
 .round-card{background:#fff;border-radius:22px;box-shadow:0 10px 40px #0002;padding:22px 26px;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:min(560px,92%);text-align:center}
@@ -2650,7 +2651,7 @@ function writtenControl(btn){
       w.reveal = !w.reveal;
       if(w.reveal){ w.calc.cols.forEach((c, i) => { if(c.needed) w.inp.res[i] = String(c.digit); if(i && c.cin) w.inp.carry[i] = String(c.cin); }); }
       renderWritten(); if(w.reveal) setHint(`Lösung: ${w.calc.res}`); return;
-    case 'w-next': return wrRandom();
+    case 'w-next': skipMark(); return wrRandom();
   }
 }
 
@@ -3031,9 +3032,20 @@ const ROUND_MODES = ['add', 'sub', 'written', 'times', 'money', 'blitz', 'read']
 app.round = {key:null, res:[]};
 const roundLen = () => Number(settings.roundLen ?? 10) || 0;
 const roundOn = () => roundLen() > 0 && ROUND_MODES.includes(app.mode) && app.ctx !== 'class';
-const roundKey = () => `${data.current || 'guest'}|${app.mode}|${app.mode === 'read' ? app.read.lvl : ''}`;
-function roundSync(){ const k = roundKey(); if(app.round.key !== k){ app.round = {key:k, res:[]}; document.querySelector('.round-end')?.remove(); } }
-const roundBarHtml = (res, n, now) => `<div class="round-bar" aria-hidden="true">${Array.from({length:n}, (_, i) => `<i class="${res[i] === true ? 'ok' : res[i] === false ? 'late' : ''}${now && i === res.length ? ' now' : ''}" style="height:${Math.round(28 + 72*(i + 1)/n)}%"></i>`).join('')}</div>`;
+/* Stufenwechsel innerhalb eines Bereichs beendet die Runde nicht (sonst ließe sich eine Runde durch Hin- und Herschalten „neu starten“) */
+const roundKey = () => `${data.current || 'guest'}|${app.mode}|${app.mode === 'read' ? (app.read.lvl || '')[0] : ''}`;
+function roundSync(){ const k = roundKey(); if(app.round.key !== k){ app.round = {key:k, res:[]}; app.solved = false; document.querySelector('.round-end')?.remove(); } }
+/* Weiterklicken ohne Lösung zählt in der Runde als „übersprungen“ – so lassen sich schwere Aufgaben nicht einfach wegklicken. */
+app.solved = false;
+function skipMark(){
+  const was = app.solved; app.solved = false;
+  if(was || !roundOn() || app.mode === 'blitz') return;
+  roundSync(); const R = app.round, n = roundLen();
+  if(R.res.length >= n) return;
+  R.res.push('skip'); roundBar();
+  if(R.res.length >= n){ clearTimeout(R.timer); R.timer = setTimeout(roundEnd, 900); }
+}
+const roundBarHtml = (res, n, now) => `<div class="round-bar" aria-hidden="true">${Array.from({length:n}, (_, i) => `<i class="${res[i] === true ? 'ok' : res[i] === false ? 'late' : res[i] === 'skip' ? 'skip' : ''}${now && i === res.length ? ' now' : ''}" style="height:${Math.round(28 + 72*(i + 1)/n)}%"></i>`).join('')}</div>`;
 function roundBar(){
   const ws = document.querySelector('.workspace'); if(!ws) return;
   ws.querySelector(':scope > .round-bar')?.remove();
@@ -3068,12 +3080,12 @@ function roundEnd(){
   if(!roundOn() || app.round.res.length < roundLen()) return;
   const ws = document.querySelector('.workspace'); if(!ws) return;
   document.querySelector('.round-end')?.remove(); document.querySelector('.adapt-tip')?.remove();
-  const R = app.round, n = R.res.length, good = R.res.filter(Boolean).length;
+  const R = app.round, n = R.res.length, good = R.res.filter(x => x === true).length, skipped = R.res.filter(x => x === 'skip').length;
   const up = roundStep(1), down = roundStep(-1), strong = good >= Math.ceil(n*0.9), weak = good < n/2;
   /* Geführte Oberfläche: bei einer sehr guten Runde in einer Förderzone einen Kurztest für die nächste Stufe anbieten */
   const zk = activeZoneKey(), p = curProfile(), kurz = strong && !up && zk && p && guideOn() && guideZones(p.id, /^[LW]/.test(zk) ? 'D' : 'M').includes(zk);
   if(kurz){ document.querySelector('.lvlup')?.remove(); (app.offered ??= {})[zk] = true; }
-  const msg = good === n ? 'Alles gleich richtig. Super!' : strong ? 'Fast alles gleich richtig. Stark!' : weak ? 'Das war nicht leicht. Gut, dass du drangeblieben bist.' : 'Gut gemacht!';
+  const msg = skipped >= n/2 ? 'Viele Aufgaben übersprungen. Probier es noch einmal – du schaffst das!' : good === n ? 'Alles gleich richtig. Super!' : strong ? 'Fast alles gleich richtig. Stark!' : weak ? 'Das war nicht leicht. Gut, dass du drangeblieben bist.' : 'Gut gemacht!';
   const sv = d => `<svg viewBox="0 0 32 32" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
   const RIC = {again: sv('<path d="M25 16a9 9 0 1 1-3-6.7"/><path d="M23 4v6h-6"/>'), up: sv('<path d="M4 27h7v-7h7v-7h7V6"/><path d="M21 9l4-4 4 4"/>'), down: sv('<path d="M4 6h7v7h7v7h7v6"/><path d="M21 23l4 4 4-4"/>'), pause: sv('<path d="M5 15L16 5l11 10"/><path d="M8 13v14h16V13"/>'), kurz: sv('<path d="M16 4l3.5 7.5 8 1-6 5.5 1.6 8L16 22l-7.1 4 1.6-8-6-5.5 8-1z"/>')};
   const btn = (id, label, sub, primary) => `<button data-round="${id}" class="${primary ? 'primary' : ''}"><span class="r-ic" aria-hidden="true">${RIC[id]}</span><span class="r-tx">${label}${sub ? `<small>${escHtml(sub)}</small>` : ''}</span></button>`;
@@ -3084,7 +3096,7 @@ function roundEnd(){
   acts.push(btn('again', 'Noch eine Runde', '', !acts.some(a => a.includes('class="primary"'))));
   acts.push(btn('pause', 'Pause', 'zurück zum Start'));
   const d = document.createElement('div'); d.className = 'round-end'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', 'Runde geschafft');
-  d.innerHTML = `<div class="round-card"><h2>Geschafft!</h2>${roundBarHtml(R.res, n, false)}<p><b>${n} Aufgaben</b> – ${good} davon gleich richtig.</p><p>${msg}</p><div class="acts">${acts.join('')}</div></div>`;
+  d.innerHTML = `<div class="round-card"><h2>Geschafft!</h2>${roundBarHtml(R.res, n, false)}<p><b>${n} Aufgaben</b> – ${good} davon gleich richtig${skipped ? `, ${skipped} übersprungen` : ''}.</p><p>${msg}</p><div class="acts">${acts.join('')}</div></div>`;
   d.addEventListener('click', ev => {
     const b = ev.target.closest('[data-round]'); if(!b) return;
     d.remove(); app.round = {key:null, res:[]};
@@ -3101,7 +3113,7 @@ function logAttempt(e){
   if(app.ctx === 'class') return;
   const id = data.current || 'guest';
   const list = data.log[id] ??= [];
-  list.push({ts: Date.now(), ...e});
+  list.push({ts: Date.now(), ...e}); app.solved = true;
   if(list.length > 3000) list.splice(0, list.length - 3000);
   saveData();
   try{ adaptTrack(e); }catch{}
@@ -3263,7 +3275,7 @@ function moneyControl(btn){
     case 'm-undo': m.items.pop(); m.check = null; return renderMoney();
     case 'm-clear': m.items = []; m.check = null; return renderMoney();
     case 'm-reveal': m.reveal = !m.reveal; return renderMoney();
-    case 'm-next': return moneyNew();
+    case 'm-next': skipMark(); return moneyNew();
   }
 }
 
@@ -5629,7 +5641,7 @@ function readControl(btn){
   const R = app.read;
   switch(btn.id){
     case 'r-check': return readCheck();
-    case 'r-next': setHint(''); return readNew();
+    case 'r-next': skipMark(); setHint(''); return readNew();
     case 'r-up': case 'r-down': { const lv = rdLevels(R.lvl); Object.assign(R, {lvl: lv[lv.indexOf(R.lvl) + (btn.id === 'r-up' ? 1 : -1)], item:null, streak:0, miss:0}); setHint(''); return render(); }
     case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; R.r.slots = null; R.r.marks = null; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else if(R.item.type === 'board'){ const it = R.item; if(it.mode === 'tap') R.r.sel = it.target; else if(it.mode === 'multi') R.r.set = [...it.set]; else { R.r.vals = it.fields.map(String); R.r.wrong = new Set(); } } else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: rdMode(R.lvl), task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
   }
@@ -7403,7 +7415,7 @@ $('#inputs').addEventListener('click', e => {
   const op = e.target.closest('[data-op]');
   if(op){ const w = app.written; w.op = op.dataset.op; if(w.ready && wrValid(w.a, w.b, w.op, w.range)) wrStart(w.a, w.b); else { w.ready = false; render(); } }
 });
-$('#btn-random').addEventListener('click', randomAny);
+$('#btn-random').addEventListener('click', () => { skipMark(); randomAny(); });
 $('#btn-say').addEventListener('click', () => {
   if(app.mode === 'written'){ const w = app.written; if(w.ready) speak(`${w.a} ${w.op === 'add' ? 'plus' : 'minus'} ${w.b}. ${w.done ? '' : wrPrompt()}`); return; }
   if(app.mode === 'money'){ const m = app.money; if(m.ready) speak(m.sub === 'pay' ? `Lege ${fmtMoney(m.target)}.` : `Der Preis ist ${fmtMoney(m.price)}. Bezahlt wird mit ${fmtMoney(m.paid)}. Wie viel Wechselgeld gibt es?`); return; }
@@ -7556,7 +7568,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.15.4 · 15.11.2026';
+const APP_VERSION = '0.15.5 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
