@@ -289,6 +289,7 @@ body.screening .toolbar{visibility:hidden}
 .zone p{margin:4px 0;font-size:15px;line-height:1.45}
 .zone .why{background:#f7f3ea;border-radius:10px;padding:8px 10px}
 .zone .analog{color:var(--muted)}
+.matway{border:1.5px solid #d9e6d2;background:#f5faf2;border-radius:12px;padding:8px 12px;margin:8px 0}.matway .mw-h{margin:0 0 2px}.mw-steps{margin:4px 0 6px;padding-left:22px;font-size:15px;line-height:1.45}.mw-steps li{margin:2px 0}.matway .mw-need{margin:2px 0 6px}
 .stats-h{margin:18px 0 0;font-size:17px}
 /* Profile & Lernstand */
 .profile-chip .psym-ic{display:inline-flex!important}.profile-chip .psym-ic svg{width:32px!important;height:32px!important}.psym-ic svg,.hello-sym svg{display:block}.hello-sym{display:inline-block;vertical-align:middle;margin-right:6px}
@@ -3666,7 +3667,10 @@ function statsSections(id){
     out.push({title: MODE_NAMES[mode], lines});
   }
   const errs = data.errs?.[id];
-  if(errs){ const lines = Object.entries(errs).map(([m, o]) => `${MODE_NAMES[m] || m}: ${Object.entries(o).filter(([k]) => k !== 'anders').map(([k, n]) => `${ERR_NAME[k]} ${n}×`).join(', ')}`).filter(l => !l.endsWith(': ')); if(lines.length) out.push({title:'Typische Fehler beim Üben', lines}); }
+  if(errs){ const lines = Object.entries(errs).map(([m, o]) => `${MODE_NAMES[m] || m}: ${Object.entries(o).filter(([k]) => k !== 'anders').map(([k, n]) => `${ERR_NAME[k]} ${n}×`).join(', ')}`).filter(l => !l.endsWith(': ')); if(lines.length) out.push({title:'Typische Fehler beim Üben', lines});
+    const tot = {}; for(const o of Object.values(errs)) for(const [k, n] of Object.entries(o)) tot[k] = (tot[k] || 0) + n;
+    const tips = Object.entries(tot).filter(([k, n]) => ERR_MAT[k] && n >= 3).sort((a, b) => b[1] - a[1]).map(([k]) => `${ERR_NAME[k]}: ${ERR_MAT[k]}`);
+    if(tips.length) out.push({title:'Nächster Schritt am Material', lines: tips}); }
   /* Übersprungen: ohne Lösung weitergeklickt (für die Lehrkraft – zeigt, wo ein Kind ausweicht) */
   const sk = data.skips?.[id] || [];
   if(sk.length){
@@ -5687,6 +5691,101 @@ function matrixHtml(pid, subj){
     <tr><th>Lesen</th>${L_LEVELS.map(l => cellChip(m, `L|${l}`)).join('')}</tr>
   </tbody></table></div><p class="note mx-legend">Lesestufen nach dem Bildungsplan GENT (Deutsch 2.1.3, erweiterter Lesebegriff). ${legend}</p>`;
 }
+/* =====================================================================
+   Lernort Material: Stufenweise ist ein Lernort unter vielen.
+   Die App übernimmt Bild und Symbol. Das Handeln mit echtem Material bleibt die Grundlage
+   (EIS-Prinzip nach Bruner: enaktiv → ikonisch → symbolisch). Je Stufe:
+   hand = mit echtem Material handeln · bild = auf dem Legeblatt bzw. Arbeitsblatt · need = Material ·
+   lege = passendes Blatt im Arbeitsblatt-Generator · zr = Zahlenraum für das Blatt
+   ===================================================================== */
+const MW = (hand, bild, need, lege = null, zr = null) => ({hand, bild, need, lege, zr});
+const DIENES = 'Zehnerstangen und Einerwürfel', DIENES3 = 'Hunderterplatten, Zehnerstangen und Einerwürfel';
+function mWay(zr, l){
+  const small = zr <= 20;
+  if(l === 'I') return zr === 1000 ? MW('In Zehnerschritten zählen mit 10-€-Scheinen (Spielgeld). Über den Hunderter: 10 Zehnerstangen auf eine Hunderterplatte legen.', 'In der Stellentafel weiterzählen: bei jedem Schritt eine Zehnerstange dazulegen, bei 10 Stangen gegen eine Hunderterplatte tauschen.', ['Spielgeld', DIENES3], 'K:stellen', 1000)
+    : zr === 100 ? MW('Viele Teile zählen (Schrauben, Muttern, Büroklammern): immer 10 in einen Becher, dann die Becher und die einzelnen Teile zählen.', 'Auf das Hunderterfeld Einerwürfel legen, Zeile für Zeile: Jede volle Zeile ist ein voller Zehner.', ['Schrauben oder Büroklammern', 'Becher', 'Einerwürfel (1 cm)'], 'K:hundert')
+    : MW('Teile abzählen und dabei jedes Teil in eine Dose legen: eins zu eins, jedes Teil nur einmal.', 'Auf dem Zahlenstrahl auf jede Zahl ein Plättchen legen und mitzählen; rückwärts wieder wegnehmen.', ['Schrauben oder Muttern', 'Dose', 'Wendeplättchen'], 'K:strahl20');
+  if(l === 'II') return small ? MW('Zahlenstrahl auf dem Boden aus Kreppband und Zahlkarten: Zahlen ablaufen, vor und zurück springen, Nachbarn zeigen.', 'Auf dem Zahlenstrahl eine Spielfigur auf die genannte Zahl stellen und die Nachbarn zeigen.', ['Kreppband', 'Zahlkarten', 'Spielfigur'], 'K:strahl20')
+    : zr === 100 ? MW('Seil mit Wäscheklammern: zuerst die Zehnerzahlen anklammern, dann Zahlen dazwischen einordnen (37 liegt näher an 40 als an 30).', 'Auf dem Zahlenstrahl bis 100 Plättchen an die genannten Stellen legen: erst den Zehner suchen, dann die Einer.', ['Seil', 'Wäscheklammern', 'Zahlkarten'], 'K:strahl100', 100)
+    : MW('Zahlkarten an einer Wäscheleine ordnen: erst die Hunderter, dann Zahlen dazwischen. Mit dem Maßband zeigen: 1 m hat 100 cm.', 'Auf dem Zahlenstrahl bis 1000 (ein Strich = 10) Plättchen an die genannten Stellen legen.', ['Wäscheleine und Klammern', 'Zahlkarten', 'Maßband'], 'K:strahl100', 1000);
+  if(l === 'III') return zr === 10 ? MW('Schüttelbox: Plättchen in eine Schachtel mit Trennwand legen, schütteln, Zerlegung ablesen und sprechen („6 sind 4 und 2“).', 'Die Zahl im Zehnerfeld mit Wendeplättchen legen: einige rot, der Rest blau. Alle Zerlegungen finden.', ['Wendeplättchen', 'Schachtel mit Trennwand (z. B. halbierter Eierkarton)'], 'K:zehner')
+    : zr === 20 ? MW('Wendeplättchen ins Zwanzigerfeld legen: zuerst die obere Reihe ganz voll, dann unten weiter. 14 sind 10 und 4.', 'Auf dem Zwanzigerfeld Zahlen legen und sofort sagen: ein voller Zehner und … Einer.', ['Wendeplättchen'], 'K:zwanzig')
+    : zr === 100 ? MW('Zahlen mit 10er-Tütchen (je 10 Schrauben) und einzelnen Schrauben legen: 47 sind 4 Tütchen und 7 einzelne.', 'Zehnerstangen und Einerwürfel in die Stellentafel legen und die Zahl mit Ziffern darunter schreiben.', ['Schrauben und kleine Tütchen', DIENES], 'K:stellen', 100)
+    : MW('Lager-Inventur: Kisten (100), Kartons (10) und einzelne Teile zählen und legen.', 'Hunderterplatten, Zehnerstangen und Einer in die Stellentafel legen und die Zahl darunter schreiben.', [DIENES3], 'K:stellen', 1000);
+  if(l === 'IV') return zr === 10 ? MW('Eierkarton mit 10 Plätzen füllen: Wie viele fehlen noch? Die leeren Plätze zählen, nicht die vollen.', 'Im Zehnerfeld eine Zahl legen und mit der zweiten Farbe bis 10 auffüllen.', ['Eierkarton (10er)', 'Wendeplättchen oder Kastanien'], 'K:zehner')
+    : zr === 20 ? MW('Box mit 20 Plätzen (zwei 10er-Eierkartons) füllen: erst bis 10 ergänzen, dann weiter bis 20.', 'Im Zwanzigerfeld legen und mit der zweiten Farbe bis 20 auffüllen.', ['zwei 10er-Eierkartons', 'Wendeplättchen'], 'K:zwanzig')
+    : zr === 100 ? MW('Karton mit 100 Teilen: erst bis zum nächsten vollen Zehner auffüllen, dann ganze 10er-Tütchen dazu.', 'Auf dem Hunderterfeld legen und mit Einerwürfeln bis 100 auffüllen: zuerst die Zeile voll, dann ganze Zeilen.', ['Schrauben und 10er-Tütchen', 'Einerwürfel (1 cm)'], 'K:hundert')
+    : MW('Wechselgeld mit Spielgeld bis 1000 €: vom Preis aus hochzählen, bis der Betrag voll ist.', 'In der Stellentafel bis zum nächsten Hunderter auffüllen, dann ganze Hunderterplatten dazu.', ['Spielgeld', DIENES3], 'K:stellen', 1000);
+  return small ? MW('Zwei Türme aus Steckwürfeln nebeneinander stellen: Wie viele hat der höhere Turm mehr? Die überstehenden Würfel zählen.', zr === 10 ? 'Im Zwanzigerfeld oben und unten je eine Zahl legen und vergleichen: Wo sind mehr? Wie viele mehr?' : 'Auf den Zahlenstrahl zwei Plättchen legen und die Sprünge dazwischen zählen.', ['Steckwürfel', 'Wendeplättchen'], zr === 10 ? 'K:zwanzig' : 'K:strahl20')
+    : MW('Längen vergleichen mit Maßband oder Zollstock: Um wie viele Zentimeter ist der Tisch länger als das Regal?', 'Auf dem Zahlenstrahl zwei Plättchen legen und den Abstand bestimmen: erst Zehnersprünge, dann Einersprünge.', ['Maßband oder Zollstock', 'Wendeplättchen'], 'K:strahl100', zr);
+}
+const MAT_WAY = {
+  R1: MW('Plusaufgaben mit Wendeplättchen in zwei Farben legen, Minusaufgaben durch Wegnehmen. Dabei sprechen: „4 und 3 dazu sind 7.“', 'Aufgaben im Zehnerfeld legen: die erste Zahl in einer Farbe, was dazukommt in der anderen. Dann das Ergebnis schreiben.', ['Wendeplättchen'], 'K:zehner'),
+  R2: MW('Zuerst 3 + 4 legen, darunter 13 + 4: gleiche Einer, ein voller Zehner mehr.', 'Im Zwanzigerfeld: oben der volle Zehner, unten die Einer. Die Einer rechnet man wie bis 10.', ['Wendeplättchen'], 'K:zwanzig'),
+  R3: MW('Rechenrahmen oder Perlenkette mit Fünferfarben: 8 + 5 heißt erst bis 10 auffüllen (8 + 2), dann weiter (+ 3).', 'Im Zwanzigerfeld: erste Zahl legen, die obere Reihe mit der zweiten Farbe voll machen, den Rest unten anlegen.', ['Wendeplättchen', 'Rechenrahmen oder Perlenkette'], 'K:zwanzig'),
+  R4: MW('Mit Zehnerstangen und Einern rechnen: Zehner zu Zehnern, Einer zu Einern legen.', 'Beide Zahlen in die Stellentafel legen, zusammenschieben und das Ergebnis ablesen.', [DIENES], 'K:stellen', 100),
+  R5: MW('47 + 8 legen: Liegen bei den Einern 10 oder mehr, werden 10 Einer gegen eine Zehnerstange getauscht.', 'In der Stellentafel legen und tauschen; danach denselben Weg mit Sprüngen auf dem Zahlenstrahl zeigen.', [DIENES], 'K:stellen', 100),
+  R6: MW('Mit Spielgeld (100-€- und 10-€-Scheine, 1-€-Münzen) bezahlen und wechseln. Analogie zeigen: 4 + 3, 40 + 30, 400 + 300.', 'Hunderterplatten, Zehnerstangen und Einer in die Stellentafel legen und rechnen.', ['Spielgeld', DIENES3], 'K:stellen', 1000),
+  R7: MW('Gleich große Gruppen legen: 3 Eierkartons mit je 4 Eiern, 5 Tütchen mit je 2 Schrauben. Sprechen: „3-mal 4“.', 'Auf dem Hunderterfeld Malaufgaben als Rechteck legen (3 Reihen mit je 4) oder mit zwei Papierstreifen abdecken.', ['Eierkartons', 'Einerwürfel oder Steckwürfel', 'zwei Papierstreifen'], 'K:hundert'),
+  S1: MW('Zahlen erst mit 10er-Tütchen und einzelnen Teilen legen, dann mit Zehnerstangen und Einerwürfeln.', 'In der Stellentafel legen: links die Zehner, rechts die Einer. Die Ziffern darunter schreiben.', ['Schrauben und kleine Tütchen', DIENES], 'K:stellen', 100),
+  S2: MW('Ungewohnte Darstellungen legen (2 Zehner und 14 Einer) und dann bündeln: 10 Einer gegen eine Stange tauschen.', 'In der Stellentafel mehr als 9 Einer legen, tauschen und erst dann die Zahl schreiben.', [DIENES], 'K:stellen', 100),
+  S3: MW('Eine Zehnerstange gegen 10 Einer tauschen und zurück: 40 sind auch 3 Zehner und 10 Einer.', 'In der Stellentafel eine Stange „aufmachen“ und die 10 Einer in die Einerspalte legen.', [DIENES], 'K:stellen', 100),
+  S4: MW('10 Zehnerstangen auf eine Hunderterplatte legen: genau gleich groß. Das ist ein Hunderter.', 'In der Stellentafel Zehner zu Hundertern bündeln und die Zahl lesen.', [DIENES3], 'K:stellen', 1000),
+  U1: MW('Lernuhr zuerst nur mit dem kurzen Zeiger: Er zeigt die Stunde. Dann den langen Zeiger auf die 12 dazu.', 'Auf das Zifferblatt Zeiger aus Pappe oder Holzstäbchen legen: volle Stunden aus dem Tagesplan.', ['Lernuhr', 'Holzstäbchen oder Zeiger aus Pappe'], 'K:uhr'),
+  U2: MW('Mit der Lernuhr zeigen: Der lange Zeiger läuft einen halben Weg herum, der kurze steht dann zwischen zwei Zahlen.', 'Auf dem Zifferblatt halbe Stunden legen und die halbe Uhr farbig anmalen.', ['Lernuhr', 'Holzstäbchen oder Zeiger aus Pappe'], 'K:uhr'),
+  U3: MW('Einen Papierkreis zweimal falten: vier Viertel. Auf die Lernuhr legen und „Viertel nach“, „halb“, „Viertel vor“ zeigen.', 'Auf dem Zifferblatt Viertelstunden legen und die Viertel anmalen.', ['Lernuhr', 'Papierkreise'], 'K:uhr'),
+  U4: MW('Den Minutenkranz an der Lernuhr in 5er-Schritten abgehen: 5, 10, 15 …', 'Auf dem Zifferblatt mit Minutenkranz Uhrzeiten legen und die Zeit digital daneben schreiben.', ['Lernuhr'], 'K:uhrm'),
+  U5: MW('Sanduhr, Küchenwecker oder Timer stellen: Wie lange dauert das? Die Zeitspanne an der Lernuhr nachdrehen.', 'Die Anfangszeit auf dem Zifferblatt legen, den langen Zeiger bis zur Endzeit schieben und die Minuten zählen.', ['Lernuhr', 'Timer'], 'K:uhrm'),
+  U6: MW('Wandkalender der Klasse: jeden Morgen das Datum mit einer Wäscheklammer markieren, die Tage bis zum Ausflug zählen.', 'Auf dem Kalenderblatt Termine mit Plättchen markieren.', ['Wandkalender', 'Wäscheklammer', 'Plättchen'], 'U:U6'),
+  G1: MW('Gegenstände mit 1-cm-Würfeln auslegen und die Würfel zählen. Danach mit dem Lineal nachmessen: Das Lineal beginnt bei 0.', 'Auf dem Arbeitsblatt messen: das Lineal an der 0 anlegen.', ['Einerwürfel (1 cm)', 'Lineal'], 'G:G1'),
+  G2: MW('Stützpunkte am eigenen Körper finden (Fingerbreite ≈ 1 cm, großer Schritt ≈ 1 m) und den Klassenraum mit Meterstab und Schritten ausmessen.', 'Längen erst schätzen, dann messen und beides aufschreiben.', ['Meterstab oder Zollstock', 'Maßband'], 'G:G2'),
+  G3: MW('Mit der Küchenwaage abwiegen: Packung Zucker (1 kg), Butter (250 g). Gegenstände in beiden Händen vergleichen.', 'Skalen auf dem Arbeitsblatt ablesen.', ['Küchenwaage', 'Packungen aus der Küche'], 'G:G3'),
+  G4: MW('Kaufladen oder echter Einkauf: Preise mit Spielgeld legen, bezahlen und das Rückgeld zählen.', 'Auf dem Legeblatt das Geld passend zum Preis auf das Feld legen.', ['Spielgeld', 'Prospekte und Kassenbons'], 'K:geld', 20),
+  H1: MW('Boden-Hundertertafel oder große Tafel an der Wand: Zahlen suchen. Erst die Zeile (Zehner), dann die Spalte (Einer).', 'Plättchen auf die genannten Zahlen der ausgedruckten Hundertertafel legen.', ['Wendeplättchen'], 'H:HM'),
+  H2: MW('Eine Zahl mit Zehnerstangen und Einern legen und dann in der Hundertertafel suchen.', 'Die Zahl in der Stellentafel legen und in der Hundertertafel ein Plättchen daraufsetzen.', [DIENES, 'Wendeplättchen'], 'K:stellen', 100),
+  H3: MW('Zahlenkarten in eine leere Hundertertafel einlegen und Nachbarn finden: rechts 1 mehr, unten 10 mehr.', 'Auf der ausgefüllten Tafel eine Zahl abdecken und von den Nachbarn erschließen.', ['Zahlenkarten', 'Wendeplättchen'], 'H:HM'),
+  H4: MW('Eine kopierte Tafel in Ausschnitte schneiden (Kreuz, L, Treppe) und wieder zusammensetzen.', 'Ausschnitte mit Zahlenkarten auf der leeren Tafel ergänzen.', ['Schere', 'Zahlenkarten'], 'H:HL'),
+  H5: MW('Eine Spielfigur auf der Boden-Hundertertafel laufen lassen: ein Schritt nach unten = 10 mehr, nach rechts = 1 mehr.', 'Die Figur auf der ausgedruckten Tafel ziehen und die Rechnung aufschreiben.', ['Spielfigur'], 'H:HM'),
+  H6: MW('Muster mit Plättchen auf die Tafel legen: alle Zahlen mit 5 am Ende, die 2er-Reihe.', 'Muster auf der ausgedruckten Tafel legen und danach anmalen.', ['Wendeplättchen'], 'H:HM'),
+  H7: MW('Ein Tausenderbuch selbst herstellen: 10 Hundertertafeln ausfüllen und zusammenheften.', 'Auf einer Tausenderbuch-Seite Zahlen mit Plättchen markieren.', ['Wendeplättchen', 'Hefter'], 'H:HT'),
+  LX: MW('Namens- und Wortkarten der Klasse den Personen, Fächern oder Orten im Schulhaus zuordnen.', 'Lernwörter mit Buchstabenkarten nachlegen.', ['Wortkarten', 'Buchstabenkarten'], 'K:buchst'),
+  L1: MW('Echte Gegenstände und Orte den passenden Piktogrammen zuordnen (die Piktogrammkarte an die Toilettentür halten).', 'Bildkarten auf die passenden Piktogramme legen.', ['Piktogrammkarten', 'Gegenstände'], 'L:L1'),
+  L2: MW('Signalwörter im Schulhaus und unterwegs suchen und die Wortkarte an das Schild halten.', 'Wortkarten auf die passenden Bilder legen.', ['Wortkarten'], 'L:L2'),
+  L3: MW('Buchstaben fühlen (Sandpapier, Knete) und Gegenstände nach dem Anfangslaut in Kisten sortieren.', 'Buchstabenkarten auf das Feld neben dem Bild legen.', ['Buchstabenkarten', 'Gegenstände', 'Kisten'], 'K:anlaut'),
+  L4: MW('Wörter mit Buchstabenkarten legen, Laut für Laut sprechen und dabei die Karten zusammenschieben.', 'Buchstabenkarten in die Kästchen neben dem Bild legen und das Wort lesen.', ['Buchstabenkarten'], 'K:wort'),
+  L5: MW('Silbenkarten legen und tauschen: Aus Ho-se wird Ro-se. Wörter in Silben klatschen.', 'Für jede Silbe einen Stein legen und das Wort dann in Silben lesen.', ['Silbenkarten', 'Steine oder Plättchen'], 'K:silben'),
+  L6: MW('Satzstreifen zerschneiden und neu legen. Einen Satz lesen und mit Gegenständen nachstellen („Die Tasse steht auf dem Tisch.“).', 'Satzkarten zu Bildern legen.', ['Satzstreifen', 'Gegenstände'], 'L:L6'),
+  L7: MW('Echte Aushänge, Rezepte und Arbeitsaufträge lesen und danach handeln, zum Beispiel ein Rezept zubereiten.', 'Wichtige Wörter mit Textmarker markieren.', ['echte Texte aus dem Alltag', 'Textmarker'], 'L:L7'),
+  L8: MW('Echte Fahrpläne und Speisepläne mitbringen. Zeile und Spalte mit Lineal oder Finger verfolgen; eine Busfahrt planen und fahren.', 'Mit Lineal oder Papierstreifen die Zeile abdecken.', ['echte Pläne', 'Lineal'], 'L:L8'),
+  L9: MW('Texte mit Bezug zum eigenen Leben lesen (Praktikum, Nachrichten in einfacher Sprache) und darüber sprechen.', 'Abschnitte markieren und am Rand mit einem Stichwort zusammenfassen.', ['Texte in einfacher Sprache'], 'L:L9'),
+  P1: MW('Silben klatschen, schwingen oder gehen: ein Schritt pro Silbe.', 'Für jede Silbe einen Stein auf die Kreise legen.', ['Steine oder Plättchen'], 'K:silben'),
+  P2: MW('Silbenrätsel: Die Lehrkraft spricht in Silben, das Kind holt den passenden Gegenstand.', 'Für die Silben Steine legen und das Wort zusammenschieben.', ['Gegenstände', 'Steine'], 'K:silben'),
+  P3: MW('Reimpaare mit Gegenständen finden (Hose – Dose) und nebeneinanderlegen.', 'Reim-Memory mit Bildkarten spielen.', ['Gegenstände', 'Bildkarten']),
+  P4: MW('„Ich sehe was, das fängt mit M an“; Gegenstände nach dem Anfangslaut sortieren.', 'Die Buchstabenkarte auf das Feld neben dem Bild legen.', ['Gegenstände', 'Buchstabenkarten'], 'K:anlaut'),
+  WX: MW('Lernwörter mit Buchstabenkarten legen, anschauen, umdrehen und aus dem Kopf neu legen.', 'Das Wort mit Buchstabenkarten legen, dann schreiben.', ['Buchstabenkarten', 'Wortkarten'], 'K:buchst'),
+  W1: MW('Namen und Einkaufswörter mit Buchstabenkarten unter die Vorlage legen.', 'Buchstabenkarten in die Kästchen unter dem vorgegebenen Wort legen.', ['Buchstabenkarten'], 'K:wortv'),
+  W2: MW('Gegenstände nach dem Anfangslaut sortieren und mit dem Buchstaben beschriften.', 'Die Buchstabenkarte auf das Feld neben dem Bild legen.', ['Gegenstände', 'Buchstabenkarten'], 'K:anlaut'),
+  W3: MW('Das Wort langsam sprechen und für jeden Laut eine Buchstabenkarte legen; mit dem Finger unter den Karten mitlesen.', 'Buchstabenkarten in die Kästchen legen: ein Kästchen für jeden Buchstaben.', ['Buchstabenkarten'], 'K:wort'),
+  W4: MW('Silben schwingen und für jede Silbe einen Bogen in die Luft zeichnen oder ein Seil auf den Boden legen.', 'Erst für jede Silbe einen Stein legen, dann Silbe für Silbe schreiben.', ['Steine', 'Seil'], 'K:silben'),
+  W5: MW('Merkwörter mit Buchstabenkarten legen und die Merkstelle (ss, ck, tz) mit einer farbigen Karte markieren.', 'Merkwörter unter der Vorlage nachlegen; die Merkstelle ist farbig.', ['Buchstabenkarten', 'farbige Karten'], 'K:wortm'),
+  W6: MW('Wortkarten zu Sätzen legen, die Punkt-Karte ans Ende, den Großbuchstaben am Anfang prüfen.', 'Wortkarten ordnen und den Satz abschreiben.', ['Wortkarten', 'Punkt-Karte'], 'W:W6')
+};
+const matWay = key => { const [ax, a, b] = key.split('|'); return ax === 'M' ? mWay(+a, b) : MAT_WAY[a] || null; };
+/* Typische Fehler beim Üben → nächster Schritt am Material */
+const ERR_MAT = {
+  dreher: 'Zuerst die Zehnerstangen legen, dann die Einer, und beim Schreiben mit den Zehnern beginnen (Stellentafel).',
+  eins: 'Beim Zählen jedes Teil zur Seite schieben; Mengen im Zwanzigerfeld in Fünfern sehen statt einzeln zählen.',
+  zehn: 'Zehner und Einer getrennt in die Stellentafel legen und die Zehner extra zählen.',
+  hundert: 'Hunderterplatten, Zehnerstangen und Einer getrennt in die Stellentafel legen.',
+  uebertrag: 'Die Aufgabe legen und 10 Einer sichtbar gegen eine Zehnerstange tauschen (Zwanzigerfeld bzw. Stellentafel).',
+  kleingross: 'Minus mit Material legen: Reichen die Einer nicht, eine Zehnerstange gegen 10 Einer tauschen und dann wegnehmen.',
+  rechenart: 'Plus heißt dazulegen, Minus heißt wegnehmen: die Aufgabe mit Plättchen handeln und das Rechenzeichen dazu sprechen.'
+};
+const LEGE_OPEN = w => w && w.lege && /^(K:|H:H[MLT])/.test(w.lege);
+function matWayHtml(key, offer){
+  const w = matWay(key); if(!w) return '';
+  return `<div class="matway"><p class="mw-h"><b>Am Material</b> <span class="note">vom Handeln über das Bild zur Zahl</span></p><ol class="mw-steps"><li><b>Handeln:</b> ${escHtml(w.hand)}</li><li><b>Bild:</b> ${escHtml(w.bild)}</li><li><b>Zahl und Schrift:</b> ${offer ? `in Stufenweise „${escHtml(offer.text.replace(/ \([^)]*\)$/, ''))}“, danach im Heft` : 'in Stufenweise, danach im Heft'}.</li></ol><p class="note mw-need">Material: ${escHtml(w.need.join(', '))}</p>${LEGE_OPEN(w) ? `<button class="icon-btn" data-lege="${w.lege}${w.zr ? '@' + w.zr : ''}">${icon('print')}<span style="display:inline">Legeblatt drucken</span></button>` : ''}</div>`;
+}
 function zoneCells(pid, subj){
   const m = matrixOf(pid), first = keys => keys.find(k => m[k] && !isOk(m[k].status));
   const out = [];
@@ -5733,7 +5832,7 @@ function zoneReport(pid, subj){
   out.ileb = {
     lernstand: `${name} ${kann.length ? [...new Set(kann)].join('; ') : subj === 'M' ? 'baut erste Zahlvorstellungen auf' : subj === 'W' ? 'baut erste Schreibfähigkeiten auf' : 'baut erste Lesefähigkeiten auf'}.${teil.length ? ` Teilweise gelingt: ${teil.join(', ')}.` : ''}`,
     ziel: out.zones.map(z => `${name} ${z.info.ziel}.`).join(' '),
-    massnahmen: out.zones.map(z => `${z.info.offer.text}; analog: ${z.info.analog}`).join('. ') + `. Re-Diagnose nach etwa 5 Übungseinheiten.`,
+    massnahmen: out.zones.map(z => { const w = matWay(z.key); return w ? `Am Material: ${w.hand.replace(/\.$/, '')}. Im Bild: ${w.bild.replace(/\.$/, '')}. In der App: ${z.info.offer.text}` : `${z.info.offer.text}; analog: ${z.info.analog}`; }).join('. ') + `. Re-Diagnose nach etwa 5 Übungseinheiten.`,
     bp: [...new Set(out.zones.map(z => z.info.bp))].join('; ')
   };
   if(!out.zones.length){ out.ileb.ziel = `${name} festigt und überträgt das Gelernte auf neue Situationen.`; out.ileb.massnahmen = 'Anwendung im Alltag und in Projekten; nächster Zahlenraum oder anspruchsvollere Texte.'; }
@@ -5766,7 +5865,7 @@ function subjectHtml(pid, subj, rep){
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${subj === 'M' ? `<button class="icon-btn" data-diag="new-M1">${icon('target')}<span style="display:inline">Teil 1: Zahlen und Rechnen</span></button><button class="icon-btn" data-diag="new-M2">${icon('target')}<span style="display:inline">Teil 2: Uhr, Größen, Hundertertafel</span></button>` : `<button class="icon-btn" data-diag="new-${subj}">${icon('target')}<span style="display:inline">${subj === 'W' ? 'Schreib-Test' : 'Lese-Test'}</span></button>`}${rep.zones.length ? `<button class="icon-btn ${since >= 25 ? 'primary' : ''}" data-diag="re-${subj}">${icon('redo')}<span style="display:inline">Re-Diagnose${since >= 25 ? ' empfohlen' : ''}</span></button>` : ''}</div>
     ${rep.zones.length && since ? `<p class="note">${since} Übungsaufgaben seit dem letzten Test.</p>` : ''}</fieldset>`;
   if(rep.zones.length){
-    h += `<fieldset><legend>Förderzone und Lernangebote</legend>${rep.zones.map((z, i) => `<div class="zone"><p><b>${escHtml(cellLabel(z.key))}</b></p><p class="why">${escHtml(z.why)}</p><p class="note">${escHtml(z.info.bp)}</p><button class="icon-btn primary" data-offer="${subj}:${i}">${icon('next')}<span style="display:inline">Lernangebot starten</span></button> <button class="icon-btn" data-sheetzone="${z.key}">${icon('print')}<span style="display:inline">Arbeitsblatt</span></button><p class="analog"><b>Analog:</b> ${escHtml(z.info.analog)}</p></div>`).join('')}</fieldset>`;
+    h += `<fieldset><legend>Förderzone und Lernangebote</legend>${rep.zones.map((z, i) => `<div class="zone"><p><b>${escHtml(cellLabel(z.key))}</b></p><p class="why">${escHtml(z.why)}</p><p class="note">${escHtml(z.info.bp)}</p><button class="icon-btn primary" data-offer="${subj}:${i}">${icon('next')}<span style="display:inline">Lernangebot starten</span></button> <button class="icon-btn" data-sheetzone="${z.key}">${icon('print')}<span style="display:inline">Arbeitsblatt</span></button>${matWayHtml(z.key, z.info.offer)}<p class="analog"><b>Im Alltag:</b> ${escHtml(z.info.analog)}</p></div>`).join('')}</fieldset>`;
   }
   if(rep.ileb) h += `<fieldset><legend>Formulierungsvorschlag ILEB – ${S}</legend><p><b>Lernstand:</b> ${escHtml(rep.ileb.lernstand)}</p><p><b>Nächstes Ziel:</b> ${escHtml(rep.ileb.ziel)}</p><p><b>Maßnahmen:</b> ${escHtml(rep.ileb.massnahmen)}</p>${rep.ileb.bp ? `<p class="note">Bezug: ${escHtml(rep.ileb.bp)}</p>` : ''}<button class="icon-btn ileb-copy" data-ileb="${subj}">${icon('check')}<span style="display:inline">ILEB-Text kopieren</span></button></fieldset>`;
   return h;
@@ -7166,6 +7265,202 @@ const H_SHEETS = {
   HL: {name:'Material: leere Hundertertafel', cols:1, max:1, mat:true, gens:[() => { const show = {1:'num', 100:'num'}; return T_('schreibe', 'Trage die Zahlen von 1 bis 100 ein.', hbP({def:'blank', show}, 16.2), '1 bis 100'); }]},
   HT: {name:'Material: Tausenderbuch-Seite', cols:1, max:1, mat:true, gens:[() => { const p = rnd(1, 9); return T_('lies', `Tausenderbuch, Seite ${hPageName(p)}`, hbP({page:p}, 16.2), hPageName(p)); }]}
 };
+/* =====================================================================
+   Legeblätter: Blätter in Originalgröße, auf die echtes Material gelegt wird
+   (Wendeplättchen bis 25 mm, Einerwürfel 1 cm, Zehnerstangen 10 cm, Buchstabenkarten 2 cm).
+   Querformat-Blätter werden für den Druck gedreht, damit sie in jedem Browser richtig herauskommen.
+   ===================================================================== */
+const LK = {none:'ohne Aufgaben', zahl:'Zahlen legen', plus:'Plus', minus:'Minus'};
+const LEGE = {
+  zehner:   {name:'Zehnerfeld für Wendeplättchen', grp:'M', kts:['none', 'zahl', 'plus', 'minus', 'ergaenz'], ktn:{ergaenz:'Ergänzen bis 10'}, def:'plus'},
+  zwanzig:  {name:'Zwanzigerfeld für Wendeplättchen (quer)', grp:'M', kts:['none', 'zahl', 'plus', 'minus', 'ergaenz'], ktn:{ergaenz:'Ergänzen bis 20'}, def:'plus', ue:true},
+  strahl20: {name:'Zahlenstrahl bis 20 (quer)', grp:'M', kts:['none', 'zahl', 'plus', 'minus', 'abstand'], ktn:{zahl:'Zahlen und Nachbarn', plus:'Plus mit Sprüngen', minus:'Minus mit Sprüngen', abstand:'Abstand bestimmen'}, def:'zahl'},
+  strahl100:{name:'Zahlenstrahl bis 100 oder 1000 (quer)', grp:'M', kts:['none', 'zahl', 'plus', 'minus'], ktn:{zahl:'Zahlen und Nachbarn', plus:'Plus mit Sprüngen', minus:'Minus mit Sprüngen'}, def:'zahl', zrs:[100, 1000]},
+  hundert:  {name:'Hunderterfeld in 1 cm für Einerwürfel', grp:'M', kts:['none', 'zahl', 'ergaenz', 'mal'], ktn:{ergaenz:'Ergänzen bis 100', mal:'Malaufgaben als Rechteck'}, def:'zahl'},
+  stellen:  {name:'Stellentafel für Zehnerstangen und Einerwürfel', grp:'M', kts:['none', 'zahl', 'plus', 'minus'], def:'zahl', zrs:[100, 1000]},
+  geld:     {name:'Preise mit Spielgeld legen', grp:'M', kts:['zahl'], ktn:{zahl:'Preise legen'}, def:'zahl', zrs:[10, 20, 100]},
+  uhr:      {name:'Zifferblatt mit Zeigern zum Ausschneiden', grp:'M', kts:['none', 'zeit'], ktn:{zeit:'volle und halbe Stunden, Viertel'}, def:'zeit'},
+  uhrm:     {name:'Zifferblatt mit Minutenkranz', grp:'M', kts:['none', 'zeit'], ktn:{zeit:'Uhrzeiten auf 5 Minuten'}, def:'zeit'},
+  anlaut:   {name:'Anfangsbuchstaben legen', grp:'D', kts:['zahl'], def:'zahl'},
+  wort:     {name:'Wörter legen (ein Kästchen pro Buchstabe)', grp:'D', kts:['zahl'], def:'zahl'},
+  wortv:    {name:'Wörter nachlegen (mit Vorlage)', grp:'D', kts:['zahl'], def:'zahl'},
+  wortm:    {name:'Merkwörter nachlegen (Merkstelle farbig)', grp:'D', kts:['zahl'], def:'zahl'},
+  silben:   {name:'Silben legen (ein Stein pro Silbe)', grp:'D', kts:['zahl'], def:'zahl'},
+  buchst:   {name:'Buchstabenkarten zum Ausschneiden', grp:'D', kts:['zahl'], def:'zahl'}
+};
+const legeKt = (def, S) => def.kts.includes(S.kt) ? S.kt : def.def;
+const lgBox = (w = 14) => `<span class="lg-box" style="width:${w}mm"></span>`;
+const lgUniq = (n, f) => { const out = [], seen = new Set(); let t = 0; while(out.length < n && t++ < 200){ const g = f(); if(seen.has(g.k)) continue; seen.add(g.k); out.push(g); } return out; };
+/* Zehnerfeld (5 Spalten) bzw. Zwanzigerfeld (10 Spalten), Feld 25 mm, Fünferstrich kräftig */
+function lgField(cols){
+  const c = 25, W = cols*c, H = 2*c; let s = `<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="2" fill="#fff" stroke="#222" stroke-width=".8"/><path d="M0 ${c}h${W}" stroke="#222" stroke-width=".4"/>`;
+  for(let i = 1; i < cols; i++) s += `<path d="M${i*c} 0v${H}" stroke="#222" stroke-width="${i === 5 ? 1.2 : .35}"/>`;
+  for(let i = 0; i < 2*cols; i++) s += `<circle cx="${(i % cols)*c + c/2}" cy="${Math.floor(i/cols)*c + c/2}" r="10" fill="none" stroke="#c8c8c8" stroke-width=".3" stroke-dasharray="1 1.2"/>`;
+  return `<svg class="lg-svg" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}">${s}</svg>`;
+}
+/* Zahlenstrahl: bis 20 mit 12 mm je Schritt, bis 100 mit 2,5 mm je Schritt (bei 1000: ein Strich = 10) */
+function lgStrahl(max, zr = max){
+  const step = max === 20 ? 12 : 2.5, x0 = 6, W = x0*2 + max*step, k = zr/max; let s = `<path d="M${x0 - 3} 12H${W - 3}" stroke="#222" stroke-width=".7"/><path d="M${W - 3} 12l-3-2v4z" fill="#222"/>`;
+  for(let i = 0; i <= max; i++){
+    const x = x0 + i*step, big = i % 10 === 0, mid = i % 5 === 0, h = max === 20 ? (big ? 6 : mid ? 4.5 : 3) : (big ? 6 : mid ? 4 : 2.2);
+    s += `<path d="M${x} ${12 - h}v${2*h}" stroke="#222" stroke-width="${big ? .7 : .35}"/>`;
+    if(max === 20 || big) s += `<text x="${x}" y="${max === 20 ? 25 : 24}" text-anchor="middle" font-size="${max === 20 ? (big ? 5 : 4.2) : 4}" font-weight="${big ? 700 : 400}" fill="#222">${i*k}</text>`;
+  }
+  return `<svg class="lg-svg" width="${W}mm" height="27mm" viewBox="0 0 ${W} 27">${s}</svg>`;
+}
+/* Hunderterfeld 10 × 10 mit 1 cm, Mitte (Fünfer) kräftig */
+function lgHundert(){
+  let s = '';
+  for(let i = 0; i <= 10; i++){ const w = i === 0 || i === 10 ? .8 : i === 5 ? .7 : .25; s += `<path d="M${i*10} 0v100M0 ${i*10}h100" stroke="#222" stroke-width="${w}"/>`; }
+  return `<svg class="lg-svg" width="100mm" height="100mm" viewBox="0 0 100 100">${s}</svg>`;
+}
+/* Stellentafel: Spalten breit genug für echtes Material (Hunderterplatte 10 cm, 9 Zehnerstangen nebeneinander) */
+function lgStellen(zr){
+  const cols = zr === 1000 ? [['h', 'Hunderter', 108], ['z', 'Zehner', 108], ['e', 'Einer', 57]] : [['z', 'Zehner', 110], ['e', 'Einer', 76]], H = zr === 1000 ? 104 : 126;
+  return `<div class="lg-st">${cols.map(([k, n, w]) => `<div class="lg-stc" style="width:${w}mm"><div class="lg-sth" style="background:${PLACE[k]}">${n}</div><div class="lg-stb" style="height:${H}mm"></div>${zr === 1000 ? '' : `<div class="lg-std"><span class="lg-box" style="width:22mm;height:22mm"></span></div>`}</div>`).join('')}</div>`;
+}
+/* Zifferblatt 14 cm, auf Wunsch mit Minutenkranz; Zeiger zum Ausschneiden */
+function lgClock(min){
+  const R = 66, c = min ? 80 : 72, S = 2*c; let s = `<circle cx="${c}" cy="${c}" r="${R}" fill="#fff" stroke="#222" stroke-width="1"/>`;
+  for(let i = 0; i < 60; i++){ const a = i*6*Math.PI/180, h = i % 5 === 0, r1 = R - (h ? 6 : 2.5); s += `<path d="M${(c + Math.sin(a)*R).toFixed(2)} ${(c - Math.cos(a)*R).toFixed(2)}L${(c + Math.sin(a)*r1).toFixed(2)} ${(c - Math.cos(a)*r1).toFixed(2)}" stroke="#222" stroke-width="${h ? .9 : .35}"/>`; }
+  for(let i = 1; i <= 12; i++){ const a = i*30*Math.PI/180; s += `<text x="${(c + Math.sin(a)*(R - 15)).toFixed(2)}" y="${(c - Math.cos(a)*(R - 15) + 3.6).toFixed(2)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#222">${i}</text>`; }
+  if(min) for(let i = 0; i < 12; i++){ const a = i*30*Math.PI/180; s += `<text x="${(c + Math.sin(a)*(R + 7)).toFixed(2)}" y="${(c - Math.cos(a)*(R + 7) + 1.6).toFixed(2)}" text-anchor="middle" font-size="4.4" fill="#346bc3" font-weight="700">${String(i*5).padStart(2, '0')}</text>`; }
+  s += `<circle cx="${c}" cy="${c}" r="1.6" fill="#222"/>`;
+  const hand = (L, col) => `<svg width="${L + 6}mm" height="12mm" viewBox="0 0 ${L + 6} 12"><rect x=".3" y=".3" width="${L + 5.4}" height="11.4" fill="none" stroke="#999" stroke-width=".3" stroke-dasharray="1.5 1"/><path d="M3 4.5H${L - 4}V2l6 4-6 4V7.5H3z" fill="${col}" stroke="#222" stroke-width=".4"/><circle cx="6" cy="6" r="1" fill="#fff" stroke="#222" stroke-width=".3"/></svg>`;
+  return `<div class="lg-clock"><svg class="lg-svg" width="${S}mm" height="${S}mm" viewBox="0 0 ${S} ${S}">${s}</svg><div class="lg-hands"><span class="note">Zum Ausschneiden (mit einer Musterklammer in der Mitte befestigen) – oder Holzstäbchen als Zeiger legen:</span><div>${hand(44, '#c9414a')}${hand(60, '#346bc3')}</div><span class="note">kurzer Zeiger: Stunden · langer Zeiger: Minuten</span></div></div>`;
+}
+/* Aufgaben zu Feldern */
+function lgFieldTasks(kt, cap, ue, n){
+  const R = (a, b) => rnd(a, b);
+  const gen = {
+    zahl: () => { const a = R(cap === 10 ? 3 : 6, cap); return {k:a, t:`Lege ${a}. Wie viele Felder sind noch frei?`, w:lgBox(), a:`${a}: ${cap - a} frei`}; },
+    plus: () => { let a, b; if(cap === 10){ a = R(2, 7); b = R(1, 10 - a); } else if(ue === 'mit' || (ue !== 'ohne' && Math.random() < .5)){ a = R(6, 9); b = R(11 - a, 9); } else if(Math.random() < .5){ a = R(2, 7); b = R(1, 10 - a); } else { a = R(11, 16); b = R(1, 19 - a); }
+      return {k:`${a}+${b}`, t:`Lege ${a} in einer Farbe. Lege ${b} in der anderen Farbe dazu.`, w:`<span class="lg-eq">${a} + ${b} = ${lgBox()}</span>`, a:`${a} + ${b} = ${a + b}`}; },
+    minus: () => { let a, b; if(cap === 10){ a = R(4, 10); b = R(1, a - 1); } else if(ue === 'mit' || (ue !== 'ohne' && Math.random() < .5)){ a = R(11, 17); b = R(a - 9, 9); } else { a = R(12, 19); b = R(1, a - 10); }
+      return {k:`${a}-${b}`, t:`Lege ${a}. Nimm ${b} weg: von hinten, Reihe für Reihe.`, w:`<span class="lg-eq">${a} − ${b} = ${lgBox()}</span>`, a:`${a} − ${b} = ${a - b}`}; },
+    ergaenz: () => { const a = R(cap === 10 ? 2 : 4, cap - 1); return {k:a, t:`Lege ${a}. Fülle mit der anderen Farbe bis ${cap} auf.`, w:`<span class="lg-eq">${a} + ${lgBox()} = ${cap}</span>`, a:`${a} + ${cap - a} = ${cap}`}; }
+  };
+  return kt === 'none' ? Array(n).fill(null) : lgUniq(n, gen[kt]);
+}
+function lgStrahlTasks(kt, max, zr, n){
+  const k = zr/max, R = (a, b) => rnd(a, b)*k;
+  const gen = {
+    zahl: () => { const a = max === 20 ? rnd(1, 19) : (rnd(1, 9)*10 + rnd(1, 9))*k; if(max === 20) return {k:a, t:`Lege ein Plättchen auf ${a}. Welche Zahlen sind die Nachbarn?`, w:`${lgBox()} und ${lgBox()}`, a:`${a}: ${a - 1} und ${a + 1}`};
+      const lo = Math.floor(a/(10*k))*10*k; return {k:a, t:`Lege ein Plättchen auf ${a}. Zwischen welchen ${zr === 1000 ? 'Hunderterzahlen' : 'Zehnerzahlen'} liegt die Zahl?`, w:`${lgBox()} und ${lgBox()}`, a: zr === 1000 ? `${a}: ${Math.floor(a/100)*100} und ${Math.floor(a/100)*100 + 100}` : `${a}: ${lo} und ${lo + 10}`}; },
+    plus: () => { const a = max === 20 ? rnd(2, 12) : R(12, 58), b = max === 20 ? rnd(3, 20 - a) : R(13, 39); return {k:`${a}+${b}`, t:`Stelle eine Figur auf ${a}. Springe ${b} weiter${max === 20 ? '' : ': erst die Zehner, dann die Einer'}.`, w:`<span class="lg-eq">${a} + ${b} = ${lgBox()}</span>`, a:`${a} + ${b} = ${a + b}`}; },
+    minus: () => { const a = max === 20 ? rnd(9, 20) : R(45, 97), b = max === 20 ? rnd(3, a - 1) : R(12, a/k - 11); return {k:`${a}-${b}`, t:`Stelle eine Figur auf ${a}. Springe ${b} zurück${max === 20 ? '' : ': erst die Zehner, dann die Einer'}.`, w:`<span class="lg-eq">${a} − ${b} = ${lgBox()}</span>`, a:`${a} − ${b} = ${a - b}`}; },
+    abstand: () => { const a = rnd(1, 9), b = rnd(a + 3, 20); return {k:`${a}~${b}`, t:`Lege Plättchen auf ${a} und auf ${b}. Wie viele Sprünge sind es von ${a} bis ${b}?`, w:lgBox(), a:`von ${a} bis ${b}: ${b - a}`}; }
+  };
+  return kt === 'none' ? Array(n).fill(null) : lgUniq(n, gen[kt]);
+}
+const lgTaskRow = (g, i) => g ? `<div class="lg-task"><span class="nr">${i}</span><span class="lg-tt">${g.t}</span><span class="lg-tw">${g.w}</span></div>` : '';
+/* Buchstabenkarten: Häufigkeit wie in deutschen Wörtern, Strich unten zeigt, wie herum die Karte liegt (b/d/p/q) */
+const LG_LOW = 'eeeeeeeeennnnnnaaaaaaiiiiirrrrrssssstttttoooouuuuhhhhllllmmmmdddbbbgggkkkcccffwwppzzäöüßvj';
+const LG_UP = 'ABDEFGHKLMNOPRSTWZ';
+function lgLetters(mode){
+  const low = [...LG_LOW], extra = [...'enirstahlmoudbgkcw'];
+  const list = mode === 'up' ? [...LG_UP, ...low.map(c => c === 'ß' ? 'E' : c.toUpperCase())] : mode === 'low' ? [...low, ...extra] : [...LG_UP, ...low];
+  return `<div class="lg-cards">${list.map(c => `<span class="lg-card">${c}<i></i></span>`).join('')}</div>`;
+}
+const LG_MERK = /(ss|nn|mm|ll|tt|ck|tz|zz|pp|ff)/;
+function legeBuild(key, S){
+  const def = LEGE[key], kt = legeKt(def, S), zr = def.zrs ? (def.zrs.includes(S.zr) ? S.zr : def.zrs[0]) : null, sols = [];
+  const num = (list) => list.forEach(g => g && sols.push(g.a));
+  let title = def.name.replace(' (quer)', ''), how = '', body = '', quer = false;
+  if(key === 'zehner' || key === 'zwanzig'){
+    const cap = key === 'zehner' ? 10 : 20, n = cap === 10 ? 3 : 2, ts = lgFieldTasks(kt, cap, S.ue, n); num(ts); quer = cap === 20;
+    title = cap === 10 ? 'Zehnerfeld' : 'Zwanzigerfeld'; if(kt !== 'none') title += `: ${(def.ktn?.[kt] || LK[kt])}${cap === 20 && S.ue !== 'egal' && ['plus', 'minus'].includes(kt) ? (S.ue === 'mit' ? ' mit Zehnerübergang' : ' ohne Zehnerübergang') : ''}`;
+    how = 'Lege die Plättchen in die Felder. Fülle immer zuerst die obere Reihe, dann die untere.';
+    body = ts.map((g, i) => `<div class="lg-unit">${lgTaskRow(g, i + 1)}<div class="lg-c">${lgField(cap === 10 ? 5 : 10)}</div></div>`).join('');
+  }
+  else if(key === 'strahl20' || key === 'strahl100'){
+    const max = key === 'strahl20' ? 20 : 100, z = max === 20 ? 20 : zr, ts = lgStrahlTasks(kt, max, z, 3); num(ts); quer = true;
+    title = `Zahlenstrahl bis ${z}${kt !== 'none' ? `: ${def.ktn[kt]}` : ''}`;
+    how = max === 20 ? 'Lege Plättchen oder eine Spielfigur auf die Zahlen. Zähle die Sprünge mit dem Finger.' : z === 1000 ? 'Ein kleiner Strich bedeutet 10, ein großer Strich 100. Lege Plättchen auf die Zahlen.' : 'Ein kleiner Strich bedeutet 1, ein großer Strich 10. Lege Plättchen auf die Zahlen.';
+    body = ts.map((g, i) => `<div class="lg-unit">${lgTaskRow(g, i + 1)}<div class="lg-c">${lgStrahl(max, z)}</div></div>`).join('');
+  }
+  else if(key === 'hundert'){
+    const gen = {
+      zahl: () => { const a = rnd(2, 9)*10 + rnd(1, 9); return {k:a, t:`Lege ${a}.`, w:`${lgBox(11)} Zehner ${lgBox(11)} Einer`, a:`${a} = ${Math.floor(a/10)} Zehner und ${a % 10} Einer`}; },
+      ergaenz: () => { const a = rnd(3, 9)*10 + rnd(1, 9); return {k:a, t:`Lege ${a}. Wie viele fehlen bis 100?`, w:`<span class="lg-eq">${a} + ${lgBox()} = 100</span>`, a:`${a} + ${100 - a} = 100`}; },
+      mal: () => { const a = rnd(2, 6), b = rnd(2, 10); return {k:`${a}x${b}`, t:`Lege ${a} Reihen mit je ${b}.`, w:`<span class="lg-eq">${a} · ${b} = ${lgBox()}</span>`, a:`${a} · ${b} = ${a*b}`}; }
+    };
+    const ts = kt === 'none' ? [] : lgUniq(6, gen[kt]); num(ts);
+    title = `Hunderterfeld${kt !== 'none' ? `: ${def.ktn[kt] || LK[kt]}` : ''}`;
+    how = 'Jedes Kästchen ist 1 cm groß: Ein Einerwürfel passt genau hinein, eine Zehnerstange füllt eine Zeile. Lege immer erst volle Zeilen, dann den Rest.';
+    body = `<div class="lg-c">${lgHundert()}</div>${ts.length ? `<div class="lg-tasks2">${ts.map((g, i) => lgTaskRow(g, i + 1)).join('')}</div>` : ''}`;
+  }
+  else if(key === 'stellen'){
+    quer = zr === 1000; const h = zr === 1000;
+    const pz = () => h ? rnd(1, 8)*100 + rnd(0, 9)*10 + rnd(1, 9) : rnd(1, 9)*10 + rnd(1, 9);
+    const split = a => h ? `${Math.floor(a/100)} H ${Math.floor(a/10) % 10} Z ${a % 10} E` : `${Math.floor(a/10)} Z ${a % 10} E`;
+    const gen = {
+      zahl: () => { const a = pz(); return {k:a, t:`Lege ${a}.`, w: h ? `${lgBox(10)} H ${lgBox(10)} Z ${lgBox(10)} E` : `${lgBox(10)} Z ${lgBox(10)} E`, a:`${a} = ${split(a)}`}; },
+      plus: () => { const a = h ? rnd(1, 6)*100 + rnd(1, 8)*10 + rnd(1, 9) : rnd(1, 6)*10 + rnd(1, 9), b = h ? rnd(1, 2)*100 + rnd(1, 9)*10 + rnd(1, 9) : rnd(1, 3)*10 + rnd(1, 9); return {k:`${a}+${b}`, t:`Lege ${a} und ${b} und schiebe zusammen.`, w:`<span class="lg-eq">${a} + ${b} = ${lgBox(16)}</span>`, a:`${a} + ${b} = ${a + b}`}; },
+      minus: () => { const a = h ? rnd(4, 9)*100 + rnd(0, 9)*10 + rnd(0, 9) : rnd(4, 9)*10 + rnd(0, 9), b = h ? rnd(1, 3)*100 + rnd(1, 9)*10 + rnd(1, 9) : rnd(1, 3)*10 + rnd(1, 9); return {k:`${a}-${b}`, t:`Lege ${a} und nimm ${b} weg.`, w:`<span class="lg-eq">${a} − ${b} = ${lgBox(16)}</span>`, a:`${a} − ${b} = ${a - b}`}; }
+    };
+    const ts = kt === 'none' ? [] : lgUniq(h ? 4 : 6, gen[kt]); num(ts);
+    if(h) ts.forEach(g => { if(kt === 'zahl') g.w = `${g.k} = ${g.w}`; g.t = ''; }); /* Querformat: wenig Platz, die Anleitung steht oben */
+    title = `Stellentafel bis ${zr}${kt !== 'none' ? `: ${LK[kt]}` : ''}`;
+    how = h ? 'Hunderterplatten, Zehnerstangen und Einerwürfel in die passende Spalte legen. Liegen 10 gleiche in einer Spalte: tauschen. Reicht es beim Wegnehmen nicht: einen größeren aufmachen.' : 'Zehnerstangen und Einerwürfel in die passende Spalte legen. Liegen 10 Einer da: gegen eine Zehnerstange tauschen. Reichen beim Wegnehmen die Einer nicht: eine Zehnerstange gegen 10 Einer tauschen.';
+    body = `<div class="lg-c">${lgStellen(zr)}</div>${ts.length ? `<div class="lg-tasks2${h ? ' x2' : ''}">${ts.map((g, i) => lgTaskRow(g, i + 1)).join('')}</div>` : ''}`;
+  }
+  else if(key === 'geld'){
+    const items = shuffle(['Apfel', 'Banane', 'Brot', 'Ball', 'Buch', 'Stift', 'Schere', 'Tasse', 'Hut', 'Pizza', 'Jacke', 'Mütze', 'Lampe', 'Radio'].filter(k => ICON[k])).slice(0, 4);
+    const pr = () => zr === 10 ? rnd(2, 9) : zr === 20 ? rnd(11, 19) : rnd(21, 95);
+    const fewest = v => { const out = []; for(const d of [50, 20, 10, 5, 2, 1]) while(v >= d){ out.push(d); v -= d; } return out.map(d => `${d} €`).join(' + '); };
+    const ps = lgUniq(4, () => { const p = pr(); return {k:p, p}; });
+    ps.forEach((g, i) => sols.push(`${items[i]} ${g.p} €: zum Beispiel ${fewest(g.p)}`));
+    title = `Preise legen bis ${zr} €`; how = 'Lies den Preis. Lege das Geld (Spielgeld) passend auf das Feld daneben. Kontrolliere: Wie viel liegt da?';
+    body = ps.map((g, i) => `<div class="lg-geld"><span class="lg-gi">${iconSvg(items[i], 100)}<b class="lg-price">${g.p} €</b></span><span class="lg-gf">Lege hier das Geld hin.</span></div>`).join('');
+  }
+  else if(key === 'uhr' || key === 'uhrm'){
+    const m = key === 'uhrm';
+    const fmt = (h, mi) => `${h}:${String(mi).padStart(2, '0')}`;
+    const say = (h, mi) => { const n = h % 12 + 1, H = h % 12 || 12, N = n || 12; return mi === 0 ? `${H} Uhr` : mi === 30 ? `halb ${N}` : mi === 15 ? `Viertel nach ${H}` : mi === 45 ? `Viertel vor ${N}` : fmt(h, mi); };
+    const ts = kt === 'none' ? [] : lgUniq(6, () => { const h = rnd(1, 12), mi = m ? rnd(1, 11)*5 : pick([0, 0, 30, 30, 15, 45]); return {k:`${h}:${mi}`, t: m ? `${fmt(h, mi)} Uhr` : say(h, mi), a:`${m ? fmt(h, mi) : say(h, mi)}: kurzer Zeiger ${mi ? `zwischen ${h} und ${h % 12 + 1}` : `auf ${h}`}, langer Zeiger auf ${mi ? mi/5 : 12}`}; });
+    num(ts);
+    title = m ? 'Zifferblatt mit Minuten' : 'Zifferblatt'; how = 'Lege die Zeiger so, wie es unten steht. Kontrolliere zu zweit.';
+    body = `<div class="lg-c">${lgClock(m)}</div>${ts.length ? `<p class="lg-times"><b>Lege:</b> ${ts.map(g => `<span>${g.t}</span>`).join('')}</p>` : ''}`;
+  }
+  else if(key === 'anlaut'){
+    const words = shuffle(Object.entries(INITIAL).map(([L, ws]) => pick(ws.filter(w => ICON[w]))).filter(Boolean)).slice(0, 12);
+    words.forEach(w => sols.push(`${w}: ${w[0]}`));
+    title = 'Anfangsbuchstaben legen'; how = 'Sprich das Wort langsam. Welchen Laut hörst du am Anfang? Lege die passende Buchstabenkarte in das Kästchen.';
+    body = `<div class="lg-anl">${words.map(w => `<div class="lg-anc"><span class="lg-ic">${iconSvg(w, 100)}</span><span class="lg-slot"></span></div>`).join('')}</div>`;
+  }
+  else if(key === 'wort' || key === 'wortv' || key === 'wortm'){
+    const pool = (key === 'wortm' ? MERK : LAUT_SHORT).filter(w => ICON[w] && w.length <= 6 && (key !== 'wortm' || LG_MERK.test(w)));
+    const words = shuffle(pool).slice(0, key === 'wort' ? 7 : 5); words.forEach(w => sols.push(w));
+    const tpl = w => { const m = key === 'wortm' ? w.match(LG_MERK) : null, at = m ? w.indexOf(m[0]) : -1; return [...w].map((c, i) => `<span class="${at >= 0 && i >= at && i < at + m[0].length ? 'mk' : ''}">${c}</span>`).join(''); };
+    title = key === 'wort' ? 'Wörter legen' : key === 'wortv' ? 'Wörter nachlegen' : 'Merkwörter nachlegen';
+    how = key === 'wort' ? 'Sprich das Wort langsam. Lege für jeden Laut eine Buchstabenkarte in ein Kästchen.' : key === 'wortv' ? 'Lies das Wort. Lege es mit Buchstabenkarten genau darunter nach.' : 'Lies das Wort. Lege es mit Buchstabenkarten nach. Die farbigen Buchstaben sind die Merkstelle.';
+    body = `<div class="lg-words">${words.map(w => `<div class="lg-wr"><span class="lg-ic">${iconSvg(w, 100)}</span><div class="lg-wc">${key === 'wort' ? '' : `<div class="lg-tpl">${tpl(w)}</div>`}<div class="lg-slots">${[...w].map(() => '<span class="lg-slot"></span>').join('')}</div></div></div>`).join('')}</div>`;
+  }
+  else if(key === 'silben'){
+    const pool = Object.keys(WORDS).filter(w => ICON[w] && WORDS[w]?.length && WORDS[w].length <= 4);
+    const by = n => shuffle(pool.filter(w => WORDS[w].length === n));
+    const words = shuffle([...by(1).slice(0, 2), ...by(2).slice(0, 2), ...by(3).slice(0, 2), ...by(4).slice(0, 1)]).slice(0, 7);
+    words.forEach(w => sols.push(`${w}: ${WORDS[w].join('-')} (${WORDS[w].length})`));
+    title = 'Silben legen'; how = 'Sprich das Wort und schwinge die Silben. Lege für jede Silbe einen Stein in einen Kreis.';
+    body = `<div class="lg-words">${words.map(w => `<div class="lg-wr"><span class="lg-ic">${iconSvg(w, 100)}</span><div class="lg-syl">${'<span></span>'.repeat(4)}</div></div>`).join('')}</div>`;
+  }
+  else if(key === 'buchst'){
+    const mode = S.bcase || 'mixed';
+    title = 'Buchstabenkarten'; how = 'Ausschneiden (am besten auf Karton drucken oder laminieren). Der Strich zeigt, wo unten ist.';
+    body = lgLetters(mode);
+  }
+  return {title, how, body, quer, sols, compact: key === 'buchst'};
+}
+function legeSheet(key){
+  const S = app.sheet, b = legeBuild(key, S), kid = S.pid && S.pid !== 'none' ? kids().find(p => p.id === S.pid) : null;
+  const head = b.compact ? `<div class="ab-top lg-top cmp"><h1>${escHtml(b.title)}</h1><p class="lg-how">${b.how}</p></div>` : `<div class="ab-top lg-top"><h1>${escHtml(b.title)}</h1><div class="ab-meta"><div>Name: <span>${kid ? escHtml(kid.name) : ''}</span></div><div>Datum: <span></span></div></div></div><p class="lg-how">${b.how}</p>`;
+  const foot = `<div class="lg-foot"><span class="lg-cal"></span><span>Kontrolle: Dieser Strich ist genau 5 cm lang. Sonst beim Drucken „Tatsächliche Größe“ oder 100 % wählen (nicht „An Seite anpassen“).</span></div><p class="ab-foot ab-lic">Stufenweise · Legeblatt für echtes Material · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
+  const page = `<div class="page lg${b.quer ? ' quer' : ''}"><div class="q">${head}<div class="lg-body">${b.body}</div>${foot}</div></div>`;
+  const sol = S.sol && b.sols.length ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(b.title)}</h1></div><ol>${b.sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
+  app.sheetGen = null;
+  return {title: b.title, n: b.sols.length, lege: true, quer: b.quer, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(b.title)}</title><style>${SHEET_CSS}</style></head><body>${page}${sol}</body></html>`};
+}
 const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:A4;margin:12mm}*{box-sizing:border-box}body{font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,Arial,sans-serif;color:#222;margin:0;font-size:13pt}
 .page{width:186mm;margin:0 auto;page-break-after:always}.page:last-child{page-break-after:auto}
 .ab-top{border-bottom:2.5px solid #222;padding-bottom:2.5mm;margin-bottom:3mm}.ab-top h1{font-size:20pt;margin:0 0 3mm;line-height:1.15}
@@ -7198,7 +7493,7 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .ab-foot{font-size:8pt;color:#888;margin-top:2.5mm;margin-bottom:0}.ab-lic{margin-top:.5mm}
 .sol{font-size:12pt}.sol ol{columns:2;column-gap:10mm;padding-left:6mm}.sol li{margin:1mm 0;break-inside:avoid}
 @media screen{body{background:#eee}.page{background:#fff;margin:6mm auto;padding:12mm;box-shadow:0 2px 8px #0002;width:210mm;min-height:297mm}}
-.hbp{display:flex;justify-content:center}.hbp .hb{display:flex;flex-direction:column;align-items:center;gap:1mm}.hbp .hb-title{font-size:10pt;font-weight:700;color:#444}.hbp .hb-grid{display:grid;grid-template-columns:repeat(var(--hcols),auto);gap:.6mm}.hbp .hb-c{width:var(--hs);height:var(--hs);border:.25mm solid #9a9a9a;border-radius:.8mm;display:flex;align-items:center;justify-content:center;font-size:calc(var(--hs)*.42);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}.hbp .h3d .hb-c{font-size:calc(var(--hs)*.33)}.hbp .hb-c.g5c{margin-right:1.1mm}.hbp .hb-c.g5r{margin-bottom:1.1mm}.hbp .hb-off{visibility:hidden}.hbp .hb-c.mk{border:.6mm solid #222;background:#e9e9e9}.hbp .hb-c.pat{background:#cfcfcf}.hbp .hb-c.hb-gap{border:.45mm solid #222;background:#fff}.ab-arrows{letter-spacing:.5mm;font-size:13pt}`;
+.hbp{display:flex;justify-content:center}.hbp .hb{display:flex;flex-direction:column;align-items:center;gap:1mm}.hbp .hb-title{font-size:10pt;font-weight:700;color:#444}.hbp .hb-grid{display:grid;grid-template-columns:repeat(var(--hcols),auto);gap:.6mm}.hbp .hb-c{width:var(--hs);height:var(--hs);border:.25mm solid #9a9a9a;border-radius:.8mm;display:flex;align-items:center;justify-content:center;font-size:calc(var(--hs)*.42);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}.hbp .h3d .hb-c{font-size:calc(var(--hs)*.33)}.hbp .hb-c.g5c{margin-right:1.1mm}.hbp .hb-c.g5r{margin-bottom:1.1mm}.hbp .hb-off{visibility:hidden}.hbp .hb-c.mk{border:.6mm solid #222;background:#e9e9e9}.hbp .hb-c.pat{background:#cfcfcf}.hbp .hb-c.hb-gap{border:.45mm solid #222;background:#fff}.ab-arrows{letter-spacing:.5mm;font-size:13pt}.page.lg .q{display:flex;flex-direction:column}.lg-top{margin-bottom:2mm}.lg-top.cmp{display:flex;align-items:baseline;gap:6mm;padding-bottom:1.5mm}.lg-top.cmp h1{font-size:15pt;margin:0;white-space:nowrap}.lg-top.cmp .lg-how{margin:0;font-size:10pt}.lg-how{font-size:12pt;margin:0 0 4mm;line-height:1.35}.quer .lg-how{margin-bottom:2.5mm}.lg-body{display:flex;flex-direction:column;gap:6mm;flex:1}.quer .lg-body{gap:3.5mm}.lg-svg{display:block;flex:none;max-width:none;max-height:none}.lg-c{display:flex;justify-content:center}.lg-unit{display:flex;flex-direction:column;gap:2.5mm;break-inside:avoid}.lg-task{display:flex;align-items:center;gap:3mm;font-size:13pt;line-height:1.3}.lg-task .nr{width:6.5mm;height:6.5mm;border-radius:50%;background:#222;color:#fff;font-size:9.5pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}.lg-tt{flex:1}.lg-tw{display:flex;align-items:center;gap:2mm;white-space:nowrap;font-size:13pt}.lg-box{display:inline-block;height:10mm;border:1.5px solid #333;border-radius:1.5mm;vertical-align:middle;background:#fff;flex:none}.lg-eq{display:inline-flex;align-items:center;gap:2mm;font-size:15pt}.lg-tasks2{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm 8mm;margin-top:2mm}.lg-tasks2 .lg-task,.lg-tasks2 .lg-tw,.lg-tasks2 .lg-eq{font-size:12pt}.lg-tasks2.x2{grid-template-columns:repeat(4,1fr);gap:2mm 5mm;margin-top:0}.lg-tasks2.x2 .lg-tt{display:none}.lg-st{display:flex}.lg-stc{display:flex;flex-direction:column}.lg-sth{color:#fff;font-weight:700;text-align:center;padding:1.5mm 0;font-size:13pt;border:.3mm solid #222;-webkit-print-color-adjust:exact;print-color-adjust:exact}.lg-stb{border:.3mm solid #222;border-top:0}.lg-std{display:flex;justify-content:center;padding-top:2.5mm}.lg-stc+.lg-stc .lg-sth,.lg-stc+.lg-stc .lg-stb{border-left:0}.lg-clock{display:flex;flex-direction:column;align-items:center;gap:3mm}.lg-hands{display:flex;flex-direction:column;align-items:center;gap:1.5mm;font-size:9.5pt}.lg-hands>div{display:flex;gap:10mm;align-items:center}.lg-hands svg{display:block}.lg-times{display:flex;flex-wrap:wrap;gap:3mm 6mm;font-size:15pt;justify-content:center;align-items:center;margin:2mm 0 0}.lg-times span{border:1.2px solid #333;border-radius:2mm;padding:1mm 3mm}.lg-geld{display:flex;align-items:center;gap:6mm;break-inside:avoid}.lg-gi{display:flex;flex-direction:column;align-items:center;gap:2mm;width:36mm;flex:none}.lg-gi svg{width:24mm;height:24mm}.lg-price{font-size:18pt;border:2px solid #222;border-radius:2mm;padding:.5mm 3mm}.lg-gf{flex:1;height:46mm;border:.5mm dashed #888;border-radius:3mm;display:flex;align-items:flex-end;justify-content:flex-end;padding:2mm 3mm;color:#aaa;font-size:9pt}.lg-ic{width:24mm;height:24mm;flex:none;display:block}.lg-ic svg{width:100%;height:100%;display:block}.lg-slot{width:22mm;height:22mm;border:.5mm dashed #555;border-radius:1.5mm;display:inline-block;flex:none}.lg-anl{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}.lg-anc{display:flex;align-items:center;gap:4mm;border:1px solid #ccc;border-radius:3mm;padding:3mm;justify-content:center}.lg-words{display:flex;flex-direction:column;gap:3mm}.lg-wr{display:flex;align-items:center;gap:6mm;border-bottom:1px solid #ddd;padding-bottom:3mm;break-inside:avoid}.lg-wc{display:flex;flex-direction:column;gap:1mm}.lg-tpl,.lg-slots{display:flex;gap:1.5mm}.lg-tpl span{width:22mm;text-align:center;font-size:21pt;font-weight:700;color:#444;line-height:1.1}.lg-tpl .mk{color:#c9414a}.lg-syl{display:flex;gap:7mm}.lg-syl span{width:21mm;height:21mm;border-radius:50%;border:.5mm dashed #555}.lg-cards{display:grid;grid-template-columns:repeat(9,20mm);justify-content:center}.lg-card{width:20mm;height:20mm;border:.25mm dashed #9a9a9a;display:flex;align-items:center;justify-content:center;font-size:34pt;font-weight:700;position:relative;line-height:1;padding-bottom:1.5mm}.lg-card i{position:absolute;bottom:2mm;left:7mm;width:6mm;height:.7mm;background:#b5b5b5}.lg-foot{display:flex;align-items:center;gap:3mm;font-size:8pt;color:#555;margin-top:3mm}.lg-cal{width:50mm;border-top:.6mm solid #222;flex:none}.page.lg.quer .q{width:272mm}@media print{.page.lg{height:272mm;overflow:hidden}.page.lg .q{height:100%}.page.lg.quer{position:relative}.page.lg.quer .q{position:absolute;left:0;top:0;width:272mm;height:185mm;transform-origin:0 0;transform:translateX(186mm) rotate(90deg)}}@media screen{.page.lg.quer{width:297mm;min-height:210mm}}`;
 function sheetTopics(){
   return [
     ['Mathe', Object.entries(M_SHEETS).map(([k, v]) => [`M:${k}`, v.name])],
@@ -7206,7 +7501,9 @@ function sheetTopics(){
     ['Schreiben', Object.entries(W_SHEETS).map(([k, v]) => [`W:${k}`, `${k} ${v.name}`])],
     ['Hundertertafel und Tausenderbuch', Object.entries(H_SHEETS).map(([k, v]) => [`H:${k}`, v.mat ? v.name : `${k} ${v.name}`])],
     ['Größen und Einkaufen', Object.entries(G_SHEETS).map(([k, v]) => [`G:${k}`, `${k} ${v.name}`])],
-    ['Uhr und Kalender', Object.entries(U_SHEETS).map(([k, v]) => [`U:${k}`, `${k} ${v.name.replace('Uhr: ', '')}`])]
+    ['Uhr und Kalender', Object.entries(U_SHEETS).map(([k, v]) => [`U:${k}`, `${k} ${v.name.replace('Uhr: ', '')}`])],
+    ['Legeblätter für echtes Material: Mathe', Object.entries(LEGE).filter(([, v]) => v.grp === 'M').map(([k, v]) => [`K:${k}`, v.name])],
+    ['Legeblätter für echtes Material: Deutsch', Object.entries(LEGE).filter(([, v]) => v.grp === 'D').map(([k, v]) => [`K:${k}`, v.name])]
   ];
 }
 function zoneToSheet(key){
@@ -7228,6 +7525,7 @@ function buildSheet(limit){
 }
 function buildSheet0(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
+  if(sj === 'K') return legeSheet(key);
   const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : sj === 'H' ? H_SHEETS[key] : W_SHEETS[key];
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : ['einmaleins', 'stellenwert'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
@@ -7269,10 +7567,10 @@ function sheetFit(fr, show = sheetShow){
   const page = d.querySelector('.page'), tasks = [...d.querySelectorAll('.ab-grid > .ab-task')], foot = d.querySelector('.ab-lic'); if(!page || !tasks.length) return;
   const mm = (() => { const t = d.createElement('div'); t.style.cssText = 'position:absolute;width:100mm;height:0'; d.body.append(t); const w = t.getBoundingClientRect().width/100; t.remove(); return w; })();
   const pr = page.getBoundingClientRect(), limit = pr.top + (12 + 273 - 5)*mm - (foot ? foot.getBoundingClientRect().height + 6*mm : 10*mm); /* 5 mm Sicherheit: Druck misst minimal anders als die Vorschau */
-  let fit = tasks.filter(t => t.getBoundingClientRect().bottom <= limit + 1).length;
-  fit = Math.max(G.cols, fit - fit % G.cols);
+  const raw = tasks.filter(t => t.getBoundingClientRect().bottom <= limit + 1).length;
+  let fit = raw === tasks.length ? raw : Math.max(G.cols, raw - raw % G.cols); /* alles passt: auch eine angefangene letzte Reihe behalten (kleiner Aufgabenvorrat) */
   if(G.checking){ /* Prüfrunde: die ausgewählten Aufgaben sind sortiert anders hoch – notfalls eine Reihe weniger, bei viel Platz eine Reihe mehr */
-    if(fit >= tasks.length){
+    if(raw >= tasks.length){
       const top = tasks[0].getBoundingClientRect().top, last = Math.max(...tasks.slice(-G.cols).map(t => t.getBoundingClientRect().bottom));
       const rowH = (last - top)/Math.ceil(tasks.length/G.cols);
       if(!G.shrunk && G.limit < G.tasks.length && limit - last > rowH*0.75 && ++G.checking <= 10){ G.limit = Math.min(G.tasks.length, G.limit + G.cols); app.sheetDoc = buildSheet(G.limit); show(); return; }
@@ -7284,9 +7582,10 @@ function sheetFit(fr, show = sheetShow){
   if(fit === G.limit && fit === tasks.length){ G.fitted = true; return; }
   G.checking = 1; G.limit = fit; app.sheetDoc = buildSheet(fit); show();
 }
-function openSheets(pid, zoneKey){
+function openSheets(pid, zoneKey, lege){
   const S = app.sheet;
   S.pid = pid ?? (data.current || 'none');
+  if(lege){ app.sheetMode = 'single'; S.topic = lege.topic; if(lege.zr) S.zr = lege.zr; }
   if(zoneKey){ const z = zoneToSheet(zoneKey); if(z){ S.topic = z.topic; if(z.zr) S.zr = z.zr; S.ue = z.ue || 'egal'; } }
   $('#dlg-sheet').showModal(); renderSheets();
 }
@@ -7301,13 +7600,13 @@ function heftAdd(){
   const doc = app.sheetDoc; if(!doc) return;
   const d = new DOMParser().parseFromString(doc.html, 'text/html'), pg = d.querySelector('.page'); if(!pg) return;
   pg.querySelector('.ab-meta')?.remove();
-  app.heft.items.push({title: doc.title, html: pg.innerHTML});
+  app.heft.items.push({title: doc.title, html: pg.innerHTML, cls: pg.className.replace(/^page\s*/, '')});
   saveHeft(); toast(`Ins Arbeitsheft übernommen – jetzt ${app.heft.items.length} ${app.heft.items.length === 1 ? 'Seite' : 'Seiten'}.`);
   renderSheets(true);
 }
 function buildHeft(){
   const H = app.heft, kid = kids().find(p => p.id === H.pid), name = kid ? kid.name : '';
-  const pages = H.items.map((it, i) => `<div class="page">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + 1} · `)}</div>`).join('');
+  const pages = H.items.map((it, i) => `<div class="page ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + 1} · `)}</div>`).join('');
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><span class="cv-dots"></span><span>${i + 1}</span></li>`).join('')}</ol></div>` : '';
   const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1><div class="cv-name">Name: <span>${escHtml(name)}</span></div>${toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
   const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:268mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}`;
@@ -7357,7 +7656,7 @@ function renderHeft(){
 const sheetModeSwitch = () => `<div class="seg sh-mode" role="group" aria-label="Was drucken?"><button data-shmode="single" aria-pressed="${app.sheetMode === 'single'}">Einzelblatt</button><button data-shmode="heft" aria-pressed="${app.sheetMode === 'heft'}">Arbeitsheft${app.heft.items.length ? ` (${app.heft.items.length})` : ''}</button></div>`;
 function renderSheets(keep){
   if(app.sheetMode === 'heft') return renderHeft();
-  const S = app.sheet, isM = S.topic.startsWith('M:'), key = S.topic.split(':')[1];
+  const S = app.sheet, isM = S.topic.startsWith('M:'), key = S.topic.split(':')[1], LD = S.topic.startsWith('K:') ? LEGE[key] : null, lkt = LD ? legeKt(LD, S) : null;
   const kid = kids().find(p => p.id === S.pid);
   const zones = kid ? ['M', 'L', 'W'].flatMap(sj => zoneReport(kid.id, sj).zones).filter(z => zoneToSheet(z.key)) : [];
   const sel = (id, opts, cur) => `<select id="${id}">${opts.map(([v, n]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
@@ -7369,10 +7668,15 @@ function renderSheets(keep){
     ${isM && ['plus', 'minus', 'schriftlich'].includes(key) ? `<label class="row">${key === 'schriftlich' ? 'Übertrag' : 'Zehnerübergang'} ${sel('sh-ue', [['egal', 'gemischt'], ['ohne', 'ohne'], ['mit', 'mit']], S.ue)}</label>` : ''}
     ${isM && !['schriftlich', 'zahlenstrahl', 'geld', 'zaehlen', 'zeichnen'].includes(key) ? `<label class="row cb"><input type="checkbox" id="sh-mat" ${S.mat ? 'checked' : ''}> mit Materialbildern</label>` : ''}
     ${S.topic === 'L:L2' ? `<label class="row">Schrift ${sel('sh-case', [['up', 'nur Großbuchstaben'], ['mixed', 'Groß- und Kleinschreibung']], S.lcase ? 'mixed' : 'up')}</label>` : ''}
-    <label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
-    <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>
+    ${LD ? `${LD.zrs ? `<label class="row">Zahlenraum ${sel('sh-lzr', LD.zrs.map(z => [z, `bis ${z}${key === 'geld' ? ' €' : ''}`]), LD.zrs.includes(S.zr) ? S.zr : LD.zrs[0])}</label>` : ''}
+      ${LD.kts.length > 1 ? `<label class="row">Aufgaben ${sel('sh-kt', LD.kts.map(k => [k, LD.ktn?.[k] || LK[k]]), lkt)}</label>` : ''}
+      ${LD.ue && ['plus', 'minus'].includes(lkt) ? `<label class="row">Zehnerübergang ${sel('sh-ue', [['egal', 'gemischt'], ['ohne', 'ohne'], ['mit', 'mit']], S.ue)}</label>` : ''}
+      ${key === 'buchst' ? `<label class="row">Buchstaben ${sel('sh-bcase', [['mixed', 'groß und klein'], ['low', 'nur klein'], ['up', 'nur groß']], S.bcase || 'mixed')}</label>` : ''}
+      ${key !== 'buchst' && lkt !== 'none' ? `<label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>` : ''}`
+    : `<label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
+    <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
-    <p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge. Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P).</p></div>
+    ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge. Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P).</p></div>
     <iframe id="sh-frame" title="Vorschau Arbeitsblatt"></iframe>`;
   if(!keep || !app.sheetDoc) app.sheetDoc = buildSheet();
   sheetShow();
@@ -7380,7 +7684,7 @@ function renderSheets(keep){
 function sheetShow(){
   const fr = $('#sh-frame'); if(!fr) return;
   fr.onload = () => sheetFit(fr);
-  fr.srcdoc = app.sheetDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.4, ((fr.clientWidth || 700) - 30)/830)).toFixed(2)}}}</style></head>`);
+  fr.srcdoc = app.sheetDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.3, ((fr.clientWidth || 700) - 30)/(app.sheetDoc.quer ? 1160 : 830))).toFixed(2)}}}</style></head>`);
 }
 function sheetEvents(e){
   const S = app.sheet, H = app.heft;
@@ -7411,6 +7715,9 @@ function sheetChange(e){
   if(t.id === 'sh-mat') S.mat = t.checked;
   if(t.id === 'sh-n') S.n = t.value === 'fill' ? 'fill' : +t.value;
   if(t.id === 'sh-sol') S.sol = t.checked;
+  if(t.id === 'sh-lzr') S.zr = +t.value;
+  if(t.id === 'sh-kt') S.kt = t.value;
+  if(t.id === 'sh-bcase') S.bcase = t.value;
   renderSheets();
 }
 
@@ -7562,7 +7869,7 @@ function buildReport(pid, kind){
     const subjects = [['M', 'Mathematik'], ['L', 'Lesen'], ['W', 'Schreiben']].filter(([sj]) => Object.keys(matrixOf(pid)).some(k => (sj === 'M' ? /^[MSUGR]\|/ : new RegExp('^' + sj + '\\|')).test(k)));
     const tests = ['M', 'L', 'W'].map(sj => p?.['lastDiag' + sj] ? `${{M:'Mathe', L:'Lesen', W:'Schreiben'}[sj]}: ${new Date(p['lastDiag' + sj]).toLocaleDateString('de-DE')}` : '').filter(Boolean).join(' · ');
     body = `<div class="page rp">${head('Lernstandsbericht')}<p class="note">Letzte Tests: ${tests || '–'}. Kriteriumsorientierte Einstufung nach Kompetenzstufen (keine Normwerte). ✓ erreicht · (✓) abgeleitet · ½ teilweise · ✗ nicht erreicht · – nicht geprüft.</p>
-      ${subjects.map(([sj, S]) => { const rep = zoneReport(pid, sj); return `<h2>${S}</h2>${mxTable(pid, sj)}${rep.zones.map(z => `<div class="z"><b>Förderzone: ${escHtml(cellLabel(z.key))}</b><br>${escHtml(z.why)}<br><small>${escHtml(z.info.bp)}</small><br><b>Analog:</b> ${escHtml(z.info.analog)}</div>`).join('')}${rep.ileb ? `<h3>Formulierungsvorschlag ILEB</h3><p><b>Lernstand:</b> ${escHtml(rep.ileb.lernstand)}</p><p><b>Nächstes Ziel:</b> ${escHtml(rep.ileb.ziel)}</p><p><b>Maßnahmen:</b> ${escHtml(rep.ileb.massnahmen)}</p>` : ''}`; }).join('') || '<p>Noch keine Tests.</p>'}
+      ${subjects.map(([sj, S]) => { const rep = zoneReport(pid, sj); return `<h2>${S}</h2>${mxTable(pid, sj)}${rep.zones.map(z => `<div class="z"><b>Förderzone: ${escHtml(cellLabel(z.key))}</b><br>${escHtml(z.why)}<br><small>${escHtml(z.info.bp)}</small>${(w => w ? `<br><b>Am Material:</b> ${escHtml(w.hand)} <b>Im Bild:</b> ${escHtml(w.bild)}` : '')(matWay(z.key))}<br><b>Im Alltag:</b> ${escHtml(z.info.analog)}</div>`).join('')}${rep.ileb ? `<h3>Formulierungsvorschlag ILEB</h3><p><b>Lernstand:</b> ${escHtml(rep.ileb.lernstand)}</p><p><b>Nächstes Ziel:</b> ${escHtml(rep.ileb.ziel)}</p><p><b>Maßnahmen:</b> ${escHtml(rep.ileb.massnahmen)}</p>` : ''}`; }).join('') || '<p>Noch keine Tests.</p>'}
       ${(() => { const pr = progressOf(pid); return pr?.gained.length ? `<h2>Lernfortschritt seit dem ersten Test (${new Date(pr.start).toLocaleDateString('de-DE')})</h2><ul>${pr.gained.map(k => `<li>${dShort(pr.sinceOf(k))}: ${escHtml(cellLabel(k))}</li>`).join('')}</ul>` : ''; })()}
       ${(() => { const secs = statsSections(pid).filter(x => x.title !== 'Zuletzt geübt'); return secs.length ? `<h2>Übungen</h2>${secs.map(x => `<h3>${escHtml(x.title)}</h3><ul>${x.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul>`).join('')}` : ''; })()}
       <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Einstufungen sind Vorschläge und werden von der Lehrkraft geprüft. Sie ersetzen keine sonderpädagogische Diagnostik.</p></div>`;
@@ -7601,6 +7908,7 @@ function weekReportHtml(pid, head){
     ${good.length ? `<h2>Läuft sicher</h2><p>${escHtml(good.join(', '))}</p>` : ''}
     ${hard.length ? `<h2>Braucht noch Unterstützung</h2><p>${escHtml(hard.join(', '))} (weniger als 60 % beim ersten Versuch richtig)</p>` : ''}
     ${SK.length ? `<h2>Übersprungene Aufgaben</h2><p>${SK.slice(-8).map(e => escHtml(e.task)).join(' · ')}</p>` : ''}
+    ${(() => { const zs = ['M', 'L', 'W'].flatMap(sj => zoneReport(pid, sj).zones.slice(0, 1)).filter(z => matWay(z.key)); return zs.length ? `<h2>Nächster Schritt am Material</h2><ul>${zs.map(z => `<li><b>${escHtml(cellLabel(z.key))}:</b> ${escHtml(matWay(z.key).hand)}</li>`).join('')}</ul>` : ''; })()}
     <h2>Notizen</h2><div class="wk-notes"></div>
     <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Zahlen zeigen nur, was in der App geübt wurde.</p></div>`;
 }
@@ -7836,7 +8144,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.17.6 · 15.11.2026';
+const APP_VERSION = '0.18.0 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -7985,6 +8293,7 @@ $('#dlg-profile').addEventListener('submit', e => {
 });
 $('#dlg-stats').addEventListener('change', e => { if(e.target.id === 'stats-who'){ statsId = e.target.value; renderStats(); } });
 $('#dlg-stats').addEventListener('click', async e => {
+  const lb = e.target.closest('[data-lege]'); if(lb){ $('#dlg-stats').close(); const [t, z] = lb.dataset.lege.split('@'); openSheets(statsId === 'guest' || statsId === 'class' ? 'none' : statsId, null, {topic:t, zr: z ? +z : null}); return; }
   const sz = e.target.closest('[data-sheetzone]'); if(sz){ $('#dlg-stats').close(); openSheets(statsId === 'guest' || statsId === 'class' ? 'none' : statsId, sz.dataset.sheetzone); return; }
   if(e.target.closest('#stats-report')){ $('#dlg-stats').close(); openReport(statsId); return; }
   if(e.target.closest('#stats-heft')){ $('#dlg-stats').close(); openHeftZone(statsId); return; }
@@ -8033,13 +8342,14 @@ $('#help-content').innerHTML = [
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
   ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung und am Ende keine Ergebnisse. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
-  ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, Ideen für die Förderung ohne Gerät, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
-  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
+  ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, der Weg am Material (Handeln, Bild, Zahl) mit Legeblatt, Ideen für den Alltag, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
+  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Legeblätter für echtes Material“ gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],
   ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Bis 100 und 1000 gibt es die Ansicht „Tafel“ bzw. „Tausenderbuch“: Das Kind springt mit +10 und +1 (bis 1000 auch +100, mit Seitenleiste zum Blättern), der Weg bleibt sichtbar. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln (wahlweise mit Hundertern oder Tausendern) oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schülerinnen und Schüler selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch.'],
   ['h','Über Stufenweise'],
   ['target','Die Idee','Stufenweise zeigt jedem Kind, was als Nächstes dran ist: seine Förderzone. Das schafft Klarheit und Sicherheit. Es gibt keine Klassenstufen, nur Stufen. So arbeiten Jugendliche nicht an Aufgaben „für die 1. Klasse“, sondern an altersgerechten Aufgaben aus ihrer Lebenswelt, genau auf ihrem Lernstand.'],
+  ['blocks','Ein Lernort unter vielen','Kinder lernen mit Händen, Augen und Sprache: Sie legen Plättchen, bündeln Schrauben, fädeln Perlen, kneten Buchstaben. Stufenweise übernimmt nur den Teil, den ein Gerät gut kann: passende Aufgaben im Bild und in Zahlen, sofortige Rückmeldung, Übersicht für die Lehrkraft. Deshalb steht im Lernstand zu jeder Förderzone ein Weg vom Handeln über das Bild zur Zahl, mit Materialliste und einem Legeblatt zum Ausdrucken. Auf Legeblätter legen die Kinder echtes Material: Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten.'],
   ['check','Freie Software','Stufenweise ist kostenlos, ohne Werbung und für alle Schulen gedacht. ©&nbsp;2026 Stefan Hackl. Der Programmcode steht unter der Lizenz EUPL-1.2 (European Union Public Licence): Du darfst ihn nutzen, verändern und weitergeben. Wer eine veränderte Fassung weitergibt, muss sie ebenfalls offen unter dieser Lizenz weitergeben.'],
   ['print','Freie Inhalte','Texte, Aufgaben, Arbeitsblätter und Formulierungsvorschläge stehen unter CC&nbsp;BY-SA&nbsp;4.0: Du darfst sie nutzen, ausdrucken, anpassen und weitergeben. Bedingungen: Namensnennung („Stufenweise, Stefan Hackl, CC&nbsp;BY-SA&nbsp;4.0“) und Weitergabe unter derselben Lizenz.'],
   ['edit','Schrift','Die Schrift „Stufenfibel“ ist aus der Leseschrift Andika von SIL International abgeleitet (SIL Open Font License&nbsp;1.1). Geändert: Das kleine l hat unten einen Bogen, damit es sich deutlich vom großen I unterscheidet; die Schrift ist auf die Zeichen für Deutsch reduziert. Sie steckt in der App selbst, es wird nichts aus dem Internet nachgeladen.'],

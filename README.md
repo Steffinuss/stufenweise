@@ -10,16 +10,17 @@ Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, al
 - **Klarheit statt Auswahlflut:** Nach dem Test sieht jedes Kind nur, was für es dran ist. „Heute für dich“ sagt, womit es weitergeht.
 - **Sicherheit durch Passung:** Die Aufgaben liegen knapp über dem, was das Kind sicher kann. So entstehen Erfolgserlebnisse ohne Unterforderung.
 - **Altersgerecht:** keine kindliche Spielwelt, sondern Aufgaben aus der Lebenswelt Jugendlicher wie Geld, Einkaufen, Uhr, Kalender und Maße, in respektvoller, sachlicher Sprache.
+- **Ein Lernort unter vielen:** Kinder brauchen echtes Material: Plättchen legen, Schrauben bündeln, Perlen fädeln, Buchstaben kneten. Stufenweise übernimmt nur den Teil, den ein Gerät gut kann, und zeigt zu jeder Förderzone den Weg vom Handeln über das Bild zur Zahl, mit Legeblättern zum Ausdrucken. Siehe [Lernort Material](docs/material.md).
 - **Bildungsplan GENT:** Die Stufen folgen dem Bildungsplan für den Förderschwerpunkt geistige Entwicklung (Baden-Württemberg 2022) und der Fachliteratur zur Zahlbegriffsentwicklung, nicht einem Grundschul-Curriculum.
 
 ## Was die App kann
 
 - **Lernstand ermitteln:** kurze adaptive Tests in Mathe (zwei Teile), Lesen und Schreiben
-- **Förderzone zeigen:** Kompetenzmatrix, begründete Förderzone, ILEB-Formulierungsvorschläge und Ideen für die Förderung ohne Gerät
+- **Förderzone zeigen:** Kompetenzmatrix, begründete Förderzone, ILEB-Formulierungsvorschläge und zu jeder Stufe ein Weg am echten Material (Handeln, Bild, Zahl) mit Materialliste
 - **Themenwelten GS, HS, BSS:** gleiche Stufen und Tests, aber Texte, Pläne und Sachaufgaben passend zur Schulstufe; Bildmodus für Kinder, die noch nicht lesen
 - **Unterricht an der Tafel:** Werkzeuge für die interaktive Tafel ohne Namen und ohne Speichern: Zwanzigerfeld zum Legen und Wegstreichen, Zahlenstrahl mit Sprüngen und Rechenstrich, Hundertertafel zum Färben und Abdecken, Uhr, Wörter mit Silben, Material frei legen
 - **Selbstständig üben:** Übungen passend zur Stufe, mit Material wie Zehnerstangen, Hundertertafel, Tausenderbuch, Geld und Uhr; altersgerecht und ohne Spielmechanik
-- **Arbeit abnehmen:** Arbeitsblätter zur Förderzone, Elterninfo in einfacher Sprache, Klassenübersicht als Tabelle
+- **Arbeit abnehmen:** Arbeitsblätter zur Förderzone, Legeblätter in Originalgröße für echtes Material (Zwanzigerfeld, Stellentafel, Hunderterfeld, Zifferblatt, Buchstabenkarten …), Elterninfo in einfacher Sprache, Klassenübersicht als Tabelle
 
 ## Nutzen
 

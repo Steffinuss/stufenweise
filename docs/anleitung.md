@@ -80,7 +80,9 @@ Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das
 
 ![Kompetenzmatrix Mathematik](bilder/08_lernstand.png)
 
-**Die Förderzone:** Darunter steht für jeden Bereich die erste Stufe, die noch nicht sicher ist, mit Begründung und Bezug zum Bildungsplan. **Lernangebot starten** öffnet die passende Übung, **Arbeitsblatt** das passende Blatt. Die Analog-Ideen helfen bei der Förderung ohne Gerät.
+**Die Förderzone:** Darunter steht für jeden Bereich die erste Stufe, die noch nicht sicher ist, mit Begründung und Bezug zum Bildungsplan. **Lernangebot starten** öffnet die passende Übung, **Arbeitsblatt** das passende Blatt.
+
+**Am Material:** Zu jeder Förderzone steht ein Weg in drei Schritten: erst **Handeln** mit echtem Material, dann **im Bild** auf einem Legeblatt, dann **Zahl und Schrift** in Stufenweise und im Heft. Dazu kommen eine Materialliste und der Knopf **Legeblatt drucken**. „Im Alltag“ nennt weitere Ideen ohne Gerät. Alle Wege stehen gesammelt in der Übersicht [Lernort Material](material.md).
 
 ![Förderzone und Lernangebote mit Begründung](bilder/09_foerderzone.png)
 
@@ -88,9 +90,9 @@ Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das
 
 ![Formulierungsvorschlag ILEB Mathematik](bilder/10_ileb.png)
 
-**Übungsprotokoll:** Darunter stehen die geübten Bereiche, **typische Fehler** und **übersprungene Aufgaben**. Typische Fehler erkennt die App beim Rechnen selbst: um 1 verzählt, Zahlendreher, Zehner falsch, falsche Rechenart (plus statt minus), Zehnerübergang nicht beachtet und „klein von groß“ bei Minus (bei 32 − 5 wird 5 − 2 gerechnet). Das Kind bekommt dazu sofort einen passenden Tipp. Übersprungen heißt: Das Kind hat zur nächsten Aufgabe geklickt, ohne die Aufgabe zu lösen. Du siehst, wie oft, in welchem Bereich und bei welchen Aufgaben.
+**Übungsprotokoll:** Darunter stehen die geübten Bereiche, **typische Fehler** und **übersprungene Aufgaben**. Kommt ein Fehler öfter vor (ab 3-mal), steht unter „Nächster Schritt am Material“, wie das Kind die Aufgabe mit Material nachlegen kann, zum Beispiel beim Zehnerübergang: 10 Einer sichtbar gegen eine Zehnerstange tauschen. Typische Fehler erkennt die App beim Rechnen selbst: um 1 verzählt, Zahlendreher, Zehner falsch, falsche Rechenart (plus statt minus), Zehnerübergang nicht beachtet und „klein von groß“ bei Minus (bei 32 − 5 wird 5 − 2 gerechnet). Das Kind bekommt dazu sofort einen passenden Tipp. Übersprungen heißt: Das Kind hat zur nächsten Aufgabe geklickt, ohne die Aufgabe zu lösen. Du siehst, wie oft, in welchem Bereich und bei welchen Aufgaben.
 
-**Wochenübersicht:** Unter **Bericht drucken** gibt es neben Lernstandsbericht, Elterninfo und Lernlandkarte die **Wochenübersicht** für die letzten 7 Tage: Aufgaben pro Tag als Balken, geübte Bereiche mit Anzahl, Anteil gleich richtig, geschätzter Übungszeit, übersprungenen Aufgaben und Stufen, dazu „Läuft sicher“, „Braucht noch Unterstützung“ und Platz für Notizen. Gut für das ILEB- oder Elterngespräch.
+**Wochenübersicht:** Unter **Bericht drucken** gibt es neben Lernstandsbericht, Elterninfo und Lernlandkarte die **Wochenübersicht** für die letzten 7 Tage: Aufgaben pro Tag als Balken, geübte Bereiche mit Anzahl, Anteil gleich richtig, geschätzter Übungszeit, übersprungenen Aufgaben und Stufen, dazu „Läuft sicher“, „Braucht noch Unterstützung“ und Platz für Notizen. Am Ende steht der nächste Schritt am Material für jede Förderzone. Gut für das ILEB- oder Elterngespräch.
 
 ## Schritt 5: Üben
 
@@ -194,6 +196,15 @@ Unter „Hundertertafel und Tausenderbuch“ gibt es Blätter zu allen sieben St
 Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0“, du darfst es also kopieren und weitergeben.
 
 Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in Fünferreihen. Neu ist das Thema **Zahlen mit Material zeichnen**: Die Kinder zeichnen Zahlen in der Kurzschreibweise □ Hunderter, | Zehner, • Einer und lesen gezeichnete Zahlen ab. Wählst du eine Förderzone aus dem Rechnen, passt das Blatt genau dazu, zum Beispiel „Plus bis 20, mit Zehnerübergang“ für R3.
+
+### Legeblätter für echtes Material
+
+Im Thema ganz unten stehen die **Legeblätter für echtes Material**. Auf diese Blätter legen die Kinder Wendeplättchen, Einerwürfel, Zehnerstangen oder Buchstabenkarten, bevor sie rechnen oder schreiben:
+
+- **Mathe:** Zehnerfeld, Zwanzigerfeld (Querformat), Zahlenstrahl bis 20, Zahlenstrahl bis 100 oder 1000, Hunderterfeld in 1 cm für Einerwürfel, Stellentafel (bis 100 hochkant, bis 1000 quer, breit genug für Hunderterplatten und Zehnerstangen), Preise mit Spielgeld legen, Zifferblatt mit Zeigern zum Ausschneiden, Zifferblatt mit Minutenkranz.
+- **Deutsch:** Anfangsbuchstaben legen, Wörter legen (ein Kästchen pro Buchstabe), Wörter nachlegen mit Vorlage, Merkwörter nachlegen (Merkstelle farbig), Silben legen (ein Stein pro Silbe), Buchstabenkarten zum Ausschneiden (groß und klein, häufige Buchstaben öfter; ein Strich zeigt, wo unten ist).
+
+Bei den meisten Mathe-Blättern wählst du unter **Aufgaben**, was dazu auf dem Blatt steht, zum Beispiel „Plus“, „Ergänzen bis 20“ oder „ohne Aufgaben“ für das freie Legen. **Wichtig:** in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf jedem Legeblatt ist ein 5-cm-Strich: Ist er kürzer, wurde verkleinert. Im Lernstand öffnet **Legeblatt drucken** direkt das passende Blatt zur Förderzone. Legeblätter lassen sich auch ins Arbeitsheft übernehmen.
 
 ### Arbeitsheft
 
