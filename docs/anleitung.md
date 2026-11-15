@@ -191,7 +191,7 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 
 ![Arbeitsblatt-Generator mit Vorschau](bilder/13_arbeitsblatt.png)
 
-Unter „Hundertertafel und Tausenderbuch“ gibt es Blätter zu allen sieben Stufen und drei Material-Blätter: eine ausgefüllte Hundertertafel, eine leere Tafel zum Eintragen und eine Seite aus dem Tausenderbuch (mit „Neue Aufgaben“ kommt eine andere Seite).
+Unter „Hundertertafel und Tausenderbuch“ gibt es Blätter zu allen sieben Stufen und drei Material-Blätter: eine ausgefüllte Hundertertafel, eine leere Tafel zum Eintragen und das Tausenderbuch: Unter „Seite“ wählst du eine bestimmte Seite (zum Beispiel 701–800) oder „ganzes Tausenderbuch“. Dann kommen alle 10 Seiten von 1–100 bis 901–1000 zum Ausdrucken und Binden; mit „Ins Arbeitsheft“ werden es 10 Heftseiten.
 
 Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0“, du darfst es also kopieren und weitergeben.
 

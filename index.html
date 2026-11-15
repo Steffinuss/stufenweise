@@ -7207,8 +7207,17 @@ const R_SHEETS = {
   L8: {name:'Pläne und Tabellen lesen', cols:1, max:3, gens:[() => { const g = fresh(docKeys()), d = DOCS[g](); return T_(['lies', 'kreuze'], 'Lies genau. Kreuze die richtige Antwort an.', `<div class="ab-doc">${d.html}</div>${d.qs.slice(0, 4).map(([k, q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, `${d.title}: ` + d.qs.slice(0, 4).map(([k, q, o]) => o[0]).join(' · ')); }]},
   L9: {name:'Längere Texte verstehen', cols:1, max:2, gens:[() => { const t = fresh(forWorld(LONG).map(x => x.t)), tx = LONG.find(x => x.t === t); return T_(['lies', 'kreuze'], 'Lies den Text. Kreuze die richtige Antwort an.', `<div class="ab-doc">${longHtml(tx)}</div>${tx.q.map(([k, w, q, ...o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, `${tx.t}: ` + tx.q.map(q => q[3]).join(' · ')); }]}
 };
+/* Nachspur-Schrift: hohle Buchstaben. Die Kontur liegt hinter der weißen Füllung (paint-order),
+   so verschwinden die Linien, wo sich Teile eines Buchstabens überlappen (N, e, t). */
+function traceWord(w, px = 44){
+  let wd = 0;
+  try{ const c = (traceWord.c ||= document.createElement('canvas').getContext('2d')); c.font = `${px}px Stufenfibel`; wd = c.measureText(w).width; }catch{}
+  if(!wd || !document.fonts?.check?.(`${px}px Stufenfibel`)) wd = Math.max(wd, w.length*px*.62);
+  const ls = px*.09, W = Math.ceil(wd + ls*w.length + 8), H = Math.ceil(px*1.32);
+  return `<svg class="ab-trace" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="${escHtml(w)}"><text x="4" y="${Math.round(px*1.02)}" font-family="Stufenfibel,'Atkinson Hyperlegible',Verdana,Arial,sans-serif" font-size="${px}" letter-spacing="${ls.toFixed(1)}" fill="#fff" stroke="#8a8a8a" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke fill">${escHtml(w)}</text></svg>`;
+}
 const W_SHEETS = {
-  WX: {name:'Meine Wörter (nachspuren und schreiben)', cols:2, gens:[() => { const ws = ownWords(), k = fresh(ws.length ? ws : ['Name', 'Schule', 'Montag', 'Arbeit']); return T_(['lies', 'schreibe'], 'Spure nach. Schreibe dann selbst.', `<p class="ab-trace">${escHtml(k)}</p>${lineW(2)}`, k); }]},
+  WX: {name:'Meine Wörter (nachspuren und schreiben)', cols:2, gens:[() => { const ws = ownWords(), k = fresh(ws.length ? ws : ['Name', 'Schule', 'Montag', 'Arbeit']); return T_(['lies', 'schreibe'], 'Spure nach. Schreibe dann selbst.', `${traceWord(k)}${lineW(2)}`, k); }]},
   W1: {name:'Wörter abschreiben', cols:2, gens:[() => { const k = fresh([...LAUT_SHORT, 'Lampe','Tasse','Hose','Banane','Blume','Kiste']); return T_(['lies', 'schreibe'], 'Lies und schreibe ab.', `<div class="ab-pw">${iconP(k, 18)}<p class="ab-word">${k}</p></div>${lineW()}`, k); }]},
   W2: {name:'Anfangsbuchstaben schreiben', cols:3, gens:[() => { const k = fresh(Object.values(INITIAL).flat()); return T_('schreibe', 'Erster Buchstabe', `${iconP(k, 22)}${ans(13)}`, `${k}: ${k[0]}`); }]},
   W3: {name:'Kurze Wörter schreiben', cols:2, gens:[() => { const k = fresh(LAUT_SHORT); return T_('schreibe', 'Schreibe das Wort.', `${iconP(k, 22)}${lineW()}`, k); }]},
@@ -7263,7 +7272,7 @@ const H_SHEETS = {
   ]},
   HM: {name:'Material: Hundertertafel (ausgefüllt)', cols:1, max:1, mat:true, gens:[() => T_('lies', 'Hundertertafel 1 bis 100', hbP({}, 16.2), '–')]},
   HL: {name:'Material: leere Hundertertafel', cols:1, max:1, mat:true, gens:[() => { const show = {1:'num', 100:'num'}; return T_('schreibe', 'Trage die Zahlen von 1 bis 100 ein.', hbP({def:'blank', show}, 16.2), '1 bis 100'); }]},
-  HT: {name:'Material: Tausenderbuch-Seite', cols:1, max:1, mat:true, gens:[() => { const p = rnd(1, 9); return T_('lies', `Tausenderbuch, Seite ${hPageName(p)}`, hbP({page:p}, 16.2), hPageName(p)); }]}
+  HT: {name:'Material: Tausenderbuch-Seite', cols:1, max:1, mat:true, gens:[() => { const q = app.sheet.htp, p = q === 'rnd' || q == null || q === 'all' ? rnd(1, 9) : +q; return T_('lies', `Tausenderbuch, Seite ${hPageName(p)}`, hbP({page:p}, 16.2), hPageName(p)); }]}
 };
 /* =====================================================================
    Legeblätter: Blätter in Originalgröße, auf die echtes Material gelegt wird
@@ -7461,7 +7470,7 @@ function legeSheet(key){
   app.sheetGen = null;
   return {title: b.title, n: b.sols.length, lege: true, quer: b.quer, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(b.title)}</title><style>${SHEET_CSS}</style></head><body>${page}${sol}</body></html>`};
 }
-const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:A4;margin:12mm}*{box-sizing:border-box}body{font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,Arial,sans-serif;color:#222;margin:0;font-size:13pt}
+const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:A4;margin:12mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,Arial,sans-serif;color:#222;margin:0;font-size:13pt}
 .page{width:186mm;margin:0 auto;page-break-after:always}.page:last-child{page-break-after:auto}
 .ab-top{border-bottom:2.5px solid #222;padding-bottom:2.5mm;margin-bottom:3mm}.ab-top h1{font-size:20pt;margin:0 0 3mm;line-height:1.15}
 .ab-meta{display:grid;grid-template-columns:2fr 1fr;gap:8mm;font-size:11pt}.ab-meta div{display:flex;gap:2mm;align-items:flex-end}.ab-meta span{flex:1;border-bottom:1.2px solid #444;min-height:6mm;font-weight:700;padding-left:1mm}
@@ -7481,7 +7490,7 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .ab-ic{display:inline-block;vertical-align:middle}.ab-ic svg{width:100%;height:auto;display:block}
 .ab-pw{display:flex;align-items:center;gap:4mm;justify-content:center}
 .ab-word{font-size:24pt;font-weight:700;letter-spacing:1px;text-align:center;margin:0}.ab-sent{font-size:17pt;font-weight:600;margin:0;text-align:center}.ab-text{font-size:14pt;line-height:1.6;margin:0 0 1mm;padding:2mm 3mm;background:#f6f6f6;border-radius:2mm;align-self:stretch}
-.dc-bon{font-family:Menlo,Consolas,monospace;font-size:11pt;border-top:1px dashed #555;border-bottom:1px dashed #555;padding:1.5mm 0;max-width:80mm}.dc-bon>div{display:flex;justify-content:space-between}.dc-bon .dc-bon-sum{font-weight:700;border-top:1px solid #333}.dc-offer{display:inline-flex;flex-direction:column;border:2px solid #333;border-radius:3mm;padding:2mm 4mm}.dc-offer b{font-size:14pt}.dc-old{text-decoration:line-through}.dc-new{font-size:16pt;font-weight:700}.dc-tag{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #333;border-radius:2mm;padding:2mm 6mm}.dc-tag b{font-size:16pt}.ab-trace{font-family:Stufenfibel,'Atkinson Hyperlegible',Verdana,Arial,sans-serif;font-size:30pt;letter-spacing:2pt;color:#fff;-webkit-text-stroke:.7pt #888;margin:1mm 0 2mm;align-self:flex-start}.ab-q{align-self:stretch;font-size:12.5pt}.ab-q div{display:flex;gap:6mm;flex-wrap:wrap;margin-top:1mm}.ab-doc{align-self:stretch;font-size:13pt;line-height:1.5;border:1px solid #bbb;border-radius:2mm;padding:3mm 4mm}.ab-doc .dc-g{font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;color:#555}.ab-doc .dc-h{font-size:14pt;margin:1mm 0 2mm}.ab-doc .dc-p{margin:0 0 1.6mm}.ab-doc .dc-pn{display:inline-block;width:5mm;font-size:9pt;font-weight:700;color:#777}.ab-doc .dc-head{font-size:10pt;color:#555;margin:0 0 2mm}.dc-t{border-collapse:collapse;width:100%;font-size:11.5pt}.dc-t th,.dc-t td{border:1px solid #999;padding:1.2mm 2mm;text-align:left;vertical-align:top}.dc-t thead th{background:#eee}.dc-note{font-size:10.5pt;margin:1.5mm 0 0}.dc-veg{display:inline-block;border:1px solid #333;border-radius:50%;width:5mm;text-align:center;font-size:8pt;font-weight:700}.dc-msg{border:1px solid #bbb;border-radius:3mm;padding:1mm 3mm;margin:1.2mm 0;max-width:85%}.dc-msg.me{margin-left:auto;background:#f2f2f2}.dc-msg b{display:block;font-size:9pt;color:#555}.dc-rec{display:grid;grid-template-columns:1fr 1.6fr;gap:4mm}.cal{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12pt}.cal th{font-size:10pt;padding:1mm 0}.cal td{border:1px solid #999;height:10mm;vertical-align:top;padding:1mm}.cal td.cal-x{border:none}.cal td.cal-we{background:#eee}.cal .cal-d{font-weight:700}.cal .cal-t{display:block;font-size:8pt;line-height:1.1;border:1px solid #333;border-radius:1mm;padding:0 1mm;margin-top:1mm}.dc-rec ul,.dc-rec ol{margin:1mm 0 0;padding-left:5mm}
+.dc-bon{font-family:Menlo,Consolas,monospace;font-size:11pt;border-top:1px dashed #555;border-bottom:1px dashed #555;padding:1.5mm 0;max-width:80mm}.dc-bon>div{display:flex;justify-content:space-between}.dc-bon .dc-bon-sum{font-weight:700;border-top:1px solid #333}.dc-offer{display:inline-flex;flex-direction:column;border:2px solid #333;border-radius:3mm;padding:2mm 4mm}.dc-offer b{font-size:14pt}.dc-old{text-decoration:line-through}.dc-new{font-size:16pt;font-weight:700}.dc-tag{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #333;border-radius:2mm;padding:2mm 6mm}.dc-tag b{font-size:16pt}.ab-trace{display:block;margin:1mm 0 2mm;align-self:flex-start;max-width:100%;height:auto;overflow:visible}.ab-q{align-self:stretch;font-size:12.5pt}.ab-q div{display:flex;gap:6mm;flex-wrap:wrap;margin-top:1mm}.ab-doc{align-self:stretch;font-size:13pt;line-height:1.5;border:1px solid #bbb;border-radius:2mm;padding:3mm 4mm}.ab-doc .dc-g{font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;color:#555}.ab-doc .dc-h{font-size:14pt;margin:1mm 0 2mm}.ab-doc .dc-p{margin:0 0 1.6mm}.ab-doc .dc-pn{display:inline-block;width:5mm;font-size:9pt;font-weight:700;color:#777}.ab-doc .dc-head{font-size:10pt;color:#555;margin:0 0 2mm}.dc-t{border-collapse:collapse;width:100%;font-size:11.5pt}.dc-t th,.dc-t td{border:1px solid #999;padding:1.2mm 2mm;text-align:left;vertical-align:top}.dc-t thead th{background:#eee}.dc-note{font-size:10.5pt;margin:1.5mm 0 0}.dc-veg{display:inline-block;border:1px solid #333;border-radius:50%;width:5mm;text-align:center;font-size:8pt;font-weight:700}.dc-msg{border:1px solid #bbb;border-radius:3mm;padding:1mm 3mm;margin:1.2mm 0;max-width:85%}.dc-msg.me{margin-left:auto;background:#f2f2f2}.dc-msg b{display:block;font-size:9pt;color:#555}.dc-rec{display:grid;grid-template-columns:1fr 1.6fr;gap:4mm}.cal{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12pt}.cal th{font-size:10pt;padding:1mm 0}.cal td{border:1px solid #999;height:10mm;vertical-align:top;padding:1mm}.cal td.cal-x{border:none}.cal td.cal-we{background:#eee}.cal .cal-d{font-weight:700}.cal .cal-t{display:block;font-size:8pt;line-height:1.1;border:1px solid #333;border-radius:1mm;padding:0 1mm;margin-top:1mm}.dc-rec ul,.dc-rec ol{margin:1mm 0 0;padding-left:5mm}
 .ab-wline{height:13mm;border-bottom:1.5px solid #444;background:linear-gradient(#fff 0 60%, #ddd 60% 62%, #fff 62%);align-self:stretch}.ab-gap{display:inline-block;width:14mm;border-bottom:2px solid #222;margin:0 1mm}.ab-syl{text-align:center;font-size:16pt;color:#888;margin:0;letter-spacing:3mm}
 .ab-card{display:inline-block;border:1.4px solid #333;border-radius:2mm;padding:1mm 3mm;font-size:15pt}.ab-sign{display:inline-block;border:2px solid #222;border-radius:2mm;padding:2mm 4mm;font-weight:700;font-size:15pt;letter-spacing:1px}.ab-sign.lc{letter-spacing:.3px;font-size:16pt}
 .ab-match{display:grid;grid-template-columns:1fr 34mm 1fr;align-items:center;row-gap:4.5mm;align-self:stretch}.ab-match .l,.ab-match .r{display:flex;align-items:center;gap:3mm}.ab-match .l{justify-content:flex-start}.ab-match .r{justify-content:flex-end}.ab-dot{width:3mm;height:3mm;border-radius:50%;background:#222;display:inline-block}
@@ -7518,9 +7527,15 @@ function zoneToSheet(key){
   if(ax === 'R') return a === 'R7' ? {topic:'M:einmaleins'} : {topic:'M:plus', zr: R_CONF[a].range, ue: ({without:'ohne', with:'mit'})[R_CONF[a].ten] || 'egal'};
   return null;
 }
-app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false};
+app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all'};
 function buildSheet(limit){
-  const S0 = app.sheet; app.sheetKid = S0.pid && S0.pid !== 'none' ? kids().find(p => p.id === S0.pid) || null : null;
+  const S0 = app.sheet;
+  if(S0.topic === 'H:HT' && S0.htp === 'all'){ /* ganzes Tausenderbuch: 10 Seiten von 1–100 bis 901–1000 */
+    let doc, pages = '';
+    try { for(let p = 0; p < 10; p++){ S0.htp = String(p); doc = buildSheet(); pages += doc.html.match(/<div class="page">[^]*?(?=<div class="page sol">|<\/body>)/)[0]; } } finally { S0.htp = 'all'; }
+    app.sheetGen = null;
+    return {title:'Tausenderbuch (10 Seiten)', n:10, html: doc.html.replace(/<title>[^<]*<\/title>/, '<title>Tausenderbuch</title>').replace(/<body>[^]*<\/body>/, `<body>${pages}</body>`)};
+  } app.sheetKid = S0.pid && S0.pid !== 'none' ? kids().find(p => p.id === S0.pid) || null : null;
   try { return buildSheet0(limit); } finally { app.sheetKid = null; }
 }
 function buildSheet0(limit){
@@ -7529,7 +7544,7 @@ function buildSheet0(limit){
   const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : sj === 'H' ? H_SHEETS[key] : W_SHEETS[key];
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : ['einmaleins', 'stellenwert'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
-  const title = (key === 'schriftlich' ? (S.wop === 'add' ? 'Schriftlich plus' : S.wop === 'sub' ? 'Schriftlich minus' : def.name) : def.name) + sub;
+  const title = sj === 'H' && key === 'HT' && /^\d$/.test(S.htp) ? `Tausenderbuch: Seite ${hPageName(+S.htp)}` : (key === 'schriftlich' ? (S.wop === 'add' ? 'Schriftlich plus' : S.wop === 'sub' ? 'Schriftlich minus' : def.name) : def.name) + sub;
   const fill = S.n === 'fill', cols = def.match ? 1 : (typeof def.cols === 'function' ? def.cols(S) : def.cols || 2);
   if(limit == null){
     FRESH.used = new Set();
@@ -7557,7 +7572,7 @@ function buildSheet0(limit){
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
   const info = sj === 'L' ? L_INFO[key] : sj === 'W' ? W_INFO[key] : sj === 'U' ? U_INFO[key] : sj === 'G' ? G_INFO[key] : sj === 'H' ? H_INFO[key] : null;
   const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
-  const sol = S.sol ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
+  const sol = S.sol && !def.mat ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
   return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}</style></head><body><div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`};
 }
 /* Blatt füllen: in der Vorschau messen, wie viele volle Reihen auf die erste Seite passen */
@@ -7598,9 +7613,8 @@ const LOGO_SVG = '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="26"
 /* aktuelles Blatt als Heftseite übernehmen: genau diese Aufgaben, ohne Name/Datum, ohne Lösungen */
 function heftAdd(){
   const doc = app.sheetDoc; if(!doc) return;
-  const d = new DOMParser().parseFromString(doc.html, 'text/html'), pg = d.querySelector('.page'); if(!pg) return;
-  pg.querySelector('.ab-meta')?.remove();
-  app.heft.items.push({title: doc.title, html: pg.innerHTML, cls: pg.className.replace(/^page\s*/, '')});
+  const d = new DOMParser().parseFromString(doc.html, 'text/html'), pgs = [...d.querySelectorAll('.page:not(.sol)')]; if(!pgs.length) return;
+  for(const pg of pgs){ pg.querySelector('.ab-meta')?.remove(); app.heft.items.push({title: pgs.length > 1 ? (pg.querySelector('h1')?.textContent || doc.title) : doc.title, html: pg.innerHTML, cls: pg.className.replace(/^page\s*/, '')}); }
   saveHeft(); toast(`Ins Arbeitsheft übernommen – jetzt ${app.heft.items.length} ${app.heft.items.length === 1 ? 'Seite' : 'Seiten'}.`);
   renderSheets(true);
 }
@@ -7673,6 +7687,8 @@ function renderSheets(keep){
       ${LD.ue && ['plus', 'minus'].includes(lkt) ? `<label class="row">Zehnerübergang ${sel('sh-ue', [['egal', 'gemischt'], ['ohne', 'ohne'], ['mit', 'mit']], S.ue)}</label>` : ''}
       ${key === 'buchst' ? `<label class="row">Buchstaben ${sel('sh-bcase', [['mixed', 'groß und klein'], ['low', 'nur klein'], ['up', 'nur groß']], S.bcase || 'mixed')}</label>` : ''}
       ${key !== 'buchst' && lkt !== 'none' ? `<label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>` : ''}`
+    : S.topic === 'H:HT' ? `<label class="row">Seite ${sel('sh-htp', [['all', 'ganzes Tausenderbuch (10 Seiten)'], ...Array.from({length:10}, (_, p) => [String(p), hPageName(p)]), ['rnd', 'zufällige Seite']], S.htp ?? 'all')}</label>`
+    : /^H:H[ML]$/.test(S.topic) ? ''
     : `<label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
@@ -7718,6 +7734,7 @@ function sheetChange(e){
   if(t.id === 'sh-lzr') S.zr = +t.value;
   if(t.id === 'sh-kt') S.kt = t.value;
   if(t.id === 'sh-bcase') S.bcase = t.value;
+  if(t.id === 'sh-htp') S.htp = t.value;
   renderSheets();
 }
 
@@ -8144,7 +8161,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.18.0 · 15.11.2026';
+const APP_VERSION = '0.18.1 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
