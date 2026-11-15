@@ -37,21 +37,23 @@ async def main():
             const d=new DOMParser().parseFromString(buildSheet().html,'text/html'); const sols=[...d.querySelectorAll('.sol li')].map(l=>l.textContent);
             [...d.querySelectorAll('.ab-task')].forEach((x,i)=>{ const rows=[...x.querySelectorAll('.ab-row')].map(r=>r.textContent.replace(/\\s+/g,' ').trim());
               const want=rows.map(r=>{let m; if(m=r.match(/^(\\d+) \\+ = 10$/)) return 10-m[1]; if(m=r.match(/^\\+ (\\d+) = 10$/)) return 10-m[1]; if(m=r.match(/^10 = (\\d+) \\+$/)) return 10-m[1]; if(m=r.match(/^10 − (\\d+) =$/)) return 10-m[1]; if(m=r.match(/^(\\d+)→/)) return 10-m[1]; return 'X'+r;});
-              const got=String(sols[i]).split('; ').map(Number); if(want.join()!==got.join()) out.push(rows.join('|')+' = '+sols[i]);
-              const o=x.querySelectorAll('.ab-opt'); if(o.length && ![...o].some(e=>+e.textContent===got[0])) out.push('Partner fehlt in Auswahl: '+rows);});}
+              const got=String(sols[i]).split('; ').map(Number);
+              const mt=x.querySelector('.ab-match'); if(mt){ const L=[...mt.querySelectorAll('.l')].map(e=>+e.textContent), R=[...mt.querySelectorAll('.r')].map(e=>+e.textContent);
+                if(L.length!==3 || L.some(l=>!R.includes(10-l)) || String(sols[i])!==L.map(l=>l+' – '+(10-l)).join('; ')) out.push('Verbinden falsch: '+L+' / '+R+' = '+sols[i]); return; }
+              if(want.join()!==got.join()) out.push(rows.join('|')+' = '+sols[i]);});}
             return out}""")
         print('Zehnerpartner falsch:', bad[:5])
         if bad: errs.append(f'Zehnerpartner: {len(bad)} falsch')
 
-        # 4. Über die 10: Zerlegung stimmt, Beispiel ausgefüllt, nur das erste
+        # 4. Über die 10: Zerlegung stimmt, Beispiel ausgefüllt: je Rechenart genau die erste Aufgabe
         bad = await pg.evaluate("""()=>{const out=[];for(const wop of ['add','sub','both'])for(let k=0;k<20;k++){Object.assign(app.sheet,{topic:'M:ueber10',wop,draw:false,mat:true,n:8,sol:true});
-            const d=new DOMParser().parseFromString(buildSheet().html,'text/html'); const ts=[...d.querySelectorAll('.ab-task')];
+            const d=new DOMParser().parseFromString(buildSheet().html,'text/html'); const ts=[...d.querySelectorAll('.ab-task')]; const seenOp=new Set();
             ts.forEach((x,i)=>{const sp=[...x.querySelector('.ab-ast').children].filter(c=>c.tagName!=='svg').map(c=>c.textContent.trim());
               const [a,o,bb]=[+sp[0],sp[1],+sp[2]]; const ex=x.querySelectorAll('.bsp').length;
-              if(i===0 && ex!==4) out.push('Beispiel nicht ausgefüllt'); if(i>0 && ex) out.push('Beispiel doppelt');
+              const firstOp=!seenOp.has(o); seenOp.add(o); if(firstOp && ex!==4) out.push('Beispiel nicht ausgefüllt'); if(!firstOp && ex) out.push('Beispiel doppelt');
               if(o==='+' && !(a<10 && a+bb>10)) out.push('kein Übergang '+a+o+bb); if(o==='−' && !(a>10 && a-bb<10)) out.push('kein Übergang '+a+o+bb);
               if(wop==='add'&&o!=='+'||wop==='sub'&&o!=='−') out.push('falsche Rechenart');
-              if(i===0){ const s=sp.slice(6).filter(v=>v!=='+'&&v!=='−'&&v!=='='); const [p,r,res]=s.map(Number); const ok=o==='+'?(a+p===10&&p+r===bb&&res===a+bb):(a-p===10&&p+r===bb&&res===a-bb); if(!ok) out.push('Beispiel falsch '+sp.join(' ')); }});}
+              if(ex){ const s=sp.slice(6).filter(v=>v!=='+'&&v!=='−'&&v!=='='); const [p,r,res]=s.map(Number); const ok=o==='+'?(a+p===10&&p+r===bb&&res===a+bb):(a-p===10&&p+r===bb&&res===a-bb); if(!ok) out.push('Beispiel falsch '+sp.join(' ')); }});}
             return out}""")
         print('Über die 10 falsch:', bad[:5])
         if bad: errs.append(f'Über die 10: {len(bad)} Fehler')
@@ -84,5 +86,26 @@ async def main():
         print('Auswahl Materialbilder', st, st2)
         if st != [True, True] or st2[0]: errs.append(f'Auswahl Materialbilder: {st} {st2}')
         await pg.evaluate("app.sheet.mat=true; app.sheet.draw=false")
+
+        # 8. Einstellungen bleiben nach dem Neuladen
+        await pg.evaluate("app.sheet.topic='M:minus'; renderSheets()"); await pg.wait_for_timeout(300)
+        await pg.check('#sh-gross'); await pg.select_option('#sh-matm', 'zeichnen'); await pg.wait_for_timeout(300)
+        await pg.reload(); await pg.wait_for_timeout(600)
+        st = await pg.evaluate("[app.sheet.topic, app.sheet.gross, app.sheet.draw, app.sheet.pid]")
+        print('nach Neuladen', st)
+        if st[:3] != ['M:minus', True, True]: errs.append(f'Einstellungen nicht gemerkt: {st}')
+        await pg.evaluate("localStorage.removeItem('stufenweise.blatt')")
+
+        # 9. Förderzone R3: Chips Zehnerpartner und Rechnen über die 10
+        await pg.evaluate("""(()=>{const p={id:'p_z',name:'Ida',created:Date.now()};data.profiles.push(p);selectProfile(p.id);
+            for(const [k,s] of [['R|R2','erreicht'],['R|R3','nicht'],['Z|Z1','erreicht'],['Z|Z2','erreicht'],['Z|Z3','nicht']]) setCell(p.id,k,{status:s,quelle:'test',sum:'x'}); inferCells(p.id,'M'); openSheets('p_z');})()""")
+        await pg.wait_for_timeout(500)
+        chips = await pg.evaluate("[...document.querySelectorAll('.sh-zones button')].map(b=>[b.textContent, b.dataset.shtopic || zoneToSheet(b.dataset.shzone).topic])")
+        print('Chips', chips)
+        tops = [c[1] for c in chips]
+        for want in ['M:zehnerpartner', 'M:ueber10']:
+            if tops.count(want) != 1: errs.append(f'Chip {want}: {tops.count(want)}-mal')
+        await pg.click('.sh-zones [data-shtopic="M:zehnerpartner"]'); await pg.wait_for_timeout(300)
+        if await pg.evaluate("app.sheet.topic") != 'M:zehnerpartner': errs.append('Chip wirkt nicht')
         print('ERR', errs); await b.close()
 asyncio.run(main())

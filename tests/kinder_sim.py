@@ -6,6 +6,8 @@ def math_skill(maxlvl_by_zr, smax, umax=2, rmax=0):
     def f(key):
         p=key.split('|')
         if p[0]=='R': return int(p[1][1]) <= rmax
+        if p[0]=='Z': return int(p[1][1]) <= max(1, rmax)
+        if p[0]=='H': return int(p[1][1]) <= smax + 1
         if p[0]=='G': return False
         if p[0]=='U': return int(p[1][1]) <= umax
         if p[0]=='M': return NL.index(p[2]) < maxlvl_by_zr.get(int(p[1]),0)
@@ -58,6 +60,14 @@ async def answer(pg, correct):
         await pg.evaluate(f"app.diag.resp={{guess:{int(v)}}}"); await pg.click('#d-next')
     elif t=='money':
         await pg.evaluate("(c)=>{const it=app.diag.items[app.diag.idx];let r=it.target,out=[];for(const d of it.denoms){while(r>=d){out.push(d);r-=d;}} if(!c) out.push(it.denoms[it.denoms.length-1]); app.diag.resp={items:out}}", correct); await pg.click('#d-next')
+    elif t=='board':
+        mode = await pg.evaluate("app.diag.items[app.diag.idx].mode")
+        if mode=='fill':
+            ins = pg.locator('#stage .dg-in, #controls .dg-in'); n = await ins.count()
+            for i,v in enumerate(it['fields']): await ins.nth(i).fill(str(v if correct else v+1))
+        else:
+            await pg.evaluate("(c)=>{const it=app.diag.items[app.diag.idx]; if(it.mode==='tap') app.diag.resp={sel:c?it.target:(it.target%100)+1}; else app.diag.resp={set:c?[...it.set]:[it.set[0]]};}", correct)
+        await pg.click('#d-next')
     elif t=='build':
         await pg.evaluate("(c)=>{const it=app.diag.items[app.diag.idx]; const ok=(Z,E)=>it.exact?(Z===it.exact[0]&&E===it.exact[1]):Z*10+E===it.target; let m=[0,0]; outer: for(let z=0;z<=10;z++)for(let e=0;e<=30;e++){ if(ok(z,e)===c){m=[z,e];break outer;} } app.diag.resp={mat:m}}", correct); await pg.click('#d-next')
     return it

@@ -126,7 +126,7 @@ Unter **Zehnerpartner** (in der Leiste links nach Minus) üben die Kinder die Za
 - **im Kopf:** 7 + ☐ = 10, ☐ + 4 = 10, 10 − 6 = ☐ oder den passenden Partner antippen.
 - **über 10:** schrittweise über die 10 rechnen, zum Beispiel 8 + 5 = 8 + ☐ + ☐ = ☐ (erst bis 10, dann weiter), mit Zwanzigerfeld. Auch mit Minus: 13 − 5 = 13 − ☐ − ☐ = ☐.
 
-Die Zehnerpartner haben keine eigene Zeile im Lernstand. In der Statistik und der Wochenübersicht erscheinen sie als eigener Bereich. In der geführten Oberfläche sind sie sichtbar, solange Plus bis 10 oder bis 20 dran ist.
+Die Zehnerpartner haben im Lernstand eine eigene Zeile (Z1–Z3). Im Mathe-Test (Teil 1) werden sie geprüft, solange der Zehnerübergang bis 20 (R3) noch nicht sicher ist. Wer R3 schon kann, bekommt die Zehnerpartner als „abgeleitet erreicht“. Eine Förderzone bei den Zehnerpartnern führt in der Übung und bei den Arbeitsblättern direkt zur passenden Stufe. In der geführten Oberfläche sind sie sichtbar, wenn sie zur Förderzone gehören (vor dem ersten Test: solange Plus bis 10 oder bis 20 dran ist).
 
 ### Zwanzigerfeld beim Üben
 
@@ -199,13 +199,15 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 3. Bei Bedarf Thema, Zahlenraum und Material anpassen. Bei „Aufgaben“ füllt „Blatt füllen“ die Seite mit vollen Reihen; du kannst auch eine feste Zahl wählen. Rechts siehst du die Vorschau.
 4. **Drucken** tippen. „Lösungsblatt anhängen“ legt eine Seite mit den Lösungen dazu.
 
-**Materialbilder:** Bei Plus, Minus, Ergänzen, Einmaleins, Zehnerpartnern und „Rechnen über die 10“ wählst du „bei allen Aufgaben“, „1. Aufgabe vorgegeben, dann selbst zeichnen“ oder „ohne“. Beim Zeichnen zeigt die erste Aufgabe das Bild als Beispiel, bei Zahlen ab 20 in der Kurzschreibweise (| Zehner, • Einer). Die weiteren Aufgaben haben ein leeres Zwanzigerfeld oder ein Zeichenfeld.
+**Materialbilder:** Bei Plus, Minus, Ergänzen, Einmaleins, Zehnerpartnern und „Rechnen über die 10“ wählst du „bei allen Aufgaben“, „1. Aufgabe vorgegeben, dann selbst zeichnen“ oder „ohne“. Beim Zeichnen zeigt die erste Aufgabe das Bild als Beispiel, bei Zahlen ab 20 in der Kurzschreibweise (| Zehner, • Einer). Die weiteren Aufgaben haben ein leeres Zwanzigerfeld (bei Plus und Minus immer mit 20 Feldern, auch bis 10) oder ein Zeichenfeld.
 
 **Geld zählen:** Wähle „nur Euro“, „Euro und Cent“ (10-, 20- und 50-Cent-Münzen) oder „auf den Cent“ (auch 1, 2 und 5 Cent), wie beim Üben.
 
 **Einmaleins:** Unter „Reihen“ kreuzt du an, welche Reihen auf dem Blatt vorkommen. Die Auswahl steht auch in der Überschrift, zum Beispiel „Einmaleins: 3er- und 7er-Reihe“.
 
-**Zehnerpartner und Rechnen über die 10:** Zwei Blätter zum Zehnerübergang. „Zehnerpartner“ hat Aufgaben am Zehnerfeld (4 + ☐ = 10), ohne Bild (☐ + 9 = 10, 10 = 7 + ☐, 10 − 8 = ☐) und zum Einkreisen des Partners. „Rechnen über die 10“ zeigt den Rechenweg mit einem Zerlegungsast: 7 + 8 = ☐, darunter 7 + ☐ + ☐ = ☐. Die erste Aufgabe ist als Beispiel grau ausgefüllt. Unter „Rechenart“ wählst du Plus, Minus oder gemischt.
+**Zehnerpartner und Rechnen über die 10:** Zwei Blätter zum Zehnerübergang. „Zehnerpartner“ hat Aufgaben am Zehnerfeld (4 + ☐ = 10), ohne Bild (☐ + 9 = 10, 10 = 7 + ☐, 10 − 8 = ☐) und zum Verbinden der Partner. „Rechnen über die 10“ zeigt den Rechenweg mit einem Zerlegungsast: 7 + 8 = ☐, darunter 7 + ☐ + ☐ = ☐. Die erste Plus- und die erste Minus-Aufgabe sind als Beispiel grau ausgefüllt. Unter „Rechenart“ wählst du Plus, Minus oder gemischt. Bei den Förderzonen R1 bis R3 stehen beide Blätter auch unter „Passend zur Förderzone“.
+
+**Einstellungen bleiben:** Thema, Zahlenraum, große Aufgaben, Materialbilder und die anderen Einstellungen merkt sich das Gerät bis zum nächsten Mal. Das Kind wählst du jedes Mal neu.
 
 **Große Aufgaben:** Mit dem Häkchen „Große Aufgaben“ werden Zahlen, Schreibkästchen und Bilder etwa ein Drittel größer, dafür passen weniger Aufgaben auf das Blatt. Das hilft Kindern, die mehr Platz zum Schreiben, Streichen und Zeigen brauchen. Die Einstellung gilt auch, wenn du das Blatt ins Arbeitsheft übernimmst.
 

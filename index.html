@@ -1011,7 +1011,6 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 <dialog id="dlg-help" aria-labelledby="help-title">
   <div class="dlg-head"><h2 id="help-title">So geht Stufenweise</h2><button data-close class="icon-btn">Schließen</button></div>
   <div id="help-content"></div>
-  <p class="help-note">Gemeinsam ausprobieren: Lege dieselbe Menge auch mit echtem Material. Beim Umtauschen bleibt die Menge gleich.</p>
 </dialog>
 
 <script>
@@ -1354,8 +1353,8 @@ function guideOf(subj){
     if(!axHas('M')){ MATH_RAIL.forEach(x => modes.add(x)); RANGES.forEach(r => zrs.add(r)); }
     g.modes = modes; g.zrs = zrs;
   }
-  g.lvlOk = l => { const ax = l[0]; if(l === 'LX' || l === 'WX') return true; if(ax === 'Z') return gm !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20)); if(!axHas(ax)) return gm !== 'zone'; return allow.has(`${ax}|${l}`); };
-  g.first = ax => { const lv = {L:L_LEVELS, W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS}[ax]; return lv.find(l => g.zones.has(`${ax}|${l}`)) || [...lv].reverse().find(l => g.lvlOk(l)) || lv[0]; };
+  g.lvlOk = l => { const ax = l[0]; if(l === 'LX' || l === 'WX') return true; if(ax === 'Z' && !axHas('Z')) return gm !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20)); if(!axHas(ax)) return gm !== 'zone'; return allow.has(`${ax}|${l}`); };
+  g.first = ax => { const lv = {L:L_LEVELS, W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS}[ax]; return lv.find(l => g.zones.has(`${ax}|${l}`)) || [...lv].reverse().find(l => g.lvlOk(l)) || lv[0]; };
   g.axVisible = ax => !axHas(ax) ? gm !== 'zone' : [...allow].some(k => k.startsWith(ax + '|'));
   return g;
 }
@@ -1363,7 +1362,7 @@ const guideOn = () => !!guideOf(settings.subject);
 /* Nächste offene Stufe je Bereich, wenn dort keine Förderzone (mehr) besteht – z. B. nach einem bestandenen Kurztest */
 function frontierKeys(pid, subj){
   const m = matrixOf(pid), out = [], zones = new Set((subj === 'M' ? ['M'] : ['L', 'W']).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)));
-  const axes = subj === 'M' ? [['R', R_LEVELS], ['U', U_LEVELS], ['G', G_LEVELS], ['H', H_LEVELS]] : [['L', L_LEVELS], ['W', W_LEVELS]];
+  const axes = subj === 'M' ? [['R', R_LEVELS], ['Z', Z_LEVELS], ['U', U_LEVELS], ['G', G_LEVELS], ['H', H_LEVELS]] : [['L', L_LEVELS], ['W', W_LEVELS]];
   for(const [ax, lv] of axes){ const ks = lv.map(l => `${ax}|${l}`); if(!ks.some(k => m[k]) || ks.some(k => zones.has(k))) continue; const f = ks.find(k => m[k]?.status !== 'erreicht'); if(f) out.push(f); }
   if(subj === 'M' && Object.keys(m).some(k => k.startsWith('M|')) && ![...zones].some(k => k.startsWith('M|'))){ const f = ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)).find(k => m[k]?.status !== 'erreicht'); if(f) out.push(f); }
   return out;
@@ -1454,8 +1453,8 @@ function railHtml(){
   if(fy) h += `<button data-foryou class="foryou" title="${escHtml(fy.info.offer.text)}"><b aria-hidden="true">★</b>Für dich</button>`;
   const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l);
   const tafelBtn = !g || g.axVisible('H') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1'}" data-board="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'H'}"><b aria-hidden="true">${TAFEL_SYM}</b>Tafel</button>` : '';
-  const zVis = subj === 'M' && (!g || g.mode !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20)));
-  const zBtn = zVis ? `<button data-mode="read" data-lvl="${app.read.zlvl || 'Z1'}" data-tenpair="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'Z'}"><b aria-hidden="true">${ZP_SYM}</b>Zehner&shy;partner</button>` : '';
+  const zVis = subj === 'M' && (!g || (g.axHas('Z') ? g.axVisible('Z') : g.mode !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20))));
+  const zBtn = zVis ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.zlvl || 'Z1') ? g.first('Z') : app.read.zlvl || 'Z1'}" data-tenpair="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'Z'}"><b aria-hidden="true">${ZP_SYM}</b>Zehner&shy;partner</button>` : '';
   if(subj === 'M') h += MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '') + (k === 'sub' ? zBtn : '')).join('') + (g && !g.modes.has('sub') ? zBtn : '') + (g && !g.modes.has('number') ? tafelBtn : '')
     + (!g || g.axVisible('U') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1'}" data-clock="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'U'}"><b aria-hidden="true">◷</b>Uhr</button>` : '')
     + (!g || g.axVisible('G') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1'}" data-size="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'G'}"><b aria-hidden="true">⚖</b>Größen</button>` : '');
@@ -3714,7 +3713,7 @@ function classHtml(){
 }
 /* Klassenübersicht als CSV (Semikolon, UTF-8 mit BOM – öffnet direkt in Excel und Numbers) */
 function classCsv(){
-  const keys = [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l), ...L_LEVELS.map(l => 'L|' + l), ...W_LEVELS.map(l => 'W|' + l)];
+  const keys = [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l), ...Z_LEVELS.map(l => 'Z|' + l), ...L_LEVELS.map(l => 'L|' + l), ...W_LEVELS.map(l => 'W|' + l)];
   const q = v => { const t = String(v ?? ''); return /[;"\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
   const zone = (pid, subj) => zoneReport(pid, subj).zones.map(z => cellLabel(z.key)).join(', ');
   const st = c => !c ? '' : c.status === 'erreicht' ? (c.quelle === 'abgeleitet' ? 'erreicht (abgeleitet)' : 'erreicht') : c.status;
@@ -4684,6 +4683,7 @@ function cellInfo(key){
   if(ax === 'G') return {...G_INFO[a], short:a, place:'Größen'};
   if(ax === 'H') return {...H_INFO[a], short:a, place: a === 'H7' ? 'Tausenderbuch' : 'Hundertertafel'};
   if(ax === 'R') return {...R_INFO[a], short:a, place:'Rechnen'};
+  if(ax === 'Z') return {...Z_INFO[a], short:a, place:'Zehnerpartner'};
   return {...L_INFO[a], short:a, place: ax === 'L' ? 'Lesen' : 'Hören'};
 }
 function itemsFor(key){
@@ -4696,9 +4696,10 @@ function itemsFor(key){
   if(ax === 'G') return G_ITEMS[a];
   if(ax === 'H') return H_ITEMS[a];
   if(ax === 'R') return R_ITEMS[a];
+  if(ax === 'Z') return Z_ITEMS[a];
   return PHON[a];
 }
-const cellLabel = key => { const [ax, a, b] = key.split('|'), i = cellInfo(key); return ax === 'M' ? `ZR ${a}, Niveau ${b} (${i.name})` : ax === 'S' ? `Stellenwert ${a} (${i.name})` : ax === 'U' ? `Uhrzeit ${a} (${i.name})` : ax === 'G' ? `Größen ${a} (${i.name})` : ax === 'H' ? `Hundertertafel ${a} (${i.name})` : ax === 'R' ? `Rechnen ${a} (${i.name})` : `${ax === 'L' ? 'Lesen' : ax === 'W' ? 'Schreiben' : 'Hören'} ${a} (${i.name})`; };
+const cellLabel = key => { const [ax, a, b] = key.split('|'), i = cellInfo(key); return ax === 'M' ? `ZR ${a}, Niveau ${b} (${i.name})` : ax === 'S' ? `Stellenwert ${a} (${i.name})` : ax === 'U' ? `Uhrzeit ${a} (${i.name})` : ax === 'G' ? `Größen ${a} (${i.name})` : ax === 'H' ? `Hundertertafel ${a} (${i.name})` : ax === 'R' ? `Rechnen ${a} (${i.name})` : ax === 'Z' ? `Zehnerpartner ${a} (${i.name})` : `${ax === 'L' ? 'Lesen' : ax === 'W' ? 'Schreiben' : 'Hören'} ${a} (${i.name})`; };
 
 /* =====================================================================
    Schreiben und Rechtschreibung W1–W6 (BP GENT Deutsch 2.1.2)
@@ -5062,14 +5063,14 @@ const G_SHEETS = {
 
 /* ---------- Hundertertafel und Tausenderbuch H1–H7 (BP GENT M 2.1.1.2 Zahldarstellungen) ---------- */
 const H_LEVELS = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'];
-/* Zehnerpartner (verliebte Zahlen): reine Übung ohne eigene Zeile im Lernstand. Grundlage für den Zehnerübergang (R3). */
+/* Zehnerpartner (verliebte Zahlen): eigene Zeile im Lernstand (Test Teil 1, solange R3 nicht erreicht ist). Grundlage für den Zehnerübergang (R3). */
 const Z_LEVELS = ['Z1', 'Z2', 'Z3'];
 const Z_INFO = {
-  Z1:{name:'Zehnerpartner am Zehnerfeld', short:'mit Feld', kann:'findet Zehnerpartner am Zehnerfeld', ziel:'sieht am Zehnerfeld sofort, wie viele bis 10 fehlen'},
-  Z2:{name:'Zehnerpartner im Kopf', short:'im Kopf', kann:'kennt die Zehnerpartner auswendig', ziel:'nennt zu jeder Zahl bis 10 den Partner ohne Abzählen (7 und 3, 6 und 4 …)'},
-  Z3:{name:'Über die 10 rechnen', short:'über 10', kann:'rechnet schrittweise über die 10 (8 + 5 = 8 + 2 + 3)', ziel:'nutzt die Zehnerpartner beim Zehnerübergang: erst bis 10, dann weiter'}
+  Z1:{name:'Zehnerpartner am Zehnerfeld', short:'mit Feld', kann:'findet Zehnerpartner am Zehnerfeld', ziel:'sieht am Zehnerfeld sofort, wie viele bis 10 fehlen', analog:'Eierkarton mit 10 Plätzen füllen; Zehnerpartner mit Fingern zeigen (7 Finger hoch, 3 unten)'},
+  Z2:{name:'Zehnerpartner im Kopf', short:'im Kopf', kann:'kennt die Zehnerpartner auswendig', ziel:'nennt zu jeder Zahl bis 10 den Partner ohne Abzählen (7 und 3, 6 und 4 …)', analog:'Partnerkarten-Memory (7 sucht 3); beim Einräumen von 10er-Packungen sagen, wie viele noch fehlen'},
+  Z3:{name:'Über die 10 rechnen', short:'über 10', kann:'rechnet schrittweise über die 10 (8 + 5 = 8 + 2 + 3)', ziel:'nutzt die Zehnerpartner beim Zehnerübergang: erst bis 10, dann weiter', analog:'Zwei 10er-Eierkartons: erst den ersten voll machen, dann im zweiten weiter; beim Bezahlen bis zum vollen Zehner ergänzen'}
 };
-for(const [k, v] of Object.entries(Z_INFO)){ v.offer = {text:`Zehnerpartner: ${v.name}`, set:{mode:'read', lvl:k}}; v.bp = 'BP GENT 2022, M 2.1.2 Operationen (Zahlzerlegung, Zehnerübergang)'; }
+for(const [k, v] of Object.entries(Z_INFO)){ v.offer = {text:`Zehnerpartner: ${v.name}`, set:{mode:'read', lvl:k}}; v.bp = 'BP GENT 2022, M 2.1.1.3 Operationen (Zahlzerlegung, Zehnerübergang)'; }
 const zOther = (p, n) => { const o = new Set([p]); for(const x of shuffle([p + 1, p - 1, n, p + 2, p - 2])) if(x >= 0 && x <= 10 && o.size < 3) o.add(x); return [...o].map(String); };
 const Z_ITEMS = {
   Z1: [
@@ -5330,6 +5331,8 @@ function inferCells(pid, subj){
     line(G_LEVELS.map(l => `G|${l}`));
     line(H_LEVELS.map(l => `H|${l}`));
     line(R_LEVELS.slice(0, 6).map(l => `R|${l}`));
+    line(Z_LEVELS.map(l => `Z|${l}`));
+    if(['R|R3', 'R|R4', 'R|R5', 'R|R6'].some(k => isOk(m[k]?.status) && m[k].quelle !== 'abgeleitet')) Z_LEVELS.forEach(l => put(`Z|${l}`));
   } else if(subj === 'W') line(W_LEVELS.map(l => `W|${l}`));
   else { line(L_LEVELS.map(l => `L|${l}`)); line(P_LEVELS.map(l => `P|${l}`)); }
 }
@@ -5367,6 +5370,8 @@ function* mathPlan(d){
     const startR = highPass === null ? 0 : [0, 1, 3, 5][highPass];
     yield* binary(d, R_LEVELS.slice(0, 6).map(l => `R|${l}`), startR);
     if(['R|R4', 'R|R5', 'R|R6'].some(k => isOk(d.res[k]))) yield* tst(d, 'R|R7');
+    /* Zehnerpartner, solange der Zehnerübergang bis 20 noch nicht sicher ist */
+    if(!['R|R3', 'R|R4', 'R|R5', 'R|R6'].some(k => isOk(d.res[k]))) yield* binary(d, Z_LEVELS.map(l => `Z|${l}`), isOk(d.res['R|R1']) ? 1 : 0);
   }
   // 4. Stellenwert, sobald der Zahlenraum bis 20 sicher ist
   const iii = zr => ZR.filter(z => z >= zr).some(z => isOk(d.res[`M|${z}|III`]));
@@ -5400,6 +5405,7 @@ function* mathRePlan(d){
   yield* walkUp(d, G_LEVELS.map(l => `G|${l}`));
   yield* walkUp(d, H_LEVELS.map(l => `H|${l}`));
   yield* walkUp(d, R_LEVELS.slice(0, 6).map(l => `R|${l}`));
+  yield* walkUp(d, Z_LEVELS.map(l => `Z|${l}`));
 }
 function* binary(d, keys, start){
   let lo = -1, hi = keys.length, i = Math.max(0, Math.min(keys.length - 1, start));
@@ -5710,11 +5716,12 @@ function matrixHtml(pid, subj){
   if(subj === 'M') return `<div class="mx-scroll"><table class="mx-table"><thead><tr><th></th>${N_LEVELS.map(l => `<th title="${N_NAMES[l]}">${l}<small>${N_NAMES[l].split(' ')[0].replace('Mentaler', 'Zahlenstrahl')}</small></th>`).join('')}</tr></thead><tbody>
     ${ZR.map(zr => `<tr><th>ZR ${zr}</th>${N_LEVELS.map(l => cellChip(m, `M|${zr}|${l}`)).join('')}</tr>`).join('')}
     <tr class="mx-gap"><th>Rechnen</th>${R_LEVELS.map(l => cellChip(m, `R|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${R_LEVELS.map(l => `<td><small>${R_INFO[l].short}</small></td>`).join('')}</tr>
+    <tr class="mx-gap"><th>Zehnerpartner</th>${Z_LEVELS.map(l => cellChip(m, `Z|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${Z_LEVELS.map(l => `<td><small>${Z_INFO[l].short}</small></td>`).join('')}</tr>
     <tr class="mx-gap"><th>Stellenwert</th>${S_LEVELS.map(l => cellChip(m, `S|${l}`)).join('')}<td></td></tr><tr class="mx-sub"><th></th>${S_LEVELS.map(l => `<td><small>${l}</small></td>`).join('')}</tr>
     <tr class="mx-gap"><th>Uhr und Kalender</th>${U_LEVELS.map(l => cellChip(m, `U|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${U_LEVELS.map(l => `<td><small>${U_INFO[l].short}</small></td>`).join('')}</tr>
     <tr class="mx-gap"><th>Größen</th>${G_LEVELS.map(l => cellChip(m, `G|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${G_LEVELS.map(l => `<td><small>${G_INFO[l].short}</small></td>`).join('')}</tr>
     <tr class="mx-gap"><th>Hundertertafel</th>${H_LEVELS.map(l => cellChip(m, `H|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${H_LEVELS.map(l => `<td><small>${H_INFO[l].short}</small></td>`).join('')}</tr>
-  </tbody></table></div><p class="note mx-legend">Niveaus nach Fritz & Ricken, Zahlenräume nach Krajewski, Stellenwert S1–S4 nach Herzog, Ehlert & Fritz, Rechnen R1–R7 nach BP GENT M 2.1.1.3, Uhr und Kalender U1–U6 nach M 2.1.3.5, Größen G1–G4 nach M 2.1.3, Hundertertafel und Tausenderbuch H1–H7 nach M 2.1.1.2. ${legend}</p>`;
+  </tbody></table></div><p class="note mx-legend">Niveaus nach Fritz & Ricken, Zahlenräume nach Krajewski, Stellenwert S1–S4 nach Herzog, Ehlert & Fritz, Rechnen R1–R7 und Zehnerpartner Z1–Z3 nach BP GENT M 2.1.1.3, Uhr und Kalender U1–U6 nach M 2.1.3.5, Größen G1–G4 nach M 2.1.3, Hundertertafel und Tausenderbuch H1–H7 nach M 2.1.1.2. ${legend}</p>`;
   if(subj === 'W') return `<div class="mx-scroll"><table class="mx-table"><thead><tr><th></th>${W_LEVELS.map(l => `<th title="${W_INFO[l].name}">${l}<small>${W_INFO[l].short}</small></th>`).join('')}</tr></thead><tbody><tr><th>Schreiben</th>${W_LEVELS.map(l => cellChip(m, `W|${l}`)).join('')}</tr></tbody></table></div><p class="note mx-legend">Schreibstufen nach dem Bildungsplan GENT (Deutsch 2.1.2.4–2.1.2.7). Bis W4 zählt lautgetreues Schreiben als richtig, ab W5 die richtige Schreibweise. ${legend}</p>`;
   return `<div class="mx-scroll"><table class="mx-table"><thead><tr><th></th>${L_LEVELS.map(l => `<th title="${L_INFO[l].name}">${l}<small>${L_INFO[l].short}</small></th>`).join('')}</tr></thead><tbody>
     <tr><th>Lesen</th>${L_LEVELS.map(l => cellChip(m, `L|${l}`)).join('')}</tr>
@@ -5777,6 +5784,9 @@ const MAT_WAY = {
   H5: MW('Eine Spielfigur auf der Boden-Hundertertafel laufen lassen: ein Schritt nach unten = 10 mehr, nach rechts = 1 mehr.', 'Die Figur auf der ausgedruckten Tafel ziehen und die Rechnung aufschreiben.', ['Spielfigur'], 'H:HM'),
   H6: MW('Muster mit Plättchen auf die Tafel legen: alle Zahlen mit 5 am Ende, die 2er-Reihe.', 'Muster auf der ausgedruckten Tafel legen und danach anmalen.', ['Wendeplättchen'], 'H:HM'),
   H7: MW('Ein Tausenderbuch selbst herstellen: 10 Hundertertafeln ausfüllen und zusammenheften.', 'Auf einer Tausenderbuch-Seite Zahlen mit Plättchen markieren.', ['Wendeplättchen', 'Hefter'], 'H:HT'),
+  Z1: MW('Eierkarton mit 10 Plätzen: einige Plätze füllen, die leeren zählen. Zehnerpartner mit den Fingern zeigen.', 'Im Zehnerfeld eine Zahl mit Wendeplättchen legen und mit der zweiten Farbe bis 10 auffüllen.', ['Eierkarton (10er)', 'Wendeplättchen'], 'K:zehner'),
+  Z2: MW('Partnerkarten-Memory: Karten 1 bis 9 umdrehen, Partner suchen, die zusammen 10 ergeben.', 'Zehnerpartner aufschreiben und mit dem Zehnerfeld prüfen.', ['Zahlenkarten 1–9', 'Wendeplättchen'], 'M:zehnerpartner'),
+  Z3: MW('Zwei 10er-Eierkartons: erst den ersten voll machen, dann im zweiten weiter (8 + 5 = 8 + 2 + 3).', 'Im Zwanzigerfeld legen: erst die obere Reihe bis 10 auffüllen, dann unten weiter.', ['zwei 10er-Eierkartons', 'Wendeplättchen'], 'K:zwanzig'),
   LX: MW('Namens- und Wortkarten der Klasse den Personen, Fächern oder Orten im Schulhaus zuordnen.', 'Lernwörter mit Buchstabenkarten nachlegen.', ['Wortkarten', 'Buchstabenkarten'], 'K:buchst'),
   L1: MW('Echte Gegenstände und Orte den passenden Piktogrammen zuordnen (die Piktogrammkarte an die Toilettentür halten).', 'Bildkarten auf die passenden Piktogramme legen.', ['Piktogrammkarten', 'Gegenstände'], 'L:L1'),
   L2: MW('Signalwörter im Schulhaus und unterwegs suchen und die Wortkarte an das Schild halten.', 'Wortkarten auf die passenden Bilder legen.', ['Wortkarten'], 'L:L2'),
@@ -5825,6 +5835,7 @@ function zoneCells(pid, subj){
     const gz = first(G_LEVELS.map(l => `G|${l}`)); if(gz) out.push(gz);
     const hz = first(H_LEVELS.map(l => `H|${l}`)); if(hz) out.push(hz);
     const rz = first(R_LEVELS.map(l => `R|${l}`)); if(rz) out.splice(Math.min(1, out.length), 0, rz);
+    const zp = first(Z_LEVELS.map(l => `Z|${l}`)); if(zp && !isOk(m['R|R3']?.status)) out.splice(Math.min(rz ? 2 : 1, out.length), 0, zp);
   } else if(subj === 'W'){ const w = first(W_LEVELS.map(x => `W|${x}`)); if(w) out.push(w); }
   else { const l = first(L_LEVELS.map(x => `L|${x}`)); if(l) out.push(l); }
   return out;
@@ -5833,11 +5844,11 @@ function highestIn(m, keys){ let h = null; for(const k of keys) if(isOk(m[k]?.st
 function zoneReport(pid, subj){
   const name = pid === 'guest' ? 'Das Kind' : (data.profiles.find(p => p.id === pid)?.name || 'Das Kind');
   const m = matrixOf(pid), out = {zones:[], ileb:null, subj};
-  const prefix = subj === 'M' ? ['M|', 'R|', 'S|', 'U|', 'G|', 'H|'] : subj === 'W' ? ['W|'] : ['L|', 'P|'];
+  const prefix = subj === 'M' ? ['M|', 'R|', 'Z|', 'S|', 'U|', 'G|', 'H|'] : subj === 'W' ? ['W|'] : ['L|', 'P|'];
   if(!Object.keys(m).some(k => prefix.some(p => k.startsWith(p)))) return out;
   for(const key of zoneCells(pid, subj)){
     const info = cellInfo(key), c = m[key], [ax, a] = key.split('|');
-    const row = ax === 'M' ? N_LEVELS.map(l => `M|${a}|${l}`) : (ax === 'S' ? S_LEVELS.map(l => 'S|' + l) : ax === 'U' ? U_LEVELS.map(l => 'U|' + l) : ax === 'G' ? G_LEVELS.map(l => 'G|' + l) : ax === 'H' ? H_LEVELS.map(l => 'H|' + l) : ax === 'R' ? R_LEVELS.map(l => 'R|' + l) : ax === 'L' ? L_LEVELS.map(l => 'L|' + l) : ax === 'W' ? W_LEVELS.map(l => 'W|' + l) : P_LEVELS.map(l => 'P|' + l));
+    const row = ax === 'M' ? N_LEVELS.map(l => `M|${a}|${l}`) : (ax === 'S' ? S_LEVELS.map(l => 'S|' + l) : ax === 'U' ? U_LEVELS.map(l => 'U|' + l) : ax === 'G' ? G_LEVELS.map(l => 'G|' + l) : ax === 'H' ? H_LEVELS.map(l => 'H|' + l) : ax === 'Z' ? Z_LEVELS.map(l => 'Z|' + l) : ax === 'R' ? R_LEVELS.map(l => 'R|' + l) : ax === 'L' ? L_LEVELS.map(l => 'L|' + l) : ax === 'W' ? W_LEVELS.map(l => 'W|' + l) : P_LEVELS.map(l => 'P|' + l));
     const hi = highestIn(m, row);
     const fails = c?.items ? c.items.filter(x => !x.ok).map(x => x.label).slice(0, 2).join('; ') : '';
     const obs = c?.obs?.length ? ` Beobachtet: ${c.obs.join(', ')}.` : '';
@@ -5853,6 +5864,7 @@ function zoneReport(pid, subj){
     const gz = highestIn(m, G_LEVELS.map(l => 'G|' + l)); if(gz) kann.push(cellInfo(gz).kann);
     const hh = highestIn(m, H_LEVELS.map(l => 'H|' + l)); if(hh) kann.push(cellInfo(hh).kann);
     const rz = highestIn(m, R_LEVELS.map(l => 'R|' + l)); if(rz) kann.push(cellInfo(rz).kann);
+    const zp = highestIn(m, Z_LEVELS.map(l => 'Z|' + l)); if(zp && !isOk(m['R|R3']?.status)) kann.push(cellInfo(zp).kann);
   } else if(subj === 'W'){ const w = highestIn(m, W_LEVELS.map(x => 'W|' + x)); if(w) kann.push(cellInfo(w).kann); }
   else {
     const l = highestIn(m, L_LEVELS.map(x => 'L|' + x)); if(l) kann.push(cellInfo(l).kann);
@@ -5912,7 +5924,7 @@ const ilebText = r => `Lernstand: ${r.lernstand}\nNächstes Ziel: ${r.ziel}\nMa�
 function teacherText(pid){
   const m = matrixOf(pid); let t = '';
   for(const subj of ['M', 'L', 'W']){
-    const keys = subj === 'W' ? W_LEVELS.map(l => 'W|' + l) : subj === 'M' ? [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l)] : L_LEVELS.map(l => 'L|' + l);
+    const keys = subj === 'W' ? W_LEVELS.map(l => 'W|' + l) : subj === 'M' ? [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l), ...Z_LEVELS.map(l => 'Z|' + l)] : L_LEVELS.map(l => 'L|' + l);
     const got = keys.filter(k => m[k]); if(!got.length) continue;
     const rep = zoneReport(pid, subj);
     t += `Kompetenzmatrix ${subj === 'M' ? 'Mathematik' : subj === 'W' ? 'Schreiben' : 'Lesen'} (kriteriumsorientiert)\n${got.map(k => `• ${cellLabel(k)}: ${STATUS_TXT[m[k].status]}${m[k].quelle === 'abgeleitet' ? ' (abgeleitet)' : ''}${m[k].sum && m[k].quelle !== 'abgeleitet' ? ` – ${m[k].sum}` : ''}`).join('\n')}`;
@@ -7220,21 +7232,21 @@ const M_SHEETS = {
   zehnerpartner: {name:'Zehnerpartner', cols:2, fixZr:10, max:24, gens:[
     zr => { const n = rnd(1, 9); return T_('rechne', 'Wie viele fehlen bis 10?', `${app.sheet.mat ? abMV(abField(n, 0, '+', 10), abEmptyField(10)) : ''}<p class="ab-row big">${n} + ${box(13)} = 10</p>`, 10 - n, n); },
     zr => { const ns = []; while(ns.length < 3){ const n = rnd(1, 9); if(!ns.includes(n)) ns.push(n); } const f = [n => [`${box(12)} + ${n} = 10`, 10 - n], n => [`10 = ${n} + ${box(12)}`, 10 - n], n => [`10 − ${n} = ${box(12)}`, 10 - n]]; const rows = ns.map((n, i) => f[i](n)); return T_('rechne', 'Ergänze bis 10.', rows.map(r => `<p class="ab-row">${r[0]}</p>`).join(''), rows.map(r => r[1]).join('; '), 20); },
-    zr => { const n = rnd(1, 9), p = 10 - n, opts = [...new Set([p, n === p ? (p === 9 ? 8 : p + 1) : n, p === 1 ? 2 : p - 1, p + 1])].slice(0, 3).sort(() => Math.random() - .5); return T_('kreise', `Welche Zahl macht mit ${n} zusammen 10?`, `<p class="ab-row big"><b>${n}</b><span class="sep">→</span>${opts.map(o => `<span class="ab-opt">${o}</span>`).join('')}</p>`, p, 30 + n); }]},
+    zr => { const ls = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 3), rs = shuffle(ls.map(n => 10 - n)); return T_('verbinde', 'Verbinde die Zehnerpartner.', `<div class="ab-match zp">${ls.map((l, j) => `<div class="l">${l}<span class="ab-dot"></span></div><div></div><div class="r"><span class="ab-dot"></span>${rs[j]}</div>`).join('')}</div>`, ls.map(n => `${n} – ${10 - n}`).join('; '), 30 + ls[0]); }]},
   ueber10: {name:'Rechnen über die 10', cols:2, fixZr:20, max:20, gens:[
     zr => { const op = app.sheet.wop === 'sub' ? '−' : app.sheet.wop === 'add' ? '+' : pick(['+', '−']); let a, b;
       if(op === '+'){ a = rnd(3, 9); b = rnd(11 - a, 9); } else { a = rnd(11, 17); b = rnd(a - 9, 9); }
       const fld = app.sheet.mat ? (op === '+' ? abMV(abField(a, b, '+', 20), abEmptyField(20)) : abMV(abField(a, b, '−', 20), abEmptyField(20))) : '';
-      return T_('rechne', abEx('<b>Beispiel:</b> Rechne über die 10.', 'Rechne über die 10.'), `${fld}${abAst(a, b, op)}`, op === '+' ? `${a} + ${10 - a} + ${b - 10 + a} = ${a + b}` : `${a} − ${a - 10} − ${b - a + 10} = ${a - b}`, op === '+' ? a + b : 30 - a + b); }]},
+      return T_('rechne', `§EK:${op === '+' ? 'p' : 'm'}§` + abEx('<b>Beispiel:</b> Rechne über die 10.', 'Rechne über die 10.'), `${fld}${abAst(a, b, op)}`, op === '+' ? `${a} + ${10 - a} + ${b - 10 + a} = ${a + b}` : `${a} − ${a - 10} − ${b - a + 10} = ${a - b}`, op === '+' ? a + b : 30 - a + b); }]},
   unterschied: {name:'Unterschiede bestimmen', cols:2, gens:[
     zr => { const T = zrMax(zr), a = rnd(Math.ceil(T*.1), Math.floor(T*.5)), b = a + rnd(Math.max(1, Math.floor(T*.1)), Math.floor(T*.4)); const nm = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']), nm2 = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_('rechne', `${nm} hat ${a} €. ${nm2} hat ${b} €. Wie viel mehr hat ${nm2}?`, `${app.sheet.mat && zr <= 20 ? `<div class="ab-bars"><span>${nm}</span>${abField(a, 0, '+', 20)}<span>${nm2}</span>${abField(b, 0, '+', 20)}</div>` : ''}${ans(18, '€')}`, b - a); },
     zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${ans()}`, b - a); }]},
   plus: {name:'Plus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('+', zr, app.sheet.ue), D = app.sheet.mat && app.sheet.draw;
-    if(D && zr <= 20) return T_(['male', 'rechne'], abEx('Rechne.', 'Male ins Feld und rechne.'), `${abEx(abField(a, b, '+', zr), abEmptyField(abCap(a, b, '+')))}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b);
+    if(D && zr <= 20) return T_(['male', 'rechne'], abEx('Rechne.', 'Male ins Feld und rechne.'), `${abEx(abField(a, b, '+', 20), abEmptyField(20))}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b);
     if(D) return T_(['skizze', 'rechne'], 'Zeichne beide Zahlen. Rechne.', `${abEx(`<div class="ab-matrow">${abSketch(a)}<b>+</b>${abSketch(b)}</div>${abKey(zr)}`, '<div class="ab-draw"></div>')}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b);
     const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '+', zr) : `<div class="ab-matrow">${abMat(a, zr)}<b>+</b>${abMat(b, zr)}</div>`; return T_('rechne', 'Rechne.', `${mat}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b); }]},
   minus: {name:'Minus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('−', zr, app.sheet.ue), D = app.sheet.mat && app.sheet.draw;
-    if(D && zr <= 20) return T_(['male', 'streiche', 'rechne'], abEx('Rechne.', `Male ${a} Punkte. Streiche ${b} weg. Rechne.`), `${abEx(abField(a, b, '−', zr), abEmptyField(abCap(a, b, '−')))}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a);
+    if(D && zr <= 20) return T_(['male', 'streiche', 'rechne'], abEx('Rechne.', `Male ${a} Punkte. Streiche ${b} weg. Rechne.`), `${abEx(abField(a, b, '−', 20), abEmptyField(20))}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a);
     if(D) return T_(['skizze', 'streiche', 'rechne'], `Zeichne ${a}. Streiche ${b} weg. Rechne.`, `${abEx(`${abSketch(a)}${abKey(zr)}`, '<div class="ab-draw"></div>')}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a);
     const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '−', zr) : app.sheet.tausch ? abMatTausch(a, b) : abMat(a, zr); return T_(zr <= 20 || !app.sheet.mat ? 'rechne' : ['streiche', 'rechne'], zr <= 20 || !app.sheet.mat ? 'Rechne.' : `Streiche ${b} weg und rechne.`, `${mat}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a); }]},
   stellenwert: {name:'Zehner und Einer (Stellenwert)', cols:2, gens:[
@@ -7578,7 +7590,7 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .dc-bon{font-family:Menlo,Consolas,monospace;font-size:11pt;border-top:1px dashed #555;border-bottom:1px dashed #555;padding:1.5mm 0;max-width:80mm}.dc-bon>div{display:flex;justify-content:space-between}.dc-bon .dc-bon-sum{font-weight:700;border-top:1px solid #333}.dc-offer{display:inline-flex;flex-direction:column;border:2px solid #333;border-radius:3mm;padding:2mm 4mm}.dc-offer b{font-size:14pt}.dc-old{text-decoration:line-through}.dc-new{font-size:16pt;font-weight:700}.dc-tag{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #333;border-radius:2mm;padding:2mm 6mm}.dc-tag b{font-size:16pt}.ab-trace{display:block;margin:1mm 0 2mm;align-self:flex-start;max-width:100%;height:auto;overflow:visible}.ab-q{align-self:stretch;font-size:12.5pt}.ab-q div{display:flex;gap:6mm;flex-wrap:wrap;margin-top:1mm}.ab-doc{align-self:stretch;font-size:13pt;line-height:1.5;border:1px solid #bbb;border-radius:2mm;padding:3mm 4mm}.ab-doc .dc-g{font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;color:#555}.ab-doc .dc-h{font-size:14pt;margin:1mm 0 2mm}.ab-doc .dc-p{margin:0 0 1.6mm}.ab-doc .dc-pn{display:inline-block;width:5mm;font-size:9pt;font-weight:700;color:#777}.ab-doc .dc-head{font-size:10pt;color:#555;margin:0 0 2mm}.dc-t{border-collapse:collapse;width:100%;font-size:11.5pt}.dc-t th,.dc-t td{border:1px solid #999;padding:1.2mm 2mm;text-align:left;vertical-align:top}.dc-t thead th{background:#eee}.dc-note{font-size:10.5pt;margin:1.5mm 0 0}.dc-veg{display:inline-block;border:1px solid #333;border-radius:50%;width:5mm;text-align:center;font-size:8pt;font-weight:700}.dc-msg{border:1px solid #bbb;border-radius:3mm;padding:1mm 3mm;margin:1.2mm 0;max-width:85%}.dc-msg.me{margin-left:auto;background:#f2f2f2}.dc-msg b{display:block;font-size:9pt;color:#555}.dc-rec{display:grid;grid-template-columns:1fr 1.6fr;gap:4mm}.cal{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12pt}.cal th{font-size:10pt;padding:1mm 0}.cal td{border:1px solid #999;height:10mm;vertical-align:top;padding:1mm}.cal td.cal-x{border:none}.cal td.cal-we{background:#eee}.cal .cal-d{font-weight:700}.cal .cal-t{display:block;font-size:8pt;line-height:1.1;border:1px solid #333;border-radius:1mm;padding:0 1mm;margin-top:1mm}.dc-rec ul,.dc-rec ol{margin:1mm 0 0;padding-left:5mm}
 .ab-wline{height:13mm;border-bottom:1.5px solid #444;background:linear-gradient(#fff 0 60%, #ddd 60% 62%, #fff 62%);align-self:stretch}.ab-gap{display:inline-block;width:14mm;border-bottom:2px solid #222;margin:0 1mm}.ab-syl{text-align:center;font-size:16pt;color:#888;margin:0;letter-spacing:3mm}
 .ab-card{display:inline-block;border:1.4px solid #333;border-radius:2mm;padding:1mm 3mm;font-size:15pt}.ab-sign{display:inline-block;border:2px solid #222;border-radius:2mm;padding:2mm 4mm;font-weight:700;font-size:15pt;letter-spacing:1px}.ab-sign.lc{letter-spacing:.3px;font-size:16pt}
-.ab-match{display:grid;grid-template-columns:1fr 34mm 1fr;align-items:center;row-gap:4.5mm;align-self:stretch}.ab-match .l,.ab-match .r{display:flex;align-items:center;gap:3mm}.ab-match .l{justify-content:flex-start}.ab-match .r{justify-content:flex-end}.ab-dot{width:3mm;height:3mm;border-radius:50%;background:#222;display:inline-block}
+.ab-match{display:grid;grid-template-columns:1fr 34mm 1fr;align-items:center;row-gap:4.5mm;align-self:stretch}.ab-match .l,.ab-match .r{display:flex;align-items:center;gap:3mm}.ab-match .l{justify-content:flex-start}.ab-match .r{justify-content:flex-end}.ab-dot{width:3mm;height:3mm;border-radius:50%;background:#222;display:inline-block}.ab-match.zp{font-size:18pt;grid-template-columns:auto 24mm auto;justify-content:center;row-gap:5mm;margin:1mm 0}
 .ab-col{border-collapse:collapse;font-size:17pt}.ab-col td,.ab-col th{width:9mm;height:10mm;border:1px solid #bbb;text-align:center}.ab-col th{height:6mm;font-size:9pt;color:#666;border:0}.ab-col .ab-res td{border-top:2.5px solid #222}.ab-col .ab-carry td{height:5mm;font-size:9pt}.ab-col tr td:first-child{border:0;width:6mm}
 .ab-ic svg[aria-label^="Uhr"]{width:100%;height:auto}
 .ab-svg.matp{display:block;flex:none;max-width:none;max-height:none;margin:0 auto}.ab-matrow{flex-wrap:wrap;row-gap:2mm}.ab-matrow .ab-svg.matp{max-width:none;max-height:none;margin:0}.ab-matrow:has(.matp){align-items:flex-start}.ab-matrow b{margin:0 2mm;align-self:center}
@@ -7600,6 +7612,8 @@ function sheetTopics(){
     ['Legeblätter für echtes Material: Deutsch', Object.entries(LEGE).filter(([, v]) => v.grp === 'D').map(([k, v]) => [`K:${k}`, v.name])]
   ];
 }
+/* Zusätzliche Blätter zur Förderzone (Rechnen): Zehnerpartner und Rechnen über die 10 */
+const ZONE_EXTRA = {'R|R1':[['M:zehnerpartner', 'Zehnerpartner']], 'R|R2':[['M:zehnerpartner', 'Zehnerpartner']], 'R|R3':[['M:zehnerpartner', 'Zehnerpartner'], ['M:ueber10', 'Rechnen über die 10']]};
 function zoneToSheet(key){
   const [ax, a, b] = key.split('|');
   if(ax === 'M') return {topic:`M:${{I:'zaehlen', II:'zahlenstrahl', III:'zerlegen', IV:'ergaenzen', V:'unterschied'}[b]}`, zr:+a};
@@ -7609,11 +7623,16 @@ function zoneToSheet(key){
   if(ax === 'U') return {topic:`U:${a}`};
   if(ax === 'G') return {topic:`G:${a}`};
   if(ax === 'H') return {topic:`H:${a}`};
+  if(ax === 'Z') return {topic: a === 'Z3' ? 'M:ueber10' : 'M:zehnerpartner'};
   if(ax === 'R') return a === 'R7' ? {topic:'M:einmaleins'} : {topic:'M:plus', zr: R_CONF[a].range, ue: ({without:'ohne', with:'mit'})[R_CONF[a].ten] || 'egal'};
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
 app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null};
+const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp'];
+/* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
+try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k in m) app.sheet[k] = m[k]; } catch {}
+function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch {} }
 const AB_GROSS = 1.35; /* „Große Aufgaben“: alles in der Aufgabe so viel größer */
 function buildSheet(limit){
   const S0 = app.sheet;
@@ -7653,7 +7672,7 @@ function buildSheet0(limit){
   const G = app.sheetGen, n = Math.min(limit ?? G.limit, G.tasks.length);
   /* gleiche Aufgabenart zusammen, innerhalb davon von leicht nach schwer */
   const ord = [...Array(n).keys()].sort((x, y) => G.gi[x] - G.gi[y] || G.d[x] - G.d[y] || x - y);
-  const exSeen = new Set(), tasks = ord.map((j, i) => { const h = G.tasks[j].replace('§NR§', i + 1); if(!h.includes('§V§')) return h; const ex = !exSeen.has(G.gi[j]); exSeen.add(G.gi[j]); return abPick(h, ex); }), sols = ord.map(j => G.sols[j]), used = new Set(G.ops.slice(0, n).flat());
+  const exSeen = new Set(), tasks = ord.map((j, i) => { let h = G.tasks[j].replace('§NR§', i + 1); const ek = G.gi[j] + '|' + (h.match(/§EK:(\w+)§/)?.[1] || ''); h = h.replace(/§EK:\w+§/g, ''); if(!h.includes('§V§')) return h; const ex = !exSeen.has(ek); exSeen.add(ek); return abPick(h, ex); }), sols = ord.map(j => G.sols[j]), used = new Set(G.ops.slice(0, n).flat());
   const body = abScale(`<div class="ab-grid${S.gross ? ' gross' : ''}" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols, S.gross ? AB_GROSS : 1);
   const legend = `<div class="ab-legend">${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
@@ -7763,7 +7782,7 @@ function renderSheets(keep){
   const sel = (id, opts, cur) => `<select id="${id}">${opts.map(([v, n]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
   $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Kind ${sel('sh-kid', [['none', 'ohne Namen'], ...kids().map(p => [p.id, escHtml(p.name)])], S.pid)}</label>
-    ${zones.length ? `<div class="sh-zones"><span class="note">Passend zur Förderzone:</span>${zones.map(z => `<button class="chip-toggle" data-shzone="${z.key}" aria-pressed="${(() => { const t = zoneToSheet(z.key); return t.topic === S.topic && (!t.zr || t.zr === S.zr) && (!t.ue || t.ue === S.ue); })()}">${escHtml(cellLabel(z.key).replace(/ \(.*\)$/, ''))}</button>`).join('')}</div>` : ''}
+    ${zones.length ? `<div class="sh-zones"><span class="note">Passend zur Förderzone:</span>${zones.map(z => `<button class="chip-toggle" data-shzone="${z.key}" aria-pressed="${(() => { const t = zoneToSheet(z.key); return t.topic === S.topic && (!t.zr || t.zr === S.zr) && (!t.ue || t.ue === S.ue); })()}">${escHtml(cellLabel(z.key).replace(/ \(.*\)$/, ''))}</button>` + (ZONE_EXTRA[z.key] || []).filter(([t]) => !zones.some(y => zoneToSheet(y.key)?.topic === t) && !zones.some(y => y.key !== z.key && (ZONE_EXTRA[y.key] || []).some(([u]) => u === t) && zones.indexOf(y) < zones.indexOf(z))).map(([t, n]) => `<button class="chip-toggle" data-shtopic="${t}" aria-pressed="${S.topic === t}">${n}</button>`).join('')).join('')}</div>` : ''}
     <label class="row">Thema <select id="sh-topic">${sheetTopics().map(([g, opts]) => `<optgroup label="${g}">${opts.map(([v, n]) => `<option value="${v}" ${v === S.topic ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</optgroup>`).join('')}</select></label>
     ${isM && key === 'schriftlich' ? `<label class="row">Zahlenraum ${sel('sh-wzr', [[100, 'bis 100 (zweistellig)'], [1000, 'bis 1000 (dreistellig)'], [10000, 'bis 10 000 (vierstellig)']], S.wzr)}</label><label class="row">Rechenart ${sel('sh-wop', [['add', 'nur Plus'], ['sub', 'nur Minus'], ['both', 'gemischt']], S.wop)}</label>` : isM && key === 'ueber10' ? `<label class="row">Rechenart ${sel('sh-wop', [['add', 'nur Plus'], ['sub', 'nur Minus'], ['both', 'gemischt']], S.wop)}</label>` : isM && !['einmaleins', 'zehnerpartner'].includes(key) ? `<label class="row">Zahlenraum ${sel('sh-zr', [10, 20, 100, 1000].map(z => [z, 'bis ' + z]), S.zr)}</label>` : ''}
     ${isM && key === 'geld' ? `<label class="row">Geld ${sel('sh-gcent', [['euro', 'nur Euro'], ['cent10', 'Euro und Cent (10, 20, 50 Cent)'], ['exact', 'auf den Cent (auch 1, 2, 5 Cent)']], S.gcent || 'euro')}</label>` : ''}
@@ -7804,7 +7823,8 @@ function sheetEvents(e){
   if(e.target.closest('#hf-clear')){ const b = e.target.closest('#hf-clear'); if(!b.dataset.sure){ b.dataset.sure = '1'; b.textContent = 'Wirklich leeren?'; return; } H.items = []; saveHeft(); return renderHeft(); }
   if(e.target.closest('#hf-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
   if(e.target.closest('#hf-save')){ const doc = app.heftDoc || buildHeft(); return saveFile(`Arbeitsheft ${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
-  const z = e.target.closest('[data-shzone]'); if(z){ const t = zoneToSheet(z.dataset.shzone); S.topic = t.topic; if(t.zr) S.zr = t.zr; S.ue = t.ue || 'egal'; return renderSheets(); }
+  const zt = e.target.closest('[data-shtopic]'); if(zt){ S.topic = zt.dataset.shtopic; sheetSave(); return renderSheets(); }
+  const z = e.target.closest('[data-shzone]'); if(z){ const t = zoneToSheet(z.dataset.shzone); S.topic = t.topic; if(t.zr) S.zr = t.zr; S.ue = t.ue || 'egal'; sheetSave(); return renderSheets(); }
   if(e.target.closest('#sh-new')) return renderSheets();
   if(e.target.closest('#sh-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
   if(e.target.closest('#sh-save')){ const doc = app.sheetDoc; saveFile(`Arbeitsblatt ${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
@@ -7831,6 +7851,7 @@ function sheetChange(e){
   if(t.id === 'sh-kt') S.kt = t.value;
   if(t.id === 'sh-bcase') S.bcase = t.value;
   if(t.id === 'sh-htp') S.htp = t.value;
+  sheetSave();
   renderSheets();
 }
 
@@ -7912,6 +7933,7 @@ function mapRoutes(pid){
   if(!zr) zr = [...ZR].reverse().find(z => N_LEVELS.some(l => m[`M|${z}|${l}`])) || 20;
   routes.push({title:`Zahlen bis ${zr}`, sym:'123', keys: N_LEVELS.map(l => `M|${zr}|${l}`)});
   if(has(R_LEVELS.map(l => 'R|' + l))) routes.push({title:'Rechnen', sym:'+−', keys: R_LEVELS.map(l => 'R|' + l)});
+  if(has(Z_LEVELS.map(l => 'Z|' + l))) routes.push({title:'Zehnerpartner', sym:'5+5', keys: Z_LEVELS.map(l => 'Z|' + l)});
   if(has(S_LEVELS.map(l => 'S|' + l))) routes.push({title:'Zehner und Einer', sym:'▥', keys: S_LEVELS.map(l => 'S|' + l)});
   if(has(U_LEVELS.map(l => 'U|' + l))) routes.push({title:'Uhr und Kalender', sym:'◷', keys: U_LEVELS.map(l => 'U|' + l)});
   if(has(G_LEVELS.map(l => 'G|' + l))) routes.push({title:'Größen und Einkaufen', sym:'⚖', keys: G_LEVELS.map(l => 'G|' + l)});
@@ -7955,7 +7977,7 @@ const REPORT_CSS = SHEET_CSS + `@page{size:A4;margin:12mm}@media print{.page{wid
 function mxTable(pid, subj){
   const m = matrixOf(pid), sym = k => { const c = m[k]; return !c ? '–' : c.status === 'erreicht' ? (c.quelle === 'abgeleitet' ? '(✓)' : '✓') : c.status === 'teilweise' ? '½' : '✗'; };
   if(subj === 'M') return `<table class="mx"><tr><th></th>${N_LEVELS.map(l => `<th>${l}<br><small>${N_NAMES[l]}</small></th>`).join('')}</tr>${ZR.map(zr => `<tr><th>ZR ${zr}</th>${N_LEVELS.map(l => `<td>${sym(`M|${zr}|${l}`)}</td>`).join('')}</tr>`).join('')}</table>
-    <table class="mx"><tr><th>Stellenwert</th>${S_LEVELS.map(l => `<th>${l}</th>`).join('')}<th>Uhr/Kalender</th>${U_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${S_LEVELS.map(l => `<td>${sym('S|' + l)}</td>`).join('')}<td></td>${U_LEVELS.map(l => `<td>${sym('U|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Rechnen</th>${R_LEVELS.map(l => `<th>${l}<br><small>${R_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${R_LEVELS.map(l => `<td>${sym('R|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Größen</th>${G_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${G_LEVELS.map(l => `<td>${sym('G|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Hundertertafel</th>${H_LEVELS.map(l => `<th>${l}<br><small>${H_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${H_LEVELS.map(l => `<td>${sym('H|' + l)}</td>`).join('')}</tr></table>`;
+    <table class="mx"><tr><th>Stellenwert</th>${S_LEVELS.map(l => `<th>${l}</th>`).join('')}<th>Uhr/Kalender</th>${U_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${S_LEVELS.map(l => `<td>${sym('S|' + l)}</td>`).join('')}<td></td>${U_LEVELS.map(l => `<td>${sym('U|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Rechnen</th>${R_LEVELS.map(l => `<th>${l}<br><small>${R_INFO[l].short}</small></th>`).join('')}<th>Zehnerpartner</th>${Z_LEVELS.map(l => `<th>${l}<br><small>${Z_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${R_LEVELS.map(l => `<td>${sym('R|' + l)}</td>`).join('')}<td></td>${Z_LEVELS.map(l => `<td>${sym('Z|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Größen</th>${G_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${G_LEVELS.map(l => `<td>${sym('G|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Hundertertafel</th>${H_LEVELS.map(l => `<th>${l}<br><small>${H_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${H_LEVELS.map(l => `<td>${sym('H|' + l)}</td>`).join('')}</tr></table>`;
   const lv = subj === 'L' ? L_LEVELS : W_LEVELS, info = subj === 'L' ? L_INFO : W_INFO;
   return `<table class="mx"><tr>${lv.map(l => `<th>${l}<br><small>${info[l].short}</small></th>`).join('')}</tr><tr>${lv.map(l => `<td>${sym(subj + '|' + l)}</td>`).join('')}</tr></table>`;
 }
@@ -8257,7 +8279,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.20.1 · 16.11.2026';
+const APP_VERSION = '0.21.0 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -8446,7 +8468,7 @@ $('#help-content').innerHTML = [
   ['h','So ist Stufenweise aufgebaut'],
   ['target','Testen – Üben – Prüfen','Stufenweise folgt einem Kreislauf: Ein kurzer adaptiver Test findet heraus, was ein Kind schon kann (Lernstand). Daraus ergibt sich die Förderzone – die erste Stufe, die noch nicht sicher ist. Dazu passende Übungen und Arbeitsblätter folgen. Nach etwa 5 Übungseinheiten zeigt eine Wiederholung des Tests, ob die nächste Stufe erreicht ist.'],
   ['chart','Die Stufen','Mathe: Zahlenräume 10, 20, 100, 1000 mit den Niveaus I–V (Fritz & Ricken, Krajewski), Stellenwert S1–S4 (Herzog, Ehlert & Fritz) Rechnen R1–R7 (Plus und Minus bis 10, 20, 100, 1000, Einmaleins), Zeit U1–U6 (Uhr und Kalender) und Hundertertafel H1–H7 (bis zum Tausenderbuch). Der Mathe-Test hat zwei Teile: Teil 1 Zahlen und Rechnen, Teil 2 Uhr, Größen und Hundertertafel – so bleibt jede Sitzung kurz. Deutsch: Lesen L1–L9 und Schreiben W1–W6 nach dem Bildungsplan GENT. Dazu Größen G1–G4 (Messen, cm/m/km, g/kg, Einkaufen). Jede Stufe hat einen „Ich kann“-Satz in einfacher Sprache.'],
-  ['h','Für Schülerinnen und Schüler'],
+  ['h','Für Schüler*innen'],
   ['home','Startseite','Das Stufen-Zeichen links oben führt zur Startseite. Dort tippst du deinen Namen an. Unter „Heute für dich“ stehen deine Übungen. Die „Startrunde“ sind 3 kurze Aufgaben zum Aufwärmen. „Meine Lernlandkarte“ zeigt, was du schon kannst (✓) und woran du gerade arbeitest (★).'],
   ['edit','Mathe','Links wählst du: Zahlen legen, Hundertertafel, Plus, Minus, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
   ['target','Zahlenstrahl vergrößern','Tippe auf einen Sprung (zum Beispiel +7), dann wird er groß. Noch einmal tippen: zurück. Mit + und − vergrößerst und verkleinerst du. Mit zwei Fingern kannst du auch zoomen und mit einem Finger verschieben. Unten zeigt der kleine Zahlenstrahl, wo du gerade bist – tippe dort, um hinzuspringen.'],
@@ -8459,7 +8481,7 @@ $('#help-content').innerHTML = [
   ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Legeblätter für echtes Material“ gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],
-  ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Bis 100 und 1000 gibt es die Ansicht „Tafel“ bzw. „Tausenderbuch“: Das Kind springt mit +10 und +1 (bis 1000 auch +100, mit Seitenleiste zum Blättern), der Weg bleibt sichtbar. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln (wahlweise mit Hundertern oder Tausendern) oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schülerinnen und Schüler selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch.'],
+  ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Bis 100 und 1000 gibt es die Ansicht „Tafel“ bzw. „Tausenderbuch“: Das Kind springt mit +10 und +1 (bis 1000 auch +100, mit Seitenleiste zum Blättern), der Weg bleibt sichtbar. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln (wahlweise mit Hundertern oder Tausendern) oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schüler*innen selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch. Gemeinsam ausprobieren: dieselbe Menge auch mit echtem Material legen – beim Umtauschen bleibt die Menge gleich.'],
   ['h','Über Stufenweise'],
   ['target','Die Idee','Stufenweise zeigt jedem Kind, was als Nächstes dran ist: seine Förderzone. Das schafft Klarheit und Sicherheit. Es gibt keine Klassenstufen, nur Stufen. So arbeiten Jugendliche nicht an Aufgaben „für die 1. Klasse“, sondern an altersgerechten Aufgaben aus ihrer Lebenswelt, genau auf ihrem Lernstand.'],
   ['blocks','Ein Lernort unter vielen','Kinder lernen mit Händen, Augen und Sprache: Sie legen Plättchen, bündeln Schrauben, fädeln Perlen, kneten Buchstaben. Stufenweise übernimmt nur den Teil, den ein Gerät gut kann: passende Aufgaben im Bild und in Zahlen, sofortige Rückmeldung, Übersicht für die Lehrkraft. Deshalb steht im Lernstand zu jeder Förderzone ein Weg vom Handeln über das Bild zur Zahl, mit Materialliste und einem Legeblatt zum Ausdrucken. Auf Legeblätter legen die Kinder echtes Material: Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten.'],
