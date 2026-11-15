@@ -29,6 +29,8 @@ Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. D
 | `kinder_sim.py` (mit `simlib.py`) | 10 simulierte Kinder machen Tests und üben; Förderzonen plausibel |
 | `zufallsklicks.py` | viele zufällige Klicks, die App darf nicht abstürzen |
 | `arbeitsblaetter.py` | jedes Arbeitsblatt-Thema: passt auf die Seite, genug Aufgaben (`PRÜFEN` = ansehen) |
+| `arbeitsblatt_optionen.py` | Materialbilder „1. Aufgabe vorgegeben, dann selbst zeichnen“, Zehnerpartner, Rechnen über die 10 (Beispiel ausgefüllt), Geld mit Cent, Einmaleins-Reihen |
+| `zehnerpartner_ueben.py` | Üben „Zehnerpartner“ Z1–Z3 lösbar, Statistik; Blitzblick „Neue Aufgabe“ zählt als übersprungen |
 | `grosse_aufgaben.py` | „Große Aufgaben“: nichts zu breit, alles größer; Minus „Umtausch schon im Bild zeigen“: Bild stimmt, Tausch reicht zum Wegstreichen |
 | `doppelte_zeilen.py` | keine Zeile doppelt in einer Aufgabe (z. B. zweimal „7 = 4 + □“), keine gleichen Aufgaben direkt nacheinander |
 | `legeblaetter.py` | alle Legeblätter als PDF: genau 1 Seite, nichts abgeschnitten (`scroll` ≤ verfügbare Höhe) |
