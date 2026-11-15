@@ -76,6 +76,8 @@ Fehler, Ideen und Lob:
 - **[Neue Meldung auf GitHub](https://github.com/Steffinuss/stufenweise/issues/new)** (kostenloses GitHub-Konto nötig, öffentlich sichtbar, bitte keine Namen von Kindern). Am einfachsten über den Knopf „Rückmeldung“ in der App, der die Meldung schon vorausfüllt.
 - Ohne GitHub-Konto: die Rückmeldung an die Person geben, die Stufenweise an deiner Schule betreut. Wer an einer Schule Rückmeldungen sammelt, kann in den Einstellungen eine eigene E-Mail-Adresse eintragen; dann bietet der Knopf „Rückmeldung“ zusätzlich „Per E-Mail senden“ an.
 
+Für Entwickler*innen: Die automatischen Tests (echter Browser, Playwright) liegen in [`tests/`](tests/README.md); `sh tests/run_all.sh` startet sie.
+
 ## Mit KI entwickelt
 
 Stufenweise wurde mit Unterstützung der KI Claude (Anthropic) programmiert. Konzept, fachliche Entscheidungen und Prüfung: Stefan Hackl.

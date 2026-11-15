@@ -1,0 +1,26 @@
+import asyncio, sys
+from playwright.async_api import async_playwright
+from common import URL, launch  # noqa: E402 (Adresse, Browser, Ausgabeordner)
+async def main():
+    W,H = int(sys.argv[1]), int(sys.argv[2])
+    async with async_playwright() as p:
+        b=await launch(p)
+        pg=await b.new_page(viewport={'width':W,'height':H}, has_touch=True); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
+        await pg.goto(URL); await pg.wait_for_timeout(400)
+        await pg.click("[data-ctx='class']"); await pg.screenshot(path=f'tf_home_{W}.png')
+        await pg.click(".wz-body [data-ctool='tfield']")
+        eq = lambda: pg.evaluate("document.querySelector('#prompt').textContent")
+        await pg.click("[data-tfi='7']"); print('tap 8 blue:', await eq())
+        await pg.click("[data-tft='o']"); await pg.click("[data-tfk='5']"); print('+5 orange:', await eq())
+        await pg.screenshot(path=f'tf1_{W}.png')
+        await pg.click("[data-tft='x']"); await pg.click("[data-tfi='10']"); print('strike from 11:', await eq())
+        await pg.click("#tf-undo"); print('undo:', await eq())
+        await pg.click("[data-tfk='1']"); await pg.click("[data-tfk='1']"); print('-2:', await eq())
+        await pg.click("[data-tfh]"); print('hidden:', await eq())
+        await pg.click("[data-tf-reveal]"); print('revealed:', await eq())
+        await pg.screenshot(path=f'tf2_{W}.png')
+        await pg.click("[data-tft='b']"); await pg.click("[data-tfi='3']"); print('tap filled 4 -> cut:', await eq(), await pg.evaluate("app.tf.dots.length"))
+        await pg.click("[data-tfr='10']"); await pg.click("[data-tfk='5']"); print('cap10 +5', await pg.evaluate("app.tf.dots.length"), await eq())
+        await pg.click("#tf-new"); print('new', repr(await eq()))
+        print('ERR', errs); await b.close()
+asyncio.run(main())

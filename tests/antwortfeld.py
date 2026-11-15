@@ -1,0 +1,36 @@
+import asyncio, sys
+from playwright.async_api import async_playwright
+from common import URL, launch  # noqa: E402 (Adresse, Browser, Ausgabeordner)
+async def main():
+    async with async_playwright() as p:
+        b=await launch(p)
+        for (W,H,touch) in [(1180,820,True),(820,1180,True)]:
+            ctx=await b.new_context(viewport={'width':W,'height':H}, has_touch=touch, is_mobile=False)
+            pg=await ctx.new_page(); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
+            await pg.goto(URL); await pg.wait_for_timeout(400)
+            await pg.evaluate("settings.numpad='on'; saveSettings()")
+            if await pg.locator("[data-ctx='practice']").count(): await pg.click("[data-ctx='practice']")
+            await pg.click('[data-mode="add"]'); await pg.wait_for_timeout(200)
+            await pg.click('[data-range="100"]'); await pg.wait_for_timeout(200); await pg.evaluate('startRandom()'); await pg.wait_for_timeout(200)
+            print(W, 'before join input?', await pg.locator('#guess').count())
+            await pg.click('#c-join'); await pg.wait_for_timeout(1500)
+            print(W, 'after join input in eq?', await pg.locator('#equation #guess').count())
+            await pg.click('#guess'); await pg.wait_for_timeout(200)
+            a,bb = await pg.evaluate("[task().a, task().b]")
+            for ch in str(a+bb-1): await pg.click(f'#numpad [data-np="{ch}"]')
+            await pg.click('#numpad [data-np="ok"]'); await pg.wait_for_timeout(300)
+            print(W, 'wrong hint:', await pg.evaluate("document.querySelector('#hint').innerText"))
+            await pg.screenshot(path=f'eq_wrong_{W}.png')
+            await pg.fill('#guess', ''); await pg.type('#guess', str(a+bb)); await pg.click('#equation #c-check'); await pg.wait_for_timeout(400)
+            print(W, 'right:', await pg.evaluate("document.querySelector('#hint').innerText"), await pg.evaluate("document.querySelector('#equation').innerText"))
+            await pg.screenshot(path=f'eq_ok_{W}.png')
+            # board view keeps typed value across jumps
+            await pg.evaluate('startRandom()'); await pg.wait_for_timeout(200); await pg.click('[data-view="board"]'); await pg.wait_for_timeout(200)
+            await pg.click('#numpad [data-np="min"]'); await pg.type('#guess', '12'); await pg.click('[data-tbj="1"]'); await pg.wait_for_timeout(200)
+            print(W, 'kept value after jump:', await pg.evaluate("document.querySelector('#guess').value"))
+            await pg.click('[data-mode="times"]'); await pg.wait_for_timeout(300); await pg.evaluate('timesStart(6, 4)'); await pg.wait_for_timeout(300)
+            await pg.screenshot(path=f'eq_times_{W}.png')
+            print(W, 'times input:', await pg.locator('#equation #guess').count(), await pg.evaluate("document.querySelector('#equation').innerText"))
+            print('ERR', errs); await ctx.close()
+        await b.close()
+asyncio.run(main())
