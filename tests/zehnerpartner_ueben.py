@@ -1,5 +1,5 @@
 """Üben „Zehnerpartner“ (Z1–Z3): Knopf in der Leiste, alle Stufen mit richtigen Antworten lösbar,
-falsche Antwort wird erkannt, Statistik zeigt den Bereich. Dazu: Blitzblick „Neue Aufgabe“ zählt als übersprungen."""
+falsche Antwort wird erkannt, Statistik zeigt den Bereich. Dazu: Blitzblick und „Zahl suchen“ – „Neue Aufgabe“ zählt als übersprungen."""
 import asyncio
 from playwright.async_api import async_playwright
 from common import URL, launch  # noqa: E402
@@ -44,5 +44,15 @@ async def main():
         after = await pg.evaluate("(data.skips?.[data.current||'guest']||[]).length")
         print('Blitzblick übersprungen:', after - before)
         if after - before != 2: errs.append(f'Blitzblick: {after - before} statt 2 übersprungen')
+        # Zahlen: „Zahl suchen“ am Zahlenstrahl überspringen
+        await pg.evaluate("app.mode='number'; app.range=100; render()"); await pg.wait_for_timeout(300)
+        await pg.click('#btn-random'); await pg.wait_for_timeout(300)
+        await pg.evaluate("task().view='line'; render()"); await pg.wait_for_timeout(300)
+        await pg.click('#c-find'); await pg.wait_for_timeout(300)
+        n0 = await pg.evaluate("(data.skips?.[data.current||'guest']||[]).length")
+        await pg.click('#btn-random'); await pg.wait_for_timeout(300)
+        last = await pg.evaluate("(data.skips?.[data.current||'guest']||[]).slice(-1)[0]?.task")
+        print('Zahl suchen übersprungen:', last)
+        if not (last or '').startswith('Zahl '): errs.append('Zahl suchen: Überspringen nicht gezählt')
         print('ERR', errs); await b.close()
 asyncio.run(main())
