@@ -1030,6 +1030,7 @@ const PATHS = {
   check:'M4 12l5 5L20 6',
   plus:'M12 5v14M5 12h14',
   grid:'M3 4h5v16H3zM10 4h4v16h-4zM16 4h5v16h-5z',
+  field:'M2 7h20v10H2zM2 12h20M12 7v10M4.5 9.5h.01M7 9.5h.01M9.5 9.5h.01M14.5 9.5h.01M4.5 14.5h.01',
   settings:'M10.23 4.92L10.50 2.52L13.50 2.52L13.77 4.92A7.3 7.3 0 0 1 15.76 5.74L17.64 4.23L19.77 6.36L18.26 8.24A7.3 7.3 0 0 1 19.08 10.23L21.48 10.50L21.48 13.50L19.08 13.77A7.3 7.3 0 0 1 18.26 15.76L19.77 17.64L17.64 19.77L15.76 18.26A7.3 7.3 0 0 1 13.77 19.08L13.50 21.48L10.50 21.48L10.23 19.08A7.3 7.3 0 0 1 8.24 18.26L6.36 19.77L4.23 17.64L5.74 15.76A7.3 7.3 0 0 1 4.92 13.77L2.52 13.50L2.52 10.50L4.92 10.23A7.3 7.3 0 0 1 5.74 8.24L4.23 6.36L6.36 4.23L8.24 5.74A7.3 7.3 0 0 1 10.23 4.92ZM15.1 12a3.1 3.1 0 1 0-6.2 0 3.1 3.1 0 1 0 6.2 0',
   close:'M6 6l12 12M18 6 6 18',
   trash:'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7',
@@ -1629,8 +1630,36 @@ function dice(n){
   return `<svg viewBox="-10 -10 120 120" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Würfelbild ${n}"><defs><filter id="tsh"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#2b2930" flood-opacity=".15"/></filter></defs><rect width="100" height="100" rx="18" fill="#fff" filter="url(#tsh)"/>${pos.map(([x,y]) => `<circle cx="${25+x*25}" cy="${25+y*25}" r="9" fill="${fillOf('e','a')}"/>`).join('')}</svg>`;
 }
 
+/* ---------- Ansicht „Zwanzigerfeld“ beim Üben (Plus/Minus bis 20) ----------
+   Die erste Zahl liegt schon (blau). Plus: die zweite Zahl in Orange dazulegen. Minus: von hinten wegstreichen.
+   Gefüllt wird wie üblich zeilenweise: erst die obere Reihe, dann die untere. */
+const fieldViewOk = () => ['add', 'sub'].includes(app.mode) && app.range <= 20;
+function fieldState(t){
+  const cap = app.range <= 10 ? 10 : 20;
+  if(!t.fd || t.fd.key !== `${t.a}|${t.b}|${cap}`) t.fd = {key:`${t.a}|${t.b}|${cap}`, cap, dots: Array(t.a).fill('b'), cross:0, hist:[]};
+  return t.fd;
+}
+function fieldInfo(t){ const f = fieldState(t), laid = f.dots.length - t.a; return app.mode === 'add' ? {done: laid === t.b, over: laid > t.b, left: t.b - laid} : {done: f.cross === t.b, over: f.cross > t.b, left: t.b - f.cross}; }
+function fieldTap(t, i){
+  const f = fieldState(t), n = f.dots.length; f.hist.push({dots:[...f.dots], cross:f.cross});
+  if(app.mode === 'add'){
+    if(i >= n){ for(let k = n; k <= i && f.dots.length < f.cap; k++) f.dots.push('o'); }
+    else if(i >= t.a) f.dots = f.dots.slice(0, i);            /* orangen Punkt antippen: ab hier wieder weg */
+    else f.hist.pop();
+  } else {
+    if(i < n){ const want = n - i; f.cross = f.cross === want ? want - 1 : want; } else f.hist.pop();
+  }
+  renderWork();
+}
+function fieldStep(t, k){
+  const f = fieldState(t); f.hist.push({dots:[...f.dots], cross:f.cross});
+  if(app.mode === 'add'){ if(k > 0) for(let j = 0; j < k && f.dots.length < f.cap; j++) f.dots.push('o'); else for(let j = 0; j < -k && f.dots.length > t.a; j++) f.dots.pop(); }
+  else f.cross = Math.max(0, Math.min(f.dots.length, f.cross + k));
+  renderWork();
+}
 function taskPrompt(t){
   const ex = settings.words === 'bundle';
+  if(t.view === 'field'){ const fi = fieldInfo(t); if(app.mode === 'add') return fi.done ? 'Wie viele sind es zusammen?' : fi.over ? 'Das sind zu viele. Tippe einen orangen Punkt an, dann geht er weg.' : `Lege ${t.b} orange Punkte dazu. Erst die obere Reihe voll machen.`; return fi.done ? 'Wie viele bleiben übrig?' : fi.over ? 'Das sind zu viele. Tippe einen durchgestrichenen Punkt an, dann ist er wieder da.' : `Streiche ${t.b} Punkte weg. Fang hinten an.`; }
   if(t.view === 'board'){ const w = app.range === 1000 ? 'im Tausenderbuch' : 'in der Hundertertafel'; return app.mode === 'number' ? (t.find ? `Wo steht die Zahl ${w}? Tippe das Feld an.` : `Hier steht die Zahl ${w}.`) : app.mode === 'add' ? `Starte bei ${t.a} und gehe ${t.b} weiter. Wo landest du?` : `Starte bei ${t.a} und gehe ${t.b} zurück. Wo landest du?`; }
   if(t.view === 'line') return app.mode === 'number' ? (t.find ? 'Schätze: Wo liegt die Zahl? Tippe auf den Zahlenstrahl.' : 'Hier liegt die Zahl auf dem Zahlenstrahl.') : app.mode === 'add' ? `Springe von ${t.a} aus ${t.b} weiter. Wo landest du?` : `Springe von ${t.a} aus ${t.b} zurück. Wo landest du?`;
   if(app.mode === 'number') return app.range < 10 || t.a < 10 ? 'Wie viele sind es? Zähle nach.' : `Die Zahl ist gelegt. ${ex ? 'Bündle oder entbündle' : 'Tausche um'}: Die Menge bleibt gleich.`;
@@ -1656,7 +1685,8 @@ function renderTask(before){
   const stage = $('#stage');
   if(t.view === 'dice' && !(app.mode === 'number' && app.range <= 6)) t.view = 'material';
   if(t.view === 'board' && !boardViewOk()) t.view = 'material';
-  stage.innerHTML = t.view === 'board' ? drawTaskBoard(t) : t.view === 'line' ? (app.mode === 'number' && t.find ? drawFindLine(t) : nlWrap(drawLine(t))) : t.view === 'dice' ? dice(a) : drawTask(t);
+  if(t.view === 'field' && !fieldViewOk()) t.view = 'material';
+  stage.innerHTML = t.view === 'field' ? `<div class="tf-wrap">${tfSvg(fieldState(t))}</div>` : t.view === 'board' ? drawTaskBoard(t) : t.view === 'line' ? (app.mode === 'number' && t.find ? drawFindLine(t) : nlWrap(drawLine(t))) : t.view === 'dice' ? dice(a) : drawTask(t);
   renderTaskControls(t);
   taskHint(t);
   if(t.view === 'board') hbFit();
@@ -1669,18 +1699,27 @@ function viewButtons(t){
   const views = [['material','blocks','Material'], ['line','line','Zahlenstrahl']];
   if(app.mode === 'number' && app.range <= 6) views.push(['dice','dice','Würfelbild']);
   if(boardViewOk()) views.push(['board','grid', app.range === 1000 ? 'Tausenderbuch' : 'Tafel']);
+  if(fieldViewOk()) views.push(['field','field', app.range <= 10 ? 'Zehnerfeld' : 'Zwanzigerfeld']);
   return `<div class="views" role="group" aria-label="Ansicht">${views.map(([v,ic,l]) => toolBtn({ic, label:l, pressed: t.view === v}).replace('<button', `<button data-view="${v}"`)).join('')}</div>`;
 }
 function checkBox(t){
   return `<div class="check"><label for="guess">Ergebnis</label><input id="guess" type="number" inputmode="numeric" min="0" ${t.check==='ok' ? 'disabled' : ''}><button id="c-check" class="primary" aria-label="Prüfen">${icon('check','ic')}</button></div>`;
 }
 /* Ergebnis direkt oben in die Rechnung schreiben (statt in ein Feld unten) */
-const guessHere = t => app.mode === 'times' || (app.mode !== 'number' && (t.view === 'board' || t.view === 'line' || t.done));
+const guessHere = t => app.mode === 'times' || (app.mode !== 'number' && (t.view === 'board' || t.view === 'line' || t.view === 'field' || t.done));
 function eqGuess(t, maxDigits){
   const w = Math.max(2, maxDigits);
   return `<span class="res eq-slot"><input id="guess" class="eq-in" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="${w}" aria-label="Ergebnis" style="--w:${w}" value="${escHtml(t.guessVal || '')}"></span><button id="c-check" class="primary eq-check" aria-label="Prüfen">${icon('check','ic')}</button>`;
 }
 function renderTaskControls(t){
+  if(t.view === 'field'){
+    const f = fieldState(t), add = app.mode === 'add', done = t.check === 'ok', col = add ? '#e8890c' : '#c9414a';
+    const c = [viewButtons(t), '<span class="sep"></span>', `<div class="nl-jumps tf-steps">${[1, 5].map(k => `<button data-fds="${add ? k : k}" style="--c:${col}" ${done ? 'disabled' : ''}>${add ? '+' : '−'}${k}</button>`).join('')}</div>`,
+      toolBtn({id:'c-fdundo', ic:'undo', label:'Zurück', disabled: done || !f.hist.length})];
+    if(resultsOn()) c.push('<span class="sep"></span>', toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
+    $('#controls').innerHTML = c.join('');
+    return;
+  }
   if(t.view === 'board'){
     const c = [viewButtons(t)];
     if(app.mode === 'number'){ c.push('<span class="sep"></span>', toolBtn({id:'c-find', ic:'target', label:'Zahl suchen', pressed: !!t.find})); if(t.find) c.push(toolBtn({id:'c-findmore', ic:'eye', label:'Mehr Zahlen', pressed: !!settings.findMore}), toolBtn({id:'c-findnext', ic:'next', label:'Nächste Zahl', primary: t.findGuess != null})); }
@@ -1731,6 +1770,7 @@ function renderTaskControls(t){
 }
 
 function taskHint(t){
+  if(t.view === 'field'){ if(t.check === 'ok' || t.check === 'no') return; const fi = fieldInfo(t); return setHint(settings.help && fi.left > 0 ? `Noch ${fi.left}.` : ''); }
   if(t.view === 'board'){
     if(app.mode === 'number') return t.find && t.findGuess != null ? undefined : setHint(t.find && app.range === 1000 ? 'Suche zuerst die richtige Seite. Dann tippe das Feld an.' : '');
     if(!settings.help || t.check === 'ok') return t.check === 'ok' ? undefined : setHint('');
@@ -3063,8 +3103,27 @@ const roundKey = () => `${data.current || 'guest'}|${app.mode}|${app.mode === 'r
 function roundSync(){ const k = roundKey(); if(app.round.key !== k){ app.round = {key:k, res:[]}; app.solved = false; document.querySelector('.round-end')?.remove(); } }
 /* Weiterklicken ohne Lösung zählt in der Runde als „übersprungen“ – so lassen sich schwere Aufgaben nicht einfach wegklicken. */
 app.solved = false;
+/* Was wurde gerade angezeigt? (für das Protokoll „übersprungen“) */
+function currentTaskLabel(){
+  const m = app.mode;
+  if(m === 'read') return app.read.item?.label || '';
+  if(m === 'times') return app.times?.ready ? `${app.times.a} · ${app.times.b}` : '';
+  if(m === 'written') return app.written?.ready ? `${app.written.a} ${app.written.op === 'sub' ? '−' : '+'} ${app.written.b} (schriftlich)` : '';
+  if(m === 'money') return app.money?.ready ? 'Geldaufgabe' : '';
+  if(['add', 'sub'].includes(m)){ const t = task(); return t.ready ? `${t.a} ${MODES[m].sym} ${t.b}` : ''; }
+  return '';
+}
+function logSkip(){
+  if(app.ctx === 'class' || app.mode === 'blitz') return;
+  const label = currentTaskLabel(); if(!label) return;
+  const id = data.current || 'guest', list = (data.skips ??= {})[id] ??= [];
+  list.push({ts: Date.now(), mode: app.mode === 'read' ? rdMode(app.read.lvl) : app.mode, lvl: app.mode === 'read' ? app.read.lvl : undefined, task: label});
+  if(list.length > 500) list.splice(0, list.length - 500);
+  saveData();
+}
 function skipMark(){
   const was = app.solved; app.solved = false;
+  if(!was) logSkip();
   if(was || !roundOn() || app.mode === 'blitz') return;
   roundSync(); const R = app.round, n = roundLen();
   if(R.res.length >= n) return;
@@ -3587,6 +3646,16 @@ function statsSections(id){
   }
   const errs = data.errs?.[id];
   if(errs){ const lines = Object.entries(errs).map(([m, o]) => `${MODE_NAMES[m] || m}: ${Object.entries(o).filter(([k]) => k !== 'anders').map(([k, n]) => `${ERR_NAME[k]} ${n}×`).join(', ')}`).filter(l => !l.endsWith(': ')); if(lines.length) out.push({title:'Typische Fehler beim Üben', lines}); }
+  /* Übersprungen: ohne Lösung weitergeklickt (für die Lehrkraft – zeigt, wo ein Kind ausweicht) */
+  const sk = data.skips?.[id] || [];
+  if(sk.length){
+    const wk = Date.now() - 7*864e5, week = sk.filter(e => e.ts >= wk), by = {};
+    for(const e of sk.slice(-200)) by[MODE_NAMES[e.mode] || e.mode] = (by[MODE_NAMES[e.mode] || e.mode] || 0) + 1;
+    const lines = [`in den letzten 7 Tagen: ${week.length}-mal, insgesamt ${sk.length}-mal`, `nach Bereich: ${Object.entries(by).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}×`).join(', ')}`];
+    const last = sk.slice(-6).reverse().map(e => `${new Date(e.ts).toLocaleString('de-DE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})} · ${e.task}`);
+    lines.push(`zuletzt: ${last.join('; ')}`);
+    out.push({title:'Übersprungene Aufgaben', lines});
+  }
   const recent = L.filter(e => e.mode !== 'screen' && e.mode !== 'diag' && MODE_NAMES[e.mode]).slice(-12).reverse();
   if(recent.length) out.push({title:'Zuletzt geübt', lines: recent.map(e => `${new Date(e.ts).toLocaleString('de-DE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})} · ${MODE_NAMES[e.mode]} · ${e.task} · ${e.ok ? '✓' : '✗'}${e.tries > 1 ? ` (${e.tries} Versuche)` : ''}`)});
   return out;
@@ -6124,8 +6193,8 @@ function tfEquation(){
   const left = runs.map(x => x.n).join(' + ') + (t.cross ? ` − ${t.cross}` : '');
   return { txt:left, res };
 }
-function tfSvg(){
-  const t = app.tf, cols = t.cap === 20 ? 10 : 5, C = 100, M = 14, W = cols*C, H = 2*C;
+function tfSvg(t = app.tf){
+  const cols = t.cap === 20 ? 10 : 5, C = 100, M = 14, W = cols*C, H = 2*C;
   let s = `<rect x="${M}" y="${M}" width="${W}" height="${H}" rx="16" fill="#fff" stroke="#2b2930" stroke-width="5"/><path d="M${M} ${M + C}h${W}" stroke="#2b2930" stroke-width="2.5"/>`;
   for(let c = 1; c < cols; c++) s += `<path d="M${M + c*C} ${M}v${H}" stroke="#2b2930" stroke-width="${c === 5 ? 5 : 1.6}" ${c === 5 ? '' : 'opacity=".45"'}/>`;
   for(let i = 0; i < t.cap; i++){
@@ -6421,6 +6490,7 @@ function mergeData(src){
     for(const p of src.profiles || []){ const q = data.profiles.find(x => x.id === p.id); if(!q) data.profiles.push(structuredClone(p)); else if((p.updated || 0) > (q.updated || 0)) Object.assign(q, structuredClone(p)); }
     for(const [pid, list] of Object.entries(src.log || {})){ const cur = data.log[pid] ??= []; const seen = new Set(cur.map(e => e.ts + '|' + e.task)); for(const e of list) if(!seen.has(e.ts + '|' + e.task)) cur.push(e); cur.sort((a, b) => a.ts - b.ts); }
     for(const [pid, m] of Object.entries(src.matrix || {})){ const cur = matrixOf(pid); for(const [k, c] of Object.entries(m)) if(!cur[k] || (c.date || 0) > (cur[k].date || 0)) cur[k] = c; }
+    for(const [pid, l] of Object.entries(src.skips || {})){ const cur = (data.skips ??= {})[pid] ??= []; const seen = new Set(cur.map(e => e.ts)); for(const e of l) if(!seen.has(e.ts)) cur.push(e); cur.sort((a, b) => a.ts - b.ts); }
     for(const [pid, h] of Object.entries(src.mhist || {})){ const cur = (data.mhist ??= {})[pid] ??= []; const seen = new Set(cur.map(e => e.date + e.key)); for(const e of h) if(!seen.has(e.date + e.key)) cur.push(e); cur.sort((a, b) => a.date - b.date); }
   }
   profSig.clear(); touchProfiles();   // übernommene Stände nicht als „gerade geändert“ markieren
@@ -6716,7 +6786,7 @@ async function qrUnzip(bytes, flag){ if(!flag) return bytes; const ds = new Deco
 function qrPayload(ids, withSettings, keep){
   const pick = (o, f) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ids.includes(k)).map(([k, v]) => [k, f ? f(v) : v]));
   return {app:'stufenweise', kind:'move', v:1, from:data.device, at:Date.now(),
-    data:{schema:data.schema, profiles:data.profiles.filter(p => ids.includes(p.id)), log:pick(data.log, l => keep == null ? l : l.slice(-keep)), matrix:pick(data.matrix), mhist:pick(data.mhist)},
+    data:{schema:data.schema, profiles:data.profiles.filter(p => ids.includes(p.id)), log:pick(data.log, l => keep == null ? l : l.slice(-keep)), matrix:pick(data.matrix), mhist:pick(data.mhist), skips:pick(data.skips, l => l.slice(-50))},
     settings: withSettings ? {...settings, pin:undefined, startCtx:undefined} : undefined};
 }
 async function qrBuild(ids, withSettings){
@@ -7433,7 +7503,7 @@ function renderMap(){
   $('#controls').innerHTML = toolBtn({id:'map-home', ic:'home', label:'Zur Startseite', primary:true});
 }
 /* ---------- Berichte ---------- */
-const REPORT_CSS = SHEET_CSS + `.rp h2{font-size:15pt;margin:6mm 0 2mm;border-bottom:1.5px solid #222;padding-bottom:1mm}.rp h3{font-size:12.5pt;margin:4mm 0 1mm}.rp p,.rp li{font-size:11pt;line-height:1.45}.rp table.mx{border-collapse:collapse;margin:2mm 0;font-size:10pt}.rp table.mx td,.rp table.mx th{border:1px solid #bbb;padding:1mm 2mm;text-align:center}.rp table.mx th{background:#f0f0f0}.rp .z{background:#fff4e2;border-left:3px solid #e8890c;padding:2mm 3mm;margin:2mm 0}.rp .note{font-size:9pt;color:#666}
+const REPORT_CSS = SHEET_CSS + `.wk-days{display:flex;gap:4mm;align-items:flex-end;margin:4mm 0 2mm}.wk-day{display:flex;flex-direction:column;align-items:center;gap:1mm;width:18mm}.wk-bar{height:28mm;width:10mm;background:#f1ece1;border-radius:2mm;display:flex;align-items:flex-end;overflow:hidden}.wk-bar i{display:block;width:100%;background:#2f5ea8}.wk-day small{color:#555}.wk-tab{border-collapse:collapse;width:100%;font-size:11pt}.wk-tab th,.wk-tab td{border:1px solid #999;padding:1.5mm 2mm;text-align:left}.wk-tab th{background:#f1ece1}.wk-notes{height:35mm;border:1px solid #999;border-radius:2mm}.rp h2{font-size:15pt;margin:6mm 0 2mm;border-bottom:1.5px solid #222;padding-bottom:1mm}.rp h3{font-size:12.5pt;margin:4mm 0 1mm}.rp p,.rp li{font-size:11pt;line-height:1.45}.rp table.mx{border-collapse:collapse;margin:2mm 0;font-size:10pt}.rp table.mx td,.rp table.mx th{border:1px solid #bbb;padding:1mm 2mm;text-align:center}.rp table.mx th{background:#f0f0f0}.rp .z{background:#fff4e2;border-left:3px solid #e8890c;padding:2mm 3mm;margin:2mm 0}.rp .note{font-size:9pt;color:#666}
 .lk-route{break-inside:avoid;margin:0 0 5mm}.lk-route h3{display:flex;align-items:center;gap:2mm;font-size:13pt;margin:0 0 2mm}.lk-route h3 b{display:inline-flex;min-width:9mm;height:7mm;border-radius:2mm;background:#222;color:#fff;font-size:9pt;align-items:center;justify-content:center;padding:0 1.5mm}
 .lk-since{font-size:7.5pt;color:#1f7a45;font-weight:700}.lk-path{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,1fr);gap:2mm}.lk-st{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1mm;font-size:9.5pt}.lk-dot{width:9mm;height:9mm;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;border:1.5px solid #999;color:#999}.lk-st.ok .lk-dot,.lk-dot.ok{background:#1f7a45;border-color:#1f7a45;color:#fff}.lk-st.now .lk-dot,.lk-dot.now{background:#e8890c;border-color:#e8890c;color:#fff}.lk-tag{font-size:8pt;font-weight:700;color:#9a5a10}.lk-self{font-size:8.5pt;color:#444}.lk-none{font-size:9pt;color:#888}.lk-legend{display:flex;gap:4mm;align-items:center;font-size:10pt}.lk-legend .lk-dot{width:6mm;height:6mm;font-size:8pt}`;
 function mxTable(pid, subj){
@@ -7447,7 +7517,8 @@ function buildReport(pid, kind){
   const p = data.profiles.find(x => x.id === pid), name = p?.name || 'Gast', date = new Date().toLocaleDateString('de-DE');
   const head = (t) => `<div class="ab-top"><h1>${t}</h1><div class="ab-meta"><div>Name: <span>${escHtml(name)}</span></div><div>Datum: <span>${date}</span></div></div></div>`;
   let body = '';
-  if(kind === 'map'){
+  if(kind === 'week') body = weekReportHtml(pid, head);
+  else if(kind === 'map'){
     body = `<div class="page">${head('Meine Lernlandkarte')}<p class="lk-legend"><span class="lk-dot ok">✓</span> Das kann ich schon <span class="lk-dot now">★</span> Daran arbeite ich <span class="lk-dot">3</span> Das kommt noch</p>${mapHtml(pid, true)}<p class="note" style="font-size:9pt;color:#666">Zum Ankreuzen im Gespräch: Was kann ich nach meiner eigenen Einschätzung?</p></div>`;
   } else if(kind === 'parents'){
     const routes = mapRoutes(pid).filter(r => r.any);
@@ -7470,14 +7541,47 @@ function buildReport(pid, kind){
       ${(() => { const secs = statsSections(pid).filter(x => x.title !== 'Zuletzt geübt'); return secs.length ? `<h2>Übungen</h2>${secs.map(x => `<h3>${escHtml(x.title)}</h3><ul>${x.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul>`).join('')}` : ''; })()}
       <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Einstufungen sind Vorschläge und werden von der Lehrkraft geprüft. Sie ersetzen keine sonderpädagogische Diagnostik.</p></div>`;
   }
-  const title = {map:'Lernlandkarte', parents:'Elterninfo', teacher:'Lernstandsbericht'}[kind] + ' ' + name;
+  const title = {map:'Lernlandkarte', parents:'Elterninfo', teacher:'Lernstandsbericht', week:'Wochenübersicht'}[kind] + ' ' + name;
   return {title, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${REPORT_CSS}</style></head><body>${body}</body></html>`};
 }
 app.report = {pid:null, kind:'teacher'};
+/* Wochenübersicht: Was wurde an den letzten 7 Tagen geübt, wie lange, wie sicher? Für ILEB-Gespräch und Elterngespräch. */
+function weekReportHtml(pid, head){
+  const DAY = 864e5, end = new Date(); end.setHours(24, 0, 0, 0);
+  const start = end.getTime() - 7*DAY, L = (data.log[pid] || []).filter(e => e.ts >= start && MODE_NAMES[e.mode] && !['diag', 'screen', 'warm'].includes(e.mode));
+  const SK = (data.skips?.[pid] || []).filter(e => e.ts >= start);
+  const pct = es => es.length ? Math.round(100*es.filter(e => e.ok).length/es.length) : 0;
+  /* Übungszeit: Abstände zwischen zwei Aufgaben unter 5 Minuten zählen, plus 30 Sekunden für die erste */
+  const dur = new Map(); L.forEach((e, i) => { const d = i ? e.ts - L[i - 1].ts : 3e4; dur.set(e, d < 3e5 ? d : 3e4); });
+  const mins = es => Math.round(es.reduce((t, e) => t + dur.get(e), 0)/6e4);
+  const days = Array.from({length:7}, (_, i) => { const d0 = start + i*DAY, es = L.filter(e => e.ts >= d0 && e.ts < d0 + DAY); return {d: new Date(d0), es, sk: SK.filter(e => e.ts >= d0 && e.ts < d0 + DAY).length}; });
+  const maxN = Math.max(1, ...days.map(d => d.es.length));
+  const byMode = {}; for(const e of L) (byMode[e.mode] ??= []).push(e);
+  const skBy = {}; for(const e of SK) skBy[e.mode] = (skBy[e.mode] || 0) + 1;
+  const lvName = e => e.lvl ? (L_INFO[e.lvl] || W_INFO[e.lvl] || U_INFO[e.lvl] || G_INFO[e.lvl] || H_INFO[e.lvl])?.name : e.range ? `bis ${e.range}` : '';
+  const wd = d => d.toLocaleDateString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit'});
+  const rows = Object.entries(byMode).sort((a, b) => b[1].length - a[1].length).map(([m, es]) => {
+    const lv = [...new Set(es.map(lvName).filter(Boolean))].slice(0, 4).join(', ');
+    return `<tr><td>${escHtml(MODE_NAMES[m])}</td><td>${es.length}</td><td>${pct(es)} %</td><td>${mins(es)} min</td><td>${skBy[m] || 0}</td><td>${escHtml(lv)}</td></tr>`;
+  }).join('');
+  const total = L.length, act = days.filter(d => d.es.length).length;
+  const hard = Object.entries(byMode).filter(([, es]) => es.length >= 5 && pct(es) < 60).map(([m]) => MODE_NAMES[m]);
+  const good = Object.entries(byMode).filter(([, es]) => es.length >= 5 && pct(es) >= 85).map(([m]) => MODE_NAMES[m]);
+  return `<div class="page rp">${head('Wochenübersicht')}
+    <p class="note">Zeitraum: ${wd(days[0].d)} bis ${wd(days[6].d)} · Gezählt werden geprüfte Übungsaufgaben (ohne Tests). Übungszeit ist geschätzt.</p>
+    <p><b>${total} Aufgaben</b> an ${act} von 7 Tagen · etwa ${mins(L)} Minuten · ${pct(L)} % beim ersten Versuch richtig${SK.length ? ` · ${SK.length}-mal übersprungen` : ''}</p>
+    <div class="wk-days">${days.map(d => `<div class="wk-day"><div class="wk-bar"><i style="height:${Math.round(100*d.es.length/maxN)}%"></i></div><b>${d.es.length || '–'}</b><small>${d.d.toLocaleDateString('de-DE', {weekday:'short'})}</small></div>`).join('')}</div>
+    ${rows ? `<h2>Geübte Bereiche</h2><table class="wk-tab"><thead><tr><th>Bereich</th><th>Aufgaben</th><th>gleich richtig</th><th>Zeit</th><th>übersprungen</th><th>Stufen</th></tr></thead><tbody>${rows}</tbody></table>` : '<p>In dieser Woche wurde noch nicht geübt.</p>'}
+    ${good.length ? `<h2>Läuft sicher</h2><p>${escHtml(good.join(', '))}</p>` : ''}
+    ${hard.length ? `<h2>Braucht noch Unterstützung</h2><p>${escHtml(hard.join(', '))} (weniger als 60 % beim ersten Versuch richtig)</p>` : ''}
+    ${SK.length ? `<h2>Übersprungene Aufgaben</h2><p>${SK.slice(-8).map(e => escHtml(e.task)).join(' · ')}</p>` : ''}
+    <h2>Notizen</h2><div class="wk-notes"></div>
+    <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Zahlen zeigen nur, was in der App geübt wurde.</p></div>`;
+}
 function openReport(pid){ app.report.pid = pid; $('#dlg-report').showModal(); renderReport(); }
 function renderReport(){
   const R = app.report;
-  $('#report-body').innerHTML = `<div class="sheet-form"><div class="seg" role="group" aria-label="Art" style="flex-direction:column;align-items:stretch">${[['teacher', 'Lernstandsbericht (ILEB)'], ['parents', 'Elterninfo (einfache Sprache)'], ['map', 'Lernlandkarte (Kind)']].map(([k, n]) => `<button data-rk="${k}" aria-pressed="${R.kind === k}">${n}</button>`).join('')}</div>
+  $('#report-body').innerHTML = `<div class="sheet-form"><div class="seg" role="group" aria-label="Art" style="flex-direction:column;align-items:stretch">${[['teacher', 'Lernstandsbericht (ILEB)'], ['week', 'Wochenübersicht (letzte 7 Tage)'], ['parents', 'Elterninfo (einfache Sprache)'], ['map', 'Lernlandkarte (Kind)']].map(([k, n]) => `<button data-rk="${k}" aria-pressed="${R.kind === k}">${n}</button>`).join('')}</div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="rp-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="rp-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button></div>
     <p class="note">Falls „Drucken“ hier nichts tut: als Datei speichern und im Browser drucken. Die Elterninfo nutzt die Ich-kann-Sätze der Lernlandkarte.</p></div><iframe id="rp-frame" title="Vorschau Bericht"></iframe>`;
   app.reportDoc = buildReport(R.pid, R.kind);
@@ -7568,6 +7672,7 @@ $('#stage').addEventListener('click', e => {
     return;
   }
   if(app.mode === 'blitz'){ if(e.target.closest('#b-go')) blitzStart(); return; }
+  if(['add', 'sub'].includes(app.mode) && task()?.view === 'field'){ const c = e.target.closest('[data-tfi]'); if(c && task().check !== 'ok') fieldTap(task(), +c.dataset.tfi); return; }
   if(['number', 'add', 'sub'].includes(app.mode) && task()?.view === 'board'){ const pg = e.target.closest('[data-tbpage]'); if(pg){ task().bview = +pg.dataset.tbpage; return renderWork(); } const c = e.target.closest('[data-hb]'); if(c) boardTap(+c.dataset.hb); return; }
   if(app.mode === 'number' && task().view === 'line' && task().find){ if(e.target.closest('.find-svg')) findTap(e); return; }
   if(app.mode === 'written') return;
@@ -7631,6 +7736,8 @@ $('#controls').addEventListener('click', e => {
   if(btn.dataset.view){ t.view = btn.dataset.view; app.sel.clear(); t.check = t.check === 'ok' ? 'ok' : null; return renderWork(); }
   if(btn.dataset.move) return tradeButton(btn.dataset.move);
   if(btn.dataset.tbj) return tbJump(t, +btn.dataset.tbj);
+  if(btn.dataset.fds) return fieldStep(t, +btn.dataset.fds);
+  if(btn.id === 'c-fdundo'){ const f = fieldState(t), h = f.hist.pop(); if(h){ f.dots = h.dots; f.cross = h.cross; } return renderWork(); }
   if(btn.id === 'c-tbundo'){ if((t.bpath || []).length > 1) t.bpath.pop(); return renderWork(); }
   switch(btn.id){
     case 'c-join': return doJoin();
@@ -7699,7 +7806,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.16.1 · 15.11.2026';
+const APP_VERSION = '0.17.0 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -7827,7 +7934,7 @@ $('#dlg-profile').addEventListener('click', e => {
   const pick = e.target.closest('[data-pid]'); if(pick){ selectProfile(pick.dataset.pid); return; }
   const del = e.target.closest('[data-del]');
   if(del && !teacherOn()) return requireTeacher(() => renderProfiles());
-  if(del){ const id = del.dataset.del, p = data.profiles.find(x => x.id === id); if(p && del.dataset.sure){ data.profiles = data.profiles.filter(x => x.id !== id); delete data.log[id]; if(data.current === id) data.current = null; saveData(); renderProfiles(); render(); } else { del.dataset.sure = '1'; del.innerHTML = '<span style="display:inline;font-weight:700;color:var(--bad)">Sicher?</span>'; } return; }
+  if(del){ const id = del.dataset.del, p = data.profiles.find(x => x.id === id); if(p && del.dataset.sure){ data.profiles = data.profiles.filter(x => x.id !== id); delete data.log[id]; if(data.skips) delete data.skips[id]; if(data.errs) delete data.errs[id]; if(data.current === id) data.current = null; saveData(); renderProfiles(); render(); } else { del.dataset.sure = '1'; del.innerHTML = '<span style="display:inline;font-weight:700;color:var(--bad)">Sicher?</span>'; } return; }
   if(e.target.closest('#p-screen')){ $('#dlg-profile').close(); screenStart(); }
   if(e.target.closest('#p-unlock')){ requireTeacher(() => renderProfiles()); return; }
   const tb = e.target.closest('[data-ptest]'); if(tb){ requireTeacher(() => { $('#dlg-profile').close(); diagStart(tb.dataset.ptest, false); }); return; }
@@ -7860,7 +7967,7 @@ $('#dlg-stats').addEventListener('click', async e => {
     return;
   }
   const del = e.target.closest('#stats-del');
-  if(del){ if(del.dataset.sure){ delete data.log[statsId]; const p = data.profiles.find(x => x.id === statsId); if(p) p.screening = null; saveData(); renderStats(); toast('Daten gelöscht.'); } else { del.dataset.sure = '1'; del.querySelector('span').textContent = 'Wirklich löschen?'; } }
+  if(del){ if(del.dataset.sure){ delete data.log[statsId]; if(data.skips) delete data.skips[statsId]; if(data.errs) delete data.errs[statsId]; const p = data.profiles.find(x => x.id === statsId); if(p) p.screening = null; saveData(); renderStats(); toast('Daten gelöscht.'); } else { del.dataset.sure = '1'; del.querySelector('span').textContent = 'Wirklich löschen?'; } }
 });
 for(const d of [$('#dlg-profile'), $('#dlg-stats')]) d.addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target === d) d.close(); });
 if('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { if(dlgSet.open) fillVoices(); });

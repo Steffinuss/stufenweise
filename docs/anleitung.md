@@ -89,6 +89,10 @@ Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das
 
 ![Formulierungsvorschlag ILEB Mathematik](bilder/10_ileb.png)
 
+**Übungsprotokoll:** Darunter stehen die geübten Bereiche, **typische Fehler** und **übersprungene Aufgaben**. Typische Fehler erkennt die App beim Rechnen selbst: um 1 verzählt, Zahlendreher, Zehner falsch, falsche Rechenart (plus statt minus), Zehnerübergang nicht beachtet und „klein von groß“ bei Minus (bei 32 − 5 wird 5 − 2 gerechnet). Das Kind bekommt dazu sofort einen passenden Tipp. Übersprungen heißt: Das Kind hat zur nächsten Aufgabe geklickt, ohne die Aufgabe zu lösen. Du siehst, wie oft, in welchem Bereich und bei welchen Aufgaben.
+
+**Wochenübersicht:** Unter **Bericht drucken** gibt es neben Lernstandsbericht, Elterninfo und Lernlandkarte die **Wochenübersicht** für die letzten 7 Tage: Aufgaben pro Tag als Balken, geübte Bereiche mit Anzahl, Anteil gleich richtig, geschätzter Übungszeit, übersprungenen Aufgaben und Stufen, dazu „Läuft sicher“, „Braucht noch Unterstützung“ und Platz für Notizen. Gut für das ILEB- oder Elterngespräch.
+
 ## Schritt 5: Üben
 
 Nach dem Test findet das Kind seine Übungen selbst. Das Stufen-Zeichen links oben führt zur Startseite.
@@ -108,6 +112,14 @@ Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte*
 Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Links sieht das Kind nur die Bereiche, die für es dran sind, mit ★ für die Förderzone. Bei Fehlern gibt es einen konkreten Tipp. Wie viel ein Kind sehen darf, stellst du in den Einstellungen unter „Geführte Oberfläche“ ein.
 
 ![Übung Wechselgeld mit Material](bilder/12_ueben.png)
+
+### Zehnerübergang als eigene Stufe
+
+Bei Plus und Minus steigt die App in diesen Schritten auf (und bei vielen Fehlern wieder ab): bis 10 → bis 20 **ohne** Zehnerübergang → bis 20 **mit** Zehnerübergang → bis 100 ohne → bis 100 mit → bis 1000. Oben neben den Zahlen steht dann ein Hinweis wie „ohne Zehnerübergang“. Tippst du selbst auf einen Zahlenraum, ist das wieder aufgehoben. Hast du in den Einstellungen beim Zehnerübergang „mit“ oder „ohne“ festgelegt, gilt immer deine Einstellung.
+
+### Zwanzigerfeld beim Üben
+
+Bei Plus und Minus bis 20 (und bis 10) gibt es unten die Ansicht **Zwanzigerfeld** (bis 10: Zehnerfeld). Die erste Zahl liegt schon als blaue Punkte im Feld. **Plus:** Das Kind legt die zweite Zahl in Orange dazu, indem es ins Feld tippt oder +1 und +5 nimmt. Wie üblich wird erst die obere Reihe voll gemacht. **Minus:** Das Kind streicht von hinten weg, mit Tippen oder −1 und −5. Dann schreibt es das Ergebnis oben in die Rechnung.
 
 ### Übungsrunden
 
