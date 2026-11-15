@@ -2,6 +2,10 @@
 
 Stufenweise ist eine kostenlose Lern-App für Schülerinnen und Schüler mit Förderschwerpunkt geistige Entwicklung. Sie orientiert sich am Bildungsplan GENT Baden-Württemberg 2022 und läuft im Browser, vor allem auf dem iPad.
 
+### ▶ [Stufenweise jetzt öffnen](https://steffinuss.github.io/stufenweise/)
+
+Kostenlos, ohne Anmeldung, ohne Download aus einem App-Store. Einfach den Link öffnen und loslegen; wer möchte, legt die App danach auf den Home-Bildschirm (siehe [Installieren](#installieren)).
+
 ## Warum Stufenweise?
 
 Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, also darauf, was als Nächstes dran ist. Das schafft Klarheit und Sicherheit.
@@ -22,9 +26,19 @@ Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, al
 - **Selbstständig üben:** Übungen passend zur Stufe, mit Material wie Zehnerstangen, Hundertertafel, Tausenderbuch, Geld und Uhr; altersgerecht und ohne Spielmechanik
 - **Arbeit abnehmen:** Arbeitsblätter zur Förderzone, Legeblätter in Originalgröße für echtes Material (Zwanzigerfeld, Stellentafel, Hunderterfeld, Zifferblatt, Buchstabenkarten …), Elterninfo in einfacher Sprache, Klassenübersicht als Tabelle
 
-## Nutzen
+## Installieren
 
-Die ganze App steckt in einer einzigen Datei: `index.html`. Öffne sie in Safari, Chrome oder Firefox. Auf dem iPad legt „Teilen → Zum Home-Bildschirm“ die App wie eine normale App ab.
+Stufenweise ist eine Web-App. Es gibt sie nicht im App Store und nicht im Play Store, und man braucht sie dort auch nicht: Die Adresse **https://steffinuss.github.io/stufenweise/** im Browser öffnen genügt. Damit sie wie eine normale App mit eigenem Symbol startet:
+
+- **iPad und iPhone (Safari):** Adresse öffnen → „Teilen“ (Quadrat mit Pfeil) → „Zum Home-Bildschirm“ → „Hinzufügen“.
+- **Android (Chrome):** Adresse öffnen → Menü ⋮ → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.
+- **Windows und Mac (Chrome oder Edge):** Adresse öffnen → in der Adressleiste auf das Installieren-Symbol klicken (oder Menü → „Stufenweise installieren“).
+
+Nach dem ersten Öffnen funktioniert die App auch ohne Internet. Updates kommen automatisch: Gibt es eine neue Version, erscheint auf dem Startbildschirm ein Hinweis.
+
+**Wichtig:** Namen und Ergebnisse liegen auf dem jeweiligen Gerät, getrennt für den Browser und für die App auf dem Home-Bildschirm. Am besten von Anfang an nur einen der beiden Wege nutzen. Zum Umziehen auf ein anderes Gerät gibt es „Geräteumzug per QR-Code“ in den Einstellungen.
+
+**Ohne Internet weitergeben:** Die ganze App steckt in einer einzigen Datei, [`index.html`](index.html) („Download raw file“). Sie lässt sich auch direkt im Browser öffnen, etwa vom USB-Stick oder aus dem Schulnetz.
 
 **[Anleitung mit Bildern](docs/anleitung.md)**: alle Schritte von der PIN bis zur Rückmeldung.
 
