@@ -5910,6 +5910,7 @@ function readNew(){
   const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl];
   freshNew(); let it, tries = 0; do { it = pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
   Object.assign(R, {item: it, r:{}, fb:null, tries:0, spoken:false});
+  setHint(''); /* neue Aufgabe: „Richtig“ der vorigen Aufgabe weg, auch über „Neue Aufgabe“ oben */
   renderRead();
 }
 function renderTopRead(){
@@ -8161,7 +8162,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.18.1 · 15.11.2026';
+const APP_VERSION = '0.18.2 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
