@@ -4768,7 +4768,9 @@ function writeStage(it, r, opt = {}){
   if(it.memo && !r.hidden) return `<div class="it-wrap w-wrap"><div class="it-word memo-word">${escHtml(it.word)}</div><p class="memo-steps">Lies das Wort genau. Sprich es leise mit. Merke es dir.</p><button class="memo-btn" data-wmemo>Ich habe es mir gemerkt – abdecken</button></div>`;
   const showWord = it.word && (!it.memo || opt.feedback);
   const head = (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 130)}</div>` : '') + (showWord ? `<div class="it-word">${escHtml(it.word)}</div>` : '') + (it.memo && !opt.feedback ? `<button class="memo-peek" data-wpeek>Nochmal ansehen</button>` : '');
-  const n = it.max || Math.max(it.target.length, r.text.length + 1);
+  /* so viele Kästchen wie das Wort Buchstaben hat; sind alle voll, kommt kein leeres Kästchen dazu (sonst wirkt das Wort unfertig).
+     Wer weiterschreibt, sieht die zusätzlichen Buchstaben trotzdem. */
+  const n = it.max || Math.max(it.target.length, r.text.length);
   let boxes;
   if(opt.feedback && !opt.feedback.ok && r.marks) boxes = `<div class="w-boxes" aria-label="Deine Antwort mit Markierung">${r.marks.ops.map(o => `<span class="w-box ${o.k}" aria-label="${o.k === 'ok' ? 'richtig' : o.k === 'miss' ? 'hier fehlt ein Buchstabe' : o.k === 'extra' ? 'zu viel' : 'falsch'}">${escHtml(o.c)}</span>`).join('')}</div>`;
   else if(r.slots){ const cur = r.slots.findIndex(x => !x.c); boxes = `<div class="w-boxes" aria-label="Verbessere das Wort">${r.slots.map((x, i) => `<span class="w-box ${x.fix ? 'fix' : ''} ${i === cur ? 'cur' : ''}">${escHtml(x.c)}</span>`).join('')}</div>`; }
@@ -7834,7 +7836,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.17.5 · 15.11.2026';
+const APP_VERSION = '0.17.6 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
