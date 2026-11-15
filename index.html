@@ -1526,7 +1526,7 @@ function guideFix(){
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
-function render(){ if(guideFix()) return; document.body.classList.toggle('rail-off', !!settings.railOff); queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
+function render(){ if(guideFix()) return; if(typeof UPD !== 'undefined') queueMicrotask(updSync); document.body.classList.toggle('rail-off', !!settings.railOff); queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
 /* Passt die Einstellungsleiste nicht neben die Knöpfe oben rechts, rückt sie in eine eigene Zeile (sonst verschwinden z. B. die 10er-Reihe oder „Kalender“) */
 function fitTop(){
   const tb = document.querySelector('.topbar'), t = tb?.querySelector('.toolbar'); if(!t) return;
@@ -7834,7 +7834,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.17.4 · 15.11.2026';
+const APP_VERSION = '0.17.5 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -7902,16 +7902,25 @@ document.querySelectorAll('.upd-ver').forEach(e => e.textContent = `Installiert:
 /* ---------- Aktualisieren (wichtig für die App auf dem Home-Bildschirm: iPadOS lädt sie sonst nicht neu) ---------- */
 const verNum = v => String(v).split(' ')[0].split('.').map(n => parseInt(n, 10) || 0);
 const verNewer = (a, b) => { const x = verNum(a), y = verNum(b); for(let i = 0; i < Math.max(x.length, y.length); i++){ if((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
-const UPD = {last:0, found:null, later:null};
+var UPD = {last:0, found:null, later:null};   /* var: render() kann schon vorher laufen */
 async function checkUpdate(manual){
   UPD.last = Date.now();
   let j = null;
   try{ const r = await fetch(`version.json?t=${Date.now()}`, {cache:'no-store'}); if(r.ok) j = await r.json(); }catch{}
   if(!j?.version){ if(manual) toast('Die Version konnte gerade nicht geprüft werden (keine Verbindung?).'); return; }
-  if(verNewer(j.version, APP_VERSION)){ UPD.found = j; if(manual || UPD.later !== j.version) showUpdateBar(); if(manual) doUpdate(); return; }
+  if(verNewer(j.version, APP_VERSION)){ UPD.found = j; if(manual || UPD.later !== j.version) showUpdateBar(manual); if(manual) doUpdate(); return; }
   if(manual) toast(`Stufenweise ist aktuell (Version ${APP_VERSION}).`);
 }
-function showUpdateBar(){
+/* Der Hinweis erscheint nur auf dem Startbildschirm (Auswahl Üben/Unterricht, Namensauswahl, Werkzeugwahl an der Tafel).
+   Beim Üben würde „Jetzt aktualisieren“ die App neu starten – Kinder sollen da nicht hineintippen. */
+const atStart = () => !app.ctx || (app.mode === 'home' && (app.ctx === 'class' || !curProfile()));
+function updSync(){
+  const bar = document.querySelector('.upd-bar');
+  if(!UPD.found || UPD.later === UPD.found.version) return bar?.remove();
+  if(atStart()) showUpdateBar(); else bar?.remove();
+}
+function showUpdateBar(force){
+  if(!force && !atStart()) return;
   if(document.querySelector('.upd-bar')) return;
   const d = document.createElement('div'); d.className = 'upd-bar'; d.setAttribute('role', 'status');
   d.innerHTML = `<span><b>Neue Version ${escHtml(UPD.found.version)}</b> von Stufenweise ist da.</span><button class="icon-btn primary" type="button" data-upd="go">Jetzt aktualisieren</button><button class="icon-btn" type="button" data-upd="later">Später</button>`;

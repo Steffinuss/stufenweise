@@ -226,7 +226,7 @@ Melde dich am besten genau dann, wenn dir etwas auffällt. Die App schickt autom
 
 In Safari auf „Teilen“ → „Zum Home-Bildschirm“ tippen. Stufenweise startet dann wie eine App, ohne Adressleiste.
 
-iPadOS lädt eine solche App beim Öffnen oft nicht neu. Deshalb prüft Stufenweise selbst, ob es eine neue Version gibt: beim Öffnen, beim Zurückkehren in die App und alle 30 Minuten. Gibt es eine, erscheint oben der Hinweis „Neue Version … ist da“ mit dem Knopf **Jetzt aktualisieren**. Von Hand geht es in den Einstellungen („Nach neuer Version suchen“) oder in der Anleitung neben der Versionsnummer („Aktualisieren“). Namen, Ergebnisse und Einstellungen bleiben dabei erhalten.
+iPadOS lädt eine solche App beim Öffnen oft nicht neu. Deshalb prüft Stufenweise selbst, ob es eine neue Version gibt: beim Öffnen, beim Zurückkehren in die App und alle 30 Minuten. Gibt es eine, erscheint oben der Hinweis „Neue Version … ist da“ mit dem Knopf **Jetzt aktualisieren**, aber nur auf dem Startbildschirm (Auswahl Üben/Unterricht, Namensauswahl, Werkzeugwahl an der Tafel). Während ein Kind übt, bleibt der Hinweis weg, damit niemand mitten in der Übung die App neu startet. Von Hand geht es in den Einstellungen („Nach neuer Version suchen“) oder in der Anleitung neben der Versionsnummer („Aktualisieren“). Namen, Ergebnisse und Einstellungen bleiben dabei erhalten.
 
 **Ohne Internet:** Wurde Stufenweise einmal mit Internet geöffnet, startet es danach auch ohne WLAN (mit der zuletzt geladenen Version). Sobald wieder Internet da ist, kommt die neueste Version wie gewohnt.
 
