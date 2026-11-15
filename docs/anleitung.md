@@ -13,7 +13,7 @@ Oben rechts liegen zwei Knöpfe: der **Name** des Kindes (am Anfang „Gast“) 
    - **Rückmeldung geben:** Fehler, Ideen und Lob melden.
    - **Anleitung:** Hilfe zu allen Bereichen und „Über Stufenweise“ mit Lizenz und Danke.
    - **Vollbild:** blendet die Leisten des Browsers aus.
-   - **Einstellungen:** PIN, eigene Wörter, Hilfen und Datensicherung.
+   - **Einstellungen:** in vier Registerkarten: **Allgemein** (Start, Bedienung, Ergebnisse), **Mathe** (Material, Zehnerübergang, Uhr), **Deutsch** (Tastatur, eigene Wörter) und **Kinder & Daten** (geführte Oberfläche, PIN, Datensicherung, Geräteumzug).
 
 Das Stufen-Zeichen links oben führt immer zur Startseite. Darunter liegen die Übungsbereiche.
 
@@ -21,8 +21,8 @@ Das Stufen-Zeichen links oben führt immer zur Startseite. Darunter liegen die �
 
 Leg die PIN fest, bevor Kinder mit dem iPad arbeiten. Danach sind Lernstand, Tests, Arbeitsblätter und Einstellungen geschützt.
 
-1. Oben auf **Einstellungen** (7) tippen.
-2. Nach unten scrollen bis **Lehrkraft-PIN**.
+1. Oben auf **Einstellungen** (7) tippen und die Registerkarte **Kinder & Daten** wählen.
+2. Unter **Lehrkraft-PIN**
 3. Vier Ziffern eingeben und **PIN festlegen** tippen.
 
 ![Einstellungen mit dem Feld Lehrkraft-PIN](bilder/02_pin.png)
@@ -99,7 +99,7 @@ Nach dem Test findet das Kind seine Übungen selbst. Das Stufen-Zeichen links ob
 
 Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigt eine Treppe, wo das Kind gerade ist. Jede Stufe zeigt mit Bild und Wort, was schon gewählt ist (Üben, das Bild und der Name des Kindes, Mathe oder Deutsch). Die Stufe, die gerade dran ist, ist orange mit einem Fragezeichen. Oben wartet die Fahne „Los geht’s“: Dort beginnt das Üben. Mit einem Tipp auf eine grüne Stufe geht es zurück zu diesem Schritt.
 
-1. **Wer übt?** Das Kind tippt auf seinen Namen. Nach jedem Neuladen oder Neustart der App kommt diese Frage wieder, damit nicht aus Versehen unter dem Namen des letzten Kindes geübt wird. Soll an einem Gerät immer dasselbe Kind angemeldet bleiben, stellst du unter **Hilfen → Name beim Start** „letztes Kind bleibt ausgewählt“ ein.
+1. **Wer übt?** Das Kind tippt auf seinen Namen. Nach jedem Neuladen oder Neustart der App kommt diese Frage wieder, damit nicht aus Versehen unter dem Namen des letzten Kindes geübt wird. Soll an einem Gerät immer dasselbe Kind angemeldet bleiben, stellst du unter **Allgemein → Name beim Start** „letztes Kind bleibt ausgewählt“ ein.
 2. **Fach:** Unter **Heute für dich** steht die passende Übung aus der Förderzone. Ein Tipp darauf startet sie sofort. Sonst wählt das Kind Mathe oder Deutsch.
 3. **Übung:** Das Kind wählt einen Bereich, zum Beispiel Plus oder Hundertertafel. Oben steht wieder „Für dich“ mit der passenden Übung.
 
@@ -139,7 +139,7 @@ Unter **Frei legen → Würfel** wählst du oben „Zehner und Einer“, „mit 
 
 ### Wörter schreiben
 
-Die Buchstabentastatur ist wie am Handy angeordnet (QWERTZ). Wer lieber nach dem ABC sucht, stellt das in den Einstellungen unter **Hilfen → Buchstabentastatur** um. Mit **⇧ groß** wird der nächste Buchstabe groß; das ß bleibt dabei ein ß, weil kein Wort mit ß anfängt.
+Die Buchstabentastatur ist wie am Handy angeordnet (QWERTZ). Wer lieber nach dem ABC sucht, stellt das in den Einstellungen unter **Deutsch → Buchstabentastatur** um. Mit **⇧ groß** wird der nächste Buchstabe groß; das ß bleibt dabei ein ß, weil kein Wort mit ß anfängt.
 
 Schreibt das Kind ein Wort fast richtig, markiert die App die einzelnen Buchstaben: grün stimmt, rot ist falsch, ein gestricheltes Kästchen zeigt einen fehlenden Buchstaben, durchgestrichen heißt zu viel. Stimmt mindestens die Hälfte, bleiben die grünen Buchstaben beim Verbessern stehen und das Kind füllt nur die roten Kästchen neu (aus „Prot“ wird _rot, das Kind tippt das B). Ist das Wort weit weg, gibt es keine Markierung, damit das Kind nicht rät, sondern neu ansetzt. Auf den Stufen „lautgetreu“ zählt ein Wort wie „Hunt“ schon als richtig; ab der Stufe Merkstellen wird es markiert.
 
@@ -153,7 +153,7 @@ Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901
 
 ## Uhr auf die Minute genau
 
-Auf der Stufe „Minuten genau“ übt die App normalerweise in 5-Minuten-Schritten. In den Einstellungen unter **Hilfen → Uhr „Minuten genau“** kannst du auf **auf die Minute genau** umstellen. Dann kommen Uhrzeiten wie 6:37, und beim Uhr-Stellen gibt es Knöpfe für −5, −1, +1 und +5 Minuten. Der Test bleibt bei 5-Minuten-Schritten, damit die Ergebnisse vergleichbar sind.
+Auf der Stufe „Minuten genau“ übt die App normalerweise in 5-Minuten-Schritten. In den Einstellungen unter **Mathe → Uhr** kannst du auf **auf die Minute genau** umstellen. Dann kommen Uhrzeiten wie 6:37, und beim Uhr-Stellen gibt es Knöpfe für −5, −1, +1 und +5 Minuten. Der Test bleibt bei 5-Minuten-Schritten, damit die Ergebnisse vergleichbar sind.
 
 Die Zeiger lassen sich auch mit dem Finger ziehen, beim Uhr-Stellen und im Unterricht an der Tafel: außen am Minutenzeiger die Minuten (über die 12 hinweg wandert die Stunde mit), innen am kurzen Zeiger die Stunde. Uhrzeiten in Worten folgen dem Alltag: „20 nach 2“, „4 vor halb 3“, „8 nach halb 3“, „20 vor 3“. Digitale Uhrzeiten kommen auch nachmittags und abends vor (z. B. 19:38 mit dem Hinweis „Es ist Abend“).
 
@@ -179,7 +179,7 @@ Die Werkzeuge:
 - **Uhr:** Zeiger mit + und − stellen (in Schritten von 1, 5 oder 15 Minuten), dazu auf Wunsch die Digitalzeit und die Uhrzeit in Worten.
 - **Wörter:** ein Wort oder einen Satz eintippen und groß zeigen, mit farbigen Silben und Silbenbögen. Kennt die App ein Bild zum Wort, erscheint es dazu.
 
-In den Einstellungen unter **Hilfen → Beim Start** kannst du festlegen, dass ein Gerät immer direkt mit Üben oder immer mit Unterricht startet, zum Beispiel der Rechner an der Tafel.
+In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, dass ein Gerät immer direkt mit Üben oder immer mit Unterricht startet, zum Beispiel der Rechner an der Tafel.
 
 ## Schritt 6: Arbeitsblätter drucken
 
@@ -239,8 +239,8 @@ Alle Namen und Ergebnisse liegen nur auf diesem Gerät, und zwar getrennt für j
 
 So kommen Kinder ohne Datei und ohne Internet auf ein anderes Gerät, zum Beispiel vom Lehrer-iPad auf ein Schüler-iPad:
 
-1. Auf dem **alten Gerät**: Einstellungen → Daten sichern → **Per QR-Code senden**. Kinder ankreuzen (auf Wunsch auch die Einstellungen, die PIN wird nie übertragen) und **QR-Codes zeigen** tippen.
-2. Auf dem **neuen Gerät**: Einstellungen → Daten sichern → **Per QR-Code empfangen**. Beim ersten Mal fragt das iPad, ob Stufenweise die Kamera benutzen darf: erlauben.
+1. Auf dem **alten Gerät**: Einstellungen → Kinder & Daten → **Per QR-Code senden**. Kinder ankreuzen (auf Wunsch auch die Einstellungen, die PIN wird nie übertragen) und **QR-Codes zeigen** tippen.
+2. Auf dem **neuen Gerät**: Einstellungen → Kinder & Daten → **Per QR-Code empfangen**. Beim ersten Mal fragt das iPad, ob Stufenweise die Kamera benutzen darf: erlauben.
 3. Die Kamera des neuen Geräts auf den Bildschirm des alten halten. Bei vielen Daten wechseln die QR-Codes von selbst; die Reihenfolge ist egal, kleine Kästchen zeigen, welche Teile schon angekommen sind. Meist dauert das zehn bis zwanzig Sekunden.
 4. Zum Schluss zeigt das neue Gerät, welche Kinder angekommen sind. **Übernehmen** tippen.
 

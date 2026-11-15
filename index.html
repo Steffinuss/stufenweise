@@ -732,6 +732,9 @@ svg{-webkit-touch-callout:none}
 #modes .rail-fold span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
 #modes .rail-fold small{font-size:11px;font-weight:600}
 .rail button[data-zone]::after{content:'★';position:absolute;top:3px;right:5px;font-size:11px;color:#e8890c;line-height:1}
+.set-tabs{display:flex;gap:4px;background:#efe8da;border-radius:12px;padding:4px;margin:0 0 10px;position:sticky;top:-2px;z-index:2;flex-wrap:wrap}
+.set-tabs button{flex:1;min-height:40px;padding:6px 10px;font-weight:700;background:none;box-shadow:none;border-radius:9px;color:var(--muted);white-space:nowrap}
+.set-tabs button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px #0002}
 .auto-chip{display:inline-flex;align-items:center;font-size:14px;font-weight:700;color:#5f5a64;background:#efe8da;border-radius:10px;padding:8px 12px;white-space:nowrap}
 .fb-btn{border:1.5px solid #e8890c !important}
 .fb-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px}
@@ -886,49 +889,66 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 
 <dialog id="dlg-settings" aria-labelledby="set-title">
   <div class="dlg-head"><h2 id="set-title">Einstellungen</h2><button data-close class="icon-btn">Fertig</button></div>
+  <div class="set-tabs" role="tablist" aria-label="Bereiche der Einstellungen"><button role="tab" data-stab="general" aria-selected="true">Allgemein</button><button role="tab" data-stab="math" aria-selected="false">Mathe</button><button role="tab" data-stab="german" aria-selected="false">Deutsch</button><button role="tab" data-stab="kids" aria-selected="false">Kinder &amp; Daten</button></div>
+  <div class="set-panel" data-stab-panel="general" role="tabpanel">
+  <fieldset><legend>Start</legend>
+    <label class="row">Beim Start <select data-key="startCtx"><option value="ask">fragen: Üben oder Unterricht</option><option value="practice">immer Üben</option><option value="class">immer Unterricht (Tafel)</option></select></label>
+    <label class="row">Name beim Start <select data-key="askWho"><option value="ask">jedes Mal neu wählen</option><option value="keep">letztes Kind bleibt ausgewählt</option></select></label>
+    <label class="row">Themenwelt für Gast und Unterricht <select data-key="world"><option value="GS">Grundstufe (GS)</option><option value="HS">Hauptstufe (HS)</option><option value="BSS">Berufsschulstufe (BSS)</option></select></label>
+  </fieldset>
+  <fieldset><legend>Bedienung und Hilfen</legend>
+    <label class="row cb"><input type="checkbox" data-key="labels"> Texte unter den Knöpfen</label>
+    <label class="row cb"><input type="checkbox" data-key="help"> Auswahlhilfe (Hinweise unter der Fläche)</label>
+    <label class="row">Zifferntastatur auf dem Bildschirm <select data-key="numpad"><option value="auto">automatisch (Tablet)</option><option value="on">immer</option><option value="off">nie</option></select></label>
+    <label class="row">Übungsrunde <select data-key="roundLen"><option value="5">5 Aufgaben</option><option value="10">10 Aufgaben</option><option value="15">15 Aufgaben</option><option value="0">ohne Ende</option></select></label>
+  </fieldset>
+  <fieldset><legend>Ergebnisse</legend>
+    <label class="row cb"><input type="checkbox" data-key="allowResults"> Ergebnisse und Mengen anzeigen erlauben</label>
+    <p class="note">Aus: Die Kinder rechnen selbst. Ergebnis, Gesamtmenge und Ziffern unter der Tafel bleiben verborgen. „Ergebnis prüfen“ geht trotzdem.</p>
+  </fieldset>
+  <fieldset><legend>Rückmeldung zur App</legend>
+    <label class="row cb"><input type="checkbox" data-key="fbOn"> Knopf „Rückmeldung“ anzeigen</label>
+    <label class="row">Rückmeldungen zusätzlich per E-Mail an <input type="email" data-key="fbMail" placeholder="leer = nur über GitHub" autocomplete="off" style="flex:1;max-width:260px"></label>
+    <p class="note">Rückmeldungen gehen über GitHub (öffentliche Meldung, kostenloses Konto nötig). Wer zusätzlich per E-Mail sammeln möchte, zum Beispiel an die Testleitung an der eigenen Schule, trägt hier eine Adresse ein. Sie bleibt nur auf diesem Gerät.</p>
+  </fieldset>
   <fieldset><legend>App-Version</legend>
     <div class="row" style="justify-content:flex-start;gap:12px;flex-wrap:wrap"><span class="upd-ver"></span><button class="icon-btn upd-check" type="button">Nach neuer Version suchen</button></div>
     <p class="note">Stufenweise prüft beim Öffnen und beim Zurückkehren in die App selbst, ob es eine neue Version gibt, und zeigt dann oben einen Hinweis. Daten und Einstellungen bleiben beim Aktualisieren erhalten.</p>
   </fieldset>
-  <fieldset><legend>Ergebnisse</legend>
-    <label class="row cb"><input type="checkbox" data-key="allowResults"> Ergebnisse und Mengen anzeigen erlauben</label>
-    <label class="row cb"><input type="checkbox" data-key="fbOn"> Knopf „Rückmeldung“ anzeigen</label>
-    <label class="row">Rückmeldungen zusätzlich per E-Mail an <input type="email" data-key="fbMail" placeholder="leer = nur über GitHub" autocomplete="off" style="flex:1;max-width:260px"></label>
-    <p class="note">Rückmeldungen gehen über GitHub (öffentliche Meldung, kostenloses Konto nötig). Wer zusätzlich per E-Mail sammeln möchte, zum Beispiel an die Testleitung an der eigenen Schule, trägt hier eine Adresse ein. Sie bleibt nur auf diesem Gerät.</p>
-    <p class="note">Aus: Die Kinder rechnen selbst. Ergebnis, Gesamtmenge und Ziffern unter der Tafel bleiben verborgen. „Ergebnis prüfen“ geht trotzdem.</p>
-    <label class="row cb"><input type="checkbox" data-key="digits"> Ziffern unter der Stellenwerttafel</label>
-    <label class="row cb"><input type="checkbox" data-key="numberWords"> Zahlwort zeigen (Zahlen-Modus)</label>
-  </fieldset>
+  </div>
+  <div class="set-panel" data-stab-panel="math" role="tabpanel" hidden>
   <fieldset><legend>Material</legend>
     <label class="row">Farben <select data-key="colors"><option value="red">Rot – Blau</option><option value="green">Grün – Blau</option><option value="montessori">Montessori: H rot · Z blau · E grün</option></select></label>
     <label class="row">Wortwahl <select data-key="words"><option value="exchange">Umtauschen</option><option value="bundle">Bündeln / Entbündeln</option></select></label>
     <label class="row">Umtauschen <select data-key="exchangeMode"><option value="select">Material antippen</option><option value="buttons">Mit Tausch-Knöpfen</option></select></label>
     <label class="row">Minus <select data-key="subMode"><option value="self">Selbst wegnehmen (antippen)</option><option value="auto">Auf Knopfdruck abziehen</option></select></label>
+    <label class="row cb"><input type="checkbox" data-key="digits"> Ziffern unter der Stellenwerttafel</label>
+    <label class="row cb"><input type="checkbox" data-key="numberWords"> Zahlwort zeigen (Zahlen-Modus)</label>
   </fieldset>
-  <fieldset><legend>Hilfen</legend>
-    <label class="row cb"><input type="checkbox" data-key="help"> Auswahlhilfe (Hinweise unter der Fläche)</label>
-    <label class="row cb"><input type="checkbox" data-key="labels"> Texte unter den Knöpfen</label>
-    <label class="row">Zifferntastatur auf dem Bildschirm <select data-key="numpad"><option value="auto">automatisch (Tablet)</option><option value="on">immer</option><option value="off">nie</option></select></label>
-    <label class="row">Buchstabentastatur beim Schreiben <select data-key="kbd"><option value="qwertz">wie am Handy (QWERTZ)</option><option value="abc">nach dem ABC</option></select></label>
+  <fieldset><legend>Zufallsaufgaben (Plus und Minus)</legend>
+    <label class="row">Zehnerübergang <select data-key="ten"><option value="any">egal</option><option value="without">ohne</option><option value="with">mit</option></select></label>
+    <label class="row">Hunderterübergang <select data-key="hundred"><option value="any">egal</option><option value="without">ohne</option><option value="with">mit</option></select></label>
+    <p class="note">Bei „egal“ übt die App den Zehnerübergang als eigene Stufe: erst ohne, dann mit Übergang.</p>
+  </fieldset>
+  <fieldset><legend>Uhr</legend>
     <label class="row">Uhr „Minuten genau“ <select data-key="clockMin"><option value="5">in 5-Minuten-Schritten</option><option value="1">auf die Minute genau</option></select></label>
-    <label class="row">Themenwelt für Gast und Unterricht <select data-key="world"><option value="GS">Grundstufe (GS)</option><option value="HS">Hauptstufe (HS)</option><option value="BSS">Berufsschulstufe (BSS)</option></select></label>
-    <label class="row">Beim Start <select data-key="startCtx"><option value="ask">fragen: Üben oder Unterricht</option><option value="practice">immer Üben</option><option value="class">immer Unterricht (Tafel)</option></select></label>
-    <label class="row">Name beim Start <select data-key="askWho"><option value="ask">jedes Mal neu wählen</option><option value="keep">letztes Kind bleibt ausgewählt</option></select></label>
-    <label class="row">Übungsrunde <select data-key="roundLen"><option value="5">5 Aufgaben</option><option value="10">10 Aufgaben</option><option value="15">15 Aufgaben</option><option value="0">ohne Ende</option></select></label>
   </fieldset>
-  <fieldset><legend>Geführte Oberfläche</legend>
-    <p class="note">Nach dem Test sieht jedes Kind nur die Bereiche und Stufen, die für es dran sind. Werkzeuge (Zahlen zeigen, Frei legen) bleiben immer sichtbar. Mit der PIN zeigt „Alles zeigen“ in der Leiste vorübergehend alle Bereiche.</p>
-    <label class="row">Standard für alle Kinder <select data-key="guide"><option value="zone">Nur die Förderzone</option><option value="plus">Förderzone und Geschafftes</option><option value="all">Alles sichtbar (Förderzone markiert)</option></select></label>
-    <div id="guide-list"></div>
+  </div>
+  <div class="set-panel" data-stab-panel="german" role="tabpanel" hidden>
+  <fieldset><legend>Schreiben</legend>
+    <label class="row">Buchstabentastatur beim Schreiben <select data-key="kbd"><option value="qwertz">wie am Handy (QWERTZ)</option><option value="abc">nach dem ABC</option></select></label>
   </fieldset>
   <fieldset><legend>Eigene Wörter (Schreiben)</legend>
     <label class="row col">Wörter, die deine Klasse üben soll – z. B. Namen, Praktikumswörter, Wörter aus dem Unterricht. Ein Wort pro Zeile oder mit Komma getrennt.
       <textarea data-key="ownWords" rows="4" placeholder="Ali, Selin, Praktikum, Schraube, Montag" style="width:100%;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:1.5px solid #ddd4c3;margin-top:6px"></textarea></label>
     <p class="note">Die Wörter erscheinen unter „Lesen → Meine Wörter“, „Schreiben → Meine Wörter“ und als Arbeitsblatt. Sie werden nicht für Tests verwendet.</p>
   </fieldset>
-  <fieldset><legend>Zufallsaufgaben (Plus und Minus)</legend>
-    <label class="row">Zehnerübergang <select data-key="ten"><option value="any">egal</option><option value="without">ohne</option><option value="with">mit</option></select></label>
-    <label class="row">Hunderterübergang <select data-key="hundred"><option value="any">egal</option><option value="without">ohne</option><option value="with">mit</option></select></label>
+  </div>
+  <div class="set-panel" data-stab-panel="kids" role="tabpanel" hidden>
+  <fieldset><legend>Geführte Oberfläche</legend>
+    <p class="note">Nach dem Test sieht jedes Kind nur die Bereiche und Stufen, die für es dran sind. Werkzeuge (Zahlen zeigen, Frei legen) bleiben immer sichtbar. Mit der PIN zeigt „Alles zeigen“ in der Leiste vorübergehend alle Bereiche.</p>
+    <label class="row">Standard für alle Kinder <select data-key="guide"><option value="zone">Nur die Förderzone</option><option value="plus">Förderzone und Geschafftes</option><option value="all">Alles sichtbar (Förderzone markiert)</option></select></label>
+    <div id="guide-list"></div>
   </fieldset>
   <fieldset><legend>Lehrkraft-PIN</legend>
     <p class="note" id="pin-state"></p>
@@ -944,6 +964,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <p class="note" id="data-text-note" hidden>Falls kein Download startet: Den Text unten markieren, kopieren und als Datei mit der Endung .json speichern.</p>
     <textarea id="data-text" readonly hidden style="width:100%;height:80px"></textarea>
   </fieldset>
+  </div>
 </dialog>
 
 <dialog id="dlg-qr" aria-labelledby="qr-title">
@@ -7798,7 +7819,11 @@ dlgSet.addEventListener('change', e => {
   render();
 });
 let holdTimer = null;
-const openSettings = () => { syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
+/* Registerkarten in den Einstellungen */
+let setTab = 'general';
+function showSetTab(k){ setTab = k; for(const b of dlgSet.querySelectorAll('[data-stab]')) b.setAttribute('aria-selected', b.dataset.stab === k); for(const p of dlgSet.querySelectorAll('[data-stab-panel]')) p.hidden = p.dataset.stabPanel !== k; }
+dlgSet.addEventListener('click', e => { const b = e.target.closest('[data-stab]'); if(b) showSetTab(b.dataset.stab); });
+const openSettings = () => { showSetTab(setTab); syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
 $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings));
 document.addEventListener('change', e => {
   const t = e.target, pid = t.dataset?.pworld || t.dataset?.ppic; if(!pid || !teacherOn()) return;
@@ -7809,7 +7834,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.17.3 · 15.11.2026';
+const APP_VERSION = '0.17.4 · 15.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
