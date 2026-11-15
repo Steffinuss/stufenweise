@@ -189,6 +189,10 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 3. Bei Bedarf Thema, Zahlenraum und Material anpassen. Bei „Aufgaben“ füllt „Blatt füllen“ die Seite mit vollen Reihen; du kannst auch eine feste Zahl wählen. Rechts siehst du die Vorschau.
 4. **Drucken** tippen. „Lösungsblatt anhängen“ legt eine Seite mit den Lösungen dazu.
 
+**Große Aufgaben:** Mit dem Häkchen „Große Aufgaben“ werden Zahlen, Schreibkästchen und Bilder etwa ein Drittel größer, dafür passen weniger Aufgaben auf das Blatt. Das hilft Kindern, die mehr Platz zum Schreiben, Streichen und Zeigen brauchen. Die Einstellung gilt auch, wenn du das Blatt ins Arbeitsheft übernimmst.
+
+**Minus mit Zehnerübergang:** Beim Wegstreichen bis 100 oder 1000 streichen die Kinder normalerweise Kästchen im Zehner weg, der Zehner wird also „angebrochen“. Mit „Zehnerübergang: Umtausch schon im Bild zeigen“ ist der nötige Umtausch schon gemacht: Ein Zehner liegt als 10 Einer da (bis 1000 bei Bedarf auch ein Hunderter als 10 Zehner), gestrichelt umrandet und unter dem Bild benannt, zum Beispiel „1 Zehner = 10 Einer“. Das ist eine Stütze für Kinder, die den Umtausch mit echtem Material kennen, ihn im Bild aber noch nicht selbst herstellen. Den Umtausch selbst üben die Kinder vorher am Material.
+
 **Kopf- und Fußzeilen:** Am Computer werden Arbeitsblätter, Legeblätter und das Arbeitsheft ohne Datum und Internetadresse am Rand gedruckt. Stehen sie trotzdem auf dem Blatt, im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad und iPhone hängt Safari immer eine Fußzeile an; das lässt sich dort nicht abschalten. Für saubere Blätter am Computer drucken.
 
 ![Arbeitsblatt-Generator mit Vorschau](bilder/13_arbeitsblatt.png)

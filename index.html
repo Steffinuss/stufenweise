@@ -7081,8 +7081,8 @@ function abField(a, b = 0, op = '+', cap = a + (op === '+' ? b : 0) > 10 || a > 
   return `<svg class="ab-svg" viewBox="0 0 ${W + 4} 46">${s}</svg>`;
 }
 /* Material für Papier: feste Einheiten (1 Würfel = 10), Hunderter in Fünferreihen. Der Maßstab wird später für das ganze Blatt gleich gesetzt (abScale). sketch = Zeichenweise □ | • */
-function paperHZE(h, z, e, sketch = false){
-  const U = 10, G = 8; let s = '', x = 0;
+function paperHZE(h, z, e, sketch = false, sw = {}){ /* sw.z: so viele Zehner (vorne) kommen aus einem getauschten Hunderter; sw.e: die ersten 10 Einer kommen aus einem getauschten Zehner */
+  const U = 10, G = 8; let s = '', x = 0, zx0 = 0, zx1 = 0;
   const hc = Math.min(h, 5), hr = Math.ceil(h/5);
   for(let i = 0; i < h; i++){
     const cx = x + (i % 5)*(10*U + G), cy = Math.floor(i/5)*(10*U + G);
@@ -7090,19 +7090,25 @@ function paperHZE(h, z, e, sketch = false){
     else { s += `<rect x="${cx}" y="${cy}" width="${10*U}" height="${10*U}" rx="2" fill="${PLACE.h}" stroke="#0007" stroke-width="1.2"/>`; for(let k = 1; k < 10; k++) s += `<path d="M${cx + k*U} ${cy}v${10*U}M${cx} ${cy + k*U}h${10*U}" stroke="#0003" stroke-width=".9"/>`; }
   }
   if(h) x += hc*(10*U + G) - G + 18;
+  zx0 = x;
   for(let i = 0; i < z; i++){
+    if(sw.z && i === sw.z) zx1 = x - 5 - (i % 5 === 0 ? 6 : 0);
     if(sketch) s += `<path d="M${x + U/2} 4v${10*U - 8}" stroke="#222" stroke-width="5" stroke-linecap="round"/>`;
     else { s += `<rect x="${x}" y="0" width="${U}" height="${10*U}" rx="1.5" fill="${PLACE.z}" stroke="#0007" stroke-width="1.2"/>`; for(let k = 1; k < 10; k++) s += `<path d="M${x} ${k*U}h${U}" stroke="#0003" stroke-width=".9"/>`; }
-    x += U + 5 + (i === 4 ? 6 : 0);
+    x += U + 5 + (i % 5 === 4 ? 6 : 0);
   }
+  if(sw.z && !zx1) zx1 = x - 5 - (z % 5 === 0 ? 6 : 0);
+  if(sw.z) s += `<rect x="${zx0 - 3}" y="-3" width="${zx1 - zx0 + 6}" height="${10*U + 6}" rx="3" fill="none" stroke="#222" stroke-width="1.2" stroke-dasharray="4 3"/>`;
   if(z) x += 13;
+  const ex0 = x;
   const per = e > 10 ? 5 : 5, ec = Math.min(e, per);
   for(let i = 0; i < e; i++){
     const cx = x + (i % per)*(U + 4), cy = Math.floor(i/per)*(U + 4) + (Math.floor(i/per) >= 2 ? 6 : 0);
     s += sketch ? `<circle cx="${cx + U/2}" cy="${cy + U/2}" r="3.6" fill="#222"/>` : `<rect x="${cx}" y="${cy}" width="${U}" height="${U}" rx="1.5" fill="${PLACE.e}" stroke="#0007" stroke-width="1.2"/>`;
   }
+  if(sw.e) s += `<rect x="${ex0 - 3}" y="-3" width="${5*(U + 4) - 4 + 6}" height="${2*(U + 4) - 4 + 6}" rx="3" fill="none" stroke="#222" stroke-width="1.2" stroke-dasharray="4 3"/>`;
   if(e) x += ec*(U + 4) - 4;
-  const W = Math.max(x, 10), H = Math.max(h ? hr*(10*U + G) - G : 0, z ? 10*U : 0, e ? Math.ceil(e/per)*(U + 4) + (e > 10 ? 6 : 0) : 0, 10);
+  const W = Math.max(x, 10) + (sw.e || sw.z ? 3 : 0), H = Math.max(h ? hr*(10*U + G) - G : 0, z ? 10*U + (sw.z ? 3 : 0) : 0, e ? Math.ceil(e/per)*(U + 4) + (e > 10 ? 6 : 0) : 0, 10);
   return `<svg class="ab-svg matp" data-uw="${W + 4}" data-uh="${H + 4}" viewBox="-2 -2 ${W + 4} ${H + 4}" role="img" aria-label="${h ? h + ' Hunderter, ' : ''}${z} Zehner, ${e} Einer">${s}</svg>`;
 }
 function abMoney(list){
@@ -7115,13 +7121,22 @@ function abMoney(list){
 }
 const abKey = zr => `<p class="ab-key">So zeichnest du: ${zr >= 1000 ? '<span class="k-h"></span> Hunderter · ' : ''}${zr >= 20 ? '<span class="k-z"></span> Zehner · ' : ''}<span class="k-e"></span> Einer</p>`;
 function abMat(n, zr){ return paperHZE(Math.floor(n/100), Math.floor(n % 100/10), n % 10); }
+/* Wegstreichen mit Zehnerübergang: der nötige Umtausch ist schon gemacht (1 Zehner → 10 Einer, 1 Hunderter → 10 Zehner) */
+function abMatTausch(a, b){
+  let h = Math.floor(a/100), z = Math.floor(a % 100/10), e = a % 10, swZ = 0, swE = false;
+  if(e < b % 10){ if(!z){ h--; z = 10; swZ = 10; } z--; e += 10; swE = true; if(swZ) swZ--; }
+  if(z < Math.floor(b % 100/10)){ h--; z += 10; swZ = 10; }
+  if(!swE && !swZ) return abMat(a);
+  const txt = [swZ ? '1 Hunderter = 10 Zehner' : '', swE ? '1 Zehner = 10 Einer' : ''].filter(Boolean).join(' · ');
+  return `${paperHZE(h, z, e, false, {z: swZ, e: swE})}<p class="ab-tausch"><span class="tz"></span> ${txt}</p>`;
+}
 /* Gleicher Maßstab für alle Materialbilder eines Blatts, passend zur Kartenbreite */
-function abScale(body, cols){
+function abScale(body, cols, z = 1){
   const ms = [...body.matchAll(/data-uw="([\d.]+)" data-uh="([\d.]+)"/g)].map(m => [+m[1], +m[2]]);
   if(!ms.length) return body;
   /* Paare (a + b) nebeneinander: Breite beider Bilder plus Rechenzeichen */
   const pairs = [...body.matchAll(/<div class="ab-matrow">(.*?)<\/div>/g)].map(m => [...m[1].matchAll(/data-uw="([\d.]+)"/g)].reduce((a, x) => a + +x[1], 0) + 70);
-  const inner = (186 - (cols - 1)*4)/cols - 9.5, maxW = Math.max(...ms.map(m => m[0]), ...pairs), maxH = Math.max(...ms.map(m => m[1]));
+  const inner = ((186 - (cols - 1)*4)/cols)/z - 9.5, maxW = Math.max(...ms.map(m => m[0]), ...pairs), maxH = Math.max(...ms.map(m => m[1]));
   const k = Math.min(.27, inner/maxW, 27/maxH);
   return body.replace(/data-uw="([\d.]+)" data-uh="([\d.]+)"/g, (m, w, h) => `${m} style="width:${(w*k).toFixed(1)}mm;height:${(h*k).toFixed(1)}mm"`);
 }
@@ -7158,7 +7173,7 @@ const M_SHEETS = {
     zr => { const T = zrMax(zr), a = rnd(Math.ceil(T*.1), Math.floor(T*.5)), b = a + rnd(Math.max(1, Math.floor(T*.1)), Math.floor(T*.4)); const nm = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']), nm2 = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_('rechne', `${nm} hat ${a} €. ${nm2} hat ${b} €. Wie viel mehr hat ${nm2}?`, `${app.sheet.mat && zr <= 20 ? `<div class="ab-bars"><span>${nm}</span>${abField(a, 0, '+', 20)}<span>${nm2}</span>${abField(b, 0, '+', 20)}</div>` : ''}${ans(18, '€')}`, b - a); },
     zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${ans()}`, b - a); }]},
   plus: {name:'Plus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('+', zr, app.sheet.ue); const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '+', zr) : `<div class="ab-matrow">${abMat(a, zr)}<b>+</b>${abMat(b, zr)}</div>`; return T_('rechne', 'Rechne.', `${mat}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b); }]},
-  minus: {name:'Minus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('−', zr, app.sheet.ue); const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '−', zr) : abMat(a, zr); return T_(zr <= 20 || !app.sheet.mat ? 'rechne' : ['streiche', 'rechne'], zr <= 20 || !app.sheet.mat ? 'Rechne.' : `Streiche ${b} weg und rechne.`, `${mat}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a); }]},
+  minus: {name:'Minus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('−', zr, app.sheet.ue); const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '−', zr) : app.sheet.tausch ? abMatTausch(a, b) : abMat(a, zr); return T_(zr <= 20 || !app.sheet.mat ? 'rechne' : ['streiche', 'rechne'], zr <= 20 || !app.sheet.mat ? 'Rechne.' : `Streiche ${b} weg und rechne.`, `${mat}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a); }]},
   stellenwert: {name:'Zehner und Einer (Stellenwert)', cols:2, gens:[
     zr => { const n = zr >= 1000 ? rnd(1, 4)*100 + rnd(1, 6)*10 + rnd(1, 8) : rnd(2, 8)*10 + rnd(1, 9); return T_('schreibe', 'Welche Zahl ist das?', `${abMat(n, zr)}${ans()}`, n); },
     zr => { const n = zr >= 1000 ? rnd(120, 980) : rnd(21, 98); return zr >= 1000 ? T_('schreibe', 'Zerlege in Hunderter, Zehner und Einer.', `<p class="ab-row">${n} = ${box(11)} H ${box(11)} Z ${box(11)} E</p>`, `${Math.floor(n/100)} H ${Math.floor(n % 100/10)} Z ${n % 10} E`) : T_('schreibe', 'Zerlege in Zehner und Einer.', `<p class="ab-row">${n} = ${box(11)} Z ${box(11)} E</p>`, `${Math.floor(n/10)} Z ${n % 10} E`); },
@@ -7478,7 +7493,7 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .ab-top{border-bottom:2.5px solid #222;padding-bottom:2.5mm;margin-bottom:3mm}.ab-top h1{font-size:20pt;margin:0 0 3mm;line-height:1.15}
 .ab-meta{display:grid;grid-template-columns:2fr 1fr;gap:8mm;font-size:11pt}.ab-meta div{display:flex;gap:2mm;align-items:flex-end}.ab-meta span{flex:1;border-bottom:1.2px solid #444;min-height:6mm;font-weight:700;padding-left:1mm}
 .ab-legend{display:flex;flex-wrap:wrap;gap:2mm 6mm;font-size:9.5pt;color:#444;margin:0 0 4mm}.ab-legend span{display:flex;align-items:center;gap:1.5mm}.ab-legend .ab-op{width:5mm;height:5mm}
-.ab-grid{display:grid;gap:4mm}
+.ab-grid{display:grid;gap:4mm}.ab-grid.gross>.ab-task{zoom:1.35}.ab-tausch{font-size:10pt;color:#444;text-align:center;margin:0;white-space:nowrap}.ab-tausch .tz{display:inline-block;width:5mm;height:3mm;border:1.2px dashed #222;border-radius:1mm;vertical-align:middle;margin-right:1mm}
 .ab-task{border:1.2px solid #c8c8c8;border-radius:3mm;padding:3mm 4mm 3.5mm 4mm;display:flex;flex-direction:column;gap:2mm;break-inside:avoid;min-height:30mm}
 .ab-ins{display:flex;align-items:center;gap:2mm;font-size:11.5pt;line-height:1.3;color:#222}.ab-ins .nr{width:6.5mm;height:6.5mm;border-radius:50%;background:#222;color:#fff;font-size:9.5pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
 .ab-op{width:6.5mm;height:6.5mm;flex:none}.ab-ins .ops{display:flex;gap:1mm;flex:none;padding-right:1mm;border-right:1px solid #ddd;margin-right:1mm}
@@ -7530,7 +7545,8 @@ function zoneToSheet(key){
   if(ax === 'R') return a === 'R7' ? {topic:'M:einmaleins'} : {topic:'M:plus', zr: R_CONF[a].range, ue: ({without:'ohne', with:'mit'})[R_CONF[a].ten] || 'egal'};
   return null;
 }
-app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all'};
+app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false};
+const AB_GROSS = 1.35; /* „Große Aufgaben“: alles in der Aufgabe so viel größer */
 function buildSheet(limit){
   const S0 = app.sheet;
   if(S0.topic === 'H:HT' && S0.htp === 'all'){ /* ganzes Tausenderbuch: 10 Seiten von 1–100 bis 901–1000 */
@@ -7570,7 +7586,7 @@ function buildSheet0(limit){
   /* gleiche Aufgabenart zusammen, innerhalb davon von leicht nach schwer */
   const ord = [...Array(n).keys()].sort((x, y) => G.gi[x] - G.gi[y] || G.d[x] - G.d[y] || x - y);
   const tasks = ord.map((j, i) => G.tasks[j].replace('§NR§', i + 1)), sols = ord.map(j => G.sols[j]), used = new Set(G.ops.slice(0, n).flat());
-  const body = abScale(`<div class="ab-grid" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols);
+  const body = abScale(`<div class="ab-grid${S.gross ? ' gross' : ''}" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols, S.gross ? AB_GROSS : 1);
   const legend = `<div class="ab-legend">${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
   const info = sj === 'L' ? L_INFO[key] : sj === 'W' ? W_INFO[key] : sj === 'U' ? U_INFO[key] : sj === 'G' ? G_INFO[key] : sj === 'H' ? H_INFO[key] : null;
@@ -7684,6 +7700,7 @@ function renderSheets(keep){
     ${isM && key === 'schriftlich' ? `<label class="row">Zahlenraum ${sel('sh-wzr', [[100, 'bis 100 (zweistellig)'], [1000, 'bis 1000 (dreistellig)'], [10000, 'bis 10 000 (vierstellig)']], S.wzr)}</label><label class="row">Rechenart ${sel('sh-wop', [['add', 'nur Plus'], ['sub', 'nur Minus'], ['both', 'gemischt']], S.wop)}</label>` : isM && !['einmaleins'].includes(key) ? `<label class="row">Zahlenraum ${sel('sh-zr', [10, 20, 100, 1000].map(z => [z, 'bis ' + z]), S.zr)}</label>` : ''}
     ${isM && ['plus', 'minus', 'schriftlich'].includes(key) ? `<label class="row">${key === 'schriftlich' ? 'Übertrag' : 'Zehnerübergang'} ${sel('sh-ue', [['egal', 'gemischt'], ['ohne', 'ohne'], ['mit', 'mit']], S.ue)}</label>` : ''}
     ${isM && !['schriftlich', 'zahlenstrahl', 'geld', 'zaehlen', 'zeichnen'].includes(key) ? `<label class="row cb"><input type="checkbox" id="sh-mat" ${S.mat ? 'checked' : ''}> mit Materialbildern</label>` : ''}
+    ${S.topic === 'M:minus' && S.mat && S.zr >= 100 && S.ue !== 'ohne' ? `<label class="row cb"><input type="checkbox" id="sh-tausch" ${S.tausch ? 'checked' : ''}> Zehnerübergang: Umtausch schon im Bild zeigen</label>` : ''}
     ${S.topic === 'L:L2' ? `<label class="row">Schrift ${sel('sh-case', [['up', 'nur Großbuchstaben'], ['mixed', 'Groß- und Kleinschreibung']], S.lcase ? 'mixed' : 'up')}</label>` : ''}
     ${LD ? `${LD.zrs ? `<label class="row">Zahlenraum ${sel('sh-lzr', LD.zrs.map(z => [z, `bis ${z}${key === 'geld' ? ' €' : ''}`]), LD.zrs.includes(S.zr) ? S.zr : LD.zrs[0])}</label>` : ''}
       ${LD.kts.length > 1 ? `<label class="row">Aufgaben ${sel('sh-kt', LD.kts.map(k => [k, LD.ktn?.[k] || LK[k]]), lkt)}</label>` : ''}
@@ -7693,6 +7710,7 @@ function renderSheets(keep){
     : S.topic === 'H:HT' ? `<label class="row">Seite ${sel('sh-htp', [['all', 'ganzes Tausenderbuch (10 Seiten)'], ...Array.from({length:10}, (_, p) => [String(p), hPageName(p)]), ['rnd', 'zufällige Seite']], S.htp ?? 'all')}</label>`
     : /^H:H[ML]$/.test(S.topic) ? ''
     : `<label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
+    <label class="row cb"><input type="checkbox" id="sh-gross" ${S.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label>
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
     ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge. Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
@@ -7732,6 +7750,8 @@ function sheetChange(e){
   if(t.id === 'sh-ue') S.ue = t.value;
   if(t.id === 'sh-case') S.lcase = t.value === 'mixed';
   if(t.id === 'sh-mat') S.mat = t.checked;
+  if(t.id === 'sh-gross') S.gross = t.checked;
+  if(t.id === 'sh-tausch') S.tausch = t.checked;
   if(t.id === 'sh-n') S.n = t.value === 'fill' ? 'fill' : +t.value;
   if(t.id === 'sh-sol') S.sol = t.checked;
   if(t.id === 'sh-lzr') S.zr = +t.value;
@@ -8164,7 +8184,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.18.5 · 15.11.2026';
+const APP_VERSION = '0.19.0 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
