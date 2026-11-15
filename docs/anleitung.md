@@ -22,8 +22,7 @@ Das Stufen-Zeichen links oben führt immer zur Startseite. Darunter liegen die �
 Leg die PIN fest, bevor Kinder mit dem iPad arbeiten. Danach sind Lernstand, Tests, Arbeitsblätter und Einstellungen geschützt.
 
 1. Oben auf **Einstellungen** (7) tippen und die Registerkarte **Kinder & Daten** wählen.
-2. Unter **Lehrkraft-PIN**
-3. Vier Ziffern eingeben und **PIN festlegen** tippen.
+2. Unter **Lehrkraft-PIN** vier Ziffern eingeben und **PIN festlegen** tippen.
 
 ![Einstellungen mit dem Feld Lehrkraft-PIN](bilder/02_pin.png)
 
