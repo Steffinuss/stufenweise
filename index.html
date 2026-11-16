@@ -4069,7 +4069,7 @@ const MATH = {
     10: [() => { const n = rnd(6, 9), a = rnd(2, n - 2); return {kern:true, type:'input', text:`${n} = ${a} + ?`, prompt:'Zerlege die Zahl.', fields:[n - a], label:`${n} = ${a} + _`}; }, () => { const n = rnd(6, 9); return {type:'input', svg: fieldSvg(n, 10), prompt:'Wie viele Punkte sind es? Nutze die Fünfer.', fields:[n], label:`${n} im Zehnerfeld (ohne Zeitdruck)`}; }, () => { const t = rnd(6, 9); return {type:'money', target:t*100, denoms:[500, 200, 100], prompt:`Lege ${t} €.`, label:`${t} € legen`}; }],
     20: [() => { const a = rnd(2, 9), n = rnd(12, 19); return {kern:true, type:'input', text:`10 + ${a} = ?     ${n} = 10 + ?`, prompt:'Rechne.', fieldLabels:[`10 + ${a}`, `${n} = 10 + ?`], fields:[10 + a, n - 10], label:`10 + ${a} und ${n} = 10 + _`}; }, () => { const n = rnd(12, 19); return {type:'input', svg: fieldSvg(n, 20), prompt:'Wie viele Punkte sind es? Nutze die Fünfer und Zehner.', fields:[n], label:`${n} im Zwanzigerfeld (ohne Zeitdruck)`}; }, () => { const t = rnd(12, 19); return {type:'money', target:t*100, denoms:[1000, 500, 200, 100], prompt:`Lege ${t} €.`, label:`${t} € legen`}; }],
     100: [() => { const a = rnd(2, 7)*10, b = rnd(1, 9), c = rnd(2, 5)*10, d = rnd(1, 4)*10; return {kern:true, type:'input', text:`${a} + ${b} = ?     ${c} + ${d} = ?`, prompt:'Rechne.', fieldLabels:[`${a} + ${b}`, `${c} + ${d}`], fields:[a + b, c + d], label:`${a} + ${b} und ${c} + ${d}`}; }, () => { const c = rnd(3, 7), s = rnd(2, 8); return {type:'input', svg: cartonSvg(c, s), prompt:'Wie viele Schrauben sind es? In jedem Karton sind 10.', fields:[c*10 + s], label:`${c} Kartons und ${s} Schrauben`}; }, () => { const t = rnd(2, 7)*10 + pick([3, 5, 6, 7, 8]); return {type:'money', target:t*100, denoms:[5000, 2000, 1000, 500, 200, 100], prompt:`Lege ${t} €.`, label:`${t} € legen`}; }],
-    1000: [() => { const h = rnd(2, 8)*100, z = rnd(1, 9)*10, e = rnd(1, 9), a = rnd(3, 7)*100, b = rnd(2, 8)*10; return {kern:true, type:'input', text:`${h} + ${z} + ${e} = ?     ${a} + ${b} = ?`, prompt:'Rechne.', fieldLabels:[`${h} + ${z} + ${e}`, `${a} + ${b}`], fields:[h + z + e, a + b], label:`${h} + ${z} + ${e} und ${a} + ${b}`}; }, () => { const h = rnd(2, 4), z = rnd(2, 6), e = rnd(1, 7); return {type:'input', svg: hzeSvg(h, z, e), prompt:'Wie viele Würfel sind es? Eine Platte hat 100, eine Stange 10.', fields:[h*100 + z*10 + e], label:`${h} H ${z} Z ${e} E`}; }, () => { const t = rnd(2, 6)*100 + pick([20, 40, 50, 70, 80]); return {type:'money', target:t*100, denoms:[20000, 10000, 5000, 2000, 1000], prompt:`Lege ${t} €.`, label:`${t} € legen`}; }]
+    1000: [() => { const h = rnd(2, 8)*100, z = rnd(1, 9)*10, e = rnd(1, 9), a = rnd(3, 7)*100, b = rnd(2, 8)*10; return {kern:true, type:'input', text:`${h} + ${z} + ${e} = ?     ${a} + ${b} = ?`, prompt:'Rechne.', fieldLabels:[`${h} + ${z} + ${e}`, `${a} + ${b}`], fields:[h + z + e, a + b], label:`${h} + ${z} + ${e} und ${a} + ${b}`}; }, () => { const h = rnd(2, 4), z = rnd(2, 6), e = rnd(1, 7); return {type:'input', svg: hzeSvg(h, z, e), prompt:'Welche Zahl ist das? Eine Platte ist 100, eine Stange ist 10, ein Würfel ist 1.', fields:[h*100 + z*10 + e], label:`${h} H ${z} Z ${e} E`}; }, () => { const t = rnd(2, 6)*100 + pick([20, 40, 50, 70, 80]); return {type:'money', target:t*100, denoms:[20000, 10000, 5000, 2000, 1000], prompt:`Lege ${t} €.`, label:`${t} € legen`}; }]
   })[zr],
   IV: zr => ({
     10: [() => { const n = rnd(3, 8); return {kern:true, type:'input', text:`In einen Karton passen 10 Muttern. ${n} sind schon drin. Wie viele fehlen?`, prompt:'Wie viele fehlen?', fields:[10 - n], label:`${n} → 10 ergänzen`}; },
@@ -4106,7 +4106,7 @@ const STELL = {
        () => { let z, e; do { z = rnd(3, 8); e = rnd(1, 9); } while(z === e); return {type:'build', start:[0, 0], prompt:`Lege ${z*10 + e} mit Zehnerstangen und Einern.`, target:z*10 + e, canon:[z, e], label:`${z*10 + e} legen`}; },
        () => { let z, e; do { z = rnd(2, 8); e = rnd(1, 9); } while(z === e); return mkChoice({prompt:`Wie viele Zehner hat die Zahl ${z*10 + e}?`, label:`Zehner von ${z*10 + e}`}, [String(z), String(e), String(z*10 + e)]); }],
   S2: [() => { const z = rnd(1, 4), e = rnd(11, 16); return {kern:true, type:'input', svg: materialSvg(z, e), prompt:'Welche Zahl ist das? Schau genau hin.', fields:[z*10 + e], label:`${z} Z ${e} E lesen (mit Material)`}; },
-       () => { const z = rnd(4, 7), e = rnd(1, 5); return {type:'build', start:[z, e], allowTrade:true, prompt:`Hier liegt ${z*10 + e}. Lege die Zahl so um, dass genau ${e + 10} Einer dabei sind.`, exact:[z - 1, e + 10], label:`${z*10 + e} mit ${e + 10} Einern legen`}; },
+       () => { const z = rnd(4, 7), e = rnd(1, 5); return {type:'build', start:[z, e], allowTrade:true, prompt:`Hier liegt ${z*10 + e}. Tausche so, dass es ${e + 10} Einer sind. Die Zahl bleibt ${z*10 + e}.`, exact:[z - 1, e + 10], label:`${z*10 + e} mit ${e + 10} Einern legen`}; },
        () => { const s = rnd(2, 4), m = rnd(11, 15); const list = Array(s).fill(1000).concat(Array(m).fill(100)); return {type:'input', svg: moneyRowSvg(list), prompt:'Wie viel Geld ist das?', fieldLabels:['Euro'], fields:[s*10 + m], label:`${s} × 10 € und ${m} × 1 €`}; }],
   S3: [() => { const z = rnd(3, 6), e = rnd(11, 17); return {kern:true, type:'input', text:`${z} Zehner und ${e} Einer`, prompt:'Welche Zahl ist das?', fields:[z*10 + e], label:`${z} Z und ${e} E (ohne Material)`}; },
        () => { const z = rnd(4, 9); return {type:'input', text:`${z*10} = ${z - 1} Zehner und ? Einer`, prompt:'Wie viele Einer?', fields:[10], label:`${z*10} = ${z - 1} Z und _ E`}; },
@@ -5103,7 +5103,8 @@ const zOther = (p, n) => { const o = new Set([p]); for(const x of shuffle([p + 1
 const Z_ITEMS = {
   Z1: [
     () => { const n = rnd(1, 9); return {kern:true, type:'input', inl:true, svg: fieldSvg(n, 10), text:`${n} + ? = 10`, prompt:'Wie viele fehlen bis 10?', fields:[10 - n], label:`Zehnerfeld: ${n} + _ = 10`, tip:'Noch nicht. Zähle die leeren Felder.'}; },
-    () => { const n = rnd(1, 9); return mkChoice({layout:'row', svg: fieldSvg(n, 10), prompt:`Hier sind ${n} Punkte. Wie viele fehlen bis 10?`, label:`Zehnerfeld: Partner von ${n} wählen`, tip:'Noch nicht. Zähle die leeren Felder.'}, zOther(10 - n, n)); }],
+    () => { const n = rnd(1, 9); return mkChoice({layout:'row', svg: fieldSvg(n, 10), prompt:`Hier sind ${n} Punkte. Wie viele fehlen bis 10?`, label:`Zehnerfeld: Partner von ${n} wählen`, tip:'Noch nicht. Zähle die leeren Felder.'}, zOther(10 - n, n)); },
+    () => { const n = rnd(2, 8); return {type:'input', svg: fieldSvg(n, 10), prompt:'Wie viele Felder sind noch leer?', fields:[10 - n], label:`Zehnerfeld: ${n} Punkte, leere Felder`, tip:`Noch nicht. Zähle die leeren Felder.`}; }],
   Z2: [
     () => { const n = rnd(1, 9); return {kern:true, type:'input', text:`${n} + ? = 10`, prompt:'Ergänze bis 10.', fields:[10 - n], label:`${n} + _ = 10`, tip:`Noch nicht. Wie viele fehlen von ${n} bis 10?`}; },
     () => { const n = rnd(1, 9); return {type:'input', text:`? + ${n} = 10`, prompt:'Ergänze bis 10.', fields:[10 - n], label:`_ + ${n} = 10`, tip:`Noch nicht. Wie viele fehlen von ${n} bis 10?`}; },
@@ -5111,7 +5112,8 @@ const Z_ITEMS = {
     () => { const n = rnd(1, 9); return mkChoice({layout:'row', text:`${n}`, textCls:'rd-letter', prompt:`Welche Zahl macht mit ${n} zusammen 10?`, label:`Partner von ${n} wählen`, tip:`Noch nicht. ${n} + ? = 10`}, zOther(10 - n, n)); }],
   Z3: [ /* Zerlegungsast wie auf dem Arbeitsblatt: 8 + 5, darunter 8 + ☐ + ☐ = ☐ (Stefan, 16.11.: die Lückenzeile war unklar) */
     () => { const a = rnd(5, 9), b = rnd(11 - a, 9), p = 10 - a; return {kern:true, type:'input', svg: fieldSvg(a, 20, b), ast:{a, b, op:'+'}, fieldLabels:['erster Teil (bis 10)', 'zweiter Teil', 'Ergebnis'], prompt:`Zerlege ${b} und rechne über die 10.`, fields:[p, b - p, a + b], label:`${a} + ${b} über die 10`, tip:`Noch nicht. ${a} + ${p} = 10. Dann noch ${b - p} dazu.`}; },
-    () => { const a = rnd(11, 17), b = rnd(a - 9, 9), p = a - 10; return {type:'input', svg: fieldSvg(a, 20), ast:{a, b, op:'−'}, fieldLabels:['erster Teil (bis 10)', 'zweiter Teil', 'Ergebnis'], prompt:`Zerlege ${b} und rechne über die 10.`, fields:[p, b - p, a - b], label:`${a} − ${b} über die 10`, tip:`Noch nicht. ${a} − ${p} = 10. Dann noch ${b - p} weg.`}; }]
+    () => { const a = rnd(11, 17), b = rnd(a - 9, 9), p = a - 10; return {type:'input', svg: fieldSvg(a, 20), ast:{a, b, op:'−'}, fieldLabels:['erster Teil (bis 10)', 'zweiter Teil', 'Ergebnis'], prompt:`Zerlege ${b} und rechne über die 10.`, fields:[p, b - p, a - b], label:`${a} − ${b} über die 10`, tip:`Noch nicht. ${a} − ${p} = 10. Dann noch ${b - p} weg.`}; },
+    () => { const a = rnd(6, 9), b = rnd(11 - a, 9), p = 10 - a; return {type:'input', svg: fieldSvg(a, 20, b), ast:{a, b, op:'+'}, fieldLabels:['erster Teil (bis 10)', 'zweiter Teil', 'Ergebnis'], prompt:`Zerlege ${b} und rechne über die 10.`, fields:[p, b - p, a + b], label:`${a} + ${b} über die 10`, tip:`Noch nicht. ${a} + ${p} = 10. Dann noch ${b - p} dazu.`}; }]
 };
 const hRC = n => { const k = (n - 1) % 100; return [Math.floor(k/10), k % 10]; };
 const hAt = (page, r, c) => page*100 + r*10 + c + 1;
@@ -5529,7 +5531,8 @@ function diagAnswer(skip){
   d.answers.push({label: it.label, ok: res.ok, kern: !!it.kern, given: res.given, obs: res.obs || [], ms: Math.round(performance.now() - d.t0)});
   logAttempt({mode:'diag', task: it.label, ok: res.ok, tries:1, cell: d.key});
   d.nItems++;
-  const st = cellDecision(d.answers);
+  let st = cellDecision(d.answers);
+  if(!st && d.idx + 1 >= d.items.length) st = d.answers.some(a => a.ok) ? 'teilweise' : 'nicht'; /* keine Aufgabe mehr übrig: nie hängen bleiben */
   if(st){
     const ok = d.answers.filter(a => a.ok).length, obs = [...new Set(d.answers.flatMap(a => a.obs))];
     setCell(d.pid, d.key, {status: st, quelle: d.re ? 're-diagnose' : 'test', sum:`${ok} von ${d.answers.length} richtig`, items: d.answers, obs});
@@ -8336,7 +8339,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.23.0 · 16.11.2026';
+const APP_VERSION = '0.23.1 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
