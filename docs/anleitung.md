@@ -290,6 +290,17 @@ Ist ein Kind auf beiden Geräten schon da, wird zusammengeführt: Die Übungen b
 
 Tipps: Den Bildschirm des alten Geräts hell stellen, die Kamera etwa 20 bis 30 Zentimeter davor halten und Spiegelungen vermeiden. Die QR-Codes enthalten Namen und Lernstände: nur zwischen Schulgeräten im selben Raum verwenden und nicht fotografieren.
 
+## Am Handy ausprobieren
+
+Stufenweise ist für Tablet und Computer gemacht. Zum schnellen Ausprobieren geht auch ein Handy, **hochkant gehalten**:
+
+- Die Startseite zeigt *Üben* und *Unterricht* nebeneinander.
+- Die Leiste mit den Bereichen liegt oben und lässt sich zur Seite wischen.
+- Passt eine Aufgabe nicht ganz auf den Bildschirm, scrollt die Seite nach unten.
+- Die Zifferntastatur sitzt unten über die ganze Breite. Mit ▾ rollst du sie ein.
+
+Quer gehalten ist zu wenig Platz; dann bittet die App, das Handy zu drehen. Für den Unterricht mit Kindern bleibt das iPad die bessere Wahl: Die Hundertertafel und kleines Material sind am Handy zum Antippen sehr klein.
+
 ## Über Stufenweise: Lizenz und Danke
 
 Stufenweise ist ein offenes Projekt: kostenlos, ohne Werbung und für alle Schulen. Unter **Anleitung (?)** steht ganz unten „Über Stufenweise“.

@@ -862,9 +862,74 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .wz-back{font-size:16px;color:var(--muted)}
 .home.wz .home-legal{margin-top:6px}
 
+/* ---------- Handy hochkant (bis 560 px breit): brauchbare Demo-Ansicht (Stefan, 16.11.2026) ---------- */
+@media (max-width:560px){
+  .rail{margin-right:170px;padding:6px 6px 0}
+  .top-tools .profile-chip{max-width:112px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  #modes button{min-width:64px;min-height:46px;font-size:12px}
+  .subj button{min-width:62px}
+  /* Seite darf scrollen: Aufgabenfläche mindestens 380 px hoch, statt Inhalte übereinanderzulegen */
+  .shell{height:auto;min-height:100vh;min-height:100dvh}
+  main{height:auto}
+  .workspace{flex:1 0 auto}
+  .stage{flex:1 0 auto;min-height:380px}
+  .top-tools{position:absolute;top:8px;right:8px;z-index:40}
+  .top-tools .icon-btn{min-height:44px}
+  main{padding:6px;gap:6px}
+  .workspace{padding:8px 10px 8px;border-radius:18px}
+  .home{padding:12px 8px;gap:10px;justify-content:flex-start}
+  .home h2{font-size:24px}
+  .wz-top{justify-content:center;gap:8px}
+  .wz-logo svg{width:36px;height:36px}
+  .wz-brand b{font-size:22px}
+  .wz-brand span{font-size:13px}
+  .ctx-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+  .ctx-tile{width:auto;min-height:0;padding:12px 6px;border-radius:18px;gap:2px}
+  .ctx-tile svg{width:100%;max-width:130px}
+  .ctx-tile b{font-size:24px}
+  .ctx-tile span{font-size:13px}
+  .wz-stair{gap:3px}
+  .wz-blk{width:64px;height:calc(28px + var(--h)*9px);padding-top:3px}
+  .wz-blk svg{max-width:48px;max-height:36px}
+  .wz-stair button{font-size:11px}
+  .home-subj{gap:10px;width:100%;justify-content:center}
+  .home-subj button{width:auto;flex:1;max-width:170px;min-height:96px;font-size:18px}
+  .home-subj svg{width:96px}
+  .home-cards{gap:8px}
+  .wz-tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .wz-tile{padding:8px 2px;min-height:0;font-size:13px;overflow-wrap:anywhere;hyphens:auto}
+  .wz-tile b{font-size:24px;min-height:26px}
+  .ct-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .ct-tile{min-height:0;padding:10px 6px}
+  .ct-tile svg{width:72px;height:50px}
+  .ct-tile b{font-size:17px}
+  .ct-tile span{font-size:12px}
+  .intro-card{font-size:17px;padding:10px 14px;line-height:1.35}
+  .intro-card p{margin:5px 0}
+  .round-bar{left:8px;top:6px;transform:scale(.7);transform-origin:left top}
+  .headline{padding-top:16px}
+  #range-label{display:none}
+  .equation{font-size:28px}
+  .prompt{font-size:18px}
+  .controls{gap:6px}
+  .controls .tool{min-width:56px;padding:6px 8px}
+  .views .tool{min-width:50px}
+  #numpad{left:0;right:0;bottom:0;top:auto;transform:none;border-radius:16px 16px 0 0;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+  #numpad.left{left:0}
+  #numpad .np-drag{display:none}
+  #numpad .np-min{grid-column:1/-1;min-height:30px}
+  body.np-open .workspace{padding-bottom:250px}
+}
+/* Handy quer: zu wenig Höhe für die Aufgaben → Hinweis */
+.rotate-hint{display:none}
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){
+  .rotate-hint{display:flex;position:fixed;inset:0;z-index:200;background:var(--paper,#fdfbf5);align-items:center;justify-content:center;flex-direction:column;gap:10px;font-size:22px;font-weight:700;text-align:center;padding:20px}
+  .rotate-hint small{font-size:15px;font-weight:600;color:var(--muted)}
+}
 </style>
 </head>
 <body>
+<div class="rotate-hint" role="note"><svg width="70" height="56" viewBox="0 0 70 56" aria-hidden="true"><rect x="2" y="30" width="32" height="20" rx="4" fill="none" stroke="currentColor" stroke-width="3" opacity=".35"/><rect x="44" y="12" width="22" height="38" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 24c0-12 12-18 24-14" fill="none" stroke="currentColor" stroke-width="3"/><path d="M31 5l6 5-5 6" fill="none" stroke="currentColor" stroke-width="3"/></svg>Bitte das Handy hochkant halten.<small>Quer ist zu wenig Platz für die Aufgaben.</small></div>
 <div class="shell">
 <aside class="rail">
   <button class="brand" id="btn-home" aria-label="Startseite" title="Startseite"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="26.0" width="10" height="9.5" rx="1.6" fill="#27834b"/><rect x="15" y="26.0" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="15" y="15.5" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="26" y="26.0" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="15.5" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="5.0" width="10" height="9.5" rx="1.6" fill="#c9414a"/><path d="M2.5 37.8h35" stroke="#2b2930" stroke-width="2.2" stroke-linecap="round"/></svg><span class="brand-name">Stufenweise</span><h1 class="vh">Stufenweise</h1></button>
@@ -7980,7 +8045,8 @@ function npBuild(){
   d.addEventListener('click', e => { const b = e.target.closest('[data-np]'); if(b) npKey(b.dataset.np); });
   document.body.append(d); NP.el = d; return d;
 }
-function npPlace(){ const d = NP.el; if(!d) return; if(NP.pos && !NP.min){ const w = d.offsetWidth, h = d.offsetHeight; Object.assign(d.style, {left: Math.max(4, Math.min(innerWidth - w - 4, NP.pos.x)) + 'px', top: Math.max(4, Math.min(innerHeight - h - 4, NP.pos.y)) + 'px', right:'auto', bottom:'auto'}); } else Object.assign(d.style, {left:'', top:'', right:'', bottom:''}); }
+const npPhone = () => matchMedia('(max-width:560px)').matches; /* Handy: Tastatur fest unten */
+function npPlace(){ const d = NP.el; if(!d) return; document.body.classList.toggle('np-open', !d.hidden && npPhone() && !NP.min); if(NP.pos && !NP.min && !npPhone()){ const w = d.offsetWidth, h = d.offsetHeight; Object.assign(d.style, {left: Math.max(4, Math.min(innerWidth - w - 4, NP.pos.x)) + 'px', top: Math.max(4, Math.min(innerHeight - h - 4, NP.pos.y)) + 'px', right:'auto', bottom:'auto'}); } else Object.assign(d.style, {left:'', top:'', right:'', bottom:''}); }
 addEventListener('resize', () => npPlace());
 function npShow(){ const d = npBuild(); d.classList.toggle('min', !!NP.min); d.hidden = false; npPlace(); }
 /* Ein anderes Ziffernfeld auf dem Bildschirm, falls das bisherige verschwunden ist */
@@ -8379,7 +8445,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.24.0 · 16.11.2026';
+const APP_VERSION = '0.25.0 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

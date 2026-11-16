@@ -2,7 +2,7 @@
 Safari auf einem 10,2-Zoll-iPad lässt etwa 1080 × 740 Pixel frei. Vorher lagen dort bei
 46 Aufgaben Antworten unsichtbar unter dem Rand (z. B. Zehnerpartner: Auswahl ganz weg).
 Jetzt verkleinert itFit() die Aufgabe; nur sehr lange Lesetexte (L9) dürfen scrollen und
-zeigen dann „Weiter unten“."""
+zeigen dann „Weiter unten“. Am Handy (390 × 664) darf mehr scrollen, aber nie ohne Hinweis."""
 import asyncio
 from playwright.async_api import async_playwright
 from common import URL, launch  # noqa: E402
@@ -20,7 +20,7 @@ GET = r"""(id)=>{const [key,gi]=id.split('#'); const [ax,a,b]=key.split('|'); co
 async def main():
     async with async_playwright() as p:
         b = await launch(p); errs = []
-        for vw, vh in [(1080, 740), (810, 1010)]:
+        for vw, vh in [(1080, 740), (810, 1010), (390, 664)]:
             pg = await b.new_page(viewport={'width': vw, 'height': vh}); pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL); await pg.wait_for_timeout(400)
             ids = await pg.evaluate(LIST); cur = None; bad = []
@@ -31,7 +31,7 @@ async def main():
                     await pg.click('#d-start'); await pg.wait_for_timeout(80); cur = subj
                 for rep in range(3):
                     r = await pg.evaluate(GET, id_)
-                    if r['more'] and not id_.startswith('L|L9'): bad.append(f'{id_} scrollt')
+                    if r['more'] and not id_.startswith('L|L9') and vw > 560: bad.append(f'{id_} scrollt')  # Handy: Scrollen mit Hinweis erlaubt
                     if r['hidden'] and not r['more']: bad.append(f'{id_}: {r["hidden"]} Antwortknöpfe unsichtbar')
             print(vw, vh, len(ids), 'Aufgaben, Probleme:', sorted(set(bad))[:8])
             errs += sorted(set(bad)); await pg.close()
