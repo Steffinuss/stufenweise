@@ -245,6 +245,13 @@ legend{font-weight:700;padding:0;float:left;margin-bottom:2px;font-size:17px}
 .blitz-cover{width:min(360px,80%);aspect-ratio:3/2;border-radius:24px;background:repeating-linear-gradient(45deg,#ece5d6 0 14px,#f4efe5 14px 28px);display:flex;align-items:center;justify-content:center;font-size:110px;font-weight:700;color:#cfc6b4}
 .screen-calc{font-size:clamp(48px,9vw,96px);font-weight:700;font-variant-numeric:tabular-nums}
 .screen-step{font-size:20px;color:var(--muted);font-weight:700}
+.dg-prog{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;width:100%}
+.dg-path{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 6px}
+.dg-sec{font-size:13px;font-weight:700;padding:2px 10px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--muted)}
+.dg-sec.done{background:#ece7dc;border-color:#ece7dc;color:#8a8478}
+.dg-sec.now{background:var(--dark);border-color:var(--dark);color:#fff}
+.dg-bar{display:block;width:min(420px,80%);height:8px;border-radius:4px;background:#ece7dc;overflow:hidden}
+.dg-bar i{display:block;height:100%;background:#8a8478;border-radius:4px;transition:width .4s}
 .screen-sum{position:absolute;inset:0;display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;overflow:auto;padding:8px}
 .screen-sum .card{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:16px 22px;min-width:280px;max-width:440px}
 .screen-sum h3{margin:0 0 8px}
@@ -5490,6 +5497,24 @@ function warmAnswer(skip){
   if(d.idx >= d.items.length){ d.done = true; data.warm ??= {}; (data.warm[d.pid] ??= []).push({date: Date.now(), res: d.answers}); data.warm[d.pid] = data.warm[d.pid].slice(-20); saveData(); }
   renderDiag();
 }
+/* Fortschritt im Test: Abschnitte in fester Reihenfolge und ein Balken, der nur vorwärts läuft.
+   Keine Anzeige von richtig/falsch; Rückschritte der adaptiven Suche sieht man nicht. */
+const DG_SEC = k => ({M:'Zahlen', R:'Rechnen', Z:'Rechnen', S:'Stellenwert', U:'Uhr', G:'Größen', H:'Hundertertafel', L:'Lesen', W:'Schreiben'})[String(k)[0]];
+const DG_EST = {Zahlen:5, Rechnen:5, Stellenwert:2, Uhr:3, 'Größen':3, Hundertertafel:3, Lesen:4, Schreiben:3}; /* geschätzte Stufen je Abschnitt */
+function dgSections(d){
+  if(d.secs) return d.secs;
+  if(d.subj !== 'M') return d.secs = [d.subj === 'W' ? 'Schreiben' : 'Lesen'];
+  if(d.re){ const m = matrixOf(d.pid), open = new Set(Object.keys(m).filter(k => !isOk(m[k].status)).map(DG_SEC)); return d.secs = ['Zahlen', 'Stellenwert', 'Uhr', 'Größen', 'Hundertertafel', 'Rechnen'].filter(x => open.has(x)); }
+  return d.secs = d.part === 1 ? ['Zahlen', 'Rechnen', 'Stellenwert'] : d.part === 2 ? ['Uhr', 'Größen', 'Hundertertafel'] : ['Zahlen', 'Rechnen', 'Stellenwert', 'Uhr', 'Größen', 'Hundertertafel'];
+}
+function dgProgressHtml(d){
+  const secs = dgSections(d), cur = DG_SEC(d.key); if(!secs.includes(cur)) secs.push(cur);
+  const i = secs.indexOf(cur), done = d.tested.filter(t => DG_SEC(t.key) === cur).length + (d.items.length ? d.idx/d.items.length : 0);
+  const frac = Math.min(done/(d.re ? 2 : DG_EST[cur] || 3), .9);
+  d.prog = Math.max(d.prog || 0, (i + frac)/secs.length);
+  const path = secs.length > 1 ? `<span class="dg-path" aria-hidden="true">${secs.map((x, j) => `<span class="dg-sec${j < i ? ' done' : j === i ? ' now' : ''}">${x}</span>`).join('')}</span>` : '';
+  return `<span class="dg-prog" role="progressbar" aria-label="${secs.length > 1 ? `Abschnitt ${i + 1} von ${secs.length}: ${cur}` : 'Fortschritt'}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(d.prog*100)}">${path}<span class="dg-bar"><i style="width:${Math.round(d.prog*100)}%"></i></span></span>`;
+}
 function diagNextCell(){
   const d = app.diag, n = d.nItems >= CAP[d.subj] ? {done:true} : d.gen.next();
   if(n.done){ diagFinish(); return d.tested.length > 0; }
@@ -5675,7 +5700,7 @@ function renderDiag(){
   if(!d.started){
     $('#equation').innerHTML = `<span class="screen-step">${title}${d.re ? ' · Wiederholung' : ''}</span>`;
     $('#prompt').textContent = '';
-    $('#stage').innerHTML = `<div class="home"><h2>${escHtml(curName() === 'Gast' ? 'Hallo!' : 'Hallo ' + curName() + '!')}</h2><div class="intro-card"><p>Gleich kommen ein paar Aufgaben.</p><p>Manche sind leicht. Manche sind schwer.<br><b>Das ist ganz normal.</b></p><p>Kennst du eine Aufgabe nicht? Dann tippe auf <b>„Weiß ich nicht“</b>.</p><p>Es gibt keine Noten. Wir wollen nur sehen, was du schon kannst.</p></div></div>`;
+    $('#stage').innerHTML = `<div class="home"><h2>${escHtml(curName() === 'Gast' ? 'Hallo!' : 'Hallo ' + curName() + '!')}</h2><div class="intro-card"><p>Gleich kommen ein paar Aufgaben.</p><p>Manche sind leicht. Manche sind schwer.<br><b>Das ist ganz normal.</b></p><p>Kennst du eine Aufgabe nicht? Dann tippe auf <b>„Weiß ich nicht“</b>.</p><p>Es gibt keine Noten. Wir wollen nur sehen, was du schon kannst.</p><p>Oben siehst du, wie weit du schon bist.</p></div></div>`;
     $('#controls').innerHTML = toolBtn({id:'d-start', ic:'next', label:'Los geht’s', primary:true}) + '<span class="sep"></span>' + toolBtn({id:'d-close', ic:'close', label:'Abbrechen'});
     setHint(''); return;
   }
@@ -5694,7 +5719,7 @@ function renderDiag(){
     setHint(''); return;
   }
   const it = d.items[d.idx], r = d.resp ||= {};
-  $('#equation').innerHTML = `<span class="screen-step">${title}${d.re ? ' · Re-Diagnose' : ''} · Aufgabe ${d.nItems + 1}${d.warm ? ' von ' + d.items.length : ''}</span>`;
+  $('#equation').innerHTML = d.warm ? `<span class="screen-step">${title} · Aufgabe ${d.nItems + 1} von ${d.items.length}</span>` : `<span class="screen-step">${title}${d.re ? ' · Wiederholung' : ''}</span>${dgProgressHtml(d)}`;
   $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
   /* Antwortfelder gehören zur Aufgabe: im „?“ der Rechnung oder direkt darunter – nicht unten in der Leiste */
   const ans = needsFields(it, r) && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : '';
@@ -8311,7 +8336,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.22.2 · 16.11.2026';
+const APP_VERSION = '0.23.0 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -8508,7 +8533,7 @@ $('#help-content').innerHTML = [
   ['next','Schwerer oder leichter','Wenn du 5 Aufgaben hintereinander richtig hast, schlägt Stufenweise die nächste Stufe vor. Nach 3 Fehlern gibt es eine leichtere Stufe. Du entscheidest selbst.'],
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
-  ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung und am Ende keine Ergebnisse. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
+  ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung, während des Tests oben die Abschnitte und einen Balken, der nur vorwärts läuft (ohne richtig/falsch), und am Ende keine Ergebnisse. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
   ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, der Weg am Material (Handeln, Bild, Zahl) mit Legeblatt, Ideen für den Alltag, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
   ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Wählbar sind unter anderem „Große Aufgaben“ und bei Mathe „Materialbilder: 1. Aufgabe vorgegeben, dann selbst zeichnen“; die Einstellungen bleiben auf diesem Gerät gespeichert. Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Legeblätter für echtes Material“ gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],

@@ -60,6 +60,8 @@ Neben jedem Namen stehen (mit Lehrkraft-PIN) drei Einstellungen:
 
 Der Test passt sich an: Gelöste Aufgaben führen zu schwereren, nicht gelöste zu leichteren. Er dauert etwa 10–20 Minuten.
 
+Oben zeigt eine Leiste, wie weit das Kind ist: die Abschnitte des Tests (z. B. *Zahlen · Rechnen · Stellenwert*) und darunter einen Balken. Der Balken läuft nur vorwärts, auch wenn der Test eine leichtere Stufe einschiebt. Er zeigt nie, ob eine Antwort richtig oder falsch war. Weil sich der Test anpasst, ist die Länge nur ungefähr: Ein Abschnitt kann früher enden, und am Ende springt der Balken auf fertig. Beim Lese- und Schreib-Test gibt es nur den Balken.
+
 Zuerst sieht das Kind eine ermutigende Begrüßung. Lies sie bei Bedarf vor und tippe dann auf **Los geht’s**.
 
 ![Begrüßung vor dem Mathe-Test](bilder/05_intro.png)
