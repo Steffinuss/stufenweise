@@ -671,6 +671,7 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 .rail.compact #modes button{min-height:42px;flex-direction:row;gap:6px;justify-content:flex-start;padding:4px 8px;font-size:12px;text-align:left}
 .rail.compact #modes b{font-size:14px;width:30px;flex:none;text-align:center}
 .rail.compact #modes b small{font-size:9.5px}
+.rail.compact #modes .subj button{justify-content:center;text-align:center} /* Fachwahl immer mittig, wie in der schmalen Leiste */
 
 /* Marke */
 button.brand{display:flex;flex-direction:column;align-items:center;gap:1px}
@@ -4968,14 +4969,29 @@ for(const v of Object.values(R_INFO)) v.bp = 'BP GENT 2022, M 2.1.1.3 Rechenoper
 /* ---------- Größen und Sachrechnen G1–G4 (BP GENT M 2.1.3 Größen: Geld, Längen, Gewichte) ---------- */
 const G_LEVELS = ['G1', 'G2', 'G3', 'G4'];
 const RULER_OBJ = [['Bleistift', 'der Bleistift'], ['Nagel', 'der Nagel'], ['Radiergummi', 'der Radiergummi'], ['Schnur', 'die Schnur'], ['Schlüssel', 'der Schlüssel'], ['Kreide', 'die Kreide']];
+/* Realistische Längen in cm: ein Radiergummi ist nicht 12 cm lang, ein Schlüssel nicht 3 cm */
+const RULER_LEN = {Bleistift:[5, 14], Nagel:[3, 10], Radiergummi:[3, 6], Schnur:[3, 14], Schlüssel:[4, 8], Kreide:[5, 10]};
+const rulerLen = (k, lo, hi) => { const [a, b] = RULER_LEN[k] || [lo, hi], x = Math.max(lo, a), y = Math.min(hi, b); return x <= y ? rnd(x, y) : rnd(lo, hi); };
 function objShape(kind, x1, x2, y){
   const w = x2 - x1;
   if(kind === 'Bleistift') return `<path d="M${x1} ${y - 11} h${w - 26} l26 11 l-26 11 h${-(w - 26)} z" fill="#e8b53a" stroke="#7a5b16" stroke-width="2"/><path d="M${x2 - 26} ${y - 11} l26 11 l-26 11 z" fill="#f2d7a6" stroke="#7a5b16" stroke-width="2"/><path d="M${x2 - 8} ${y - 3.5} l8 3.5 l-8 3.5z" fill="#2b2930"/><rect x="${x1}" y="${y - 11}" width="12" height="22" fill="#e58aa0" stroke="#7a5b16" stroke-width="2"/>`;
   if(kind === 'Nagel') return `<rect x="${x1}" y="${y - 12}" width="7" height="24" rx="2" fill="#8a8f98"/><path d="M${x1 + 7} ${y - 3.5} H${x2 - 12} L${x2} ${y} L${x2 - 12} ${y + 3.5} H${x1 + 7}z" fill="#a9aeb6" stroke="#6b7079" stroke-width="1.5"/>`;
-  if(kind === 'Radiergummi') return `<rect x="${x1}" y="${y - 14}" width="${w}" height="28" rx="5" fill="#f4f1ea" stroke="#6b6672" stroke-width="2"/><rect x="${x1}" y="${y - 14}" width="${w*.45}" height="28" rx="5" fill="#4b8fd6" stroke="#6b6672" stroke-width="2"/>`;
+  if(kind === 'Radiergummi'){ /* Radiergummi mit Papierhülle; die Ecken vorne sind abgerundet (benutzt) */
+    const sx = x1 + w*.34, sw = w*.66;
+    return `<rect x="${x1}" y="${y - 13}" width="${w}" height="26" rx="6" fill="#f7f4ee" stroke="#6b6672" stroke-width="2"/><path d="M${x1 + 4} ${y - 8} h${w*.3 - 6}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`
+      + `<rect x="${sx}" y="${y - 14.5}" width="${sw}" height="29" rx="3" fill="#3f7fd0" stroke="#2c5a96" stroke-width="2"/><rect x="${sx + sw*.12}" y="${y - 14.5}" width="${sw*.18}" height="29" fill="#fff" opacity=".85"/><path d="M${sx + 2} ${y - 9} h${sw - 4}" stroke="#8fb7e8" stroke-width="2"/>`; }
   if(kind === 'Schnur') return `<path d="M${x1} ${y} C${x1 + w*.25} ${y - 9}, ${x1 + w*.5} ${y + 9}, ${x2} ${y}" fill="none" stroke="#c9414a" stroke-width="5" stroke-linecap="round"/>`;
-  if(kind === 'Schlüssel') return `<circle cx="${x1 + 14}" cy="${y}" r="13" fill="none" stroke="#b08a2e" stroke-width="6"/><path d="M${x1 + 27} ${y} H${x2}" stroke="#b08a2e" stroke-width="7"/><path d="M${x2 - 14} ${y} v9 M${x2 - 4} ${y} v12" stroke="#b08a2e" stroke-width="5"/>`;
-  return `<rect x="${x1}" y="${y - 9}" width="${w}" height="18" rx="4" fill="#f4f1ea" stroke="#6b6672" stroke-width="2"/>`;
+  if(kind === 'Schlüssel'){ /* Schlüssel: runde Reide mit Loch, Hals, breiter Schaft und ein Bart mit wenigen tiefen Einschnitten */
+    const R = Math.min(24, Math.max(14, w*.22)), bx = x1 + 2*R - 2, tx = bx + (x2 - bx)*.3, tw = x2 - tx - 4, d = [12, 6, 14, 8, 12], n = tw > 70 ? 5 : 4, st = tw/n;
+    let bit = `M${tx} ${y + 6}`; for(let i = 0; i < n; i++) bit += ` L${tx + st*(i + .45)} ${y + 6 + d[i]} L${tx + st*(i + 1)} ${y + 6 + (i === n - 1 ? 0 : d[i]*.4)}`;
+    return `<circle cx="${x1 + R}" cy="${y}" r="${R}" fill="#e2b84b" stroke="#8a6a1e" stroke-width="2.2"/><circle cx="${x1 + R*.7}" cy="${y}" r="${R*.3}" fill="#fff" stroke="#8a6a1e" stroke-width="2"/>`
+      + `<path d="${bit} L${x2 - 4} ${y + 6} Z" fill="#d9ad40" stroke="#8a6a1e" stroke-width="2" stroke-linejoin="round"/>`
+      + `<path d="M${bx - 4} ${y - 7} H${x2 - 6} L${x2} ${y - 1} V${y + 7} H${bx - 4}z" fill="#e2b84b" stroke="#8a6a1e" stroke-width="2" stroke-linejoin="round"/><path d="M${bx + 2} ${y - 1} H${x2 - 8}" stroke="#b8902e" stroke-width="1.6"/>`
+      + `<rect x="${bx - 7}" y="${y - 10}" width="9" height="20" rx="2" fill="#d6aa3c" stroke="#8a6a1e" stroke-width="2"/>`; }
+  /* Kreide: weißes Stück Tafelkreide – hinten gerade abgeschnitten, vorne abgerundet und abgenutzt, mit etwas Kreidestaub */
+  return `<path d="M${x1 + 2} ${y - 11} H${x2 - 12} Q${x2} ${y - 11} ${x2} ${y} Q${x2} ${y + 11} ${x2 - 12} ${y + 11} H${x1 + 2} Q${x1} ${y + 11} ${x1} ${y + 9} V${y - 9} Q${x1} ${y - 11} ${x1 + 2} ${y - 11}z" fill="#fbf9f1" stroke="#5f5b55" stroke-width="2.2"/>`
+    + `<path d="M${x1 + 6} ${y + 5} H${x2 - 12}" stroke="#e3ded2" stroke-width="4" stroke-linecap="round"/><path d="M${x1 + 6} ${y - 6} H${x2 - 14}" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`
+    + [.2, .45, .7].map(f => `<circle cx="${x1 + w*f}" cy="${y + 1}" r="1.1" fill="#d9d4c8"/>`).join('') + `<circle cx="${x2 + 5}" cy="${y + 10}" r="1.8" fill="#dcd7cb"/><circle cx="${x2 + 10}" cy="${y + 6}" r="1.2" fill="#dcd7cb"/>`;
 }
 function rulerSvg(len, start = 0, kind = 'Bleistift', {show = true} = {}){
   const PX = 38, X0 = 26, N = 15, Y = 92, end = start + len;
@@ -4999,9 +5015,9 @@ function scaleSvg(g, label = 'Mehl', max = 1000){
 const SCALE_GOODS = ['Mehl', 'Zucker', 'Nudeln', 'Kartoffeln', 'Äpfel', 'Reis', 'Tomaten', 'Käse'];
 const G_ITEMS = {
   G1: [
-    () => { const [k, the] = pick(RULER_OBJ), n = rnd(4, 13); return mkChoice({kern:true, layout:'row', svg: rulerSvg(n, 0, k), prompt:`Wie lang ist ${the}?`, label:`Lineal ab 0: ${k} ${n} cm`, tip:'Noch nicht. Schau, wo das Ende ist. Lies die Zahl darunter.'}, opt3(`${n} cm`, [`${n + 1} cm`, `${n - 1} cm`, `${n*10} cm`])); },
-    () => { const [k, the] = pick(RULER_OBJ), n = rnd(3, 12); return mkChoice({layout:'row', svg: rulerSvg(n, 0, k), prompt:`Wie lang ist ${the}?`, label:`Lineal ab 0: ${k} ${n} cm`, tip:'Noch nicht. Schau, wo das Ende ist. Lies die Zahl darunter.'}, opt3(`${n} cm`, [`${n + 1} cm`, `${n + 2} cm`, `${n - 1} cm`])); },
-    () => { const [k, the] = pick(RULER_OBJ), st = rnd(1, 4), n = rnd(3, 15 - st - 1); return mkChoice({layout:'row', svg: rulerSvg(n, st, k), prompt:`Wie lang ist ${the}? Achtung: ${the.startsWith('die') ? 'Sie' : 'Er'} fängt nicht bei 0 an.`, label:`Lineal nicht ab 0: ${st} bis ${st + n} cm`, tip:`Noch nicht. Ende minus Anfang: ${st + n} − ${st}. Oder zähle die Zentimeter-Schritte.`}, opt3(`${n} cm`, [`${st + n} cm`, `${n + 1} cm`, `${n - 1} cm`])); }
+    () => { const [k, the] = pick(RULER_OBJ), n = rulerLen(k, 4, 13); return mkChoice({kern:true, layout:'row', svg: rulerSvg(n, 0, k), prompt:`Wie lang ist ${the}?`, label:`Lineal ab 0: ${k} ${n} cm`, tip:'Noch nicht. Schau, wo das Ende ist. Lies die Zahl darunter.'}, opt3(`${n} cm`, [`${n + 1} cm`, `${n - 1} cm`, `${n*10} cm`])); },
+    () => { const [k, the] = pick(RULER_OBJ), n = rulerLen(k, 3, 12); return mkChoice({layout:'row', svg: rulerSvg(n, 0, k), prompt:`Wie lang ist ${the}?`, label:`Lineal ab 0: ${k} ${n} cm`, tip:'Noch nicht. Schau, wo das Ende ist. Lies die Zahl darunter.'}, opt3(`${n} cm`, [`${n + 1} cm`, `${n + 2} cm`, `${n - 1} cm`])); },
+    () => { const [k, the] = pick(RULER_OBJ), st = rnd(1, 4), n = rulerLen(k, 3, 15 - st - 1); return mkChoice({layout:'row', svg: rulerSvg(n, st, k), prompt:`Wie lang ist ${the}? Achtung: ${the.startsWith('die') ? 'Sie' : 'Er'} fängt nicht bei 0 an.`, label:`Lineal nicht ab 0: ${st} bis ${st + n} cm`, tip:`Noch nicht. Ende minus Anfang: ${st + n} − ${st}. Oder zähle die Zentimeter-Schritte.`}, opt3(`${n} cm`, [`${st + n} cm`, `${n + 1} cm`, `${n - 1} cm`])); }
   ],
   G2: [
     () => { const [thing, v, u] = pick([['ein Bus', 12, 'm'], ['ein Bleistift', 18, 'cm'], ['ein Fußballfeld', 100, 'm'], ['eine Tür', 2, 'm'], ['ein Handy', 15, 'cm'], ['der Weg von Ulm nach Stuttgart', 90, 'km'], ['ein Daumen', 5, 'cm'], ['ein Klassenzimmer', 8, 'm'], ['ein Fahrrad', 2, 'm']]);
@@ -5055,7 +5071,7 @@ const G_INFO = {
 };
 for(const [k, v] of Object.entries(G_INFO)){ v.offer = {text:`Größen: ${v.name}`, set:{mode:'read', lvl:k}}; v.bp = 'BP GENT 2022, M 2.1.3 Größen (Geld, Längen, Gewichte) und Sachrechnen'; }
 const G_SHEETS = {
-  G1: {name:'Länge messen (Lineal)', cols:1, gens:[() => { const [k] = pick(RULER_OBJ), st = Math.random() < .5 ? 0 : rnd(1, 3), n = rnd(3, 11); return T_(['lies', 'schreibe'], `Wie lang ist das? Schreibe die Länge auf.`, `<span class="ab-ic" style="width:150mm">${rulerSvg(n, st, k)}</span><p class="ab-row big">${box(14)} cm</p>`, `${n} cm`); }]},
+  G1: {name:'Länge messen (Lineal)', cols:1, gens:[() => { const [k] = pick(RULER_OBJ), st = Math.random() < .5 ? 0 : rnd(1, 3), n = rulerLen(k, 3, 11); return T_(['lies', 'schreibe'], `Wie lang ist das? Schreibe die Länge auf.`, `<span class="ab-ic" style="width:150mm">${rulerSvg(n, st, k)}</span><p class="ab-row big">${box(14)} cm</p>`, `${n} cm`); }]},
   G2: {name:'Längen im Alltag', cols:2, gens:[() => { const [thing, v, u] = pick([['Bus', 12, 'm'], ['Bleistift', 18, 'cm'], ['Tür', 2, 'm'], ['Handy', 15, 'cm'], ['Weg nach Stuttgart', 90, 'km'], ['Klassenzimmer', 8, 'm'], ['Daumen', 5, 'cm']]); return T_(['kreuze'], `${thing}: Wie lang ungefähr?`, `<p class="ab-row">${['cm', 'm', 'km'].map(x => `☐ ${v} ${x}`).join('&nbsp;&nbsp;&nbsp;')}</p>`, `${v} ${u}`); }, () => { const m = rnd(1, 6); return T_('rechne', `${m} m = ? cm`, `<p class="ab-row big">${m} m = ${box(16)} cm</p>`, `${m*100} cm`); }]},
   G3: {name:'Gewichte (Waage)', cols:2, gens:[() => { const g = rnd(1, 19)*50, it = pick(SCALE_GOODS); return T_(['lies', 'schreibe'], 'Wie viel zeigt die Waage?', `<span class="ab-ic" style="width:55mm">${scaleSvg(g, it)}</span><p class="ab-row big">${box(16)} g</p>`, `${g} g`); }, () => { const k = pick([1, 2, 3, 5]); return T_('rechne', `${k} kg = ? g`, `<p class="ab-row big">${k} kg = ${box(16)} g</p>`, `${k*1000} g`); }]},
   G4: {name:'Einkaufen: lesen und rechnen', cols:1, max:3, gens:[() => { const d = GOODS_DOCS[fresh(Object.keys(GOODS_DOCS))](); return T_(['lies', 'rechne'], 'Lies genau. Rechne und schreibe die Antwort auf.', `<div class="ab-doc">${d.html}</div>${d.qs.map(([k, q]) => `<div class="ab-q"><b>${q}</b>${lineW()}</div>`).join('')}`, `${d.title}: ` + d.qs.map(q => q[2][0]).join(' · ')); }]}
@@ -8287,7 +8303,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.22.0 · 16.11.2026';
+const APP_VERSION = '0.22.1 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
