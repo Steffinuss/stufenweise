@@ -7255,7 +7255,7 @@ function abScale(body, cols, z = 1){
   return body.replace(/data-uw="([\d.]+)" data-uh="([\d.]+)"/g, (m, w, h) => `${m} style="width:${(w*k).toFixed(1)}mm;height:${(h*k).toFixed(1)}mm"`);
 }
 function abScatterIcons(n, k){ const pts = []; let t = 0; while(pts.length < n && t++ < 9000){ const x = 3 + Math.random()*100, y = 3 + Math.random()*40; if(pts.every(p => Math.hypot(p[0] - x, p[1] - y) > 15.5)) pts.push([x, y]); } return `<svg class="ab-svg" viewBox="0 0 120 60"><rect x="1" y="1" width="118" height="58" rx="4" fill="none" stroke="#bbb"/>${pts.map(([x, y]) => `<g transform="translate(${x} ${y}) scale(.23)">${ICON[k]}</g>`).join('')}</svg>`; }
-function abLine(zr, mark){ const c = LINE[zr], X = v => 8 + v*184/zr; let s = `<line x1="4" y1="20" x2="196" y2="20" stroke="#222" stroke-width="1.2"/>`; for(let v = 0; v <= zr; v += c.minor){ const big = v % c.major === 0; s += `<line x1="${X(v)}" y1="${big ? 14 : 17}" x2="${X(v)}" y2="${big ? 26 : 23}" stroke="#222" stroke-width="${big ? 1.2 : .7}"/>`; } for(const v of c.labels) s += `<text x="${X(v)}" y="35" text-anchor="middle" font-size="7" font-family="Arial">${v}</text>`; if(mark != null) s += `<path d="M${X(mark)} 12 l-3 -6 h6 z" fill="#c9414a"/>`; return `<svg class="ab-svg wide" viewBox="0 0 200 38">${s}</svg>`; }
+function abLine(zr, mark){ const c = LINE[zr], X = v => 8 + v*184/zr; let s = `<line x1="4" y1="20" x2="196" y2="20" stroke="#222" stroke-width="1.2"/>`; for(let v = 0; v <= zr; v += c.minor){ const big = v % c.major === 0; s += `<line x1="${X(v)}" y1="${big ? 14 : zr >= 100 ? 16 : 17}" x2="${X(v)}" y2="${big ? 26 : zr >= 100 ? 24 : 23}" stroke="#222" stroke-width="${big ? 1.2 : .7}"/>`; } if(zr >= 100) for(let v = c.minor/2; v < zr; v += c.minor) s += `<line x1="${X(v)}" y1="18.5" x2="${X(v)}" y2="21.5" stroke="#222" stroke-width=".5"/>`; /* Halbstriche bei 5 bzw. 50: Der Pfeil zeigt immer auf einen Strich (Stefan, 16.11.) */ for(const v of c.labels) s += `<text x="${X(v)}" y="35" text-anchor="middle" font-size="7" font-family="Arial">${v}</text>`; if(mark != null) s += `<path d="M${X(mark)} 12 l-3 -6 h6 z" fill="#c9414a"/>`; return `<svg class="ab-svg wide" viewBox="0 0 200 38">${s}</svg>`; }
 /* Plus/Minus mit Zehnerübergang-Wahl */
 function abPair(op, zr, ue){
   const T = zrMax(zr);
@@ -8339,7 +8339,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.23.1 · 16.11.2026';
+const APP_VERSION = '0.23.2 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
