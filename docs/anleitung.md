@@ -62,6 +62,10 @@ Der Test passt sich an: Gelöste Aufgaben führen zu schwereren, nicht gelöste 
 
 Oben zeigt eine Leiste, wie weit das Kind ist: die Abschnitte des Tests (z. B. *Zahlen · Rechnen · Stellenwert*) und darunter einen Balken. Der Balken läuft nur vorwärts, auch wenn der Test eine leichtere Stufe einschiebt. Er zeigt nie, ob eine Antwort richtig oder falsch war. Weil sich der Test anpasst, ist die Länge nur ungefähr: Ein Abschnitt kann früher enden, und am Ende springt der Balken auf fertig. Beim Lese- und Schreib-Test gibt es nur den Balken.
 
+Während des Tests sind die Leiste links und das Menü oben gesperrt. So kann niemand versehentlich hinaustippen. Zum Beenden tippst du zweimal auf **Abbrechen** (beim ersten Mal steht dort „Wirklich beenden?“). Was bis dahin getestet wurde, bleibt gespeichert.
+
+Jede Aufgabe passt auf den Bildschirm, auch auf kleinere iPads mit Safari-Leisten: Ist wenig Platz, wird die Aufgabe etwas kleiner. Nur sehr lange Lesetexte muss man schieben; dann steht unten „Weiter unten“.
+
 Zuerst sieht das Kind eine ermutigende Begrüßung. Lies sie bei Bedarf vor und tippe dann auf **Los geht’s**.
 
 ![Begrüßung vor dem Mathe-Test](bilder/05_intro.png)

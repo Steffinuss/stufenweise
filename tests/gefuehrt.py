@@ -44,6 +44,8 @@ async def main():
             await pg.wait_for_timeout(200)
         await pg.screenshot(path='gd_kurz1.png')
         print('L4 now', await pg.evaluate("JSON.stringify(matrixOf('p1')['L|L4'])"))
-        await pg.click('#d-close'); await pg.wait_for_timeout(200); print('after D:', await pg.evaluate(rail))
+        await pg.click('#d-close'); await pg.wait_for_timeout(150)
+        if await pg.evaluate("!!app.diag && !app.diag.done && app.mode==='diag'"): await pg.click('#d-close'); await pg.wait_for_timeout(150)  # im laufenden Test: zweimal tippen
+        print('after D:', await pg.evaluate(rail))
         print(errs); await b.close()
 asyncio.run(main())

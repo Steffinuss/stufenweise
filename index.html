@@ -251,6 +251,8 @@ legend{font-weight:700;padding:0;float:left;margin-bottom:2px;font-size:17px}
 .dg-sec.done{background:#ece7dc;border-color:#ece7dc;color:#8a8478}
 .dg-sec.now{background:var(--dark);border-color:var(--dark);color:#fff}
 .dg-bar{display:block;width:min(420px,80%);height:8px;border-radius:4px;background:#ece7dc;overflow:hidden}
+body.testing aside.rail, body.testing .top-tools, body.testing #btn-rail-show{opacity:.35;pointer-events:none}
+#controls .tool.sure{background:#fbe9e7;color:#a33}
 .dg-bar i{display:block;height:100%;background:#8a8478;border-radius:4px;transition:width .4s}
 .screen-sum{position:absolute;inset:0;display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;overflow:auto;padding:8px}
 .screen-sum .card{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:16px 22px;min-width:280px;max-width:440px}
@@ -370,6 +372,8 @@ body.screening .toolbar{visibility:hidden}
 .it-ast .dg-in{width:84px;text-align:center}.dg-in::-webkit-inner-spin-button,.dg-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .dg-stage{flex-direction:column;justify-content:flex-start;padding-top:clamp(6px,3vh,36px)}
 .it-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-height:100%;overflow:auto;padding:6px}
+.it-wrap.it-more{-webkit-mask-image:linear-gradient(#000 calc(100% - 46px),#0003);mask-image:linear-gradient(#000 calc(100% - 46px),#0003)}
+.dg-stage:has(.it-more)::after{content:'↓ Weiter unten';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;font-weight:700;font-size:15px;padding:5px 14px;border-radius:999px;pointer-events:none;z-index:3}
 .it-svg{width:100%;display:flex;justify-content:center}.it-svg>svg{max-width:100%;max-height:300px}
 .it-icon svg{display:block;filter:drop-shadow(0 2px 3px #0002)}
 .it-word{font-size:clamp(44px,7vw,72px);font-weight:700;letter-spacing:.04em;background:#fff;border-radius:18px;padding:6px 34px;box-shadow:var(--shadow)}
@@ -1544,7 +1548,14 @@ function guideFix(){
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
-function render(){ if(guideFix()) return; if(typeof UPD !== 'undefined') queueMicrotask(updSync); document.body.classList.toggle('rail-off', !!settings.railOff); queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
+/* Während eines Tests sind Leiste und Menü gesperrt, damit niemand versehentlich hinaustippt (Durchsicht 16.11.).
+   Beenden geht über „Abbrechen“ (zweimal tippen). */
+function testLock(){
+  const on = app.mode === 'diag' && !!app.diag && !app.diag.done && !app.diag.warm;
+  document.body.classList.toggle('testing', on);
+  for(const el of document.querySelectorAll('aside.rail, #btn-rail-show, .top-tools')) el.inert = on;
+}
+function render(){ testLock(); if(guideFix()) return; if(typeof UPD !== 'undefined') queueMicrotask(updSync); document.body.classList.toggle('rail-off', !!settings.railOff); queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
 /* Passt die Einstellungsleiste nicht neben die Knöpfe oben rechts, rückt sie in eine eigene Zeile (sonst verschwinden z. B. die 10er-Reihe oder „Kalender“) */
 function fitTop(){
   const tb = document.querySelector('.topbar'), t = tb?.querySelector('.toolbar'); if(!t) return;
@@ -5140,6 +5151,28 @@ function boardHtml(bd, o = {}){
   return `<div class="hb${bd.cls ? ' ' + bd.cls : ''}${page ? ' h3d' : ''}" style="--hcols:${c1 - c0 + 1}">${bd.title ? `<div class="hb-title">${bd.title}</div>` : ''}<div class="hb-grid">${s}</div></div>`;
 }
 /* Tafel an den Platz anpassen: Felder verkleinern, bis nichts mehr überläuft */
+/* Aufgabe passt auf den Bildschirm (Durchsicht 16.11.2026): Auf kleineren iPads mit Safari-Leisten (etwa 1080 × 740)
+   lagen Antworten sonst unsichtbar unter dem Rand. Erst verkleinern (Lesetexte ab L6 höchstens auf 75 %, sonst auf 60 %),
+   reicht das nicht, zeigt ein Hinweis „Weiter unten“, dass man schieben kann. */
+function itFit(){
+  for(const w of document.querySelectorAll('#stage .it-wrap')){
+    const kids = [...w.children].filter(c => !c.matches('.hb') && !c.querySelector('.hb'));
+    const set = z => kids.forEach(c => c.style.zoom = z === 1 ? '' : z);
+    const over = () => w.scrollHeight - w.clientHeight;
+    set(1); w.classList.remove('it-more'); w.onscroll = null;
+    if(over() <= 2) continue;
+    const key = String((app.mode === 'diag' ? app.diag?.key : app.read?.lvl) || ''), min = /(^|\|)L[6-9]$/.test(key) ? .75 : .6;
+    set(min);
+    if(over() > 2){
+      w.classList.add('it-more');
+      w.onscroll = () => w.classList.toggle('it-more', w.scrollTop + w.clientHeight < w.scrollHeight - 8);
+      continue;
+    }
+    let lo = min, hi = 1;
+    for(let i = 0; i < 7; i++){ const mid = (lo + hi)/2; set(mid); if(over() <= 2) lo = mid; else hi = mid; }
+    set(Math.floor(lo*100)/100);
+  }
+}
 function hbFit(){
   for(const hb of document.querySelectorAll('#stage .hb')){
     const wrap = hb.closest('.it-wrap, .hb-task, .blitz'); if(!wrap) continue;
@@ -5227,7 +5260,7 @@ const H_ITEMS = {
     () => { const z = rnd(1, 4), e = rnd(0, 5), s = hAt(0, rnd(z, 9), rnd(e, 9)), b = z*10 + e;
       return hBoard({side:true, text:`${s} − ${b} = ?`, textCls:'hb-eq', prompt:`Rechne mit der Tafel: ${s} − ${b}. Tippe das Ergebnis an.`, label:`Tafel-Weg ${s} − ${b}`, tip:`Noch nicht. ${z} Zehner: ${z}-mal nach oben.${e ? ` ${e} Einer: ${e}-mal nach links.` : ''}`}, {marks:{[s]:'mk'}}, 'tap', {target:s - b}); },
     () => { const d = rnd(1, 4), k = rnd(1, 4), s = hAt(0, rnd(0, 9 - d), rnd(0, 9 - k)), t = s + 10*d + k, w = (a, b) => `${a}-mal nach unten, ${b}-mal nach rechts`;
-      return mkChoice({layout:'col', html: boardHtml({marks:{[s]:'mk', [t]:'mk2'}, cls:'mid'}), prompt:`Von ${s} nach ${t}: Wie bist du gegangen?`, label:`Weg ${s} → ${t}`, tip:'Noch nicht. Zähle die Zeilen nach unten (Zehner) und die Felder nach rechts (Einer).'}, [w(d, k), w(k, d) === w(d, k) ? w(d + 1, k) : w(k, d), w(d, k + 1)]); }
+      return mkChoice({layout:'side', html: boardHtml({marks:{[s]:'mk', [t]:'mk2'}, cls:'mid'}), prompt:`Von ${s} nach ${t}: Wie bist du gegangen?`, label:`Weg ${s} → ${t}`, tip:'Noch nicht. Zähle die Zeilen nach unten (Zehner) und die Felder nach rechts (Einer).'}, [w(d, k), w(k, d) === w(d, k) ? w(d + 1, k) : w(k, d), w(d, k + 1)]); }
   ],
   H6: [
     () => { const e = rnd(1, 9), set = Array.from({length:10}, (_, i) => i*10 + e); return hBoard({kern:true, prompt:`Tippe alle Zahlen an, die mit ${e} enden. Dann „Prüfen“.`, label:`Muster: Endziffer ${e}`, tip:`Noch nicht. Alle Zahlen mit ${e} am Ende stehen untereinander in einer Spalte.`}, {}, 'multi', {set}); },
@@ -5236,7 +5269,7 @@ const H_ITEMS = {
     () => { const k = pick([2, 3, 4, 5]), set = Array.from({length:10}, (_, i) => (i + 1)*k); return hBoard({prompt:`Tippe die ${k}er-Reihe an: ${k}, ${2*k}, ${3*k} … bis ${10*k}. Dann „Prüfen“.`, label:`Muster: ${k}er-Reihe`, tip:`Noch nicht. Springe immer ${k} weiter.`}, {}, 'multi', {set}); },
     () => { const k = rnd(3, 9), kind = pick(['end', 'row', 'ten']), set = kind === 'end' ? Array.from({length:10}, (_, i) => i*10 + k) : kind === 'row' ? Array.from({length:10}, (_, i) => (i + 1)*k) : Array.from({length:10}, (_, i) => k*10 + i), marks = {};
       set.forEach(n => marks[n] = 'pat'); const o = [`Alle Zahlen mit ${k} am Ende`, `Die ${k}er-Reihe`, `Alle Zahlen mit ${k} Zehnern`];
-      return mkChoice({layout:'col', html: boardHtml({marks, cls:'mid'}), prompt:'Welches Muster ist markiert?', label:`Muster erkennen: ${o[['end', 'row', 'ten'].indexOf(kind)]}`, tip:'Noch nicht. Schau die markierten Zahlen genau an: Was haben sie gemeinsam?'}, o, ['end', 'row', 'ten'].indexOf(kind)); }
+      return mkChoice({layout:'side', html: boardHtml({marks, cls:'mid'}), prompt:'Welches Muster ist markiert?', label:`Muster erkennen: ${o[['end', 'row', 'ten'].indexOf(kind)]}`, tip:'Noch nicht. Schau die markierten Zahlen genau an: Was haben sie gemeinsam?'}, o, ['end', 'row', 'ten'].indexOf(kind)); }
   ],
   H7: [
     () => { const p = rnd(1, 9), n = hInPage(p), others = shuffle([p - 1, p + 1, (p + 5) % 10].filter(x => x >= 0 && x <= 9 && x !== p)).slice(0, 2), bk = q => ({h:`<span class="hb-book"><small>Seite</small><b>${hPageName(q)}</b></span>`, a: hPageName(q)});
@@ -5678,6 +5711,7 @@ function fieldsHtml(it){
 
 /* ---------- Test-Oberfläche ---------- */
 function renderDiag(){
+  testLock();
   const d = app.diag;
   $('#words').hidden = true; $('#btn-say').hidden = true;
   const title = d.kurz ? 'Kurztest' : d.warm ? 'Startrunde' : d.subj === 'M' ? (d.part === 1 ? 'Mathe-Test Teil 1' : d.part === 2 ? 'Mathe-Test Teil 2' : 'Mathe-Test') : d.subj === 'W' ? 'Schreib-Test' : 'Lese-Test';
@@ -5723,17 +5757,19 @@ function renderDiag(){
   }
   const it = d.items[d.idx], r = d.resp ||= {};
   $('#equation').innerHTML = d.warm ? `<span class="screen-step">${title} · Aufgabe ${d.nItems + 1} von ${d.items.length}</span>` : `<span class="screen-step">${title}${d.re ? ' · Wiederholung' : ''}</span>${dgProgressHtml(d)}`;
-  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
+  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt.replace('„Prüfen“', '„Weiter“'))}</span>`; /* im Test heißt der Knopf „Weiter“ */
   /* Antwortfelder gehören zur Aufgabe: im „?“ der Rechnung oder direkt darunter – nicht unten in der Leiste */
   const ans = needsFields(it, r) && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : '';
   $('#stage').innerHTML = `<div class="blitz dg-stage"><div class="dg-item">${itemStage(it, r, {inline:true})}</div>${ans}</div>`;
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
+  itFit();
   let c = '';
   if(it.type === 'flash' && r.hidden) c += toolBtn({id:'d-again', ic:'eye', label:'Nochmal zeigen'});
   if(it.type !== 'flash' || r.hidden) c += toolBtn({id:'d-next', ic:'next', label:'Weiter', primary:true});
   c += toolBtn({id:'d-skip', ic:'help', label: d.warm ? 'Überspringen' : 'Weiß ich nicht'}) + '<span class="sep"></span>' + toolBtn({id:'d-close', ic:'close', label:'Abbrechen'});
   $('#controls').innerHTML = c;
   setHint(it.hint || '');
+  itFit();
   if(it.type === 'flash' && !r.hidden){
     clearTimeout(d.timer);
     d.timer = setTimeout(() => { if(app.mode === 'diag' && app.diag === d && d.items[d.idx] === it){ r.hidden = true; renderDiag(); } }, it.ms);
@@ -5743,7 +5779,7 @@ function renderDiag(){
 function diagStageClick(e){
   const d = app.diag; if(!d || d.done) return;
   const it = d.items[d.idx], r = d.resp ||= {};
-  if(itemClick(e, it, r)){ $('#stage .dg-item').innerHTML = itemStage(it, r, {inline:true}); if(it.type === 'board') hbFit(); }
+  if(itemClick(e, it, r)){ const w = $('#stage .it-wrap'), top = w?.scrollTop || 0; $('#stage .dg-item').innerHTML = itemStage(it, r, {inline:true}); if(it.type === 'board' || it.html?.includes('class="hb')) hbFit(); itFit(); const w2 = $('#stage .it-wrap'); if(w2) w2.scrollTop = top; }
 }
 function diagControl(btn){
   const d = app.diag;
@@ -5754,7 +5790,10 @@ function diagControl(btn){
     case 'w-more': { const k = d.answers.find(a => !a.ok)?.key || d.answers[0]?.key; app.diag = null; $('#stage').innerHTML = ''; if(k){ leaveMode(); applyOffer(cellInfo(k).offer.set); } else { app.mode = 'home'; render(); } return; }
     case 'd-again': { d.resp ||= {}; d.resp.hidden = false; d.resp.again = true; return renderDiag(); }
     case 'd-stats': return requireTeacher(() => { app.mode = homeMode(); app.diag = null; $('#stage').innerHTML = ''; render(); openStats(); });
-    case 'd-close': clearTimeout(d?.timer); if(d && !d.done && d.tested.length){ inferCells(d.pid, d.subj); saveData(); } if(d?.kurz && d.done){ app.diag = null; app.run = {}; app.mode = homeMode(); $('#stage').innerHTML = ''; render(); return; } app.mode = d?.done ? 'home' : homeMode(); app.diag = null; $('#stage').innerHTML = ''; render(); return;
+    case 'd-close':
+      /* Versehentliches Abbrechen vermeiden (Durchsicht 16.11.): im laufenden Test zweimal tippen */
+      if(d && !d.done && d.started && !d.warm && !btn.dataset.sure){ btn.dataset.sure = '1'; btn.classList.add('sure'); btn.querySelector('.lbl').textContent = 'Wirklich beenden?'; setTimeout(() => { if(btn.isConnected){ delete btn.dataset.sure; btn.classList.remove('sure'); btn.querySelector('.lbl').textContent = 'Abbrechen'; } }, 4000); return; }
+      clearTimeout(d?.timer); if(d && !d.done && d.tested.length){ inferCells(d.pid, d.subj); saveData(); } if(d?.kurz && d.done){ app.diag = null; app.run = {}; app.mode = homeMode(); $('#stage').innerHTML = ''; render(); return; } app.mode = d?.done ? 'home' : homeMode(); app.diag = null; $('#stage').innerHTML = ''; render(); return;
   }
 }
 
@@ -6037,6 +6076,7 @@ function renderRead(){
   const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl), up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn() && !roundOn(), down = R.miss >= 3 && li > 0;
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : (it.type === 'board' && it.mode === 'fill') || it.type === 'input' ? false : !evalItem(it, R.r, [])})) +
     (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '');
+  itFit();
 }
 function readCheck(){
   const R = app.read, it = R.item, isFill = it.type === 'board' && it.mode === 'fill', isIn = it.type === 'input';
@@ -6480,7 +6520,7 @@ function renderHboard(){
 function hb2Fit(){ const w = document.querySelector('.hb2-wrap'), g = document.querySelector('.hb2'); if(!w || !g) return; const s = Math.max(240, Math.min(w.clientWidth, w.clientHeight) - 8); g.style.width = g.style.height = s + 'px'; g.style.fontSize = Math.round(s/22) + 'px'; }
 addEventListener('resize', () => { if(app.mode === 'hboard') hb2Fit(); });
 /* Ändert sich der Platz (z. B. Rückmeldung erscheint), passt sich die Hundertertafel an */
-{ let ro = 0; new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(() => { if(document.querySelector('#stage .hb')) hbFit(); }); }).observe(document.getElementById('stage')); }
+{ let ro = 0; new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(() => { if(document.querySelector('#stage .hb')) hbFit(); itFit(); }); }).observe(document.getElementById('stage')); }
 function hboardClick(e){
   const b = e.target.closest('[data-hb2]'); if(!b) return; const v = +b.dataset.hb2, h = app.hb2;
   if(h.tool === 'cover'){ h.cover.has(v) ? h.cover.delete(v) : h.cover.add(v); }
@@ -8339,7 +8379,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.23.2 · 16.11.2026';
+const APP_VERSION = '0.24.0 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -8536,7 +8576,7 @@ $('#help-content').innerHTML = [
   ['next','Schwerer oder leichter','Wenn du 5 Aufgaben hintereinander richtig hast, schlägt Stufenweise die nächste Stufe vor. Nach 3 Fehlern gibt es eine leichtere Stufe. Du entscheidest selbst.'],
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
-  ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung, während des Tests oben die Abschnitte und einen Balken, der nur vorwärts läuft (ohne richtig/falsch), und am Ende keine Ergebnisse. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
+  ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung, während des Tests oben die Abschnitte und einen Balken, der nur vorwärts läuft (ohne richtig/falsch), und am Ende keine Ergebnisse. Während des Tests sind Leiste und Menü gesperrt; Beenden mit zweimal „Abbrechen“. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
   ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, der Weg am Material (Handeln, Bild, Zahl) mit Legeblatt, Ideen für den Alltag, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
   ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Wählbar sind unter anderem „Große Aufgaben“ und bei Mathe „Materialbilder: 1. Aufgabe vorgegeben, dann selbst zeichnen“; die Einstellungen bleiben auf diesem Gerät gespeichert. Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Legeblätter für echtes Material“ gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
