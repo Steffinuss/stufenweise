@@ -87,6 +87,23 @@ async def main():
         if st != [True, True] or st2[0]: errs.append(f'Auswahl Materialbilder: {st} {st2}')
         await pg.evaluate("app.sheet.mat=true; app.sheet.draw=false")
 
+        # 7b. Minus im Bild: Wegstreichen eingezeichnet oder nur Ausgangsmenge
+        for t, zr, wop in [('M:minus', 20, 'both'), ('M:ueber10', 20, 'sub')]:
+            r = await pg.evaluate("""([t,zr,wop])=>{const out={};for(const ms of ['gezeigt','selbst']){Object.assign(app.sheet,{topic:t,zr,wop,mstrich:ms,mat:true,draw:false,n:8,sol:false});
+                const d=new DOMParser().parseFromString(buildSheet().html,'text/html'); const ts=[...d.querySelectorAll('.ab-task')];
+                out[ms]={n:ts.length, kreuz:ts.filter(x=>x.innerHTML.includes('#c9414a')).length, streiche:ts.filter(x=>/Streiche \d+ weg/.test(x.textContent)).length,
+                  menge:ts.every(x=>{const a=x.querySelector('.ab-ast') ? +x.querySelector('.ab-ast').children[0].textContent : +x.querySelector('.ab-row.big').textContent.match(/(\d+)/)[1]; return x.querySelectorAll('svg.ab-svg circle').length===a;})};} return out}""", [t, zr, wop])
+            print('Minus im Bild', t, r)
+            g, sb = r['gezeigt'], r['selbst']
+            if g['kreuz'] != g['n'] or sb['kreuz'] or sb['streiche'] != sb['n'] or not sb['menge'] or not g['menge']: errs.append(f'Minus im Bild {t}: {r}')
+        await pg.evaluate("app.sheet.topic='M:ueber10'; app.sheet.wop='both'; app.sheet.mstrich='gezeigt'; renderSheets()"); await pg.wait_for_timeout(300)
+        if not await pg.locator('#sh-mstrich').count(): errs.append('Auswahl „Minus im Bild“ fehlt')
+        await pg.select_option('#sh-mstrich', 'selbst'); await pg.wait_for_timeout(300)
+        if await pg.evaluate("app.sheet.mstrich") != 'selbst': errs.append('Auswahl „Minus im Bild“ wirkt nicht')
+        await pg.evaluate("app.sheet.wop='add'; renderSheets()"); await pg.wait_for_timeout(300)
+        if await pg.locator('#sh-mstrich').count(): errs.append('„Minus im Bild“ bei nur Plus sichtbar')
+        await pg.evaluate("app.sheet.mstrich='gezeigt'; app.sheet.wop='both'")
+
         # 8. Einstellungen bleiben nach dem Neuladen
         await pg.evaluate("app.sheet.topic='M:minus'; renderSheets()"); await pg.wait_for_timeout(300)
         await pg.check('#sh-gross'); await pg.select_option('#sh-matm', 'zeichnen'); await pg.wait_for_timeout(300)

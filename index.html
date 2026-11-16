@@ -7238,8 +7238,9 @@ const M_SHEETS = {
   ueber10: {name:'Rechnen über die 10', cols:2, max:20, gens:[
     zr => { const op = app.sheet.wop === 'sub' ? '−' : app.sheet.wop === 'add' ? '+' : pick(['+', '−']); let a, b;
       if(op === '+'){ a = rnd(3, 9); b = rnd(11 - a, 9); } else { a = rnd(11, 17); b = rnd(a - 9, 9); }
-      const fld = app.sheet.mat ? (op === '+' ? abMV(abField(a, b, '+', 20), abEmptyField(20)) : abMV(abField(a, b, '−', 20), abEmptyField(20))) : '';
-      return T_('rechne', `§EK:${op === '+' ? 'p' : 'm'}§` + abEx('<b>Beispiel:</b> Rechne über die 10.', 'Rechne über die 10.'), `${fld}${abAst(a, b, op)}`, op === '+' ? `${a} + ${10 - a} + ${b - 10 + a} = ${a + b}` : `${a} − ${a - 10} − ${b - a + 10} = ${a - b}`, op === '+' ? a + b : 30 - a + b); }]},
+      const selbst = op === '−' && app.sheet.mstrich === 'selbst' && !app.sheet.draw;
+      const fld = app.sheet.mat ? (op === '+' ? abMV(abField(a, b, '+', 20), abEmptyField(20)) : abMV(selbst ? abField(a, 0, '+', 20) : abField(a, b, '−', 20), abEmptyField(20))) : '';
+      return T_(selbst && app.sheet.mat ? ['streiche', 'rechne'] : 'rechne', `§EK:${op === '+' ? 'p' : 'm'}§` + abEx(`<b>Beispiel:</b> ${selbst && app.sheet.mat ? `Streiche ${b} weg. ` : ''}Rechne über die 10.`, `${selbst && app.sheet.mat ? `Streiche ${b} weg. ` : ''}Rechne über die 10.`), `${fld}${abAst(a, b, op)}`, op === '+' ? `${a} + ${10 - a} + ${b - 10 + a} = ${a + b}` : `${a} − ${a - 10} − ${b - a + 10} = ${a - b}`, op === '+' ? a + b : 30 - a + b); }]},
   unterschied: {name:'Unterschiede bestimmen', cols:2, gens:[
     zr => { const T = zrMax(zr), a = rnd(Math.ceil(T*.1), Math.floor(T*.5)), b = a + rnd(Math.max(1, Math.floor(T*.1)), Math.floor(T*.4)); const nm = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']), nm2 = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_('rechne', `${nm} hat ${a} €. ${nm2} hat ${b} €. Wie viel mehr hat ${nm2}?`, `${app.sheet.mat && zr <= 20 ? `<div class="ab-bars"><span>${nm}</span>${abField(a, 0, '+', 20)}<span>${nm2}</span>${abField(b, 0, '+', 20)}</div>` : ''}${ans(18, '€')}`, b - a); },
     zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${ans()}`, b - a); }]},
@@ -7250,7 +7251,8 @@ const M_SHEETS = {
   minus: {name:'Minus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('−', zr, app.sheet.ue), D = app.sheet.mat && app.sheet.draw;
     if(D && zr <= 20) return T_(['male', 'streiche', 'rechne'], abEx('Rechne.', `Male ${a} Punkte. Streiche ${b} weg. Rechne.`), `${abEx(abField(a, b, '−', 20), abEmptyField(20))}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a);
     if(D) return T_(['skizze', 'streiche', 'rechne'], `Zeichne ${a}. Streiche ${b} weg. Rechne.`, `${abEx(`${abSketch(a)}${abKey(zr)}`, '<div class="ab-draw"></div>')}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a);
-    const mat = !app.sheet.mat ? '' : zr <= 20 ? abField(a, b, '−', zr) : app.sheet.tausch ? abMatTausch(a, b) : abMat(a, zr); return T_(zr <= 20 || !app.sheet.mat ? 'rechne' : ['streiche', 'rechne'], zr <= 20 || !app.sheet.mat ? 'Rechne.' : `Streiche ${b} weg und rechne.`, `${mat}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a); }]},
+    const selbst = zr <= 20 && app.sheet.mstrich === 'selbst'; /* nur die Ausgangsmenge, die Kinder streichen selbst */
+    const mat = !app.sheet.mat ? '' : zr <= 20 ? (selbst ? abField(a, 0, '+', zr) : abField(a, b, '−', zr)) : app.sheet.tausch ? abMatTausch(a, b) : abMat(a, zr); return T_((zr <= 20 && !selbst) || !app.sheet.mat ? 'rechne' : ['streiche', 'rechne'], (zr <= 20 && !selbst) || !app.sheet.mat ? 'Rechne.' : `Streiche ${b} weg und rechne.`, `${mat}<p class="ab-row big">${a} − ${b} = ${box(18)}</p>`, a - b, carries(a, b, '−')*1e5 + a); }]},
   stellenwert: {name:'Zehner und Einer (Stellenwert)', cols:2, gens:[
     zr => { const n = zr >= 1000 ? rnd(1, 4)*100 + rnd(1, 6)*10 + rnd(1, 8) : rnd(2, 8)*10 + rnd(1, 9); return T_('schreibe', 'Welche Zahl ist das?', `${abMat(n, zr)}${ans()}`, n); },
     zr => { const n = zr >= 1000 ? rnd(120, 980) : rnd(21, 98); return zr >= 1000 ? T_('schreibe', 'Zerlege in Hunderter, Zehner und Einer.', `<p class="ab-row">${n} = ${box(11)} H ${box(11)} Z ${box(11)} E</p>`, `${Math.floor(n/100)} H ${Math.floor(n % 100/10)} Z ${n % 10} E`) : T_('schreibe', 'Zerlege in Zehner und Einer.', `<p class="ab-row">${n} = ${box(11)} Z ${box(11)} E</p>`, `${Math.floor(n/10)} Z ${n % 10} E`); },
@@ -7630,8 +7632,8 @@ function zoneToSheet(key){
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
-app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null};
-const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp'];
+app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt'};
+const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
 function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch {} }
@@ -7793,6 +7795,7 @@ function renderSheets(keep){
     ${isM && key === 'einmaleins' ? `<div class="row sh-rows" role="group" aria-label="Reihen"><span>Reihen</span>${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<label class="cb"><input type="checkbox" data-shrow="${n}" ${sheetRows().includes(n) ? 'checked' : ''}>${n}</label>`).join('')}</div>` : ''}
     ${isM && ['plus', 'minus', 'schriftlich'].includes(key) ? `<label class="row">${key === 'schriftlich' ? 'Übertrag' : 'Zehnerübergang'} ${sel('sh-ue', [['egal', 'gemischt'], ['ohne', 'ohne'], ['mit', 'mit']], S.ue)}</label>` : ''}
     ${isM && !['schriftlich', 'zahlenstrahl', 'geld', 'zaehlen', 'zeichnen'].includes(key) ? (DRAW_KEYS.includes(key) ? `<label class="row">Materialbilder ${sel('sh-matm', [['bild', 'bei allen Aufgaben'], ['zeichnen', '1. Aufgabe vorgegeben, dann selbst zeichnen'], ['ohne', 'ohne']], !S.mat ? 'ohne' : S.draw ? 'zeichnen' : 'bild')}</label>` : `<label class="row cb"><input type="checkbox" id="sh-mat" ${S.mat ? 'checked' : ''}> mit Materialbildern</label>`) : ''}
+    ${S.mat && !S.draw && ((S.topic === 'M:minus' && S.zr <= 20) || (S.topic === 'M:ueber10' && S.wop !== 'add')) ? `<label class="row">Minus im Bild ${sel('sh-mstrich', [['gezeigt', 'Wegstreichen schon eingezeichnet'], ['selbst', 'nur Ausgangsmenge – selbst streichen']], S.mstrich || 'gezeigt')}</label>` : ''}
     ${S.topic === 'M:minus' && S.mat && !S.draw && S.zr >= 100 && S.ue !== 'ohne' ? `<label class="row cb"><input type="checkbox" id="sh-tausch" ${S.tausch ? 'checked' : ''}> Zehnerübergang: Umtausch schon im Bild zeigen</label>` : ''}
     ${S.topic === 'L:L2' ? `<label class="row">Schrift ${sel('sh-case', [['up', 'nur Großbuchstaben'], ['mixed', 'Groß- und Kleinschreibung']], S.lcase ? 'mixed' : 'up')}</label>` : ''}
     ${LD ? `${LD.zrs ? `<label class="row">Zahlenraum ${sel('sh-lzr', LD.zrs.map(z => [z, `bis ${z}${key === 'geld' ? ' €' : ''}`]), LD.zrs.includes(S.zr) ? S.zr : LD.zrs[0])}</label>` : ''}
@@ -7846,6 +7849,7 @@ function sheetChange(e){
   if(t.id === 'sh-mat'){ S.mat = t.checked; S.draw = false; }
   if(t.id === 'sh-matm'){ S.mat = t.value !== 'ohne'; S.draw = t.value === 'zeichnen'; }
   if(t.id === 'sh-gcent') S.gcent = t.value;
+  if(t.id === 'sh-mstrich') S.mstrich = t.value;
   if(t.dataset.shrow){ const n = +t.dataset.shrow, r = new Set(sheetRows()); t.checked ? r.add(n) : r.delete(n); if(!r.size){ t.checked = true; return; } S.rows = [...r]; }
   if(t.id === 'sh-gross') S.gross = t.checked;
   if(t.id === 'sh-tausch') S.tausch = t.checked;
@@ -8283,7 +8287,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.21.1 · 16.11.2026';
+const APP_VERSION = '0.22.0 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

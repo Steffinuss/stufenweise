@@ -205,7 +205,7 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 
 **Einmaleins:** Unter „Reihen“ kreuzt du an, welche Reihen auf dem Blatt vorkommen. Die Auswahl steht auch in der Überschrift, zum Beispiel „Einmaleins: 3er- und 7er-Reihe“.
 
-**Zehnerpartner und Rechnen über die 10:** Zwei Blätter zum Zehnerübergang. „Zehnerpartner“ hat Aufgaben am Zehnerfeld (4 + ☐ = 10), ohne Bild (☐ + 9 = 10, 10 = 7 + ☐, 10 − 8 = ☐) und zum Verbinden der Partner. „Rechnen über die 10“ zeigt den Rechenweg mit einem Zerlegungsast: 7 + 8 = ☐, darunter 7 + ☐ + ☐ = ☐. Die erste Plus- und die erste Minus-Aufgabe sind als Beispiel grau ausgefüllt. Unter „Rechenart“ wählst du Plus, Minus oder gemischt. Bei den Förderzonen R1 bis R3 stehen beide Blätter auch unter „Passend zur Förderzone“.
+**Zehnerpartner und Rechnen über die 10:** Zwei Blätter zum Zehnerübergang. „Zehnerpartner“ hat Aufgaben am Zehnerfeld (4 + ☐ = 10), ohne Bild (☐ + 9 = 10, 10 = 7 + ☐, 10 − 8 = ☐) und zum Verbinden der Partner. „Rechnen über die 10“ zeigt den Rechenweg mit einem Zerlegungsast: 7 + 8 = ☐, darunter 7 + ☐ + ☐ = ☐. Die erste Plus- und die erste Minus-Aufgabe sind als Beispiel grau ausgefüllt. Unter „Rechenart“ wählst du Plus, Minus oder gemischt. Bei Minus wählst du unter „Minus im Bild“, ob das Wegstreichen im Zwanzigerfeld schon eingezeichnet ist oder ob nur die Ausgangsmenge zu sehen ist und die Kinder selbst streichen („Streiche 5 weg.“). Dieselbe Auswahl gibt es beim Blatt Minus bis 20. Bei den Förderzonen R1 bis R3 stehen beide Blätter auch unter „Passend zur Förderzone“.
 
 **Einstellungen bleiben:** Thema, Zahlenraum, große Aufgaben, Materialbilder und die anderen Einstellungen merkt sich das Gerät bis zum nächsten Mal. Das Kind wählst du jedes Mal neu.
 
