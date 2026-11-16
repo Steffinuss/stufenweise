@@ -124,9 +124,9 @@ Unter **Zehnerpartner** (in der Leiste links nach Minus) üben die Kinder die Za
 
 - **mit Feld:** Im Zehnerfeld liegen Punkte. Wie viele fehlen bis 10?
 - **im Kopf:** 7 + ☐ = 10, ☐ + 4 = 10, 10 − 6 = ☐ oder den passenden Partner antippen.
-- **über 10:** schrittweise über die 10 rechnen, zum Beispiel 8 + 5 = 8 + ☐ + ☐ = ☐ (erst bis 10, dann weiter), mit Zwanzigerfeld. Auch mit Minus: 13 − 5 = 13 − ☐ − ☐ = ☐.
+- **über 10:** schrittweise über die 10 rechnen, mit Zwanzigerfeld und Zerlegungsast wie auf dem Arbeitsblatt: Unter 8 + 5 zeigen zwei Striche von der 5 auf 8 + ☐ + ☐ = ☐ (erst bis 10, dann weiter). Auch mit Minus.
 
-Die Zehnerpartner haben im Lernstand eine eigene Zeile (Z1–Z3). Im Mathe-Test (Teil 1) werden sie geprüft, solange der Zehnerübergang bis 20 (R3) noch nicht sicher ist. Wer R3 schon kann, bekommt die Zehnerpartner als „abgeleitet erreicht“. Eine Förderzone bei den Zehnerpartnern führt in der Übung und bei den Arbeitsblättern direkt zur passenden Stufe. In der geführten Oberfläche sind sie sichtbar, wenn sie zur Förderzone gehören (vor dem ersten Test: solange Plus bis 10 oder bis 20 dran ist).
+Die Zehnerpartner haben im Lernstand eine eigene Zeile (Z1–Z3). Im Mathe-Test (Teil 1) werden Z1 und Z2 geprüft, solange der Zehnerübergang bis 20 (R3) noch nicht sicher ist. Z3 („über die 10“) wird im Test nicht eigens abgefragt, sondern übernimmt das Ergebnis von R3 – so hängt die Einstufung nicht davon ab, ob ein Kind die Darstellung mit den Lücken versteht. Wer R3 schon kann, bekommt die Zehnerpartner als „abgeleitet erreicht“. Eine Förderzone bei den Zehnerpartnern führt in der Übung und bei den Arbeitsblättern direkt zur passenden Stufe. In der geführten Oberfläche sind sie sichtbar, wenn sie zur Förderzone gehören (vor dem ersten Test: solange Plus bis 10 oder bis 20 dran ist).
 
 ### Zwanzigerfeld beim Üben
 

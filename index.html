@@ -355,7 +355,12 @@ body.screening .toolbar{visibility:hidden}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* Diagnostik und Lese-Werkstatt */
-.dg-in{-moz-appearance:textfield;appearance:textfield}.dg-in::-webkit-inner-spin-button,.dg-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.dg-in{-moz-appearance:textfield;appearance:textfield}
+.it-ast{display:grid;grid-template-columns:auto 34px 96px 34px 96px 34px 110px;align-items:center;justify-items:center;font-size:clamp(26px,3.4vw,36px);font-weight:600;background:#fff;border-radius:18px;padding:14px 26px;box-shadow:var(--shadow)}
+.it-ast>:nth-child(-n+3){grid-row:1}.it-ast>:nth-child(1){grid-column:1}.it-ast>:nth-child(2){grid-column:2}.it-ast .ast-b{grid-column:3/6}
+.it-ast .ast-l{grid-row:2;grid-column:3/6;width:100%;height:34px;color:var(--ink,#222)}
+.it-ast>:nth-child(5){grid-row:3;grid-column:1}.it-ast>:nth-child(6){grid-row:3;grid-column:2}.it-ast>:nth-child(7){grid-row:3;grid-column:3}.it-ast>:nth-child(8){grid-row:3;grid-column:4}.it-ast>:nth-child(9){grid-row:3;grid-column:5}.it-ast>:nth-child(10){grid-row:3;grid-column:6}.it-ast>:nth-child(11){grid-row:3;grid-column:7}
+.it-ast .dg-in{width:84px;text-align:center}.dg-in::-webkit-inner-spin-button,.dg-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .dg-stage{flex-direction:column;justify-content:flex-start;padding-top:clamp(6px,3vh,36px)}
 .it-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-height:100%;overflow:auto;padding:6px}
 .it-svg{width:100%;display:flex;justify-content:center}.it-svg>svg{max-width:100%;max-height:300px}
@@ -5097,9 +5102,9 @@ const Z_ITEMS = {
     () => { const n = rnd(1, 9); return {type:'input', text:`? + ${n} = 10`, prompt:'Ergänze bis 10.', fields:[10 - n], label:`_ + ${n} = 10`, tip:`Noch nicht. Wie viele fehlen von ${n} bis 10?`}; },
     () => { const n = rnd(1, 9); return {type:'input', text:`10 − ${n} = ?`, prompt:'Rechne.', fields:[10 - n], label:`10 − ${n}`, tip:`Noch nicht. Denk an den Zehnerpartner von ${n}.`}; },
     () => { const n = rnd(1, 9); return mkChoice({layout:'row', text:`${n}`, textCls:'rd-letter', prompt:`Welche Zahl macht mit ${n} zusammen 10?`, label:`Partner von ${n} wählen`, tip:`Noch nicht. ${n} + ? = 10`}, zOther(10 - n, n)); }],
-  Z3: [
-    () => { const a = rnd(5, 9), b = rnd(11 - a, 9), p = 10 - a; return {kern:true, type:'input', inl:true, svg: fieldSvg(a, 20, b), text:`${a} + ${b} = ${a} + ? + ? = ?`, fieldLabels:['bis 10', 'dann noch', 'Ergebnis'], prompt:'Rechne über die 10: erst bis 10, dann weiter.', fields:[p, b - p, a + b], label:`${a} + ${b} über die 10`, tip:`Noch nicht. ${a} + ${p} = 10. Dann noch ${b - p} dazu.`}; },
-    () => { const a = rnd(11, 17), b = rnd(a - 9, 9), p = a - 10; return {type:'input', inl:true, svg: fieldSvg(a, 20), text:`${a} − ${b} = ${a} − ? − ? = ?`, fieldLabels:['bis 10', 'dann noch', 'Ergebnis'], prompt:'Rechne über die 10: erst bis 10 zurück, dann weiter.', fields:[p, b - p, a - b], label:`${a} − ${b} über die 10`, tip:`Noch nicht. ${a} − ${p} = 10. Dann noch ${b - p} weg.`}; }]
+  Z3: [ /* Zerlegungsast wie auf dem Arbeitsblatt: 8 + 5, darunter 8 + ☐ + ☐ = ☐ (Stefan, 16.11.: die Lückenzeile war unklar) */
+    () => { const a = rnd(5, 9), b = rnd(11 - a, 9), p = 10 - a; return {kern:true, type:'input', svg: fieldSvg(a, 20, b), ast:{a, b, op:'+'}, fieldLabels:['erster Teil (bis 10)', 'zweiter Teil', 'Ergebnis'], prompt:`Zerlege ${b} und rechne über die 10.`, fields:[p, b - p, a + b], label:`${a} + ${b} über die 10`, tip:`Noch nicht. ${a} + ${p} = 10. Dann noch ${b - p} dazu.`}; },
+    () => { const a = rnd(11, 17), b = rnd(a - 9, 9), p = a - 10; return {type:'input', svg: fieldSvg(a, 20), ast:{a, b, op:'−'}, fieldLabels:['erster Teil (bis 10)', 'zweiter Teil', 'Ergebnis'], prompt:`Zerlege ${b} und rechne über die 10.`, fields:[p, b - p, a - b], label:`${a} − ${b} über die 10`, tip:`Noch nicht. ${a} − ${p} = 10. Dann noch ${b - p} weg.`}; }]
 };
 const hRC = n => { const k = (n - 1) % 100; return [Math.floor(k/10), k % 10]; };
 const hAt = (page, r, c) => page*100 + r*10 + c + 1;
@@ -5350,6 +5355,8 @@ function inferCells(pid, subj){
     line(Z_LEVELS.map(l => `Z|${l}`));
     /* Zehnerübergang (R3 oder höher) sicher: Zehnerpartner gelten als erreicht – auch wenn ein älterer Test sie noch als offen zeigt */
     const rOk = ['R|R3', 'R|R4', 'R|R5', 'R|R6'].map(k => m[k]).filter(c => isOk(c?.status) && c.quelle !== 'abgeleitet');
+    /* Z3 („über die 10“) wird nicht eigens getestet: es übernimmt das Ergebnis von R3, solange es keinen eigenen Testeintrag hat */
+    const r3 = m['R|R3'], z3 = m['Z|Z3']; if(r3 && r3.quelle !== 'abgeleitet' && !isOk(r3.status) && (!z3 || z3.quelle === 'abgeleitet')) setCell(pid, 'Z|Z3', {status:r3.status, quelle:'abgeleitet', sum:'aus Rechnen R3 (Zehnerübergang bis 20) übernommen'});
     if(rOk.length){ const rDate = Math.max(...rOk.map(c => c.date || 0)); Z_LEVELS.forEach(l => { const k = `Z|${l}`, c = m[k]; if(!c || c.quelle === 'abgeleitet' || (!isOk(c.status) && (c.date || 0) < rDate)) setCell(pid, k, {status:'erreicht', quelle:'abgeleitet', sum:'aus dem Zehnerübergang (R3) abgeleitet'}); }); }
   } else if(subj === 'W') line(W_LEVELS.map(l => `W|${l}`));
   else { line(L_LEVELS.map(l => `L|${l}`)); line(P_LEVELS.map(l => `P|${l}`)); }
@@ -5389,7 +5396,7 @@ function* mathPlan(d){
     yield* binary(d, R_LEVELS.slice(0, 6).map(l => `R|${l}`), startR);
     if(['R|R4', 'R|R5', 'R|R6'].some(k => isOk(d.res[k]))) yield* tst(d, 'R|R7');
     /* Zehnerpartner, solange der Zehnerübergang bis 20 noch nicht sicher ist */
-    if(!['R|R3', 'R|R4', 'R|R5', 'R|R6'].some(k => isOk(d.res[k]))) yield* binary(d, Z_LEVELS.map(l => `Z|${l}`), isOk(d.res['R|R1']) ? 1 : 0);
+    if(!['R|R3', 'R|R4', 'R|R5', 'R|R6'].some(k => isOk(d.res[k]))) yield* binary(d, ['Z|Z1', 'Z|Z2'], isOk(d.res['R|R1']) ? 1 : 0); /* Z3 = Zehnerübergang, kommt aus R3 */
   }
   // 4. Stellenwert, sobald der Zahlenraum bis 20 sicher ist
   const iii = zr => ZR.filter(z => z >= zr).some(z => isOk(d.res[`M|${z}|III`]));
@@ -5424,7 +5431,7 @@ function* mathRePlan(d){
   yield* walkUp(d, H_LEVELS.map(l => `H|${l}`));
   yield* walkUp(d, R_LEVELS.slice(0, 6).map(l => `R|${l}`));
   const rNow = k => d.res[k] ?? matrixOf(d.pid)[k]?.status;
-  if(!['R|R3', 'R|R4', 'R|R5', 'R|R6'].some(k => isOk(rNow(k)))) yield* walkUp(d, Z_LEVELS.map(l => `Z|${l}`));
+  if(!['R|R3', 'R|R4', 'R|R5', 'R|R6'].some(k => isOk(rNow(k)))) yield* walkUp(d, ['Z|Z1', 'Z|Z2']);
 }
 function* binary(d, keys, start){
   let lo = -1, hi = keys.length, i = Math.max(0, Math.min(keys.length - 1, start));
@@ -5567,7 +5574,7 @@ function moneyRowSvg(list, tap){
 
 /* Antwortfelder direkt in die Aufgabe setzen, wo ein einzelnes „?“ steht (z. B. „8 = 6 + ?“) */
 const Q_RE = /(^|\s)\?(?=\s|$)/g;
-const inlineQ = it => it.type === 'input' && !!it.text && (!it.svg || it.inl) && (it.text.match(Q_RE) || []).length === it.fields?.length;
+const inlineQ = it => it.type === 'input' && (!!it.ast || (!!it.text && (!it.svg || it.inl) && (it.text.match(Q_RE) || []).length === it.fields?.length));
 function itemStage(it, r, opt = {}){
   const inl = opt.inline && inlineQ(it); let qk = 0;
   const qIn = () => `<input class="dg-in it-in" type="number" inputmode="numeric" placeholder=" " aria-label="${escHtml((it.fieldLabels || [])[qk] || 'Antwort ' + (qk + 1))}" data-q="${qk++}">`;
@@ -5576,6 +5583,7 @@ function itemStage(it, r, opt = {}){
     (it.word ? `<div class="it-word">${rdWordHtml(it.word, opt.colored && it.colored !== false)}</div>` : '') +
     (it.text ? `<div class="it-text ${it.textCls || ''}">${it.text.split(/ {3,}/).map(inl ? (x => escHtml(x).replace(Q_RE, (m, pre) => pre + qIn())) : opt.colored ? sylText : escHtml).join('<span class="it-gap" aria-hidden="true"></span>')}</div>` : '') +
     (it.html ? `<div class="it-doc">${it.html}</div>` : '') +
+    (it.ast ? `<div class="it-ast" role="group" aria-label="${it.ast.a} ${it.ast.op} ${it.ast.b}: ${it.ast.b} zerlegen"><span>${it.ast.a}</span><span>${it.ast.op}</span><span class="ast-b">${it.ast.b}</span><svg class="ast-l" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path d="M50 1L16 29M50 1L84 29" stroke="currentColor" stroke-width="2.5" fill="none" vector-effect="non-scaling-stroke"/></svg><span>${it.ast.a}</span><span>${it.ast.op}</span>${qIn()}<span>${it.ast.op}</span>${qIn()}<span>=</span>${qIn()}</div>` : '') +
 ''
   if(it.type === 'write') return writeStage(it, r, opt);
   if(it.type === 'sent') return sentStage(it, r);
@@ -8303,7 +8311,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.22.1 · 16.11.2026';
+const APP_VERSION = '0.22.2 · 16.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

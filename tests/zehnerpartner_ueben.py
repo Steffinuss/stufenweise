@@ -54,5 +54,18 @@ async def main():
         last = await pg.evaluate("(data.skips?.[data.current||'guest']||[]).slice(-1)[0]?.task")
         print('Zahl suchen übersprungen:', last)
         if not (last or '').startswith('Zahl '): errs.append('Zahl suchen: Überspringen nicht gezählt')
+        # Test: Z3 wird nicht abgefragt, sondern aus R3 übernommen; Z3 beim Üben mit Zerlegungsast
+        r = await pg.evaluate("""(()=>{const p={id:'p_t',name:'Tom',created:Date.now()};data.profiles.push(p);
+            const d={pid:'p_t',res:{},subj:'M'}; const asked=[]; const it=mathPlan(d); let n=it.next(); let k=0;
+            while(!n.done && k++<80){ const key=n.value; asked.push(key); d.res[key]= /R\|R[3-7]/.test(key) ? 'nicht' : 'erreicht'; n=it.next(); }
+            for(const [k,v] of Object.entries(d.res)) setCell('p_t',k,{status:v,quelle:'test',sum:'x'}); inferCells('p_t','M');
+            const m=matrixOf('p_t'); return {z3:asked.includes('Z|Z3'), zAsked:asked.filter(k=>k[0]==='Z'), z3cell:m['Z|Z3'] && [m['Z|Z3'].status, m['Z|Z3'].quelle]};})()""")
+        print('Test-Ablauf Zehnerpartner:', r)
+        if r['z3']: errs.append('Test fragt Z3 ab')
+        if not r['zAsked']: errs.append('Test fragt keine Zehnerpartner ab')
+        if r['z3cell'] != ['nicht', 'abgeleitet']: errs.append(f'Z3 nicht aus R3 übernommen: {r["z3cell"]}')
+        ast = await pg.evaluate("(()=>{app.mode='read'; app.read.lvl='Z3'; app.read.item=null; render(); return [!!app.read.item.ast, document.querySelectorAll('#stage .it-ast .dg-in').length]})()")
+        print('Z3 mit Zerlegungsast:', ast)
+        if ast != [True, 3]: errs.append(f'Z3-Darstellung: {ast}')
         print('ERR', errs); await b.close()
 asyncio.run(main())

@@ -15,7 +15,7 @@ JS = """(topic) => {
     const doc = new DOMParser().parseFromString(buildSheet().html, 'text/html');
     let prev = null;
     for (const t of doc.querySelectorAll('.ab-task')) {
-      const rows = [...t.querySelectorAll('.ab-row')].map(e => e.textContent.replace(/\\s+/g, ' ').trim()).filter(Boolean);
+      const rows = [...t.querySelectorAll('.ab-row')].map(e => [...e.childNodes].map(c => c.textContent.trim() || '○').join(' ').replace(/\\s+/g, ' ').trim()).filter(Boolean); /* Kreise/Kästchen als Trenner, sonst sind „11 ○ 3“ und „1 ○ 13“ gleich */
       const dup = rows.find((x, i) => rows.indexOf(x) !== i);
       if (dup) found.push(`${topic} bis ${zr}: Zeile doppelt „${dup}“`);
       const c = t.cloneNode(true); c.querySelectorAll('.nr').forEach(e => e.remove());
