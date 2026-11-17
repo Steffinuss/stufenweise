@@ -231,19 +231,21 @@ Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in 
 
 ### Basis: Grundlagen vor dem Zählen
 
-**Üben in der App:** Oben in der Fachwahl steht neben Mathe und Deutsch **Basis**. Links wählst du die Stufe: unter „Vergleichen“ Gleiches, passt nicht, Sortieren, Zuordnen, Mengen, Größe, Muster, Blick; unter „Orientieren“ Formen, Richtung, Reihe. Die Kinder tippen nur Bilder an:
+**Üben in der App:** Oben in der Fachwahl steht neben Mathe und Deutsch **Basis**. Links wählst du die Stufe: unter „Vergleichen“ Gleiches, passt nicht, Sortieren, Zuordnen, Mengen, Größe, Muster, Blick; unter „Orientieren“ Formen, Richtung, Reihe.
+
+Die Aufgaben sind klar geteilt: **Oben hellblau** liegt die Vorgabe oder das Ziel (das Bild zum Vergleichen, die Kisten, die Plätze). **Unten beige** liegt der Vorrat. Die Kinder legen Dinge aus dem Vorrat dazu: Sie **schieben** ein Ding mit dem Finger an seinen Platz, oder sie tippen es an und dann den Platz.
 
 - **Bild wählen:** das gleiche Bild, was nicht passt, wo mehr sind, das größte, was als Nächstes kommt. Bei „Tippe alle … an“ können es mehrere sein.
-- **Sortieren:** erst ein Ding antippen, dann die richtige Kiste. Ein Ding in der Kiste antippen nimmt es wieder heraus.
-- **Verbinden:** oben ein Bild antippen, dann unten eins: Es erscheint eine Linie. Bei „Reicht es?“ danach „ja“ oder „nein“ wählen.
-- **Der Reihe nach:** Die Bilder in der richtigen Reihenfolge antippen, es erscheinen Zahlen 1, 2, 3. Eine Zahl antippen nimmt sie (und alle danach) zurück.
+- **Sortieren:** jedes Ding in die richtige Kiste schieben. Ein Ding zurück in den Vorrat schieben (oder antippen) nimmt es wieder heraus.
+- **Dazulegen:** das gleiche Bild oder einen Löffel unter jede Tasse legen. Bei „Reicht es?“ sieht man dann, ob ein Platz leer bleibt oder etwas übrig ist, und wählt „ja“ oder „nein“.
+- **Der Reihe nach legen:** von klein nach groß oder die Bildfolge auf die Plätze 1, 2, 3 legen. Bei „Von links nach rechts“ tippen die Kinder die Bilder der Reihe nach an.
 - **Auf einen Blick:** Das Bild ist kurz zu sehen und wird dann abgedeckt. „Nochmal zeigen“ zeigt es noch einmal.
 
 Nach „Prüfen“ wird Falsches rot markiert. Jede Stufe hat ein festes Bildsymbol vor dem Auftrag.
 
-**Eine Aufgabenart nach der anderen:** Innerhalb einer Stufe gibt es mehrere Aufgabenarten, von leicht nach schwer (bei „Gleiches“ zum Beispiel: Gleiches Bild, Gleiche verbinden, Gleiche Farbe, Farbe verbinden). Das Kind bleibt bei einer Aufgabenart und wiederholt sie. Am Anfang sind es nur 2 oder 3 Bilder, nach einigen richtigen Aufgaben werden es mehr. Wer dreimal hintereinander danebenliegt, bekommt wieder leichtere Aufgaben. Nach 8 Aufgaben, die beim ersten Versuch richtig waren, erscheint „Nächste Aufgabe“ für die nächste Aufgabenart. Oben in der Leiste kannst du jede Aufgabenart auch direkt wählen.
+**Eine Aufgabenart nach der anderen:** Innerhalb einer Stufe gibt es mehrere Aufgabenarten, von leicht nach schwer (bei „Gleiches“ zum Beispiel: Gleiches Bild, Gleiches dazulegen, Gleiche Farbe, Farbe dazulegen). Das Kind bleibt bei einer Aufgabenart und wiederholt sie. Am Anfang sind es nur 2 oder 3 Bilder, nach einigen richtigen Aufgaben werden es mehr. Wer dreimal hintereinander danebenliegt, bekommt wieder leichtere Aufgaben. Nach 8 Aufgaben, die beim ersten Versuch richtig waren, erscheint „Nächste Aufgabe“ für die nächste Aufgabenart. Oben in der Leiste kannst du jede Aufgabenart auch direkt wählen.
 
-**Vormachen:** Bevor ein Kind eine Aufgabenart zum ersten Mal bekommt, macht Stufenweise sie einmal vor („Schau zu“): Schritt für Schritt wird angetippt, einsortiert oder verbunden. Das Kind kann dabei nichts antippen. Mit „Jetzt du“ beginnt das Kind selbst. „Vormachen“ unten zeigt das Beispiel jederzeit noch einmal. Erkläre den Auftrag dazu mit eigenen Worten.
+**Vormachen:** Bevor ein Kind eine Aufgabenart zum ersten Mal bekommt, macht Stufenweise sie einmal vor („Schau zu“): Schritt für Schritt wandern die Dinge langsam an ihren Platz. Das Kind kann dabei nichts antippen. Mit „Jetzt du“ beginnt das Kind selbst. „Vormachen“ unten zeigt das Beispiel jederzeit noch einmal. Erkläre den Auftrag dazu mit eigenen Worten.
 
 **Wer Basis sieht:** Ohne gewähltes Kind (Gast) und in der Lehrkraft-Ansicht immer. Ein Kind sieht „Basis“ erst, wenn du es unter **Einstellungen → Kinder & Daten → Basis** für dieses Kind einschaltest. So werden Kinder, die schon zählen und lesen, nicht damit gelangweilt. Den Basis-Test gibt es noch nicht; er kommt mit der nächsten Version.
 

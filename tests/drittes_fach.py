@@ -46,7 +46,7 @@ async def main():
         hs = await pg.evaluate("[...document.querySelectorAll('[data-home-subj]')].map(b=>b.dataset.homeSubj).join()")
         if hs != 'M,D,B,X': errs.append(f'Startseite Fächer: {hs}')
         lbl = await pg.evaluate("document.querySelector('.wz-stair').innerText")
-        if 'Mathe, Deutsch, Basis oder Probe?' not in lbl: errs.append('Treppe nennt nicht alle Fächer')
+        if 'Fach?' not in lbl or 'oder' in lbl.split('Fach?')[0][-30:]: errs.append('Treppe: bei mehr als zwei Fächern kurz „Fach?“')
         await pg.click('[data-home-subj="X"]'); await pg.wait_for_timeout(150)
         if 'Probe: Was möchtest du üben?' not in await pg.inner_text('#stage'): errs.append('Bereichs-Schritt Probe fehlt')
         # Kind anlegen, Test machen

@@ -2,7 +2,8 @@
 Alle Aufgabenarten (V1–V8, O2–O4, je mindestens 2, in den Schwierigkeiten st = 0, 1, 2) erzeugen gültige
 Aufgaben ohne NaN/undefined; bei st = 0 höchstens 4 Dinge (basal);
 die vorgemachte Lösung (bzSolve) wird als richtig gewertet, eine falsche Antwort als falsch.
-Mit echten Klicks: Bild wählen, Sortieren (Ding, dann Kiste), Verbinden (oben, unten), Reihenfolge,
+Mit echten Klicks: Bild wählen, Sortieren (Ding, dann Kiste), Dazulegen (Vorrat, dann Platz), Reihenfolge,
+Ziehen mit der Maus (in die Kiste, zurück in den Vorrat, unter das Bild, auf die Plätze 1, 2, 3),
 kurz zeigen (Bild verschwindet von selbst). Fach „Basis“ für Gast sichtbar, für ein Kind erst nach dem
 Einschalten in den Einstellungen; die Statistik zählt die Basis-Übungen.
 Ablauf (Stefan, 17.11.: nicht mischen): Das Kind bleibt bei einer Aufgabenart; jede neue Art wird zuerst
@@ -56,7 +57,7 @@ async def solve_by_clicks(pg):
             await pg.click(f'#stage .bz-pool [data-bzt="{i}"]'); await pg.click(f'#stage [data-bzb="{bx}"]')
     if t == 'match':
         for i, j in it['sol']:
-            await pg.click(f'#stage [data-bzm="t,{i}"]'); await pg.click(f'#stage [data-bzm="b,{j}"]')
+            await pg.click(f'#stage .bz-pool [data-bzp="{j}"]'); await pg.click(f'#stage [data-bzs="{i}"] .bz-slot')
         if it['ask']: await pg.click(f'#stage [data-bzyn="{1 if it["ask"]["ok"] else 0}"]')
     if await pg.is_disabled('#r-check'):
         return [False, 'Prüfen gesperrt: ' + await pg.evaluate("JSON.stringify([app.read.item.label, app.read.r])")]
@@ -100,6 +101,28 @@ async def main():
         else:
             await pg.click('#r-show'); await pg.wait_for_timeout(60)
             if await pg.evaluate("document.querySelectorAll('#stage .bz-pool .bz-c').length") != 0: errs.append('Lösung zeigen sortiert nicht ein')
+        # Ziehen: Sortieren, Dazulegen, Reihe legen
+        async def drag(src, dst):
+            a = await pg.locator(src).first.bounding_box(); b2 = await pg.locator(dst).first.bounding_box()
+            await pg.mouse.move(a['x'] + a['width']/2, a['y'] + a['height']/2); await pg.mouse.down()
+            for k in range(1, 9): await pg.mouse.move(a['x'] + a['width']/2 + (b2['x'] + b2['width']/2 - a['x'] - a['width']/2)*k/8, a['y'] + a['height']/2 + (b2['y'] + b2['height']/2 - a['y'] - a['height']/2)*k/8)
+            await pg.mouse.up(); await pg.wait_for_timeout(450)
+        await pg.evaluate("(()=>{clearTimeout(app.demoT); Object.assign(app.read,{lvl:'V3', item:AXES.V.arts.V3[0][1](0), r:{}, fb:null, tries:0, demo:false}); render();})()")
+        boxes = await pg.evaluate("app.read.item.things.map(t=>t.box)")
+        for i, bx in enumerate(boxes): await drag(f'#stage .bz-pool [data-bzt="{i}"]', f'#stage [data-bzb="{bx}"]')
+        if await pg.evaluate("JSON.stringify(app.read.r.place)") != str(boxes).replace(' ', ''): errs.append(f'Ziehen in Kisten: {await pg.evaluate("JSON.stringify(app.read.r.place)")} statt {boxes}')
+        await drag('#stage [data-bzb="0"] [data-bzt]', '#stage .bz-pool')
+        if await pg.evaluate("app.read.r.place.filter(x=>x==null).length") != 1: errs.append('zurück in den Vorrat ziehen geht nicht')
+        await pg.evaluate("(()=>{Object.assign(app.read,{lvl:'V4', item:AXES.V.arts.V4[0][1](1), r:{}, fb:null, tries:0, demo:false}); render();})()")
+        sol = await pg.evaluate("app.read.item.sol")
+        for i, j in sol: await drag(f'#stage .bz-pool [data-bzp="{j}"]', f'#stage [data-bzs="{i}"] .bz-slot')
+        if await pg.evaluate("(app.read.r.links||[]).length") != len(sol): errs.append('Dazulegen per Ziehen geht nicht')
+        await pg.click('#r-check'); await pg.wait_for_timeout(60)
+        if not await pg.evaluate("app.read.fb?.ok"): errs.append('Dazulegen per Ziehen nicht richtig gewertet')
+        await pg.evaluate("(()=>{Object.assign(app.read,{lvl:'V6', item:AXES.V.arts.V6[2][1](0), r:{}, fb:null, tries:0, demo:false}); render();})()")
+        want = await pg.evaluate("app.read.item.want")
+        for p_, i in reversed(list(enumerate(want))): await drag(f'#stage .bz-pool [data-bzo="{i}"]', f'#stage [data-bzq="{p_}"]')
+        if await pg.evaluate("JSON.stringify(app.read.r.seq)") != str(want).replace(' ', ''): errs.append(f'Reihe legen per Ziehen: {await pg.evaluate("JSON.stringify(app.read.r.seq)")}')
         # Kurz zeigen: verschwindet, „Nochmal zeigen“ zeigt wieder
         await pg.evaluate("(()=>{clearTimeout(app.demoT); Object.assign(app.read,{lvl:'V8', item:AXES.V.items.V8[0](), r:{}, fb:null, tries:0, demo:false}); render();})()")
         if await pg.query_selector('#stage [data-bz]'): errs.append('Kurz zeigen: Auswahl schon sichtbar')

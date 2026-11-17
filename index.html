@@ -864,13 +864,27 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 
 /* ---------- Handy hochkant (bis 560 px breit): brauchbare Demo-Ansicht (Stefan, 16.11.2026) ---------- */
 /* Basis: Aufgaben mit Bildern (pick, sort, match, order, glance) */
+.bz-zone{width:min(900px,100%);border-radius:22px;padding:16px 18px;display:flex;justify-content:center}
+.bz-goal{background:#e3edf9;border:3px solid #c3d6ef}
+.bz-pool{background:#efe4cf;border:3px solid #ddcca9;box-shadow:inset 0 3px 8px #8a64361f;min-height:118px;align-items:center}.bz-pool.empty{min-height:0;padding:8px}.bz-pool .bz-done{font-size:16px}
+.bz-goal .bz-box{background:#fff;border-color:#9fbbe0}.bz-boxes{width:100%}
+.bz-cols{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:18px;width:100%}
+.bz-col{display:flex;flex-direction:column;align-items:center;gap:10px;border-radius:16px;padding:4px;cursor:pointer}
+.bz-tg{display:inline-flex;background:#fff;border-radius:16px;padding:8px;line-height:0;box-shadow:var(--shadow)}.bz-tg svg{width:80px;height:80px}
+.bz-slot{display:flex;align-items:center;justify-content:center;width:104px;height:104px;border:3px dashed #8fb0dc;border-radius:16px;background:#f6f9fe;position:relative;cursor:pointer}.bz-slot.full{border-style:solid;border-color:transparent;background:none}
+.bz-slot .bz-pl{padding:6px}.bz-slot .bz-pl svg{width:80px;height:80px}
+.bz-slots{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.bz-slots .bz-slot{width:128px;height:128px}.bz-slots .bz-slot .bz-pl svg{width:104px;height:104px}.bz-slots.base .bz-slot{align-items:flex-end}
+.bz-sn{position:absolute;top:4px;left:8px;font-size:15px;font-weight:800;color:#6b88b3}.bz-arr{font-size:26px;color:#8fb0dc;font-weight:800}
+.bz-over{outline:4px solid var(--focus);outline-offset:3px}.bz-box.bz-over,.bz-col.bz-over .bz-slot,.bz-slot.bz-over{background:#fdf0dc}
+.bz [data-bzd]{touch-action:none;cursor:grab}.bz-dragging{opacity:.25}
+.bz-ghost{position:fixed!important;margin:0;z-index:1000;pointer-events:none;box-shadow:0 10px 24px #2b293040;transition:none}
 .bz{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;padding:14px 0}
-.bz-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px}.bz-row.base{align-items:flex-end}.bz-row.tight{gap:8px}.bz-row.line{gap:18px;padding-bottom:28px}
+.bz-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:22px}.bz-row.base{align-items:flex-end}.bz-row.tight{gap:8px}.bz-row.line{gap:18px;padding-bottom:28px}
 .bz-c{background:#fff;border:3px solid transparent;border-radius:18px;padding:10px;min-height:0;line-height:0;position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:6px}
 .bz-c svg{display:block}.bz-c[aria-pressed=true],.bz-c.sel{border-color:var(--dark);background:#fff;box-shadow:0 0 0 3px #2b293022}
 .bz-c[aria-pressed=true]:hover{background:#faf6ee}
 .bz-c.fb-no{border-color:var(--bad);background:#fbe3e3}.bz-c.fb-ok,.bz-small.fb-ok{border-color:var(--ok);background:#d6ebdd}
-.bz-target{background:#fff;border:3px solid var(--dark);border-radius:18px;padding:8px 14px;line-height:0;box-shadow:var(--shadow)}
+.bz-target{background:#e3edf9;border:3px solid #8fb0dc;border-radius:20px;padding:12px 20px;line-height:0;margin-bottom:6px}
 .bz-row.sets .bz-c{padding:12px}.bz-set svg{width:230px;height:170px;display:block;background:#f7f2e8;border-radius:12px}
 .bz-eq{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:150px;height:170px;font-size:20px;font-weight:700;line-height:1.1}.bz-eq b{font-size:54px}
 .bz-pat{display:flex;gap:8px;align-items:center;background:#fff;border-radius:16px;padding:10px 14px;box-shadow:var(--shadow)}.bz-q{font-size:44px;font-weight:800;width:56px;text-align:center;line-height:1}
@@ -879,11 +893,6 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .bz-box{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:190px;border:3px dashed #9a948a;border-radius:20px;background:#fbf8f2;padding:10px}
 .bz-bl{display:flex;align-items:center;gap:10px;font-size:20px;line-height:1}.bz-bl svg{width:56px;height:56px}.bz-sw{width:60px!important;height:40px!important}
 .bz-in{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}.bz-small{display:inline-flex;border:3px solid transparent;border-radius:12px;background:#fff;padding:3px;line-height:0;box-shadow:var(--shadow)}.bz-small svg{width:52px;height:52px}.bz-small.fb-no{border-color:var(--bad);background:#fbe3e3}
-.bz-match{width:min(820px,100%);display:flex;flex-direction:column}
-.bz-mrow{display:grid;grid-template-columns:repeat(var(--n),1fr);justify-items:center}
-.bz-m{padding:8px}.bz-mrow:first-child .bz-m{flex-direction:column}.bz-mrow:last-child .bz-m{flex-direction:column-reverse}
-.bz-dot{width:16px;height:16px;border-radius:50%;background:var(--dark);display:block}.bz-m.linked .bz-dot{background:var(--z)}
-.bz-lines{width:100%;height:110px;display:block}.bz-lines line{stroke:var(--z);stroke-width:5;stroke-linecap:round;vector-effect:non-scaling-stroke}.bz-lines line.no{stroke:var(--bad)}.bz-lines line.ok{stroke:var(--ok)}
 .bz-yn{display:flex;align-items:center;gap:14px;font-size:24px;font-weight:700}.bz-yn button{font-size:24px;min-width:120px;min-height:60px;border:3px solid transparent}.bz-yn button[aria-pressed=true]{border-color:var(--dark)}.bz-yn button.fb-ok{border-color:var(--ok);background:#d6ebdd}.bz-yn button.fb-no{border-color:var(--bad);background:#fbe3e3}
 .bz-num{position:absolute;top:-12px;right:-12px;width:34px;height:34px;border-radius:50%;background:var(--dark);color:#fff;font-size:20px;font-weight:800;line-height:34px;text-align:center}
 .bz-c.start::after{content:'';position:absolute;left:50%;bottom:-24px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#2e8b57}
@@ -6257,26 +6266,35 @@ const bzSet = (k, n, spread = 1) => `<span class="bz-set">${bbScatter(k, null, n
 const bzNames = (cells, idx) => idx.map(i => cells[i].a).join(', ');
 const bzMark = (r, i, cls = '') => r.mark?.bad?.includes(i) ? ' fb-no' : r.mark?.ok && cls ? ' fb-ok' : '';
 
+/* Aufbau (Stefan, 17.11.): oben hellblau die Vorgabe bzw. die Ziele (Kisten, Plätze), unten beige der Vorrat.
+   Dinge aus dem Vorrat lassen sich hinschieben (ziehen) oder antippen und dann das Ziel antippen. */
 function bzStage(it, r, opt = {}){
   const okAll = opt.feedback?.ok, wrap = (inner, cls = '') => `<div class="it-wrap bz ${cls}${okAll ? ' bz-ok' : ''}">${it.top || ''}${inner}</div>`;
+  const pool = (items, cls = '') => `<div class="bz-zone bz-pool ${cls}" data-bzdrop="pool"><div class="bz-row ${it.cls || ''}">${items || '<span class="bz-done">Alles hingelegt.</span>'}</div></div>`;
   if(it.type === 'pick' || (it.type === 'glance' && r.hidden)){
-    const set = r.set || [], row = `<div class="bz-row ${it.cls || ''}">${it.cells.map((c, i) => { const on = set.includes(i); return `<button class="bz-c${on && okAll ? ' fb-ok' : ''}${bzMark(r, i)}" data-bz="${i}" aria-pressed="${on}" aria-label="${escHtml(c.a)}">${c.h}</button>`; }).join('')}</div>`;
+    const set = r.set || [], row = `<div class="bz-row bz-opts ${it.cls || ''}">${it.cells.map((c, i) => { const on = set.includes(i); return `<button class="bz-c${on && okAll ? ' fb-ok' : ''}${bzMark(r, i)}" data-bz="${i}" aria-pressed="${on}" aria-label="${escHtml(c.a)}">${c.h}</button>`; }).join('')}</div>`;
     if(it.type === 'glance') return wrap(`<div class="bz-glance hid" aria-hidden="true">?</div>${row}<button class="bz-again" data-bzagain="1">${icon('eye')}<span>Nochmal zeigen</span></button>`);
     return wrap(row);
   }
   if(it.type === 'glance') return wrap(`<div class="bz-glance">${it.show}</div><p class="bz-note">Schau genau hin.</p>`);
   if(it.type === 'sort'){
-    const pl = r.place || [], pool = it.things.map((t, i) => pl[i] == null ? `<button class="bz-c${r.sel === i ? ' sel' : ''}" data-bzt="${i}" aria-pressed="${r.sel === i}" aria-label="${escHtml(t.a)}">${t.h}</button>` : '').join('');
-    const boxes = it.boxes.map((b, j) => `<button class="bz-box" data-bzb="${j}" aria-label="Kiste: ${escHtml(b.a)}"><span class="bz-bl">${b.h}</span><span class="bz-in">${it.things.map((t, i) => pl[i] === j ? `<span class="bz-small${bzMark(r, i)}${okAll ? ' fb-ok' : ''}" data-bzt="${i}" role="button" aria-label="${escHtml(t.a)} zurücknehmen">${t.h}</span>` : '').join('')}</span></button>`).join('');
-    return wrap(`<div class="bz-row bz-pool">${pool || '<span class="bz-done">Alles einsortiert.</span>'}</div><div class="bz-boxes n${it.boxes.length}">${boxes}</div>`);
+    const pl = r.place || [];
+    const things = it.things.map((t, i) => pl[i] == null ? `<button class="bz-c${r.sel === i ? ' sel' : ''}" data-bzt="${i}" data-bzd="t${i}" aria-pressed="${r.sel === i}" aria-label="${escHtml(t.a)}">${t.h}</button>` : '').join('');
+    const boxes = it.boxes.map((b, j) => `<button class="bz-box" data-bzb="${j}" data-bzdrop="box${j}" aria-label="Kiste: ${escHtml(b.a)}"><span class="bz-bl">${b.h}</span><span class="bz-in">${it.things.map((t, i) => pl[i] === j ? `<span class="bz-small${bzMark(r, i)}${okAll ? ' fb-ok' : ''}" data-bzt="${i}" data-bzd="t${i}" role="button" aria-label="${escHtml(t.a)} zurücknehmen">${t.h}</span>` : '').join('')}</span></button>`).join('');
+    return wrap(`<div class="bz-zone bz-goal"><div class="bz-boxes n${it.boxes.length}">${boxes}</div></div>${pool(things)}`);
   }
   if(it.type === 'match'){
-    const nt = it.up.length, nb = it.dn.length, links = r.links || [], sel = r.sel;
-    const isL = (s, i) => links.some(l => (s === 't' ? l[0] : l[1]) === i);
-    const cell = (s, c, i) => `<button class="bz-c bz-m${sel && sel.s === s && sel.i === i ? ' sel' : ''}${isL(s, i) ? ' linked' : ''}" data-bzm="${s},${i}" aria-pressed="${!!(sel && sel.s === s && sel.i === i)}" aria-label="${escHtml(c.a)}">${c.h}<span class="bz-dot"></span></button>`;
-    const lines = links.map(([i, j], x) => `<line x1="${(i + .5)*100/nt}" y1="0" x2="${(j + .5)*100/nb}" y2="100" class="${r.mark?.bad?.includes(x) ? 'no' : okAll ? 'ok' : ''}"/>`).join('');
+    const links = r.links || [], at = i => links.find(l => l[0] === i)?.[1], used = new Set(links.map(l => l[1]));
+    const slots = it.up.map((c, i) => { const j = at(i); return `<div class="bz-col" data-bzs="${i}" data-bzdrop="s${i}"><span class="bz-tg" aria-label="${escHtml(c.a)}">${c.h}</span><span class="bz-slot${j != null ? ' full' : ''}" role="button" aria-label="Platz unter ${escHtml(c.a)}">${j != null ? `<span class="bz-c bz-pl${bzMark(r, j)}${okAll ? ' fb-ok' : ''}" data-bzp="${j}" data-bzd="p${j}">${it.dn[j].h}</span>` : ''}</span></div>`; }).join('');
+    const items = it.dn.map((c, j) => used.has(j) ? '' : `<button class="bz-c${r.sel === j ? ' sel' : ''}" data-bzp="${j}" data-bzd="p${j}" aria-pressed="${r.sel === j}" aria-label="${escHtml(c.a)}">${c.h}</button>`).join('');
     const ask = it.ask ? `<div class="bz-yn"><span>${escHtml(it.ask.q)}</span>${[[1, '✓', 'ja'], [0, '✗', 'nein']].map(([v, s, t]) => `<button data-bzyn="${v}" aria-pressed="${r.yes === v}" class="${r.yes === v && opt.feedback ? (okAll ? 'fb-ok' : 'fb-no') : ''}"><b aria-hidden="true">${s}</b> ${t}</button>`).join('')}</div>` : '';
-    return wrap(`<div class="bz-match"><div class="bz-mrow" style="--n:${nt}">${it.up.map((c, i) => cell('t', c, i)).join('')}</div><svg class="bz-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg><div class="bz-mrow" style="--n:${nb}">${it.dn.map((c, i) => cell('b', c, i)).join('')}</div></div>${ask}`);
+    return wrap(`<div class="bz-zone bz-goal"><div class="bz-cols" style="--n:${it.up.length}">${slots}</div></div>${pool(items, it.ask && used.size === it.dn.length ? 'empty' : '')}${ask}`);
+  }
+  if(it.type === 'order' && it.slots){
+    const at = r.seq || [], placed = new Set(at.filter(v => v != null));
+    const slots = it.cells.map((_, p) => { const i = at[p]; return `<div class="bz-slot num${i != null ? ' full' : ''}" data-bzq="${p}" data-bzdrop="q${p}"><span class="bz-sn">${p + 1}</span>${i != null ? `<span class="bz-c bz-pl${bzMark(r, i)}${okAll ? ' fb-ok' : ''}" data-bzo="${i}" data-bzd="c${i}">${it.cells[i].h}</span>` : ''}</div>`; }).join('<span class="bz-arr" aria-hidden="true">→</span>');
+    const items = it.cells.map((c, i) => placed.has(i) ? '' : `<button class="bz-c" data-bzo="${i}" data-bzd="c${i}" aria-label="${escHtml(c.a)}">${c.h}</button>`).join('');
+    return wrap(`<div class="bz-zone bz-goal"><div class="bz-slots ${it.cls || ''}">${slots}</div></div>${pool(items)}`);
   }
   if(it.type === 'order'){
     const seq = r.seq || [];
@@ -6284,25 +6302,35 @@ function bzStage(it, r, opt = {}){
   }
   return wrap('');
 }
+/* Hinlegen (nach Ziehen oder Antippen): key = t|p|c + Nummer, drop = box…, s…, q… oder pool */
+function bzDrop(it, r, key, drop){
+  const i = +key.slice(1); r.mark = null; r.sel = null;
+  if(it.type === 'sort'){ r.place ||= []; r.place[i] = drop === 'pool' ? null : +drop.slice(3); return true; }
+  if(it.type === 'match'){ let L = (r.links || []).filter(l => l[1] !== i); if(drop !== 'pool'){ const s = +drop.slice(1); L = L.filter(l => l[0] !== s); L.push([s, i]); } r.links = L; return true; }
+  if(it.type === 'order' && it.slots){ const at = r.seq ||= []; const o = at.indexOf(i); if(o >= 0) at[o] = null; if(drop !== 'pool') at[+drop.slice(1)] = i; while(at.length && at.at(-1) == null) at.pop(); return true; }
+  return false;
+}
 function bzClick(e, it, r){
+  if(Date.now() - (app.bzDropT || 0) < 400) return false; /* gerade gezogen: kein zusätzlicher Klick */
   const t = e.target;
   if(t.closest('[data-bzagain]')){ r.hidden = false; r.again = (r.again || 0) + 1; return true; }
   const c = t.closest('[data-bz]');
   if(c){ const i = +c.dataset.bz; r.mark = null; if(it.single || it.type === 'glance') r.set = [i]; else { r.set ||= []; const k = r.set.indexOf(i); k >= 0 ? r.set.splice(k, 1) : r.set.push(i); } return true; }
-  const th = t.closest('[data-bzt]');
-  if(th && it.type === 'sort' && r.sel != null && th.closest('[data-bzb]')) return bzClick({target: th.closest('[data-bzb]')}, it, r); /* Kiste voll getroffen: ausgewähltes Ding hinein */
-  if(th && it.type === 'sort'){ const i = +th.dataset.bzt; r.place ||= []; r.mark = null; if(r.place[i] != null){ r.place[i] = null; r.sel = i; } else r.sel = r.sel === i ? null : i; return true; }
-  const bx = t.closest('[data-bzb]');
-  if(bx && it.type === 'sort'){ if(r.sel == null) return false; r.place ||= []; r.place[r.sel] = +bx.dataset.bzb; r.mark = null; r.sel = null; return true; }
-  const m = t.closest('[data-bzm]');
-  if(m){ const [s, si] = m.dataset.bzm.split(','), i = +si; r.links ||= []; r.mark = null; const sel = r.sel;
-    if(sel && sel.s !== s){ const [ti, bi] = s === 't' ? [i, sel.i] : [sel.i, i]; r.links = r.links.filter(l => l[0] !== ti && l[1] !== bi); r.links.push([ti, bi]); r.sel = null; return true; }
-    if(sel && sel.i === i){ r.sel = null; return true; }
-    const li = r.links.findIndex(l => (s === 't' ? l[0] : l[1]) === i);
-    if(li >= 0 && !sel){ r.links.splice(li, 1); r.sel = {s, i}; return true; }
-    r.sel = {s, i}; return true; }
-  const yn = t.closest('[data-bzyn]'); if(yn){ r.yes = +yn.dataset.bzyn; r.mark = null; return true; }
+  if(it.type === 'sort'){
+    const th = t.closest('[data-bzt]'), bx = t.closest('[data-bzb]');
+    if(bx && r.sel != null) return bzDrop(it, r, 't' + r.sel, 'box' + bx.dataset.bzb);
+    if(th){ const i = +th.dataset.bzt; r.place ||= []; r.mark = null; if(r.place[i] != null){ r.place[i] = null; r.sel = null; } else r.sel = r.sel === i ? null : i; return true; }
+    return false;
+  }
+  if(it.type === 'match'){
+    const col = t.closest('[data-bzs]'), pp = t.closest('[data-bzp]');
+    if(col && r.sel != null) return bzDrop(it, r, 'p' + r.sel, 's' + col.dataset.bzs);
+    if(pp){ const j = +pp.dataset.bzp; if((r.links || []).some(l => l[1] === j)) return bzDrop(it, r, 'p' + j, 'pool'); r.sel = r.sel === j ? null : j; r.mark = null; return true; }
+    const yn = t.closest('[data-bzyn]'); if(yn){ r.yes = +yn.dataset.bzyn; r.mark = null; return true; }
+    return false;
+  }
   const o = t.closest('[data-bzo]');
+  if(o && it.slots){ const i = +o.dataset.bzo, at = r.seq || []; if(at.includes(i)) return bzDrop(it, r, 'c' + i, 'pool'); let p = 0; while(at[p] != null) p++; return bzDrop(it, r, 'c' + i, 'q' + p); }
   if(o){ const i = +o.dataset.bzo; r.seq ||= []; r.mark = null; const p = r.seq.indexOf(i); if(p >= 0) r.seq = r.seq.slice(0, p); else r.seq.push(i); return true; }
   return false;
 }
@@ -6324,14 +6352,14 @@ function bzEval(it, r){
   }
   if(it.type === 'match'){
     const links = r.links || [];
-    if(it.ask){ if(r.yes == null) return null; const ok = r.yes === (it.ask.ok ? 1 : 0); if(!links.length) obs.push('ohne Linien'); return {ok, given: r.yes ? 'ja' : 'nein', obs, mark:{}}; }
+    if(it.ask){ if(r.yes == null) return null; const ok = r.yes === (it.ask.ok ? 1 : 0); if(!links.length) obs.push('ohne Hinlegen'); return {ok, given: r.yes ? 'ja' : 'nein', obs, mark:{}}; }
     if(links.length < Math.min(it.up.length, it.dn.length)) return null;
-    const bad = links.map(([i, j], x) => it.up[i].k === it.dn[j].k ? -1 : x).filter(x => x >= 0);
-    if(bad.length) obs.push(`${bad.length} falsch verbunden`);
+    const bad = links.filter(([i, j]) => it.up[i].k !== it.dn[j].k).map(l => l[1]);
+    if(bad.length) obs.push(`${bad.length} falsch hingelegt`);
     return {ok: !bad.length, given: links.map(([i, j]) => `${it.up[i].a} – ${it.dn[j].a}`).join(', '), obs, mark:{bad}};
   }
   if(it.type === 'order'){
-    const seq = r.seq || []; if(seq.length < it.want.length) return null;
+    const seq = r.seq || []; if(seq.filter(v => v != null).length < it.want.length) return null;
     const bad = seq.map((v, p) => v === it.want[p] ? -1 : v).filter(v => v >= 0);
     if(bad.length) obs.push('Reihenfolge vertauscht');
     return {ok: !bad.length, given: bzNames(it.cells, seq), obs, mark:{bad}};
@@ -6346,6 +6374,42 @@ function bzSolve(it, r){
   if(it.type === 'match'){ r.links = it.sol.map(l => [...l]); if(it.ask) r.yes = it.ask.ok ? 1 : 0; }
   if(it.type === 'order') r.seq = [...it.want];
 }
+/* ---------- Ziehen: Ding aus dem Vorrat zum Ziel schieben (Antippen geht weiter) ---------- */
+function bzHost(){
+  if(app.mode === 'read'){ const R = app.read; if(!R.item || !BZ_TYPES.includes(R.item.type) || R.fb?.ok || R.demo) return null; return {it: R.item, r: R.r, redraw: () => { R.fb = null; setHint(''); renderRead(); }}; }
+  if(app.mode === 'diag' && app.diag && !app.diag.done){ const d = app.diag, it = d.items[d.idx]; if(!BZ_TYPES.includes(it?.type)) return null; return {it, r: d.resp ||= {}, redraw: () => bzRedrawDiag()}; }
+  return null;
+}
+function bzRedrawDiag(){ const d = app.diag, it = d.items[d.idx], pre = {...bzRects(), ...(app.bzFlipFrom || {})}; $('#stage .dg-item').innerHTML = itemStage(it, d.resp, {inline:true}); itFit(); bzFlip(pre); }
+/* Bewegung sichtbar machen: wo ein Ding vorher lag → wo es jetzt liegt (beim Vormachen langsam) */
+const bzRects = () => Object.fromEntries([...document.querySelectorAll('#stage [data-bzd]')].map(el => [el.dataset.bzd, el.getBoundingClientRect()]));
+function bzFlip(pre, ms = 260){
+  for(const el of document.querySelectorAll('#stage [data-bzd]')){ const a = pre[el.dataset.bzd]; if(!a) continue; const b = el.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+    if(Math.abs(dx) + Math.abs(dy) > 4) el.animate?.([{transform:`translate(${dx}px,${dy}px)`, zIndex:5}, {transform:'translate(0,0)', zIndex:5}], {duration: ms, easing:'cubic-bezier(.3,.7,.3,1)'}); }
+}
+document.addEventListener('pointerdown', e => {
+  const src = e.target.closest?.('#stage [data-bzd]'); if(!src || e.button > 0) return; const h = bzHost(); if(!h) return;
+  app.bzDrag = {src, key: src.dataset.bzd, x0: e.clientX, y0: e.clientY, id: e.pointerId, h, ghost: null, over: null};
+});
+document.addEventListener('pointermove', e => {
+  const D = app.bzDrag; if(!D || e.pointerId !== D.id) return;
+  const dx = e.clientX - D.x0, dy = e.clientY - D.y0;
+  if(!D.ghost){ if(Math.hypot(dx, dy) < 10) return; const b = D.src.getBoundingClientRect(); D.ghost = D.src.cloneNode(true); D.ghost.classList.add('bz-ghost'); D.ghost.removeAttribute('data-bzd');
+    Object.assign(D.ghost.style, {left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px'}); document.body.appendChild(D.ghost); D.src.classList.add('bz-dragging'); }
+  D.ghost.style.transform = `translate(${dx}px,${dy}px) scale(1.08)`;
+  const over = document.elementFromPoint(e.clientX, e.clientY)?.closest('#stage [data-bzdrop]');
+  if(over !== D.over){ D.over?.classList.remove('bz-over'); over?.classList.add('bz-over'); D.over = over; }
+  e.preventDefault();
+}, {passive:false});
+function bzDragEnd(e, cancel){
+  const D = app.bzDrag; if(!D || e.pointerId !== D.id) return; app.bzDrag = null;
+  if(!D.ghost) return; /* nur angetippt: das macht der Klick */
+  const gr = D.ghost.getBoundingClientRect(); D.ghost.remove(); D.over?.classList.remove('bz-over'); D.src.classList.remove('bz-dragging'); app.bzDropT = Date.now();
+  const tgt = !cancel && document.elementFromPoint(e.clientX, e.clientY)?.closest('#stage [data-bzdrop]');
+  if(tgt && bzDrop(D.h.it, D.h.r, D.key, tgt.dataset.bzdrop)){ app.bzFlipFrom = {[D.key]: gr}; D.h.redraw(); app.bzFlipFrom = null; }
+}
+document.addEventListener('pointerup', e => bzDragEnd(e, false));
+document.addEventListener('pointercancel', e => bzDragEnd(e, true));
 /* Kurz zeigen: nach it.ms Millisekunden abdecken (Üben und Test) */
 function glanceArm(it, r, still, redraw){
   if(it?.type !== 'glance' || r.hidden) return;
@@ -6360,8 +6424,8 @@ function glanceArm(it, r, still, redraw){
 const bzN = (st, a = [2, 3, 4]) => a[Math.min(st ?? 2, a.length - 1)];
 const bzKinds = (f = () => true) => bKinds(f);
 const bzPair = () => pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]);
-const BZ_JEDER = {tasse:'jeder Tasse', teller:'jedem Teller', schraube:'jeder Schraube'};
 const BZ_EIN = {loeffel:'einen Löffel', gabel:'eine Gabel', mutter:'eine Mutter'};
+const BZ_UNTER = {tasse:'jede Tasse', teller:'jeden Teller', schraube:'jede Schraube'};
 const BZ_PAT = () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3); return fs.map((f, i) => [f, cs[i]]); };
 const bzPatRow = (u, seq, q = true) => `<div class="bz-pat">${seq.map(s => bShape(u[s][0], u[s][1], 64)).join('')}${q ? '<span class="bz-q">?</span>' : ''}</div>`;
 const bzSw = c => `<svg class="bz-sw" viewBox="0 0 60 40"><rect x="2" y="2" width="56" height="36" rx="6" fill="${B_COL[c]}" stroke="${INK}" stroke-width="2.4"/></svg>`;
@@ -6375,14 +6439,14 @@ AXES.V.arts = {
   V1: [
     ['Gleiches Bild', st => { const k = pick(bzKinds()), others = shuffle(bzKinds(o => o.grp !== B_OBJ[k].grp)).slice(0, bzN(st) - 1), cells = shuffle([k, ...others]);
       return bzPick({prompt:'Tippe das gleiche Bild an.', label:`Gleiches Bild: ${B_OBJ[k].name} (${cells.length})`, tip:'Noch nicht. Schau das Bild oben genau an.'}, cells.map(x => bzO(x)), cells.indexOf(k), bzTarget(bObj(k, null, 104))); }],
-    ['Gleiche verbinden', st => { const ks = shuffle(bzKinds()).slice(0, st ? 3 : 2), bs = shuffle(ks);
-      return bzMatchIt({prompt:'Verbinde gleiche Bilder. Tippe oben ein Bild an, dann unten das gleiche.', label:`Gleiche verbinden: ${ks.map(k => B_OBJ[k].name).join(', ')}`, tip:'Noch nicht. Die rote Linie stimmt nicht.'},
+    ['Gleiches dazulegen', st => { const ks = shuffle(bzKinds()).slice(0, st ? 3 : 2), bs = shuffle(ks);
+      return bzMatchIt({prompt:'Lege das gleiche Bild darunter.', label:`Gleiches dazulegen: ${ks.map(k => B_OBJ[k].name).join(', ')}`, tip:'Noch nicht. Das rote Bild liegt falsch. Schieb es an den richtigen Platz.'},
         ks.map(k => ({...bzO(k), k})), bs.map(k => ({...bzO(k), k})), ks.map((k, i) => [i, bs.indexOf(k)])); }],
     ['Gleiche Farbe', st => { const k = pick(bzKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), oc = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bzKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
       const opts = shuffle([[k, col], [k, oc[0]], ...(st >= 1 ? [[k, oc[1]]] : []), ...(st >= 2 ? [[k2, col]] : [])]), ok = opts.findIndex(o => o[0] === k && o[1] === col);
       return bzPick({prompt:'Tippe das gleiche Bild an. Schau auf die Farbe!', label:`Gleiches Bild mit Farbe: ${B_OBJ[k].name} ${B_COL_NAME[col]} (${opts.length})`, tip:'Noch nicht. Ding und Farbe müssen gleich sein.'}, opts.map(([x, c]) => bzO(x, c)), ok, bzTarget(bObj(k, col, 104))); }],
-    ['Farbe verbinden', st => { const n = st ? 3 : 2, cs = shuffle(B_COLS4).slice(0, n), ks = shuffle(bzKinds(o => o.grp !== 'werkstatt')).slice(0, 2*n), ord = shuffle([...Array(n).keys()]);
-      return bzMatchIt({prompt:'Verbinde, was die gleiche Farbe hat.', label:`Gleiche Farbe verbinden: ${cs.map(c => B_COL_NAME[c]).join(', ')}`, tip:'Noch nicht. Schau auf die Farbe.'},
+    ['Farbe dazulegen', st => { const n = st ? 3 : 2, cs = shuffle(B_COLS4).slice(0, n), ks = shuffle(bzKinds(o => o.grp !== 'werkstatt')).slice(0, 2*n), ord = shuffle([...Array(n).keys()]);
+      return bzMatchIt({prompt:'Lege jedes Ding unter die gleiche Farbe.', label:`Gleiche Farbe dazulegen: ${cs.map(c => B_COL_NAME[c]).join(', ')}`, tip:'Noch nicht. Schau auf die Farbe. Schieb das rote Ding an den richtigen Platz.'},
         cs.map((c, i) => ({...bzO(ks[i], c), k:c})), ord.map(i => ({...bzO(ks[n + i], cs[i]), k:cs[i]})), cs.map((c, i) => [i, ord.indexOf(i)])); }]],
   V2: [
     ['Ganz anders', st => { const n = st ? 4 : 3, k = pick(bzKinds()), k2 = pick(bzKinds(o => o.grp !== B_OBJ[k].grp)), i = rnd(0, n - 1);
@@ -6395,23 +6459,23 @@ AXES.V.arts = {
       return bzPick({prompt:'Was gehört nicht dazu? Tippe es an.', label:`Gehört nicht dazu: ${B_OBJ[odd].name} (${B_GRP[g]}, ${n})`, tip:'Noch nicht. Die anderen gehören zusammen.'}, ks.map(x => bzO(x)), i); }]],
   V3: [
     ['Nach Farbe', st => { const n = st ? 6 : 4, k = pick(['tasse', 'socke', 'knopf', 'teller', 'muetze']), cs = shuffle(B_COLS4).slice(0, 2), col = shuffle([...Array(n).keys()].map(i => i % 2));
-      return bzSortIt({prompt:'Sortiere nach der Farbe. Tippe ein Ding an, dann die Kiste.', label:`Sortieren nach Farbe: ${B_OBJ[k].name}, ${cs.map(c => B_COL_NAME[c]).join(' und ')} (${n})`, tip:'Noch nicht. Die roten Dinge sind in der falschen Kiste. Tippe sie an.'},
+      return bzSortIt({prompt:'Lege jedes Ding in die Kiste mit der gleichen Farbe.', label:`Sortieren nach Farbe: ${B_OBJ[k].name}, ${cs.map(c => B_COL_NAME[c]).join(' und ')} (${n})`, tip:'Noch nicht. Die rot markierten Dinge sind in der falschen Kiste. Schieb sie in die andere Kiste.'},
         col.map(c => ({...bzO(k, cs[c], 1, 64), box:c})), cs.map(c => ({h: bzSw(c), a: B_COL_NAME[c]}))); }],
     ['Nach Größe', st => { const n = st ? 6 : 4, k = pick(['tasse', 'apfel', 'schraube', 'stift', 'glas']), big = shuffle([...Array(n).keys()].map(i => i % 2));
-      return bzSortIt({prompt:'Sortiere: große Dinge und kleine Dinge.', label:`Sortieren nach Größe: ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Schau, wie groß die Dinge sind.'},
+      return bzSortIt({prompt:'Lege die großen Dinge in eine Kiste und die kleinen in die andere.', label:`Sortieren nach Größe: ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Schau, wie groß die Dinge sind.'},
         big.map(b => ({...bzO(k, null, b ? .5 : 1, 64), box:b})), [['groß', 1], ['klein', .5]].map(([a, s]) => ({h:`${bzSizeBox(s)}<b>${a}</b>`, a}))); }],
     ['Küche und Werkstatt', st => { const n = st ? 3 : 2, ga = shuffle(['tasse', 'loeffel', 'gabel', 'glas']).slice(0, n), gb = shuffle(['schraube', 'mutter', 'zange', 'dreher']).slice(0, n), all = shuffle([...ga, ...gb]), boxes = shuffle([['kueche', 'teller'], ['werkstatt', 'hammer']]);
-      return bzSortIt({prompt:'Sortiere. Was gehört in die Küche, was in die Werkstatt?', label:`Sortieren: Küche und Werkstatt (${2*n})`, tip:'Noch nicht. Die roten Dinge sind in der falschen Kiste. Tippe sie an.'},
+      return bzSortIt({prompt:'Was gehört in die Küche, was in die Werkstatt? Lege es in die richtige Kiste.', label:`Sortieren: Küche und Werkstatt (${2*n})`, tip:'Noch nicht. Die rot markierten Dinge sind in der falschen Kiste. Schieb sie in die andere Kiste.'},
         all.map(k => ({...bzO(k, null, 1, 64), box: boxes.findIndex(b => B_OBJ[k].grp === b[0])})), boxes.map(([g, k]) => ({h:`${bObj(k, null, 60)}<b>${B_GRP[g]}</b>`, a:B_GRP[g]}))); }],
     ['Farbe, verschiedene Dinge', st => { const n = st ? 6 : 4, cs = shuffle(B_COLS4).slice(0, 2), ks = shuffle(bzKinds(o => o.grp !== 'werkstatt')).slice(0, n), col = shuffle([...Array(n).keys()].map(i => i % 2));
-      return bzSortIt({prompt:'Sortiere nach der Farbe. Schau nur auf die Farbe!', label:`Sortieren nach Farbe, gemischt: ${cs.map(c => B_COL_NAME[c]).join(' und ')} (${n})`, tip:'Noch nicht. Schau nur auf die Farbe.'},
+      return bzSortIt({prompt:'Lege jedes Ding in die Kiste mit der gleichen Farbe. Schau nur auf die Farbe!', label:`Sortieren nach Farbe, gemischt: ${cs.map(c => B_COL_NAME[c]).join(' und ')} (${n})`, tip:'Noch nicht. Schau nur auf die Farbe.'},
         ks.map((k, i) => ({...bzO(k, cs[col[i]], 1, 64), box: col[i]})), cs.map(c => ({h: bzSw(c), a: B_COL_NAME[c]}))); }]],
   V4: [
     ['Jedem eins', st => { const [a, b] = bzPair(), n = bzN(st, [2, 3, 4]), bs = Array(n).fill(0);
-      return bzMatchIt({prompt:`Gib ${BZ_JEDER[a]} ${BZ_EIN[b]}. Verbinde.`, label:`Eins zu eins: ${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, tip:'Noch nicht. Jedes Ding oben braucht genau eine Linie.'},
+      return bzMatchIt({prompt:`Lege unter ${BZ_UNTER[a]} ${BZ_EIN[b]}.`, label:`Eins zu eins: ${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, tip:'Noch nicht. Unter jedes Ding gehört genau eins.'},
         bs.map(() => ({...bzO(a), k:1})), bs.map(() => ({...bzO(b), k:1})), bs.map((_, i) => [i, i])); }],
     ['Reicht es?', st => { const [a, b] = bzPair(), n = bzN(st, [3, 4, 5]), m = n + pick(st ? [-1, 0, 1] : [-1, 1]), ok = m >= n;
-      return bzMatchIt({prompt:`Verbinde. Bekommt jede${a === 'teller' ? 'r' : ''} ${B_OBJ[a].name} ${BZ_EIN[b]}?`, label:`Reicht es? ${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}`, tip:'Noch nicht. Verbinde alle. Bleibt oben etwas ohne Linie?'},
+      return bzMatchIt({prompt:`Lege unter ${BZ_UNTER[a]} ${BZ_EIN[b]}. Reicht es?`, label:`Reicht es? ${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}`, tip:'Noch nicht. Lege alle hin. Bleibt oben ein Platz leer? Bleibt unten etwas übrig?'},
         Array(n).fill(0).map(() => ({...bzO(a, null, 1, 72), k:1})), Array(m).fill(0).map(() => ({...bzO(b, null, 1, 72), k:1})), Array(Math.min(n, m)).fill(0).map((_, i) => [i, i]), {q:'Reicht es?', ok}); }]],
   V5: [
     ['Wo sind mehr?', st => { const k = pick(['knopf', 'mutter', 'apfel', 'socke']), a = rnd(1, st ? 3 : 2), b = rnd(st ? 6 : 7, 9), left = Math.random() < .5, L = left ? b : a, R = left ? a : b;
@@ -6427,7 +6491,7 @@ AXES.V.arts = {
     ['Das kleinste', st => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle(st ? [.5, .75, 1] : [.5, 1]);
       return bzPick({prompt:'Tippe das kleinste an.', label:`Kleinstes: ${B_OBJ[k].name} (${sizes.length})`, tip:'Noch nicht. Welches ist am kleinsten?', cls:'base'}, sizes.map(s => bzO(k, null, s, 104)), sizes.indexOf(.5)); }],
     ['Ordnen', st => { const k = pick(['stift', 'schraube', 'tasse', 'glas']), all = st < 2 ? [.45, .72, 1] : [.4, .6, .8, 1], sizes = shuffle(all);
-      return {type:'order', prompt:'Tippe der Reihe nach an: von klein nach groß.', label:`Ordnen (${all.length}): ${B_OBJ[k].name}`, tip:'Noch nicht. Fang mit dem kleinsten an. Tippe auf eine Zahl, um sie wegzunehmen.', cls:'base',
+      return {type:'order', slots:true, prompt:'Lege der Reihe nach hin: vom kleinsten zum größten.', label:`Ordnen (${all.length}): ${B_OBJ[k].name}`, tip:'Noch nicht. Das kleinste kommt auf Platz 1. Schieb die rot markierten Dinge zurück.', cls:'base',
         cells: sizes.map(s => bzC(bObj(k, null, 104, s), `${B_OBJ[k].name} Größe ${all.indexOf(s) + 1}`)), want: all.map(s => sizes.indexOf(s))}; }]],
   V7: [
     ['Was kommt dann?', st => { const u = BZ_PAT(), seq = [0, 1, 0, 1, 0, 1], opts = shuffle(st ? [0, 1, 2] : [0, 1]);
@@ -6468,7 +6532,7 @@ AXES.O.arts = {
     ['Was kommt zuerst?', st => { const s = pick(B_SEQ), ord = shuffle(st ? [0, 1, 2] : [0, 2]);
       return bzPick({prompt:'Was kommt zuerst? Tippe an.', label:`Was kommt zuerst: ${s.name} (${ord.length})`, tip:'Noch nicht. Was war ganz am Anfang?'}, ord.map(j => bzSeqPic(s, j)), ord.indexOf(0)); }],
     ['Bildfolge ordnen', st => { const s = pick(B_SEQ), ord = shuffle([0, 1, 2]);
-      return {type:'order', prompt:'Was kommt zuerst, was dann? Tippe der Reihe nach an.', label:`Bildfolge: ${s.name}`, tip:'Noch nicht. Was war ganz am Anfang?',
+      return {type:'order', slots:true, prompt:'Lege die Bilder der Reihe nach hin: Was war zuerst, was dann?', label:`Bildfolge: ${s.name}`, tip:'Noch nicht. Was war ganz am Anfang? Das kommt auf Platz 1.',
         cells: ord.map(j => bzSeqPic(s, j)), want:[0, 1, 2].map(j => ord.indexOf(j))}; }]]
 };
 for(const ax of ['V', 'O']) for(const [l, arts] of Object.entries(AXES[ax].arts)) AXES[ax].items[l] = arts.map(([, g], i) => () => ({...g(2), ...(i ? {} : {kern:true})}));
@@ -6484,7 +6548,7 @@ function bzDemoSteps(it){
   if(it.type === 'pick') it.want.forEach((_, n) => S.push({set: it.want.slice(0, n + 1)}));
   if(it.type === 'glance'){ S.push({hidden:true}); S.push({hidden:true, set:[...it.want]}); }
   if(it.type === 'sort'){ const place = []; it.things.forEach((t, i) => { S.push({place:[...place], sel:i}); place[i] = t.box; S.push({place:[...place]}); }); }
-  if(it.type === 'match'){ const links = []; it.sol.forEach(([i, j]) => { S.push({links:[...links], sel:{s:'t', i}}); links.push([i, j]); S.push({links:[...links]}); }); if(it.ask) S.push({links:[...links], yes: it.ask.ok ? 1 : 0}); }
+  if(it.type === 'match'){ const links = []; it.sol.forEach(([i, j]) => { S.push({links:[...links], sel:j}); links.push([i, j]); S.push({links:[...links]}); }); if(it.ask) S.push({links:[...links], yes: it.ask.ok ? 1 : 0}); }
   if(it.type === 'order') it.want.forEach((_, n) => S.push({seq: it.want.slice(0, n + 1)}));
   return S;
 }
@@ -6683,11 +6747,13 @@ function renderRead(){
   $('#prompt').innerHTML = `${B_SYM[R.lvl] ? `<span class="bz-psym" aria-hidden="true">${bSym(R.lvl, 34)}</span>` : ''}${R.demo ? '<b class="bz-demo-l">Schau zu: </b>' : ''}<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
   /* In Mathe keine Silbenfarben für kurze Angaben (1 m = 100 cm, 8 Uhr): Blau und Rot stehen dort für Zehner und Hunderter. Sachtexte ab 4 Wörtern dürfen gefärbt werden. */
   const colored = R.colored && (!/^[UGHZ]/.test(R.lvl) || (String(it.text || '').match(/[A-Za-zÄÖÜäöüß]{3,}/g) || []).length >= 3);
+  const bzPre = BZ_TYPES.includes(it.type) && app.bzFlipItem === it ? {...bzRects(), ...(app.bzFlipFrom || {})} : null; app.bzFlipItem = it; /* Bewegung nur innerhalb derselben Aufgabe */
   $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, R.r, {colored, feedback: R.fb, inline: it.type === 'input'})}${it.type === 'input' && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : ''}</div>`;
   if(it.type === 'input' && R.r.vals){ const ins = [...document.querySelectorAll('#stage .dg-in')]; R.r.vals.forEach((v, i) => { if(ins[i]) ins[i].value = v; }); if(R.fb) ins.forEach((x, i) => x.classList.add(R.fb.ok || Number(x.value) === it.fields[i] ? 'fb-ok' : 'fb-no')); }
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl);
   const arts = bzArts(R.lvl);
+  if(bzPre) bzFlip(bzPre, R.demo ? 750 : 260);
   if(arts && R.demo){ $('#controls').innerHTML = toolBtn({id:'r-demo', ic:'eye', label:'Nochmal vormachen'}) + toolBtn({id:'r-try', ic:'next', label:'Jetzt du', primary:true}); itFit(); return; }
   if(arts){ const m = bzMem(), nx = m.art < arts.length - 1 ? 'Nächste Aufgabe' : li >= 0 && li < lv.length - 1 && !guideOn() ? 'Nächste Stufe' : '', up = R.fb?.ok && m.ok >= BZ_NEXT && nx && !roundOn();
     $('#controls').innerHTML = (up ? toolBtn({id:'r-art-up', ic:'next', label:nx, primary:true}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label: up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: !evalItem(it, R.r, [])})) +
@@ -6786,7 +6852,7 @@ function renderHome(){
   const sj = W.subj && step === 'area' ? W.subj : null, Q = '<b class="wz-q">?</b>';
   const steps = [['ctx', 'Üben', CTX_ILL.practice],
     ...(needWho ? [['who', p ? escHtml(p.name) : W.guest ? 'Gast' : 'Wer übt?', p ? (p.sym && ICON[p.sym] ? iconSvg(p.sym, 40) : `<b class="wz-ini">${escHtml(p.name.slice(0, 1).toUpperCase())}</b>`) : W.guest ? '<b class="wz-ini">?</b>' : Q]] : []),
-    ['subj', sj ? subjName(sj) : (vs => vs.length > 1 ? vs.slice(0, -1).join(', ') + ' oder ' + vs.at(-1) + '?' : 'Fach?')(visSubjects().map(subjName)), sj ? SUBJECTS[sj]?.ill() : Q],
+    ['subj', sj ? subjName(sj) : (vs => vs.length === 2 ? vs.join(' oder ') + '?' : 'Fach?')(visSubjects().map(subjName)), sj ? SUBJECTS[sj]?.ill() : Q],
     ['area', 'Los geht\'s', WZ_FLAG]];
   const si = steps.findIndex(x => x[0] === step);
   const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l, pic], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : 'next'}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben oder Unterricht wählen"' : `data-wz-step="${k}" title="Zurück zu diesem Schritt"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk">${pic}</span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
@@ -9191,7 +9257,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.28.1 · 17.11.2026';
+const APP_VERSION = '0.28.2 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -9385,7 +9451,7 @@ $('#help-content').innerHTML = [
   ['edit','Mathe','Links wählst du: Zahlen legen, Hundertertafel, Plus, Minus, Zehnerpartner, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
   ['target','Zahlenstrahl vergrößern','Tippe auf einen Sprung (zum Beispiel +7), dann wird er groß. Noch einmal tippen: zurück. Mit + und − vergrößerst und verkleinerst du. Mit zwei Fingern kannst du auch zoomen und mit einem Finger verschieben. Unten zeigt der kleine Zahlenstrahl, wo du gerade bist – tippe dort, um hinzuspringen.'],
   ['line','Deutsch','Lesen in 9 Stufen (Bilder, Signalwörter, Buchstaben, Wörter, genau lesen, Sätze, kurze Texte, Pläne und Tabellen, lange Texte) und Schreiben in 6 Stufen (abschreiben, Anlaute, kurze und lange Wörter, Merkstellen, Sätze). Unter „Meine Wörter“ übst du Wörter, die deine Lehrkraft eingetragen hat: anschauen, merken, abdecken, auswendig schreiben, vergleichen. „Silben färben“ hilft bei langen Wörtern. Beim Schreiben gibt es Buchstaben auf dem Bildschirm.'],
-  ['blocks','Basis','Grundlagen vor dem Zählen und Lesen: Gleiches finden, Was passt nicht?, Sortieren, Eins zu eins zuordnen, Mengen vergleichen, Der Größe nach, Muster, Auf einen Blick, Formen, Richtung und Spiegelung, Von links nach rechts. Die Kinder tippen Bilder an: ein Ding und dann die Kiste, oben und unten zum Verbinden, der Reihe nach. Jede Aufgabenart wird zuerst vorgemacht; das Kind bleibt bei ihr, bis es sie sicher kann (erst wenige, dann mehr Bilder). Die Lehrkraft erklärt den Auftrag. Kinder sehen „Basis“ nur, wenn es in den Einstellungen unter „Kinder &amp; Daten“ für sie eingeschaltet ist. Dazu gibt es Arbeitsblätter und Legeblätter.'],
+  ['blocks','Basis','Grundlagen vor dem Zählen und Lesen: Gleiches finden, Was passt nicht?, Sortieren, Eins zu eins zuordnen, Mengen vergleichen, Der Größe nach, Muster, Auf einen Blick, Formen, Richtung und Spiegelung, Von links nach rechts. Oben hellblau steht die Vorgabe oder das Ziel, unten beige der Vorrat: Die Kinder schieben Dinge an ihren Platz (oder tippen das Ding und dann den Platz an). Jede Aufgabenart wird zuerst vorgemacht; das Kind bleibt bei ihr, bis es sie sicher kann (erst wenige, dann mehr Bilder). Die Lehrkraft erklärt den Auftrag. Kinder sehen „Basis“ nur, wenn es in den Einstellungen unter „Kinder &amp; Daten“ für sie eingeschaltet ist. Dazu gibt es Arbeitsblätter und Legeblätter.'],
   ['next','Schwerer oder leichter','Wenn du 5 Aufgaben hintereinander richtig hast, schlägt Stufenweise die nächste Stufe vor. Nach 3 Fehlern gibt es eine leichtere Stufe. Du entscheidest selbst.'],
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
