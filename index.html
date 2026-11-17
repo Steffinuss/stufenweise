@@ -1405,6 +1405,54 @@ function toolBtn({id, ic, label, primary, disabled, html, cls='', pressed}){
 }
 
 
+/* ---------- Fächer und Tests: zentrale Listen (0.26.0) ----------
+   Ein Fach (SUBJECTS) erscheint oben in der Fachwahl und auf der Startseite. Jeder Test (TESTS) gehört zu einem Fach
+   und deckt Achsen der Kompetenzmatrix ab (erster Buchstabe der Schlüssel, z. B. „R|R3“). Lernstand, Berichte,
+   Klassenübersicht, Förderzonen und „Für dich“ werden aus diesen Listen gebaut.
+   Neues Fach: Eintrag in SUBJECTS (mit rail/areas/enter), Test(s) in TESTS (mit plan/rePlan und den Haken
+   zoneCells, kann, matrix, mxTable, keys, infer), dazu die Inhalte. Die Haken sind nur für neue Tests nötig;
+   Mathe, Lesen und Schreiben nutzen noch ihre bisherigen Funktionen. */
+const TESTS = {
+  M: {subj:'M', name:'Mathe', long:'Mathematik', axes:['M', 'R', 'Z', 'S', 'U', 'G', 'H'], cap:50, homeZones:2, start:'baut erste Zahlvorstellungen auf',
+      plan: d => mathPlan(d), rePlan: d => mathRePlan(d), title: d => d.part === 1 ? 'Mathe-Test Teil 1' : d.part === 2 ? 'Mathe-Test Teil 2' : 'Mathe-Test',
+      homeKey: k => /^[MUGH]/.test(k), log: e => MATH_MODES.includes(e.mode),
+      buttons: () => `<button class="icon-btn" data-diag="new-M1">${icon('target')}<span style="display:inline">Teil 1: Zahlen und Rechnen</span></button><button class="icon-btn" data-diag="new-M2">${icon('target')}<span style="display:inline">Teil 2: Uhr, Größen, Hundertertafel</span></button>`},
+  L: {subj:'D', name:'Lesen', long:'Lesen', axes:['L', 'P'], cap:30, homeZones:1, start:'baut erste Lesefähigkeiten auf',
+      plan: d => readPlan(d), rePlan: d => readRePlan(d), title: () => 'Lese-Test', log: e => e.mode === 'read'},
+  W: {subj:'D', name:'Schreiben', long:'Schreiben', axes:['W'], cap:24, homeZones:1, start:'baut erste Schreibfähigkeiten auf',
+      plan: d => writePlan(d), rePlan: d => writeRePlan(d), title: () => 'Schreib-Test', log: e => e.mode === 'write'},
+};
+const SUBJECTS = {
+  M: {name:'Mathe', long:'Mathematik', tests:['M'], guideAxes:['M', 'U', 'G'], ill: () => WZ_ILL.M,
+      rail: (g, lvOk) => railMathHtml(g, lvOk), areas: (g, lvOk) => homeAreasMath(g, lvOk), enter: () => { app.mode = homeMode(); if(!MODES[app.mode]) app.mode = 'number'; if(app.mode !== 'read') autoConf(app.mode); }},
+  D: {name:'Deutsch', long:'Deutsch', tests:['L', 'W'], guideAxes:['L', 'W'], ill: () => WZ_ILL.D, compact:true,
+      rail: (g, lvOk) => railDeutschHtml(g, lvOk), areas: (g, lvOk) => homeAreasDeutsch(g, lvOk), enter: () => { app.read.item = null; if(!app.read.lvl || 'UGHZ'.includes(String(app.read.lvl)[0])) app.read.lvl = readDefaultLevel(); app.mode = 'read'; }},
+};
+/* Achsen weiterer Fächer: AXES[Buchstabe] = {place, levels, info:{Stufe: {name, kann, ziel, bp, offer …}}, items:{Stufe: [Aufgaben]}, mode} */
+const AXES = {};
+const TEST_IDS = Object.keys(TESTS), SUBJ_IDS = Object.keys(SUBJECTS);
+/* Neues Fach oder neuen Test anmelden (Reihenfolge = Anzeige-Reihenfolge) */
+function addSubject(id, def){ SUBJECTS[id] = def; if(!SUBJ_IDS.includes(id)) SUBJ_IDS.push(id); }
+function addTest(id, def){ TESTS[id] = def; if(!TEST_IDS.includes(id)) TEST_IDS.push(id); if(SUBJECTS[def.subj] && !SUBJECTS[def.subj].tests.includes(id)) SUBJECTS[def.subj].tests.push(id); }
+const testOfAxis = ax => TEST_IDS.find(t => TESTS[t].axes.includes(ax));
+const testOfKey = k => testOfAxis(String(k)[0]);
+const subjTests = sj => SUBJECTS[sj]?.tests || [];
+const subjOfTest = t => TESTS[t]?.subj;
+const keyInTest = (k, t) => testOfKey(k) === t;
+const subjOfKey = k => subjOfTest(testOfKey(k)), subjOfLvl = l => subjOfTest(testOfAxis(String(l)[0]));
+/* Welche Fächer ein Kind sieht: optionale Fächer (z. B. „Basis“) nur, wenn für das Kind eingeschaltet (p.subjOn) oder
+   automatisch nötig (auto; Standard: Förderzone in einem Test des Fachs); ohne Kind und in der Lehrkraft-Ansicht alle */
+const visSubjects = () => { const p = curProfile(); return SUBJ_IDS.filter(sj => !SUBJECTS[sj].optional || !p || teacherView() || p.subjOn?.[sj] || (SUBJECTS[sj].auto ? SUBJECTS[sj].auto(p) : subjTests(sj).some(t => zoneReport(p.id, t).zones.length))); };
+const subjName = sj => SUBJECTS[sj]?.name || sj;
+/* Alle Matrix-Schlüssel eines Tests in Anzeige-Reihenfolge */
+function testKeys(t){
+  if(TESTS[t]?.keys) return TESTS[t].keys();
+  if(t === 'M') return [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l), ...Z_LEVELS.map(l => 'Z|' + l)];
+  if(t === 'W') return W_LEVELS.map(l => 'W|' + l);
+  if(t === 'L') return L_LEVELS.map(l => 'L|' + l);
+  return [];
+}
+
 /* ---------- Geführte Oberfläche: Kinder sehen nach dem Test nur, was für sie dran ist ---------- */
 const GUIDE_NAMES = {zone:'Nur die Förderzone', plus:'Förderzone und Geschafftes', all:'Alles sichtbar (Förderzone markiert)'};
 const guideMode = p => (p && p.guide) || settings.guide || 'plus';
@@ -1413,7 +1461,7 @@ function guideOf(subj){
   const p = curProfile(); if(!p || teacherView()) return null;
   const gm = guideMode(p); if(gm === 'all') return null;
   const m = matrixOf(p.id), keys = Object.keys(m), axHas = ax => keys.some(k => k.startsWith(ax + '|'));
-  if(subj === 'M' ? !axHas('M') && !axHas('U') && !axHas('G') : !axHas('L') && !axHas('W')) return null;
+  if(!SUBJECTS[subj]?.guideAxes.some(axHas)) return null;
   const zones = guideZones(p.id, subj);
   const allow = new Set(zones);
   if(gm === 'plus') keys.filter(k => m[k].status === 'erreicht').forEach(k => allow.add(k));
@@ -1443,13 +1491,13 @@ function guideOf(subj){
 const guideOn = () => !!guideOf(settings.subject);
 /* Nächste offene Stufe je Bereich, wenn dort keine Förderzone (mehr) besteht – z. B. nach einem bestandenen Kurztest */
 function frontierKeys(pid, subj){
-  const m = matrixOf(pid), out = [], zones = new Set((subj === 'M' ? ['M'] : ['L', 'W']).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)));
-  const axes = subj === 'M' ? [['R', R_LEVELS], ['Z', Z_LEVELS], ['U', U_LEVELS], ['G', G_LEVELS], ['H', H_LEVELS]] : [['L', L_LEVELS], ['W', W_LEVELS]];
+  const m = matrixOf(pid), out = [], zones = new Set(subjTests(subj).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)));
+  const axes = SUBJECTS[subj]?.frontier?.() || (subj === 'M' ? [['R', R_LEVELS], ['Z', Z_LEVELS], ['U', U_LEVELS], ['G', G_LEVELS], ['H', H_LEVELS]] : subj === 'D' ? [['L', L_LEVELS], ['W', W_LEVELS]] : []);
   for(const [ax, lv] of axes){ const ks = lv.map(l => `${ax}|${l}`); if(!ks.some(k => m[k]) || ks.some(k => zones.has(k))) continue; const f = ks.find(k => m[k]?.status !== 'erreicht'); if(f) out.push(f); }
   if(subj === 'M' && Object.keys(m).some(k => k.startsWith('M|')) && ![...zones].some(k => k.startsWith('M|'))){ const f = ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)).find(k => m[k]?.status !== 'erreicht'); if(f) out.push(f); }
   return out;
 }
-const guideZones = (pid, subj) => [...(subj === 'M' ? ['M'] : ['L', 'W']).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)), ...frontierKeys(pid, subj)];
+const guideZones = (pid, subj) => [...subjTests(subj).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)), ...frontierKeys(pid, subj)];
 /* Aufsteigen: 10 Aufgaben in der Förderzone, mindestens 9 beim ersten Versuch richtig → Kurztest anbieten */
 function activeZoneKey(){
   if(app.mode === 'read'){ const l = String(app.read.lvl); return /^[LWUGH]\d$/.test(l) ? `${l[0]}|${l}` : null; }
@@ -1458,7 +1506,7 @@ function activeZoneKey(){
 function trackRun(e){
   const p = curProfile(); if(!p || ['diag', 'warm'].includes(e.mode)) return;
   const k = activeZoneKey(); if(!k) return;
-  if(!guideZones(p.id, /^[LW]/.test(k) ? 'D' : 'M').includes(k)) return;
+  if(!guideZones(p.id, subjOfKey(k) || 'M').includes(k)) return;
   app.run ??= {}; const r = app.run[k] ??= []; r.push(!!e.ok && (e.tries ?? 1) <= 1); if(r.length > 10) r.shift();
   app.offered ??= {};
   if(r.length >= 10 && r.filter(Boolean).length >= 9 && !app.offered[k] && !roundOn()){ app.offered[k] = true; showLevelUp(k); }
@@ -1472,7 +1520,7 @@ function showLevelUp(k){
   document.body.appendChild(d);
 }
 function quickTest(k){
-  const subj = /^[MSUGR]/.test(k) ? 'M' : k[0];
+  const subj = testOfKey(k) || 'M';
   leaveMode(); diagStart(subj, true);
   const d = app.diag; if(!d) return;
   d.kurz = k; d.gen = (function*(){ yield k; })(); d.res = {}; d.tested = []; d.nItems = 0;
@@ -1519,28 +1567,25 @@ const ZP_SYM = '<svg class="rail-tafel" viewBox="0 0 22 22" aria-hidden="true"><
 const TAFEL_SYM = '<svg class="rail-tafel" viewBox="0 0 22 22" aria-hidden="true"><path d="M2 2h18v18H2zM2 8h18M2 14h18M8 2v18M14 2v18" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="9" y="9" width="4" height="4" fill="currentColor"/></svg>';
 const READ_RAIL = [['L1','▣'],['L2','<small>STOP</small>'],['L3','A'],['L4','Ab'],['L5','<small>Ro|se</small>'],['L6','¶'],['L7','≣'],['L8','▦'],['L9','<small>¶¶</small>']];
 const HEAR_RAIL = [['P1','<small>●●</small>'],['P2','<small>●‿●</small>'],['P3','≈'],['P4','<small>M…</small>']];
-function subjOfMode(m){ return m === 'read' ? 'D' : m === 'diag' ? (app.diag?.subj === 'M' ? 'M' : 'D') : 'M'; }
+function subjOfMode(m){ return m === 'diag' ? subjOfTest(app.diag?.subj) || 'M' : m === 'read' ? subjOfLvl(app.read.lvl) || 'D' : 'M'; }
 function forYouOffer(){
   const pid = data.current; if(!pid) return null;
-  const rep = zoneReport(pid, settings.subject === 'D' ? 'L' : 'M');
+  const sj = SUBJECTS[settings.subject] ? settings.subject : 'M', rep = zoneReport(pid, subjTests(sj)[0]);
   if(rep.zones[0]) return rep.zones[0];
-  const f = frontierKeys(pid, settings.subject === 'D' ? 'D' : 'M')[0];
+  const f = frontierKeys(pid, sj)[0];
   return f ? {key:f, info:cellInfo(f)} : null;
 }
-function railHtml(){
-  if(classMode()) return classRailHtml();
-  if(!app.ctx && app.mode === 'home') return '';
-  const subj = settings.subject, fy = forYouOffer();
-  let h = `<div class="subj" role="group" aria-label="Fach"><button data-subj="M" aria-pressed="${subj === 'M'}">Mathe</button><button data-subj="D" aria-pressed="${subj === 'D'}">Deutsch</button></div>`;
-  if(fy) h += `<button data-foryou class="foryou" title="${escHtml(fy.info.offer.text)}"><b aria-hidden="true">★</b>Für dich</button>`;
-  const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l);
+/* Leiste je Fach */
+function railMathHtml(g, lvOk){
   const tafelBtn = !g || g.axVisible('H') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1'}" data-board="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'H'}"><b aria-hidden="true">${TAFEL_SYM}</b>Tafel</button>` : '';
-  const zVis = subj === 'M' && (!g || (g.axHas('Z') ? g.axVisible('Z') : g.mode !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20))));
+  const zVis = (!g || (g.axHas('Z') ? g.axVisible('Z') : g.mode !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20))));
   const zBtn = zVis ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.zlvl || 'Z1') ? g.first('Z') : app.read.zlvl || 'Z1'}" data-tenpair="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'Z'}"><b aria-hidden="true">${ZP_SYM}</b>Zehner&shy;partner</button>` : '';
-  if(subj === 'M') h += MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '') + (k === 'sub' ? zBtn : '')).join('') + (g && !g.modes.has('sub') ? zBtn : '') + (g && !g.modes.has('number') ? tafelBtn : '')
+  return MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '') + (k === 'sub' ? zBtn : '')).join('') + (g && !g.modes.has('sub') ? zBtn : '') + (g && !g.modes.has('number') ? tafelBtn : '')
     + (!g || g.axVisible('U') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1'}" data-clock="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'U'}"><b aria-hidden="true">◷</b>Uhr</button>` : '')
     + (!g || g.axVisible('G') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1'}" data-size="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'G'}"><b aria-hidden="true">⚖</b>Größen</button>` : '');
-  else {
+}
+function railDeutschHtml(g, lvOk){
+  let h = '';
     const on = l => app.mode === 'read' && app.read.lvl === l;
     const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>']];
     /* nur eine Gruppe offen: die mit der aktiven Stufe oder die zuletzt angetippte */
@@ -1551,13 +1596,23 @@ function railHtml(){
     const WL = WR.filter(([l]) => lvOk(l));
     h += open !== 'L' ? fold('L', 'Lesen', RL.length) : `<span class="rail-h">Lesen</span>` + RL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${L_INFO[l].short}</button>`).join('');
     h += open !== 'W' ? fold('W', 'Schreiben', WL.length) : `<span class="rail-h">Schreiben</span>` + WL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${W_INFO[l].short}</button>`).join('');
-  }
+  return h;
+}
+function railHtml(){
+  if(classMode()) return classRailHtml();
+  if(!app.ctx && app.mode === 'home') return '';
+  if(!visSubjects().includes(settings.subject)) settings.subject = visSubjects()[0] || 'M';
+  const subj = settings.subject, fy = forYouOffer();
+  let h = `<div class="subj" role="group" aria-label="Fach">${visSubjects().map(sj => `<button data-subj="${sj}" aria-pressed="${subj === sj}">${subjName(sj)}</button>`).join('')}</div>`;
+  if(fy) h += `<button data-foryou class="foryou" title="${escHtml(fy.info.offer.text)}"><b aria-hidden="true">★</b>Für dich</button>`;
+  const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l);
+  h += SUBJECTS[subj]?.rail(g, lvOk) || '';
   // Förderzone in der Leiste markieren (in jeder Ansicht)
   const p = curProfile();
   if(p){
-    const zk = guideZones(p.id, subj === 'M' ? 'M' : 'D'), zm = new Set(zk.filter(k => /^[MS]\|/.test(k)).map(k => cellInfo(k).offer?.set?.mode).filter(Boolean));
+    const zk = guideZones(p.id, subj), zm = new Set(zk.filter(k => /^[MS]\|/.test(k)).map(k => cellInfo(k).offer?.set?.mode).filter(Boolean));
     h = h.replace(/<button data-mode="([a-z]+)"( data-lvl="([A-Z]\d)")?/g, (all, mode, _, lvl) => (lvl ? zk.includes(`${lvl[0]}|${lvl}`) : zm.has(mode)) ? all.replace('<button ', '<button data-zone="1" ') : all);
-    h = h.replace(/<button class="rail-fold" data-railgrp="([LW])"/g, (all, gp) => zk.some(k => k[0] === gp) ? all.replace('<button ', '<button data-zone="1" ') : all);
+    h = h.replace(/<button class="rail-fold" data-railgrp="([A-Z])"/g, (all, gp) => zk.some(k => k[0] === gp) ? all.replace('<button ', '<button data-zone="1" ') : all);
   }
   return h + guideRailBtn();
 }
@@ -1572,16 +1627,16 @@ function leaveMode(){
 const homeMode = () => settings.subject === 'D' ? (app.read.item = null, ('UGHZ'.includes(String(app.read.lvl)[0]) ? app.read.lvl = 'L4' : 0), 'read') : (settings.lastMath === 'clock' ? (Object.assign(app.read, {lvl: app.read.ulvl || 'U1', item:null}), 'read') : settings.lastMath === 'size' ? (Object.assign(app.read, {lvl: app.read.glvl || 'G1', item:null}), 'read') : settings.lastMath === 'board' ? (Object.assign(app.read, {lvl: app.read.hlvl || 'H1', item:null}), 'read') : settings.lastMath === 'tenpair' ? (Object.assign(app.read, {lvl: app.read.zlvl || 'Z1', item:null}), 'read') : settings.lastMath || 'number');
 function setSubject(subj){
   if(app.busy) return;
+  if(!SUBJECTS[subj]) subj = 'M';
   settings.subject = subj; saveSettings(); leaveMode(); app.railGrp = null;
-  if(subj === 'D'){ app.read.lvl ||= readDefaultLevel(); app.read.item = null; app.mode = 'read'; }
-  else { app.mode = homeMode(); if(!MODES[app.mode]) app.mode = 'number'; if(app.mode !== 'read') autoConf(app.mode); }
+  SUBJECTS[subj].enter();
   render();
 }
 
 /* ---------- Kopfzeile, Werkzeugleiste ---------- */
 function renderTop(){
   $('#modes').innerHTML = railHtml();
-  document.querySelector('.rail').classList.toggle('compact', settings.subject === 'D');
+  document.querySelector('.rail').classList.toggle('compact', !!SUBJECTS[settings.subject]?.compact);
   const gM = settings.subject === 'M' ? guideOf('M') : null;
   const okR = gM ? (['add', 'sub'].includes(app.mode) ? gM.addZrs : gM.zrs) : null;
   if(okR && !okR.has(app.range) && ['number', 'add', 'sub'].includes(app.mode)){ app.range = Math.max(...[...okR].filter(r => RANGES.includes(r)), 10); for(const k of Object.keys(app.tasks)) app.tasks[k] = blankTask(); }
@@ -1609,7 +1664,7 @@ function renderTop(){
 /* ---------- Haupt-Rendern ---------- */
 function guideFix(){
   if(!['read', ...MATH_RAIL].includes(app.mode)) return;
-  const g = guideOf(app.mode === 'read' && /^[LW]/.test(String(app.read.lvl)) ? 'D' : app.mode === 'read' ? 'M' : settings.subject); if(!g) return;
+  const g = guideOf(app.mode === 'read' ? subjOfLvl(app.read.lvl) || 'M' : settings.subject); if(!g) return;
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
@@ -3265,7 +3320,7 @@ function roundTrack(e){
 /* Nächste Stufe/leichtere Stufe für den Rückblick; in der geführten Oberfläche nur innerhalb der freigegebenen Stufen */
 function roundStep(dir){
   if(app.mode === 'read'){
-    const R = app.read, lv = rdLevels(R.lvl), g = guideOf(/^[UGHZ]/.test(R.lvl) ? 'M' : 'D'), ok = l => !g || g.lvlOk(l);
+    const R = app.read, lv = rdLevels(R.lvl), g = guideOf(subjOfLvl(R.lvl) || 'D'), ok = l => !g || g.lvlOk(l);
     const i = lv.indexOf(R.lvl); if(i < 0) return null;
     let j = i + dir; while(j >= 0 && j < lv.length && !ok(lv[j])) j += dir;
     if(j < 0 || j >= lv.length) return null; const l = lv[j];
@@ -3285,7 +3340,7 @@ function roundEnd(){
   const R = app.round, n = R.res.length, good = R.res.filter(x => x === true).length, skipped = R.res.filter(x => x === 'skip').length;
   const up = roundStep(1), down = roundStep(-1), strong = good >= Math.ceil(n*0.9), weak = good < n/2;
   /* Geführte Oberfläche: bei einer sehr guten Runde in einer Förderzone einen Kurztest für die nächste Stufe anbieten */
-  const zk = activeZoneKey(), p = curProfile(), kurz = strong && !up && zk && p && guideOn() && guideZones(p.id, /^[LW]/.test(zk) ? 'D' : 'M').includes(zk);
+  const zk = activeZoneKey(), p = curProfile(), kurz = strong && !up && zk && p && guideOn() && guideZones(p.id, subjOfKey(zk) || 'M').includes(zk);
   if(kurz){ document.querySelector('.lvlup')?.remove(); (app.offered ??= {})[zk] = true; }
   const msg = skipped >= n/2 ? 'Viele Aufgaben übersprungen. Probier es noch einmal – du schaffst das!' : good === n ? 'Alles gleich richtig. Super!' : strong ? 'Fast alles gleich richtig. Stark!' : weak ? 'Das war nicht leicht. Gut, dass du drangeblieben bist.' : 'Gut gemacht!';
   const sv = d => `<svg viewBox="0 0 32 32" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
@@ -3791,30 +3846,30 @@ function openStats(){
   renderStats(); $('#dlg-stats').showModal();
 }
 function classHtml(){
-  const zoneTxt = (pid, subj) => { const z = zoneReport(pid, subj).zones; if(!z.length){ const any = Object.keys(matrixOf(pid)).some(k => subj === 'M' ? /^[MSUGRHZ]\|/.test(k) : subj === 'W' ? /^W\|/.test(k) : /^[LP]\|/.test(k)); return any ? '<span class="cl-ok">alles erreicht</span>' : '<span class="cl-na">kein Test</span>'; } return z.map(x => `<span class="cl-z ${x.cell.status === 'teilweise' ? 'pt' : 'no'}" title="${escHtml(x.info.offer.text)}">${escHtml(cellLabel(x.key).replace(/ \(.*\)$/, ''))}</span>`).join(' '); };
+  const zoneTxt = (pid, subj) => { const z = zoneReport(pid, subj).zones; if(!z.length){ const any = Object.keys(matrixOf(pid)).some(k => keyInTest(k, subj)); return any ? '<span class="cl-ok">alles erreicht</span>' : '<span class="cl-na">kein Test</span>'; } return z.map(x => `<span class="cl-z ${x.cell.status === 'teilweise' ? 'pt' : 'no'}" title="${escHtml(x.info.offer.text)}">${escHtml(cellLabel(x.key).replace(/ \(.*\)$/, ''))}</span>`).join(' '); };
   const due = (p, subj) => { const n = practiceSinceDiag(p.id, subj), has = zoneReport(p.id, subj).zones.length; return has && n >= 25 ? `<span class="cl-due">Re-Diagnose (${n} Übungen)</span>` : n ? `${n} Übungen` : ''; };
-  const last = p => { const t = Math.max(p.lastDiagM || 0, p.lastDiagL || 0, p.lastDiagW || 0); return t ? new Date(t).toLocaleDateString('de-DE') : '–'; };
+  const last = p => { const t = Math.max(0, ...TEST_IDS.map(t => p['lastDiag' + t] || 0)); return t ? new Date(t).toLocaleDateString('de-DE') : '–'; };
   const warmTxt = pid => { const w = (data.warm?.[pid] || []).at(-1); if(!w) return '–'; const n = w.res.filter(a => a.ok).length; return `<span title="${escHtml(w.res.map(a => `${a.ok ? '✓' : '✗'} ${cellLabel(a.key)}`).join('\n'))}">${n}/${w.res.length} · ${dShort(w.date)}</span>`; };
-  return `<fieldset><legend>Klassenübersicht: Förderzonen</legend><div class="mx-scroll"><table class="cl-table"><thead><tr><th>Kind</th><th>Mathe</th><th>Lesen</th><th>Schreiben</th><th>Letzter Test</th><th>Startrunde</th><th>Seit dem Test</th></tr></thead><tbody>
-    ${data.profiles.map(p => `<tr><th><button class="linkish" data-open="${p.id}">${escHtml(p.name)}</button></th><td>${zoneTxt(p.id, 'M')}</td><td>${zoneTxt(p.id, 'L')}</td><td>${zoneTxt(p.id, 'W')}</td><td>${last(p)}</td><td>${warmTxt(p.id)}</td><td>${[due(p, 'M') && 'Mathe: ' + due(p, 'M'), due(p, 'L') && 'Lesen: ' + due(p, 'L'), due(p, 'W') && 'Schreiben: ' + due(p, 'W')].filter(Boolean).join('<br>')}</td></tr>`).join('')}
+  return `<fieldset><legend>Klassenübersicht: Förderzonen</legend><div class="mx-scroll"><table class="cl-table"><thead><tr><th>Kind</th>${TEST_IDS.map(t => `<th>${TESTS[t].name}</th>`).join('')}<th>Letzter Test</th><th>Startrunde</th><th>Seit dem Test</th></tr></thead><tbody>
+    ${data.profiles.map(p => `<tr><th><button class="linkish" data-open="${p.id}">${escHtml(p.name)}</button></th>${TEST_IDS.map(t => `<td>${zoneTxt(p.id, t)}</td>`).join('')}<td>${last(p)}</td><td>${warmTxt(p.id)}</td><td>${TEST_IDS.map(t => due(p, t) && TESTS[t].name + ': ' + due(p, t)).filter(Boolean).join('<br>')}</td></tr>`).join('')}
   </tbody></table></div><p class="note">Förderzone = erste nicht erreichte Stufe (orange = teilweise, rot = nicht erreicht). Name antippen öffnet die Einzelansicht mit Begründung und ILEB-Vorschlag. Gruppen mit gleicher Förderzone lassen sich gut gemeinsam fördern.</p><div class="row" style="justify-content:flex-start"><button id="class-csv" class="icon-btn">${icon("download")}<span style="display:inline">Als Tabelle speichern (Excel)</span></button></div></fieldset>
   ${groupsHtml()}`;
 }
 /* Klassenübersicht als CSV (Semikolon, UTF-8 mit BOM – öffnet direkt in Excel und Numbers) */
 function classCsv(){
-  const keys = [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l), ...Z_LEVELS.map(l => 'Z|' + l), ...L_LEVELS.map(l => 'L|' + l), ...W_LEVELS.map(l => 'W|' + l)];
+  const keys = TEST_IDS.flatMap(testKeys);
   const q = v => { const t = String(v ?? ''); return /[;"\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
   const zone = (pid, subj) => zoneReport(pid, subj).zones.map(z => cellLabel(z.key)).join(', ');
   const st = c => !c ? '' : c.status === 'erreicht' ? (c.quelle === 'abgeleitet' ? 'erreicht (abgeleitet)' : 'erreicht') : c.status;
-  const head = ['Kind', 'Förderzone Mathe', 'Förderzone Lesen', 'Förderzone Schreiben', 'Letzter Test', 'Letzte Startrunde', ...keys.map(k => cellLabel(k))];
-  const rows = data.profiles.map(p => { const m = matrixOf(p.id), t = Math.max(p.lastDiagM || 0, p.lastDiagL || 0, p.lastDiagW || 0);
+  const head = ['Kind', ...TEST_IDS.map(t => 'Förderzone ' + TESTS[t].name), 'Letzter Test', 'Letzte Startrunde', ...keys.map(k => cellLabel(k))];
+  const rows = data.profiles.map(p => { const m = matrixOf(p.id), t = Math.max(0, ...TEST_IDS.map(x => p['lastDiag' + x] || 0));
     const w = (data.warm?.[p.id] || []).at(-1);
-    return [p.name, zone(p.id, 'M'), zone(p.id, 'L'), zone(p.id, 'W'), t ? new Date(t).toLocaleDateString('de-DE') : '', w ? `${w.res.filter(a => a.ok).length}/${w.res.length} am ${new Date(w.date).toLocaleDateString('de-DE')}` : '', ...keys.map(k => st(m[k]))]; });
+    return [p.name, ...TEST_IDS.map(x => zone(p.id, x)), t ? new Date(t).toLocaleDateString('de-DE') : '', w ? `${w.res.filter(a => a.ok).length}/${w.res.length} am ${new Date(w.date).toLocaleDateString('de-DE')}` : '', ...keys.map(k => st(m[k]))]; });
   return '\ufeff' + [head, ...rows].map(r => r.map(q).join(';')).join('\r\n');
 }
 function groupsHtml(){
   const g = {};
-  for(const p of data.profiles) for(const subj of ['M', 'L', 'W']){ const z = zoneReport(p.id, subj).zones[0]; if(z) (g[z.key] ??= []).push(p.name); }
+  for(const p of data.profiles) for(const subj of TEST_IDS){ const z = zoneReport(p.id, subj).zones[0]; if(z) (g[z.key] ??= []).push(p.name); }
   const rows = Object.entries(g).filter(([, n]) => n.length > 1);
   return rows.length ? `<fieldset><legend>Mögliche Fördergruppen</legend><ul class="stat-lines">${rows.map(([k, n]) => `<li><b>${escHtml(cellLabel(k))}:</b> ${n.map(escHtml).join(', ')} – ${escHtml(cellInfo(k).offer.text)}</li>`).join('')}</ul></fieldset>` : '';
 }
@@ -4765,6 +4820,7 @@ for(const v of Object.values(S_INFO)) v.bp = 'BP GENT 2022, M 2.1.1.2 Zahldarste
 /* Zellschlüssel: M|100|III, S|S2, L|L4, P|P1 */
 function cellInfo(key){
   const [ax, a, b] = key.split('|');
+  if(AXES[ax]) return {...AXES[ax].info[a], short:a, place:AXES[ax].place};
   if(ax === 'M') return mInfo(+a, b);
   if(ax === 'S') return {...S_INFO[a], short:a, place:'Stellenwert'};
   if(ax === 'W') return {...W_INFO[a], short:a, place:'Schreiben'};
@@ -4777,6 +4833,7 @@ function cellInfo(key){
 }
 function itemsFor(key){
   const [ax, a, b] = key.split('|');
+  if(AXES[ax]) return AXES[ax].items[a];
   if(ax === 'M') return MATH[b](+a);
   if(ax === 'S') return STELL[a];
   if(ax === 'L') return READ[a];
@@ -4788,7 +4845,7 @@ function itemsFor(key){
   if(ax === 'Z') return Z_ITEMS[a];
   return PHON[a];
 }
-const cellLabel = key => { const [ax, a, b] = key.split('|'), i = cellInfo(key); return ax === 'M' ? `ZR ${a}, Niveau ${b} (${i.name})` : ax === 'S' ? `Stellenwert ${a} (${i.name})` : ax === 'U' ? `Uhrzeit ${a} (${i.name})` : ax === 'G' ? `Größen ${a} (${i.name})` : ax === 'H' ? `Hundertertafel ${a} (${i.name})` : ax === 'R' ? `Rechnen ${a} (${i.name})` : ax === 'Z' ? `Zehnerpartner ${a} (${i.name})` : `${ax === 'L' ? 'Lesen' : ax === 'W' ? 'Schreiben' : 'Hören'} ${a} (${i.name})`; };
+const cellLabel = key => { const [ax, a, b] = key.split('|'), i = cellInfo(key); return AXES[ax] ? `${AXES[ax].place} ${a} (${i.name})` : ax === 'M' ? `ZR ${a}, Niveau ${b} (${i.name})` : ax === 'S' ? `Stellenwert ${a} (${i.name})` : ax === 'U' ? `Uhrzeit ${a} (${i.name})` : ax === 'G' ? `Größen ${a} (${i.name})` : ax === 'H' ? `Hundertertafel ${a} (${i.name})` : ax === 'R' ? `Rechnen ${a} (${i.name})` : ax === 'Z' ? `Zehnerpartner ${a} (${i.name})` : `${ax === 'L' ? 'Lesen' : ax === 'W' ? 'Schreiben' : 'Hören'} ${a} (${i.name})`; };
 
 /* =====================================================================
    Schreiben und Rechtschreibung W1–W6 (BP GENT Deutsch 2.1.2)
@@ -5449,6 +5506,7 @@ function cellDecision(ans){
 function inferCells(pid, subj){
   const m = matrixOf(pid), put = k => { if(!m[k] || m[k].quelle === 'abgeleitet') setCell(pid, k, {status:'erreicht', quelle:'abgeleitet', sum:'aus höherer Stufe abgeleitet'}); };
   const line = (keys) => { let hi = -1; keys.forEach((k, i) => { if(isOk(m[k]?.status) && m[k].quelle !== 'abgeleitet') hi = i; }); for(let i = 0; i < hi; i++) put(keys[i]); };
+  if(TESTS[subj]?.infer) return TESTS[subj].infer(m, put, line);
   if(subj === 'M'){
     for(let pass = 0; pass < 2; pass++){
       for(const zr of ZR) line(N_LEVELS.map(l => `M|${zr}|${l}`));
@@ -5466,7 +5524,7 @@ function inferCells(pid, subj){
     const r3 = m['R|R3'], z3 = m['Z|Z3']; if(r3 && r3.quelle !== 'abgeleitet' && !isOk(r3.status) && (!z3 || z3.quelle === 'abgeleitet')) setCell(pid, 'Z|Z3', {status:r3.status, quelle:'abgeleitet', sum:'aus Rechnen R3 (Zehnerübergang bis 20) übernommen'});
     if(rOk.length){ const rDate = Math.max(...rOk.map(c => c.date || 0)); Z_LEVELS.forEach(l => { const k = `Z|${l}`, c = m[k]; if(!c || c.quelle === 'abgeleitet' || (!isOk(c.status) && (c.date || 0) < rDate)) setCell(pid, k, {status:'erreicht', quelle:'abgeleitet', sum:'aus dem Zehnerübergang (R3) abgeleitet'}); }); }
   } else if(subj === 'W') line(W_LEVELS.map(l => `W|${l}`));
-  else { line(L_LEVELS.map(l => `L|${l}`)); line(P_LEVELS.map(l => `P|${l}`)); }
+  else if(subj === 'L'){ line(L_LEVELS.map(l => `L|${l}`)); line(P_LEVELS.map(l => `P|${l}`)); }
 }
 /* ---------- Adaptive Testpläne (Generatoren: liefern die nächste Zelle, lesen das Ergebnis aus d.res) ---------- */
 function* tst(d, key){ if(!(key in d.res)) yield key; return d.res[key]; }
@@ -5561,20 +5619,20 @@ function* readRePlan(d){ yield* walkUp(d, L_LEVELS.map(l => `L|${l}`)); }
 
 /* ---------- Testablauf ---------- */
 app.diag = null;
-const CAP = {M:50, L:30, W:24};
 function diagStart(subj = 'M', re = false){
   const pid = data.current || 'guest';
-  let part = 0; if(subj === 'M1'){ subj = 'M'; part = 1; } else if(subj === 'M2'){ subj = 'M'; part = 2; }
+  let part = 0; const pm = /^([A-Z])(\d)$/.exec(subj); if(pm && TESTS[pm[1]]){ subj = pm[1]; part = +pm[2]; } /* „M1“ = Mathe Teil 1 */
   const d = {subj, pid, re, part, res:{}, tested:[], nItems:0, done:false, resp:null, key:null, items:[], answers:[], idx:0};
-  d.gen = subj === 'M' ? (re ? mathRePlan(d) : mathPlan(d)) : subj === 'W' ? (re ? writeRePlan(d) : writePlan(d)) : (re ? readRePlan(d) : readPlan(d));
-  settings.subject = subj === 'M' ? 'M' : 'D'; saveSettings();
+  if(!TESTS[subj]){ toast('Diesen Test gibt es nicht.'); return; }
+  d.gen = re ? TESTS[subj].rePlan(d) : TESTS[subj].plan(d);
+  settings.subject = subjOfTest(subj); saveSettings();
   app.diag = d; app.mode = 'diag'; $('#stage').innerHTML = ''; $('#error').hidden = true;
   if(!diagNextCell()){ app.diag = null; app.mode = 'number'; toast(re ? 'Keine offene Förderzone – bitte zuerst den vollständigen Test machen.' : 'Kein Test möglich.'); render(); return; }
   render();
 }
 /* Startrunde: 3 kurze Aufgaben aus den Förderzonen – zum Aufwärmen und als Kurz-Check für die Lehrkraft (ändert die Einstufung nicht) */
 function warmKeys(pid){
-  const zs = ['M', 'L', 'W'].map(sj => zoneReport(pid, sj).zones);
+  const zs = TEST_IDS.map(sj => zoneReport(pid, sj).zones);
   const keys = zs.map(z => z[0]?.key).filter(Boolean);
   for(const z of zs) for(const x of z.slice(1)) if(keys.length < 3 && !keys.includes(x.key)) keys.push(x.key);
   return keys.slice(0, 3);
@@ -5599,11 +5657,12 @@ function warmAnswer(skip){
 }
 /* Fortschritt im Test: Abschnitte in fester Reihenfolge und ein Balken, der nur vorwärts läuft.
    Keine Anzeige von richtig/falsch; Rückschritte der adaptiven Suche sieht man nicht. */
-const DG_SEC = k => ({M:'Zahlen', R:'Rechnen', Z:'Rechnen', S:'Stellenwert', U:'Uhr', G:'Größen', H:'Hundertertafel', L:'Lesen', W:'Schreiben'})[String(k)[0]];
+const DG_SEC = k => ({M:'Zahlen', R:'Rechnen', Z:'Rechnen', S:'Stellenwert', U:'Uhr', G:'Größen', H:'Hundertertafel', L:'Lesen', W:'Schreiben'})[String(k)[0]] || TESTS[testOfKey(k)]?.secName?.(k) || TESTS[testOfKey(k)]?.name;
 const DG_EST = {Zahlen:5, Rechnen:5, Stellenwert:2, Uhr:3, 'Größen':3, Hundertertafel:3, Lesen:4, Schreiben:3}; /* geschätzte Stufen je Abschnitt */
 function dgSections(d){
   if(d.secs) return d.secs;
-  if(d.subj !== 'M') return d.secs = [d.subj === 'W' ? 'Schreiben' : 'Lesen'];
+  if(TESTS[d.subj]?.sections) return d.secs = TESTS[d.subj].sections(d);
+  if(d.subj !== 'M') return d.secs = [TESTS[d.subj]?.name || 'Test'];
   if(d.re){ const m = matrixOf(d.pid), open = new Set(Object.keys(m).filter(k => !isOk(m[k].status)).map(DG_SEC)); return d.secs = ['Zahlen', 'Stellenwert', 'Uhr', 'Größen', 'Hundertertafel', 'Rechnen'].filter(x => open.has(x)); }
   return d.secs = d.part === 1 ? ['Zahlen', 'Rechnen', 'Stellenwert'] : d.part === 2 ? ['Uhr', 'Größen', 'Hundertertafel'] : ['Zahlen', 'Rechnen', 'Stellenwert', 'Uhr', 'Größen', 'Hundertertafel'];
 }
@@ -5616,7 +5675,7 @@ function dgProgressHtml(d){
   return `<span class="dg-prog" role="progressbar" aria-label="${secs.length > 1 ? `Abschnitt ${i + 1} von ${secs.length}: ${cur}` : 'Fortschritt'}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(d.prog*100)}">${path}<span class="dg-bar"><i style="width:${Math.round(d.prog*100)}%"></i></span></span>`;
 }
 function diagNextCell(){
-  const d = app.diag, n = d.nItems >= CAP[d.subj] ? {done:true} : d.gen.next();
+  const d = app.diag, n = d.nItems >= (TESTS[d.subj]?.cap || 30) ? {done:true} : d.gen.next();
   if(n.done){ diagFinish(); return d.tested.length > 0; }
   d.key = n.value; freshNew(); d.items = itemsFor(d.key).map(g => g()); d.answers = []; d.idx = 0; d.resp = null; d.t0 = performance.now(); d.spoken = false;
   return true;
@@ -5779,7 +5838,7 @@ function renderDiag(){
   testLock();
   const d = app.diag;
   $('#words').hidden = true; $('#btn-say').hidden = true;
-  const title = d.kurz ? 'Kurztest' : d.warm ? 'Startrunde' : d.subj === 'M' ? (d.part === 1 ? 'Mathe-Test Teil 1' : d.part === 2 ? 'Mathe-Test Teil 2' : 'Mathe-Test') : d.subj === 'W' ? 'Schreib-Test' : 'Lese-Test';
+  const title = d.kurz ? 'Kurztest' : d.warm ? 'Startrunde' : TESTS[d.subj]?.title(d) || 'Test';
   if(d.kurz && !d.started){
     $('#equation').innerHTML = `<span class="screen-step">Kurztest</span>`; $('#prompt').textContent = '';
     $('#stage').innerHTML = `<div class="home"><h2>Kurztest</h2><div class="intro-card"><p>Zwei oder drei Aufgaben zu: <b>${escHtml(ichOf(d.kurz))}</b></p><p>Klappt es, geht es mit der nächsten Stufe weiter.</p></div></div>`;
@@ -5854,7 +5913,7 @@ function diagControl(btn){
     case 'd-skip': return d.warm ? warmAnswer(true) : diagAnswer(true);
     case 'w-more': { const k = d.answers.find(a => !a.ok)?.key || d.answers[0]?.key; app.diag = null; $('#stage').innerHTML = ''; if(k){ leaveMode(); applyOffer(cellInfo(k).offer.set); } else { app.mode = 'home'; render(); } return; }
     case 'd-again': { d.resp ||= {}; d.resp.hidden = false; d.resp.again = true; return renderDiag(); }
-    case 'd-stats': return requireTeacher(() => { app.mode = homeMode(); app.diag = null; $('#stage').innerHTML = ''; render(); openStats(); });
+    case 'd-stats': return requireTeacher(() => { (SUBJECTS[settings.subject] || SUBJECTS.M).enter(); app.diag = null; $('#stage').innerHTML = ''; render(); openStats(); });
     case 'd-close':
       /* Versehentliches Abbrechen vermeiden (Durchsicht 16.11.): im laufenden Test zweimal tippen */
       if(d && !d.done && d.started && !d.warm && !btn.dataset.sure){ btn.dataset.sure = '1'; btn.classList.add('sure'); btn.querySelector('.lbl').textContent = 'Wirklich beenden?'; setTimeout(() => { if(btn.isConnected){ delete btn.dataset.sure; btn.classList.remove('sure'); btn.querySelector('.lbl').textContent = 'Abbrechen'; } }, 4000); return; }
@@ -5872,6 +5931,7 @@ function cellChip(m, key, label){
 const legend = '✓ erreicht · ✓ hell = abgeleitet · ½ teilweise · ✗ nicht erreicht · – nicht getestet. Antippen ändert die Einstufung (Lehrkraft).';
 function matrixHtml(pid, subj){
   const m = matrixOf(pid);
+  if(TESTS[subj]?.matrix) return TESTS[subj].matrix(m);
   if(subj === 'M') return `<div class="mx-scroll"><table class="mx-table"><thead><tr><th></th>${N_LEVELS.map(l => `<th title="${N_NAMES[l]}">${l}<small>${N_NAMES[l].split(' ')[0].replace('Mentaler', 'Zahlenstrahl')}</small></th>`).join('')}</tr></thead><tbody>
     ${ZR.map(zr => `<tr><th>ZR ${zr}</th>${N_LEVELS.map(l => cellChip(m, `M|${zr}|${l}`)).join('')}</tr>`).join('')}
     <tr class="mx-gap"><th>Rechnen</th>${R_LEVELS.map(l => cellChip(m, `R|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${R_LEVELS.map(l => `<td><small>${R_INFO[l].short}</small></td>`).join('')}</tr>
@@ -5987,6 +6047,7 @@ function matWayHtml(key, offer){
 function zoneCells(pid, subj){
   const m = matrixOf(pid), first = keys => keys.find(k => m[k] && !isOk(m[k].status));
   const out = [];
+  if(TESTS[subj]?.zoneCells) return TESTS[subj].zoneCells(m, first);
   if(subj === 'M'){
     for(const zr of ZR){ const k = first(N_LEVELS.map(l => `M|${zr}|${l}`)); if(!k) continue; if(out.length && ['I', 'II', 'III'].includes(out[0].split('|')[2])) break; out.push(k); if(out.length === 2) break; }
     const s = first(S_LEVELS.map(l => `S|${l}`)); if(s) out.push(s);
@@ -5996,14 +6057,14 @@ function zoneCells(pid, subj){
     const rz = first(R_LEVELS.map(l => `R|${l}`)); if(rz) out.splice(Math.min(1, out.length), 0, rz);
     const zp = first(Z_LEVELS.map(l => `Z|${l}`)); if(zp && !isOk(m['R|R3']?.status)) out.splice(Math.min(rz ? 2 : 1, out.length), 0, zp);
   } else if(subj === 'W'){ const w = first(W_LEVELS.map(x => `W|${x}`)); if(w) out.push(w); }
-  else { const l = first(L_LEVELS.map(x => `L|${x}`)); if(l) out.push(l); }
+  else if(subj === 'L'){ const l = first(L_LEVELS.map(x => `L|${x}`)); if(l) out.push(l); }
   return out;
 }
 function highestIn(m, keys){ let h = null; for(const k of keys) if(isOk(m[k]?.status)) h = k; return h; }
 function zoneReport(pid, subj){
   const name = pid === 'guest' ? 'Das Kind' : (data.profiles.find(p => p.id === pid)?.name || 'Das Kind');
   const m = matrixOf(pid), out = {zones:[], ileb:null, subj};
-  const prefix = subj === 'M' ? ['M|', 'R|', 'Z|', 'S|', 'U|', 'G|', 'H|'] : subj === 'W' ? ['W|'] : ['L|', 'P|'];
+  const prefix = (TESTS[subj]?.axes || []).map(a => a + '|');
   if(!Object.keys(m).some(k => prefix.some(p => k.startsWith(p)))) return out;
   for(const key of zoneCells(pid, subj)){
     const info = cellInfo(key), c = m[key], [ax, a] = key.split('|');
@@ -6016,7 +6077,8 @@ function zoneReport(pid, subj){
   }
   // Lernstand: höchste sichere Stufe je Zeile
   const kann = [];
-  if(subj === 'M'){
+  if(TESTS[subj]?.kann) kann.push(...TESTS[subj].kann(m));
+  else if(subj === 'M'){
     for(const zr of [...ZR].reverse()){ const h = highestIn(m, N_LEVELS.map(l => `M|${zr}|${l}`)); if(h) kann.push(cellInfo(h).kann); if(kann.length === 2) break; }
     const s = highestIn(m, S_LEVELS.map(l => 'S|' + l)); if(s) kann.push(cellInfo(s).kann);
     const u = highestIn(m, U_LEVELS.map(l => 'U|' + l)); if(u) kann.push(cellInfo(u).kann);
@@ -6025,12 +6087,12 @@ function zoneReport(pid, subj){
     const rz = highestIn(m, R_LEVELS.map(l => 'R|' + l)); if(rz) kann.push(cellInfo(rz).kann);
     const zp = highestIn(m, Z_LEVELS.map(l => 'Z|' + l)); if(zp && !isOk(m['R|R3']?.status)) kann.push(cellInfo(zp).kann);
   } else if(subj === 'W'){ const w = highestIn(m, W_LEVELS.map(x => 'W|' + x)); if(w) kann.push(cellInfo(w).kann); }
-  else {
+  else if(subj === 'L'){
     const l = highestIn(m, L_LEVELS.map(x => 'L|' + x)); if(l) kann.push(cellInfo(l).kann);
   }
   const teil = out.zones.filter(z => z.cell?.status === 'teilweise').map(z => z.info.name);
   out.ileb = {
-    lernstand: `${name} ${kann.length ? [...new Set(kann)].join('; ') : subj === 'M' ? 'baut erste Zahlvorstellungen auf' : subj === 'W' ? 'baut erste Schreibfähigkeiten auf' : 'baut erste Lesefähigkeiten auf'}.${teil.length ? ` Teilweise gelingt: ${teil.join(', ')}.` : ''}`,
+    lernstand: `${name} ${kann.length ? [...new Set(kann)].join('; ') : TESTS[subj]?.start || 'baut erste Grundlagen auf'}.${teil.length ? ` Teilweise gelingt: ${teil.join(', ')}.` : ''}`,
     ziel: out.zones.map(z => `${name} ${z.info.ziel}.`).join(' '),
     massnahmen: out.zones.map(z => { const w = matWay(z.key); return w ? `Am Material: ${w.hand.replace(/\.$/, '')}. Im Bild: ${w.bild.replace(/\.$/, '')}. In der App: ${z.info.offer.text}` : `${z.info.offer.text}; analog: ${z.info.analog}`; }).join('. ') + `. Re-Diagnose nach etwa 5 Übungseinheiten.`,
     bp: [...new Set(out.zones.map(z => z.info.bp))].join('; ')
@@ -6041,11 +6103,11 @@ function zoneReport(pid, subj){
 const MATH_MODES = ['number', 'add', 'sub', 'written', 'times', 'money', 'blitz', 'find', 'free', 'clock', 'size', 'board', 'tenpair'];
 function practiceSinceDiag(pid, subj){
   const p = data.profiles.find(x => x.id === pid), since = p?.['lastDiag' + subj] || 0;
-  return (data.log[pid] || []).filter(e => e.ts > since && (subj === 'L' ? e.mode === 'read' : subj === 'W' ? e.mode === 'write' : MATH_MODES.includes(e.mode))).length;
+  return (data.log[pid] || []).filter(e => e.ts > since && !!TESTS[subj]?.log(e)).length;
 }
 function applyOffer(set){
   { const p = curProfile(); app.activeZone = null; if(p && set.mode !== 'read') for(const sj of ['M']) for(const z of zoneReport(p.id, sj).zones) if(JSON.stringify(z.info.offer?.set) === JSON.stringify(set)) app.activeZone = z.key; }
-  settings.subject = set.mode === 'read' && !/^[UGH]/.test(String(set.lvl)) ? 'D' : 'M'; if(set.mode !== 'read') settings.lastMath = set.mode; saveSettings();
+  settings.subject = set.mode === 'read' ? subjOfLvl(set.lvl) || 'D' : 'M'; if(set.mode !== 'read') settings.lastMath = set.mode; saveSettings();
   if(set.mode === 'read'){ app.read.lvl = set.lvl; app.read.item = null; app.mode = 'read'; $('#stage').innerHTML = ''; render(); return; }
   if(set.range) app.range = set.range;
   if(set.ten) settings.ten = set.ten;
@@ -6060,9 +6122,9 @@ function applyOffer(set){
   saveSettings(); $('#stage').innerHTML = ''; render();
 }
 function subjectHtml(pid, subj, rep){
-  const since = practiceSinceDiag(pid, subj), S = subj === 'M' ? 'Mathematik' : subj === 'W' ? 'Schreiben' : 'Lesen';
+  const since = practiceSinceDiag(pid, subj), S = TESTS[subj]?.long || subj;
   let h = `<h3 class="stats-h">${S}</h3><fieldset><legend>Kompetenzmatrix ${S}</legend>${matrixHtml(pid, subj)}
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${subj === 'M' ? `<button class="icon-btn" data-diag="new-M1">${icon('target')}<span style="display:inline">Teil 1: Zahlen und Rechnen</span></button><button class="icon-btn" data-diag="new-M2">${icon('target')}<span style="display:inline">Teil 2: Uhr, Größen, Hundertertafel</span></button>` : `<button class="icon-btn" data-diag="new-${subj}">${icon('target')}<span style="display:inline">${subj === 'W' ? 'Schreib-Test' : 'Lese-Test'}</span></button>`}${rep.zones.length ? `<button class="icon-btn ${since >= 25 ? 'primary' : ''}" data-diag="re-${subj}">${icon('redo')}<span style="display:inline">Re-Diagnose${since >= 25 ? ' empfohlen' : ''}</span></button>` : ''}</div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${TESTS[subj]?.buttons ? TESTS[subj].buttons() : `<button class="icon-btn" data-diag="new-${subj}">${icon('target')}<span style="display:inline">${TESTS[subj]?.title({}) || 'Test'}</span></button>`}${rep.zones.length ? `<button class="icon-btn ${since >= 25 ? 'primary' : ''}" data-diag="re-${subj}">${icon('redo')}<span style="display:inline">Re-Diagnose${since >= 25 ? ' empfohlen' : ''}</span></button>` : ''}</div>
     ${rep.zones.length && since ? `<p class="note">${since} Übungsaufgaben seit dem letzten Test.</p>` : ''}</fieldset>`;
   if(rep.zones.length){
     h += `<fieldset><legend>Förderzone und Lernangebote</legend>${rep.zones.map((z, i) => `<div class="zone"><p><b>${escHtml(cellLabel(z.key))}</b></p><p class="why">${escHtml(z.why)}</p><p class="note">${escHtml(z.info.bp)}</p><button class="icon-btn primary" data-offer="${subj}:${i}">${icon('next')}<span style="display:inline">Lernangebot starten</span></button> <button class="icon-btn" data-sheetzone="${z.key}">${icon('print')}<span style="display:inline">Arbeitsblatt</span></button>${matWayHtml(z.key, z.info.offer)}<p class="analog"><b>Im Alltag:</b> ${escHtml(z.info.analog)}</p></div>`).join('')}</fieldset>`;
@@ -6071,8 +6133,8 @@ function subjectHtml(pid, subj, rep){
   return h;
 }
 function teacherSectionHtml(pid){
-  const rep = {M: zoneReport(pid, 'M'), L: zoneReport(pid, 'L'), W: zoneReport(pid, 'W')};
-  let h = subjectHtml(pid, 'M', rep.M) + subjectHtml(pid, 'L', rep.L) + subjectHtml(pid, 'W', rep.W) + progressHtml(pid);
+  const rep = Object.fromEntries(TEST_IDS.map(t => [t, zoneReport(pid, t)]));
+  let h = TEST_IDS.map(t => subjectHtml(pid, t, rep[t])).join('') + progressHtml(pid);
   const wm = (data.warm?.[pid] || []).slice(-5).reverse();
   if(wm.length) h += `<fieldset><legend>Startrunden (Kurz-Check zu Stundenbeginn)</legend><ul class="stat-lines">${wm.map(w => `<li>${dShort(w.date)} · ${w.res.filter(a => a.ok).length}/${w.res.length} · ${w.res.map(a => `${a.ok ? '✓' : '✗'} ${escHtml(cellLabel(a.key))}`).join(' · ')}</li>`).join('')}</ul><p class="note">Die Startrunde ändert die Einstufung nicht. Mehrmals alles richtig in einer Förderzone? Dann lohnt sich ein Wiederholungstest.</p></fieldset>`;
   const hist = (data.mhist?.[pid] || []).filter(e => e.quelle !== 'abgeleitet').slice(-12).reverse();
@@ -6082,13 +6144,13 @@ function teacherSectionHtml(pid){
 const ilebText = r => `Lernstand: ${r.lernstand}\nNächstes Ziel: ${r.ziel}\nMaßnahmen: ${r.massnahmen}${r.bp ? `\nBezug: ${r.bp}` : ''}`;
 function teacherText(pid){
   const m = matrixOf(pid); let t = '';
-  for(const subj of ['M', 'L', 'W']){
-    const keys = subj === 'W' ? W_LEVELS.map(l => 'W|' + l) : subj === 'M' ? [...ZR.flatMap(zr => N_LEVELS.map(l => `M|${zr}|${l}`)), ...S_LEVELS.map(l => 'S|' + l), ...U_LEVELS.map(l => 'U|' + l), ...G_LEVELS.map(l => 'G|' + l), ...H_LEVELS.map(l => 'H|' + l), ...R_LEVELS.map(l => 'R|' + l), ...Z_LEVELS.map(l => 'Z|' + l)] : L_LEVELS.map(l => 'L|' + l);
+  for(const subj of TEST_IDS){
+    const keys = testKeys(subj);
     const got = keys.filter(k => m[k]); if(!got.length) continue;
     const rep = zoneReport(pid, subj);
-    t += `Kompetenzmatrix ${subj === 'M' ? 'Mathematik' : subj === 'W' ? 'Schreiben' : 'Lesen'} (kriteriumsorientiert)\n${got.map(k => `• ${cellLabel(k)}: ${STATUS_TXT[m[k].status]}${m[k].quelle === 'abgeleitet' ? ' (abgeleitet)' : ''}${m[k].sum && m[k].quelle !== 'abgeleitet' ? ` – ${m[k].sum}` : ''}`).join('\n')}`;
+    t += `Kompetenzmatrix ${TESTS[subj].long} (kriteriumsorientiert)\n${got.map(k => `• ${cellLabel(k)}: ${STATUS_TXT[m[k].status]}${m[k].quelle === 'abgeleitet' ? ' (abgeleitet)' : ''}${m[k].sum && m[k].quelle !== 'abgeleitet' ? ` – ${m[k].sum}` : ''}`).join('\n')}`;
     if(rep.zones.length) t += `\n\nBegründung der Lernangebote\n${rep.zones.map(z => '• ' + z.why).join('\n')}`;
-    if(rep.ileb) t += `\n\nILEB – Formulierungsvorschlag ${subj === 'M' ? 'Mathematik' : subj === 'W' ? 'Schreiben' : 'Lesen'}\n${ilebText(rep.ileb)}`;
+    if(rep.ileb) t += `\n\nILEB – Formulierungsvorschlag ${TESTS[subj].long}\n${ilebText(rep.ileb)}`;
     t += '\n\n';
   }
   return t.trim() || 'Noch kein Test durchgeführt.';
@@ -6101,13 +6163,14 @@ function readDefaultLevel(){
   const z = L_LEVELS.find(l => m['L|' + l] && !isOk(m['L|' + l].status));
   return z || (L_LEVELS.some(l => m['L|' + l]) ? L_LEVELS.at(-1) : 'L4');
 }
-const rdMode = l => ({W:'write', U:'clock', G:'size', H:'board', Z:'tenpair'})[String(l)[0]] || 'read';
-const rdLevels = l => ({W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS})[String(l)[0]] || L_LEVELS;
-const rdInfo = l => L_INFO[l] || W_INFO[l] || U_INFO[l] || G_INFO[l] || H_INFO[l] || Z_INFO[l];
+const rdMode = l => AXES[String(l)[0]]?.mode || ({W:'write', U:'clock', G:'size', H:'board', Z:'tenpair'})[String(l)[0]] || 'read';
+const rdLevels = l => AXES[String(l)[0]]?.levels || ({W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS})[String(l)[0]] || L_LEVELS;
+const rdInfo = l => L_INFO[l] || W_INFO[l] || U_INFO[l] || G_INFO[l] || H_INFO[l] || Z_INFO[l] || AXES[String(l)[0]]?.info[l];
 function readNew(){
   const R = app.read; R.lvl ||= readDefaultLevel();
-  if(!READ[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl] && !Z_ITEMS[R.lvl]) R.lvl = 'L4';
-  const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl];
+  const axBank = l => AXES[String(l)[0]]?.items[l];
+  if(!READ[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl] && !Z_ITEMS[R.lvl] && !axBank(R.lvl)) R.lvl = 'L4';
+  const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl);
   freshNew(); let it, tries = 0; do { it = pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
   Object.assign(R, {item: it, r:{}, fb:null, tries:0, spoken:false});
   setHint(''); /* neue Aufgabe: „Richtig“ der vorigen Aufgabe weg, auch über „Neue Aufgabe“ oben */
@@ -6188,7 +6251,6 @@ function readStageClick(e){
    Startseite, Lehrkraft-PIN, Datensicherung
    ===================================================================== */
 const kidTitle = t => t.replace(/\s*\(.*?\)\s*/g, ' ').trim();
-const SUBJ_NAME = {M:'Mathe', L:'Lesen', W:'Schreiben'};
 /* Startseite als kleiner Assistent: Wer übt? → Fach → Übung (die Stufen oben zeigen, wo man gerade ist) */
 app.wz = null;
 const WZ_ILL = {
@@ -6197,14 +6259,18 @@ const WZ_ILL = {
 };
 const WZ_FLAG = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M11 36V5" stroke="#2b2930" stroke-width="3.5" stroke-linecap="round"/><path d="M12.5 6h19l-5 7 5 7h-19z" fill="#e8962e"/></svg>';
 function homeAreas(subj){
-  const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l), out = [];
-  if(subj === 'M'){
+  const g = guideOf(subj), lvOk = l => !g || g.lvlOk(l);
+  return SUBJECTS[subj]?.areas(g, lvOk) || [];
+}
+function homeAreasMath(g, lvOk){
+  const out = [];
     for(const k of MATH_RAIL){ if(g && !g.modes.has(k)) continue; out.push({mode:k, sym:MODES[k].sym, label:MODES[k].label});
       if(k === 'number' && (!g || g.axVisible('H'))) out.push({mode:'read', lvl: g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1', last:'board', sym:TAFEL_SYM, label:'Hundertertafel'}); }
     if(!g || g.axVisible('U')) out.push({mode:'read', lvl: g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1', last:'clock', sym:'◷', label:'Uhr'});
     if(!g || g.axVisible('G')) out.push({mode:'read', lvl: g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1', last:'size', sym:'⚖', label:'Größen'});
-    return [['', out]];
-  }
+  return [['', out]];
+}
+function homeAreasDeutsch(g, lvOk){
   const RL = READ_RAIL.filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:L_INFO[l].short}));
   const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>']].filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:W_INFO[l].short}));
   return [['Lesen', RL], ['Schreiben', WR]];
@@ -6221,7 +6287,7 @@ function renderHome(){
   const sj = W.subj && step === 'area' ? W.subj : null, Q = '<b class="wz-q">?</b>';
   const steps = [['ctx', 'Üben', CTX_ILL.practice],
     ...(needWho ? [['who', p ? escHtml(p.name) : W.guest ? 'Gast' : 'Wer übt?', p ? (p.sym && ICON[p.sym] ? iconSvg(p.sym, 40) : `<b class="wz-ini">${escHtml(p.name.slice(0, 1).toUpperCase())}</b>`) : W.guest ? '<b class="wz-ini">?</b>' : Q]] : []),
-    ['subj', sj ? (sj === 'M' ? 'Mathe' : 'Deutsch') : 'Mathe oder Deutsch?', sj ? WZ_ILL[sj] : Q],
+    ['subj', sj ? subjName(sj) : (vs => vs.length > 1 ? vs.slice(0, -1).join(', ') + ' oder ' + vs.at(-1) + '?' : 'Fach?')(visSubjects().map(subjName)), sj ? SUBJECTS[sj]?.ill() : Q],
     ['area', 'Los geht\'s', WZ_FLAG]];
   const si = steps.findIndex(x => x[0] === step);
   const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l, pic], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : 'next'}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben oder Unterricht wählen"' : `data-wz-step="${k}" title="Zurück zu diesem Schritt"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk">${pic}</span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
@@ -6231,20 +6297,19 @@ function renderHome(){
     body = `<h2>Wer übt heute?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}" class="${q.sym && ICON[q.sym] ? 'has-sym' : ''}">${q.sym && ICON[q.sym] ? `<i class="kid-sym">${iconSvg(q.sym, 64)}</i>` : `<b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>`}${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div>`;
   } else if(step === 'subj'){
     const cards = [];
-    if(p) for(const subj of ['M', 'L', 'W']){
-      if(subj === 'W' && typeof W_LEVELS === 'undefined') continue;
+    if(p) for(const subj of TEST_IDS.filter(t => visSubjects().includes(subjOfTest(t)))){
       let z = zoneReport(p.id, subj).zones[0];
-      if(!z){ const f = frontierKeys(p.id, subj === 'M' ? 'M' : 'D').find(k => subj === 'M' ? /^[MUGH]/.test(k) : k[0] === subj); if(f) z = {key:f, info:cellInfo(f)}; }
-      if(z) cards.push(`<button class="home-card" data-home-offer="${subj}"><span class="hc-subj">${SUBJ_NAME[subj]}</span><span class="hc-title">${escHtml(kidTitle(z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>`);
+      if(!z){ const f = frontierKeys(p.id, subjOfTest(subj)).find(k => TESTS[subj].homeKey ? TESTS[subj].homeKey(k) : keyInTest(k, subj)); if(f) z = {key:f, info:cellInfo(f)}; }
+      if(z) cards.push(`<button class="home-card" data-home-offer="${subj}"><span class="hc-subj">${TESTS[subj].name}</span><span class="hc-title">${escHtml(kidTitle(z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>`);
     }
     body = `<h2>${p ? `${p.sym && ICON[p.sym] ? `<span class="hello-sym">${iconSvg(p.sym, 56)}</span> ` : ''}Hallo ${escHtml(p.name)}!` : 'Willkommen!'}</h2>
       ${cards.length ? `<p class="home-sub">★ Heute für dich:</p><div class="home-cards">${cards.join('')}</div><p class="home-sub">Oder such dir ein Fach aus:</p>` : `<p class="home-sub">${p ? 'Was möchtest du üben? Deine Lehrkraft kann mit dir einen Test machen – dann stehen hier deine Aufgaben.' : 'Was möchtest du üben?'}</p>`}
-      <div class="home-subj"><button data-home-subj="M">${WZ_ILL.M}<span>Mathe</span></button><button data-home-subj="D">${WZ_ILL.D}<span>Deutsch</span></button></div>
+      <div class="home-subj">${visSubjects().map(sj => `<button data-home-subj="${sj}">${SUBJECTS[sj].ill()}<span>${subjName(sj)}</span></button>`).join('')}</div>
       ${p ? `<div class="home-row">${cards.length ? `<button class="home-map" data-home-warm>${icon('next')} Startrunde (3 Aufgaben)</button>` : ''}<button class="home-map" data-home-map>${icon('target')} Meine Lernlandkarte</button></div>` : ''}`;
   } else {
     const groups = homeAreas(W.subj), fy = p ? forYouFor(W.subj) : null;
-    body = `<h2>${W.subj === 'M' ? 'Mathe' : 'Deutsch'}: Was möchtest du üben?</h2>
-      ${fy ? `<button class="home-card wz-fy" data-home-offer="${W.subj === 'M' ? 'M' : fy.sj}"><span class="hc-subj">★ Für dich</span><span class="hc-title">${escHtml(kidTitle(fy.z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>` : ''}
+    body = `<h2>${subjName(W.subj)}: Was möchtest du üben?</h2>
+      ${fy ? `<button class="home-card wz-fy" data-home-offer="${fy.sj}"><span class="hc-subj">★ Für dich</span><span class="hc-title">${escHtml(kidTitle(fy.z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>` : ''}
       ${groups.map(([h, list]) => `${h ? `<p class="home-sub wz-gh">${h}</p>` : ''}<div class="wz-tiles">${list.map(t => `<button class="wz-tile" data-wz-mode="${t.mode}" ${t.lvl ? `data-wz-lvl="${t.lvl}"` : ''} ${t.last ? `data-wz-last="${t.last}"` : ''}><b aria-hidden="true">${t.sym}</b><span>${t.label}</span></button>`).join('')}</div>`).join('')}
       <button class="linkish wz-back" data-wz-step="subj">← anderes Fach</button>`;
   }
@@ -6254,9 +6319,9 @@ function renderHome(){
 /* „Für dich“ passend zum gewählten Fach (Deutsch: erst Lesen, dann Schreiben) */
 function forYouFor(subj){
   const pid = data.current; if(!pid) return null;
-  for(const sj of subj === 'M' ? ['M'] : ['L', 'W']){
+  for(const sj of subjTests(subj)){
     let z = zoneReport(pid, sj).zones[0];
-    if(!z){ const f = frontierKeys(pid, subj === 'M' ? 'M' : 'D').find(k => subj === 'M' ? /^[MUGH]/.test(k) : k[0] === sj); if(f) z = {key:f, info:cellInfo(f)}; }
+    if(!z){ const f = frontierKeys(pid, subj).find(k => TESTS[sj].homeKey ? TESTS[sj].homeKey(k) : keyInTest(k, sj)); if(f) z = {key:f, info:cellInfo(f)}; }
     if(z) return {z, sj};
   }
   return null;
@@ -6746,7 +6811,7 @@ function homeClick(e){
   if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {step:'who'}; saveData(); renderProfiles(); render(); return; }
   const ws = e.target.closest('[data-wz-step]'); if(ws){ app.wz = {...app.wz, step: ws.dataset.wzStep}; renderHome(); return; }
   const wt = e.target.closest('[data-wz-mode]'); if(wt){ wzGo(wt.dataset); return; }
-  const of = e.target.closest('[data-home-offer]'); if(of){ const sj = of.dataset.homeOffer; let z = zoneReport(data.current, sj).zones[0]; if(!z){ const f = frontierKeys(data.current, sj === 'M' ? 'M' : 'D').find(k => sj === 'M' ? /^[MUGH]/.test(k) : k[0] === sj); if(f) z = {key:f, info:cellInfo(f)}; } if(z){ leaveMode(); applyOffer(z.info.offer.set); } return; }
+  const of = e.target.closest('[data-home-offer]'); if(of){ const sj = of.dataset.homeOffer; let z = zoneReport(data.current, sj).zones[0]; if(!z){ const f = frontierKeys(data.current, subjOfTest(sj)).find(k => TESTS[sj]?.homeKey ? TESTS[sj].homeKey(k) : keyInTest(k, sj)); if(f) z = {key:f, info:cellInfo(f)}; } if(z){ leaveMode(); applyOffer(z.info.offer.set); } return; }
   if(e.target.closest('[data-home-map]')){ app.mode = 'map'; render(); return; }
   if(e.target.closest('[data-home-warm]')){ warmStart(); return; }
   const sj = e.target.closest('[data-home-subj]'); if(sj){ app.wz = {...app.wz, step:'area', subj: sj.dataset.homeSubj}; if(settings.subject !== sj.dataset.homeSubj){ settings.subject = sj.dataset.homeSubj; app.railGrp = null; saveSettings(); } render(); }
@@ -7805,10 +7870,12 @@ function buildSheet(limit){
   } app.sheetKid = S0.pid && S0.pid !== 'none' ? kids().find(p => p.id === S0.pid) || null : null;
   try { return buildSheet0(limit); } finally { app.sheetKid = null; }
 }
+/* Arbeitsblatt-Sammlungen weiterer Fächer: SHEET_SETS[Kürzel] = {Schlüssel: Blatt}, SHEET_INFO[Kürzel] = {Schlüssel: Stufeninfo} */
+const SHEET_SETS = {}, SHEET_INFO = {};
 function buildSheet0(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
   if(sj === 'K') return legeSheet(key);
-  const def = sj === 'M' ? M_SHEETS[key] : sj === 'L' ? R_SHEETS[key] : sj === 'U' ? U_SHEETS[key] : sj === 'G' ? G_SHEETS[key] : sj === 'H' ? H_SHEETS[key] : W_SHEETS[key];
+  const def = ({M:M_SHEETS, L:R_SHEETS, U:U_SHEETS, G:G_SHEETS, H:H_SHEETS, W:W_SHEETS, ...SHEET_SETS})[sj]?.[key];
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : key === 'einmaleins' ? `: ${sheetRows().length === 10 ? 'alle Reihen' : sheetRows().length === 1 ? sheetRows()[0] + 'er-Reihe' : sheetRows().slice(0, -1).join('er-, ') + 'er- und ' + sheetRows().at(-1) + 'er-Reihe'}` : ['stellenwert', 'zehnerpartner', 'ueber10'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
   const title = sj === 'H' && key === 'HT' && /^\d$/.test(S.htp) ? `Tausenderbuch: Seite ${hPageName(+S.htp)}` : (key === 'schriftlich' ? (S.wop === 'add' ? 'Schriftlich plus' : S.wop === 'sub' ? 'Schriftlich minus' : def.name) : def.name) + sub;
@@ -7837,7 +7904,7 @@ function buildSheet0(limit){
   const body = abScale(`<div class="ab-grid${S.gross ? ' gross' : ''}" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols, S.gross ? AB_GROSS : 1);
   const legend = `<div class="ab-legend">${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
-  const info = sj === 'L' ? L_INFO[key] : sj === 'W' ? W_INFO[key] : sj === 'U' ? U_INFO[key] : sj === 'G' ? G_INFO[key] : sj === 'H' ? H_INFO[key] : null;
+  const info = ({L:L_INFO, W:W_INFO, U:U_INFO, G:G_INFO, H:H_INFO, ...SHEET_INFO})[sj]?.[key] || null;
   const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
   const sol = S.sol && !def.mat ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
   return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}</style></head><body><div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`};
@@ -7896,7 +7963,7 @@ function buildHeft(){
   return {title: H.title || 'Mein Arbeitsheft', html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${css}</style></head><body>${cover}${pages}</body></html>`};
 }
 /* Heft zur Förderzone: je Förderzone ein (oder zwei) passende Blätter, auf die Seite eingepasst */
-const heftZones = pid => ['M', 'L', 'W'].flatMap(sj => zoneReport(pid, sj).zones).filter(z => { const t = zoneToSheet(z.key); return t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic)); });
+const heftZones = pid => TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones).filter(z => { const t = zoneToSheet(z.key); return t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic)); });
 async function heftFromZones(pid, per = 1){
   const kid = data.profiles.find(p => p.id === pid); if(!kid) return;
   const zones = heftZones(pid); if(!zones.length){ toast(`Für ${kid.name} gibt es noch keine Förderzone. Zuerst einen Test machen.`); return; }
@@ -7941,7 +8008,7 @@ function renderSheets(keep){
   if(app.sheetMode === 'heft') return renderHeft();
   const S = app.sheet, isM = S.topic.startsWith('M:'), key = S.topic.split(':')[1], LD = S.topic.startsWith('K:') ? LEGE[key] : null, lkt = LD ? legeKt(LD, S) : null;
   const kid = kids().find(p => p.id === S.pid);
-  const zones = kid ? ['M', 'L', 'W'].flatMap(sj => zoneReport(kid.id, sj).zones).filter(z => zoneToSheet(z.key)) : [];
+  const zones = kid ? TEST_IDS.flatMap(sj => zoneReport(kid.id, sj).zones).filter(z => zoneToSheet(z.key)) : [];
   const sel = (id, opts, cur) => `<select id="${id}">${opts.map(([v, n]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
   $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Kind ${sel('sh-kid', [['none', 'ohne Namen'], ...kids().map(p => [p.id, escHtml(p.name)])], S.pid)}</label>
@@ -8086,6 +8153,7 @@ const ICH = {
 };
 function ichOf(key){
   const [ax, a, b] = key.split('|');
+  if(AXES[ax]) return AXES[ax].info[a]?.ich || '';
   if(ax !== 'M') return ICH[a] || '';
   const zr = +a;
   return {I: zr === 1000 ? 'Ich kann bis 1000 in Schritten zählen.' : `Ich kann bis ${zr} zählen.`, II:`Ich finde Zahlen bis ${zr} am Zahlenstrahl.`, III: zr <= 20 ? `Ich sehe schnell, wie viele es sind (bis ${zr}).` : `Ich erkenne Zahlen bis ${zr} an ${zr === 1000 ? 'Hundertern, Zehnern und Einern' : 'Zehnern und Einern'}.`, IV:`Ich kann ergänzen: Wie viele fehlen bis ${zr}?`, V:`Ich kann Unterschiede bis ${zr} ausrechnen.`}[b];
@@ -8123,7 +8191,7 @@ function progressHtml(pid, forTeacher = true){
   const pr = progressOf(pid); if(!pr) return '';
   const d0 = new Date(pr.start).toLocaleDateString('de-DE');
   if(!pr.gained.length) return forTeacher ? `<fieldset><legend>Lernfortschritt seit dem ersten Test (${d0})</legend><p class="note">Noch keine neue Stufe dazugekommen. Ein Wiederholungstest ab der Förderzone (nach etwa 5 Übungseinheiten) macht Fortschritte sichtbar.</p></fieldset>` : '';
-  const bySubj = {Mathe: pr.gained.filter(k => /^[MSUGR]\|/.test(k)).length, Lesen: pr.gained.filter(k => k.startsWith('L|')).length, Schreiben: pr.gained.filter(k => k.startsWith('W|')).length};
+  const bySubj = Object.fromEntries(TEST_IDS.map(t => [TESTS[t].name, pr.gained.filter(k => keyInTest(k, t)).length]));
   return `<fieldset><legend>Lernfortschritt seit dem ersten Test (${d0})</legend><p><b>${pr.gained.length} neue ${pr.gained.length === 1 ? 'Stufe' : 'Stufen'}</b> – ${Object.entries(bySubj).filter(([, n]) => n).map(([s, n]) => `${s} +${n}`).join(', ')}</p><ul class="stat-lines">${pr.gained.map(k => `<li>${dShort(pr.sinceOf(k))} · ${escHtml(cellLabel(k))}</li>`).join('')}</ul></fieldset>`;
 }
 function mapHtml(pid, print){
@@ -8142,6 +8210,7 @@ const REPORT_CSS = SHEET_CSS + `@page{size:A4;margin:12mm}@media print{.page{wid
 .lk-since{font-size:7.5pt;color:#1f7a45;font-weight:700}.lk-path{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,1fr);gap:2mm}.lk-st{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1mm;font-size:9.5pt}.lk-dot{width:9mm;height:9mm;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;border:1.5px solid #999;color:#999}.lk-st.ok .lk-dot,.lk-dot.ok{background:#1f7a45;border-color:#1f7a45;color:#fff}.lk-st.now .lk-dot,.lk-dot.now{background:#e8890c;border-color:#e8890c;color:#fff}.lk-tag{font-size:8pt;font-weight:700;color:#9a5a10}.lk-self{font-size:8.5pt;color:#444}.lk-none{font-size:9pt;color:#888}.lk-legend{display:flex;gap:4mm;align-items:center;font-size:10pt}.lk-legend .lk-dot{width:6mm;height:6mm;font-size:8pt}`;
 function mxTable(pid, subj){
   const m = matrixOf(pid), sym = k => { const c = m[k]; return !c ? '–' : c.status === 'erreicht' ? (c.quelle === 'abgeleitet' ? '(✓)' : '✓') : c.status === 'teilweise' ? '½' : '✗'; };
+  if(TESTS[subj]?.mxTable) return TESTS[subj].mxTable(m, sym);
   if(subj === 'M') return `<table class="mx"><tr><th></th>${N_LEVELS.map(l => `<th>${l}<br><small>${N_NAMES[l]}</small></th>`).join('')}</tr>${ZR.map(zr => `<tr><th>ZR ${zr}</th>${N_LEVELS.map(l => `<td>${sym(`M|${zr}|${l}`)}</td>`).join('')}</tr>`).join('')}</table>
     <table class="mx"><tr><th>Stellenwert</th>${S_LEVELS.map(l => `<th>${l}</th>`).join('')}<th>Uhr/Kalender</th>${U_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${S_LEVELS.map(l => `<td>${sym('S|' + l)}</td>`).join('')}<td></td>${U_LEVELS.map(l => `<td>${sym('U|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Rechnen</th>${R_LEVELS.map(l => `<th>${l}<br><small>${R_INFO[l].short}</small></th>`).join('')}<th>Zehnerpartner</th>${Z_LEVELS.map(l => `<th>${l}<br><small>${Z_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${R_LEVELS.map(l => `<td>${sym('R|' + l)}</td>`).join('')}<td></td>${Z_LEVELS.map(l => `<td>${sym('Z|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Größen</th>${G_LEVELS.map(l => `<th>${l}</th>`).join('')}</tr><tr><td></td>${G_LEVELS.map(l => `<td>${sym('G|' + l)}</td>`).join('')}</tr></table><table class="mx"><tr><th>Hundertertafel</th>${H_LEVELS.map(l => `<th>${l}<br><small>${H_INFO[l].short}</small></th>`).join('')}</tr><tr><td></td>${H_LEVELS.map(l => `<td>${sym('H|' + l)}</td>`).join('')}</tr></table>`;
   const lv = subj === 'L' ? L_LEVELS : W_LEVELS, info = subj === 'L' ? L_INFO : W_INFO;
@@ -8157,18 +8226,18 @@ function buildReport(pid, kind){
   } else if(kind === 'parents'){
     const routes = mapRoutes(pid).filter(r => r.any);
     const can = routes.flatMap(r => r.keys.filter((k, i) => r.st[i] === 'ok').slice(-2).map(ichOf));
-    const now = ['M', 'L', 'W'].flatMap(sj => zoneReport(pid, sj).zones.slice(0, sj === 'M' ? 2 : 1));
+    const now = TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones.slice(0, TESTS[sj].homeZones || 1));
     body = `<div class="page rp">${head(`So lernt ${escHtml(name)} gerade`)}
       <p>Liebe Eltern, liebe Erziehungsberechtigte,</p><p>in der Schule lernt ${escHtml(name)} mit dem Programm „Stufenweise“. Stufenweise zeigt, was ${escHtml(name)} schon kann und was als Nächstes kommt. Hier ist ein kurzer Überblick.</p>
       <h2>Das kann ich schon</h2><ul>${can.length ? can.map(t => `<li>${escHtml(t)}</li>`).join('') : '<li>Wir haben gerade erst angefangen.</li>'}</ul>
       ${(() => { const pr = progressOf(pid); return pr?.gained.length ? `<h2>Das habe ich seit dem ${new Date(pr.start).toLocaleDateString('de-DE')} dazugelernt</h2><ul>${pr.gained.map(k => `<li>${escHtml(ichOf(k))}</li>`).join('')}</ul>` : ''; })()}
       <h2>Daran arbeite ich gerade</h2><ul>${now.length ? now.map(z => `<li><b>${escHtml(ichOf(z.key))}</b></li>`).join('') : '<li>Wir üben das Gelernte weiter.</li>'}</ul>
-      <h2>So können Sie zu Hause helfen</h2><ul>${now.length ? now.map(z => `<li>${escHtml(z.info.analog.split(';')[0])}.</li>`).join('') : '<li>Im Alltag zählen, lesen und schreiben: beim Einkaufen, mit dem Busplan, mit der Uhr.</li>'}</ul>
+      <h2>So können Sie zu Hause helfen</h2><ul>${now.length ? now.map(z => `<li>${escHtml(String(z.info.analog || z.info.ziel || '').split(';')[0])}.</li>`).join('') : '<li>Im Alltag zählen, lesen und schreiben: beim Einkaufen, mit dem Busplan, mit der Uhr.</li>'}</ul>
       <p>Kleine Übungen im Alltag helfen sehr: zum Beispiel Preise lesen, Geld zählen, die Uhrzeit sagen oder einen Einkaufszettel schreiben. Loben Sie, was schon gut klappt.</p>
       <p>Bei Fragen sprechen Sie mich gerne an.</p><p style="margin-top:12mm">______________________________<br><small>Unterschrift Lehrkraft</small></p></div>`;
   } else {
-    const subjects = [['M', 'Mathematik'], ['L', 'Lesen'], ['W', 'Schreiben']].filter(([sj]) => Object.keys(matrixOf(pid)).some(k => (sj === 'M' ? /^[MSUGR]\|/ : new RegExp('^' + sj + '\\|')).test(k)));
-    const tests = ['M', 'L', 'W'].map(sj => p?.['lastDiag' + sj] ? `${{M:'Mathe', L:'Lesen', W:'Schreiben'}[sj]}: ${new Date(p['lastDiag' + sj]).toLocaleDateString('de-DE')}` : '').filter(Boolean).join(' · ');
+    const mm = matrixOf(pid), subjects = TEST_IDS.map(t => [t, TESTS[t].long]).filter(([sj]) => testKeys(sj).some(k => mm[k]));
+    const tests = TEST_IDS.map(sj => p?.['lastDiag' + sj] ? `${TESTS[sj].name}: ${new Date(p['lastDiag' + sj]).toLocaleDateString('de-DE')}` : '').filter(Boolean).join(' · ');
     body = `<div class="page rp">${head('Lernstandsbericht')}<p class="note">Letzte Tests: ${tests || '–'}. Kriteriumsorientierte Einstufung nach Kompetenzstufen (keine Normwerte). ✓ erreicht · (✓) abgeleitet · ½ teilweise · ✗ nicht erreicht · – nicht geprüft.</p>
       ${subjects.map(([sj, S]) => { const rep = zoneReport(pid, sj); return `<h2>${S}</h2>${mxTable(pid, sj)}${rep.zones.map(z => `<div class="z"><b>Förderzone: ${escHtml(cellLabel(z.key))}</b><br>${escHtml(z.why)}<br><small>${escHtml(z.info.bp)}</small>${(w => w ? `<br><b>Am Material:</b> ${escHtml(w.hand)} <b>Im Bild:</b> ${escHtml(w.bild)}` : '')(matWay(z.key))}<br><b>Im Alltag:</b> ${escHtml(z.info.analog)}</div>`).join('')}${rep.ileb ? `<h3>Formulierungsvorschlag ILEB</h3><p><b>Lernstand:</b> ${escHtml(rep.ileb.lernstand)}</p><p><b>Nächstes Ziel:</b> ${escHtml(rep.ileb.ziel)}</p><p><b>Maßnahmen:</b> ${escHtml(rep.ileb.massnahmen)}</p>` : ''}`; }).join('') || '<p>Noch keine Tests.</p>'}
       ${(() => { const pr = progressOf(pid); return pr?.gained.length ? `<h2>Lernfortschritt seit dem ersten Test (${new Date(pr.start).toLocaleDateString('de-DE')})</h2><ul>${pr.gained.map(k => `<li>${dShort(pr.sinceOf(k))}: ${escHtml(cellLabel(k))}</li>`).join('')}</ul>` : ''; })()}
@@ -8209,7 +8278,7 @@ function weekReportHtml(pid, head){
     ${good.length ? `<h2>Läuft sicher</h2><p>${escHtml(good.join(', '))}</p>` : ''}
     ${hard.length ? `<h2>Braucht noch Unterstützung</h2><p>${escHtml(hard.join(', '))} (weniger als 60 % beim ersten Versuch richtig)</p>` : ''}
     ${SK.length ? `<h2>Übersprungene Aufgaben</h2><p>${SK.slice(-8).map(e => escHtml(e.task)).join(' · ')}</p>` : ''}
-    ${(() => { const zs = ['M', 'L', 'W'].flatMap(sj => zoneReport(pid, sj).zones.slice(0, 1)).filter(z => matWay(z.key)); return zs.length ? `<h2>Nächster Schritt am Material</h2><ul>${zs.map(z => `<li><b>${escHtml(cellLabel(z.key))}:</b> ${escHtml(matWay(z.key).hand)}</li>`).join('')}</ul>` : ''; })()}
+    ${(() => { const zs = TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones.slice(0, 1)).filter(z => matWay(z.key)); return zs.length ? `<h2>Nächster Schritt am Material</h2><ul>${zs.map(z => `<li><b>${escHtml(cellLabel(z.key))}:</b> ${escHtml(matWay(z.key).hand)}</li>`).join('')}</ul>` : ''; })()}
     <h2>Notizen</h2><div class="wk-notes"></div>
     <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Zahlen zeigen nur, was in der App geübt wurde.</p></div>`;
 }
@@ -8445,7 +8514,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.25.0 · 16.11.2026';
+const APP_VERSION = '0.26.0 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -8464,7 +8533,7 @@ function fbContext(){
     else if(app.mode === 'written') detail = `Schriftlich ${app.written.op} bis ${app.written.range}${app.written.a != null ? ` · ${app.written.a} und ${app.written.b}` : ''}`;
   }catch{}
   const dev = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : 'Computer';
-  return [['Version', APP_VERSION], ['Fach', settings.subject === 'D' ? 'Deutsch' : 'Mathe'], ['Bereich', area], ['Details', detail || '–'], ['Profil', p ? 'Kind (Name wird nicht übermittelt)' : 'Gast'], ['Ansicht', guideOn() ? 'geführt' : 'alles sichtbar'], ['Gerät', `${dev}, ${innerWidth} × ${innerHeight}`], ['Zeit', new Date().toLocaleString('de-DE')]];
+  return [['Version', APP_VERSION], ['Fach', subjName(settings.subject)], ['Bereich', area], ['Details', detail || '–'], ['Profil', p ? 'Kind (Name wird nicht übermittelt)' : 'Gast'], ['Ansicht', guideOn() ? 'geführt' : 'alles sichtbar'], ['Gerät', `${dev}, ${innerWidth} × ${innerHeight}`], ['Zeit', new Date().toLocaleString('de-DE')]];
 }
 function fbText(){
   const f = app.fb, art = FB_ART.find(a => a[0] === f.art), sev = FB_SEV.find(a => a[0] === f.sev);

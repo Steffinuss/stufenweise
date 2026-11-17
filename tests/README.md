@@ -30,6 +30,7 @@ Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. D
 | `zufallsklicks.py` | viele zufällige Klicks, die App darf nicht abstürzen |
 | `arbeitsblaetter.py` | jedes Arbeitsblatt-Thema: passt auf die Seite, genug Aufgaben (`PRÜFEN` = ansehen) |
 | `arbeitsblatt_optionen.py` | Materialbilder „1. Aufgabe vorgegeben, dann selbst zeichnen“, Zehnerpartner, Rechnen über die 10 (Beispiel ausgefüllt), Geld mit Cent, Einmaleins-Reihen |
+| `drittes_fach.py` | Mehr als zwei Fächer: ein Probe-Fach wird angemeldet und erscheint in Fachwahl, Startseite, Üben, Test, Lernstand, Klassenübersicht und Berichten; optional nur für eingeschaltete Kinder |
 | `handy.py` | Handy hochkant: Startseite, Leiste, Aufgaben ohne Überlappung, Zifferntastatur unten; quer Hinweis zum Drehen; iPad unverändert |
 | `test_passt.py` | Jede Testaufgabe passt auf kleinere iPads (1080 × 740 und Hochformat); nur lange Lesetexte scrollen mit Hinweis |
 | `test_nie_haengen.py` | Jede Stufe hat mindestens 3 Aufgaben; Test läuft auch bei vielen falschen Antworten durch |
