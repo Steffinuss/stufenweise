@@ -6181,7 +6181,7 @@ const B_SYM = {
   O2: `<circle cx="10" cy="24" r="7" ${bsS}/><path d="M24 16l8 15H16z" ${bsS}/><rect x="34" y="17" width="12" height="13" ${bsS}/>`,
   O3: `<path d="M24 6v36" ${bsS} stroke-dasharray="3 3"/><path d="M19 16H6M10 11l-5 5 5 5" ${bsS}/><path d="M29 32h13M38 27l5 5-5 5" ${bsS}/>`,
   O4: `<rect x="3" y="10" width="11" height="11" rx="1.5" ${bsS}/><rect x="18.5" y="10" width="11" height="11" rx="1.5" ${bsS}/><rect x="34" y="10" width="11" height="11" rx="1.5" ${bsS}/><path d="M5 33h36M36 28l5 5-5 5" ${bsS}/>`,
-  O5: `<rect x="5" y="8" width="38" height="32" rx="3" ${bsS}/><circle cx="15" cy="18" r="3" fill="currentColor"/><circle cx="33" cy="18" r="3" fill="currentColor"/><path d="M5 26h38v11q0 3-3 3H8q-3 0-3-3z" fill="currentColor" opacity=".35"/><path d="M22 30v.5" ${bsS}/>`
+  O5: `<path d="M5 22q9 9 19 9t19-9" ${bsS}/><path d="M10 27l-3 4M17 30l-1.5 4.5M24 31v5M31 30l1.5 4.5M38 27l3 4" ${bsS}/><path d="M20 9q2-4 5-2t-1 6v2M24 18v.5" ${bsS}/>` /* geschlossenes Auge mit Fragezeichen (Stefan, 17.11.) */
 };
 const bSym = (lvl, size = 40) => `<svg class="b-sym" viewBox="0 0 48 48" width="${size}" height="${size}" aria-hidden="true">${B_SYM[lvl] || ''}</svg>`;
 /* Achsen anmelden (Aufgaben folgen in Schritt 3; mindestens 3 je Stufe) */
@@ -8672,7 +8672,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.26.1 · 17.11.2026';
+const APP_VERSION = '0.26.2 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
