@@ -34,7 +34,7 @@ async def main():
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_timeout(400)
         await pg.evaluate("openSheets()"); await pg.wait_for_timeout(500)
-        topics = await pg.evaluate("[...document.querySelectorAll('#sh-topic option')].map(o=>o.value).filter(t=>!t.startsWith('K:'))")
+        topics = await pg.evaluate("sheetTree().flatMap(f=>f.areas.flatMap(a=>a.items.map(x=>x[0]))).filter(t=>!t.startsWith('K:'))")
         bad = []
         for t in topics:
             bad += await pg.evaluate(JS, t)

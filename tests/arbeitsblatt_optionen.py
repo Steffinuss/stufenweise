@@ -16,7 +16,7 @@ async def main():
         await pg.evaluate("openSheets()"); await pg.wait_for_timeout(400)
 
         # 1. keine Marker übrig, bei allen Themen, mit und ohne Zeichnen
-        topics = await pg.evaluate("[...document.querySelectorAll('#sh-topic option')].map(o=>o.value).filter(t=>!t.startsWith('K:'))")
+        topics = await pg.evaluate("sheetTree().flatMap(f=>f.areas.flatMap(a=>a.items.map(x=>x[0]))).filter(t=>!t.startsWith('K:'))")
         left = await pg.evaluate("""(topics)=>{const out=[];for(const t of topics)for(const d of [false,true])for(const zr of (t.startsWith('M:')?[10,20,100]:[null])){
             Object.assign(app.sheet,{topic:t,draw:d,mat:true,n:8,gcent:'euro',rows:null}); if(zr) app.sheet.zr=zr;
             const h=buildSheet().html; if(/§/.test(h)) out.push(t+' '+d+' '+zr);} return out}""", topics)

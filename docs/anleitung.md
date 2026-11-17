@@ -202,7 +202,7 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 
 1. Oben auf **Arbeitsblätter** (3) tippen.
 2. Das Kind wählen. Unter „Passend zur Förderzone“ stehen seine Stufen, zum Beispiel „Rechnen R3“.
-3. Bei Bedarf Thema, Zahlenraum und Material anpassen. Bei „Aufgaben“ füllt „Blatt füllen“ die Seite mit vollen Reihen; du kannst auch eine feste Zahl wählen. Rechts siehst du die Vorschau.
+3. Das Blatt wählst du in drei Schritten: **Fach** (Basis, Mathe, Deutsch), dann **Bereich** (zum Beispiel bei Mathe: Zahlen, Rechnen, Hundertertafel, Uhr, Größen und Geld, Legeblätter), dann **Blatt** aus einer kurzen Liste. Wechselst du zurück in ein Fach, ist das dort zuletzt gewählte Blatt wieder da. Unter „Zuletzt benutzt“ stehen die Blätter, die du zuletzt gedruckt, gespeichert oder ins Heft übernommen hast. Wählst du ein Kind mit Förderzone, stellt sich das passende Fach ein. Dann bei Bedarf Zahlenraum und Material anpassen. Bei „Aufgaben“ füllt „Blatt füllen“ die Seite mit vollen Reihen; du kannst auch eine feste Zahl wählen. Rechts siehst du die Vorschau.
 4. **Drucken** tippen. „Lösungsblatt anhängen“ legt eine Seite mit den Lösungen dazu.
 
 **Materialbilder:** Bei Plus, Minus, Ergänzen, Einmaleins, Zehnerpartnern und „Rechnen über die 10“ wählst du „bei allen Aufgaben“, „1. Aufgabe vorgegeben, dann selbst zeichnen“ oder „ohne“. Beim Zeichnen zeigt die erste Aufgabe das Bild als Beispiel, bei Zahlen ab 20 in der Kurzschreibweise (| Zehner, • Einer). Die weiteren Aufgaben haben ein leeres Zwanzigerfeld (bei Plus und Minus immer mit 20 Feldern, auch bis 10) oder ein Zeichenfeld.
@@ -249,7 +249,7 @@ Nach „Prüfen“ wird Falsches rot markiert. Jede Stufe hat ein festes Bildsym
 
 **Wer Basis sieht:** Ohne gewähltes Kind (Gast) und in der Lehrkraft-Ansicht immer. Ein Kind sieht „Basis“ erst, wenn du es unter **Einstellungen → Kinder & Daten → Basis** für dieses Kind einschaltest. So werden Kinder, die schon zählen und lesen, nicht damit gelangweilt. Den Basis-Test gibt es noch nicht; er kommt mit der nächsten Version.
 
-**Arbeitsblätter:** Unter „Basis: Vergleichen und Ordnen“ und „Basis: Sehen und Orientieren“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden (V1), Was passt nicht? (V2), Sortieren (V3), Eins zu eins zuordnen (V4), Mehr, weniger, gleich viel (V5), Der Größe nach ordnen (V6), Muster fortsetzen (V7), Formen unterscheiden (O2), Richtung und Spiegelung (O3) und Von links nach rechts (O4). Die Blätter kommen ohne Zahlen und fast ohne Lesen aus: Die Kinder verbinden, kreisen ein, streichen durch und malen weiter.
+**Arbeitsblätter:** Unter Fach „Basis“, Bereiche „Vergleichen“ und „Orientieren“, stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden (V1), Was passt nicht? (V2), Sortieren (V3), Eins zu eins zuordnen (V4), Mehr, weniger, gleich viel (V5), Der Größe nach ordnen (V6), Muster fortsetzen (V7), Formen unterscheiden (O2), Richtung und Spiegelung (O3) und Von links nach rechts (O4). Die Blätter kommen ohne Zahlen und fast ohne Lesen aus: Die Kinder verbinden, kreisen ein, streichen durch und malen weiter.
 
 **Erklären statt lesen:** Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Lies den Auftrag vor und zeige ihn an dieser Aufgabe; die nächste Aufgabe derselben Art machen die Kinder selbst. Auf dem Lösungsblatt steht zu jeder Aufgabe, welches Bild gemeint ist (zum Beispiel „2. Bild (Gabel)“).
 
@@ -257,7 +257,7 @@ Nach „Prüfen“ wird Falsches rot markiert. Jede Stufe hat ein festes Bildsym
 
 ### Legeblätter für echtes Material
 
-Im Thema ganz unten stehen die **Legeblätter für echtes Material**. Auf diese Blätter legen die Kinder Wendeplättchen, Einerwürfel, Zehnerstangen oder Buchstabenkarten, bevor sie rechnen oder schreiben:
+Die **Legeblätter für echtes Material** stehen bei jedem Fach als eigener Bereich „Legeblätter“. Auf diese Blätter legen die Kinder Wendeplättchen, Einerwürfel, Zehnerstangen oder Buchstabenkarten, bevor sie rechnen oder schreiben:
 
 - **Mathe:** Zehnerfeld, Zwanzigerfeld (Querformat), Zahlenstrahl bis 20, Zahlenstrahl bis 100 oder 1000, Hunderterfeld in 1 cm für Einerwürfel, Stellentafel (bis 100 hochkant, bis 1000 quer, breit genug für Hunderterplatten und Zehnerstangen), Preise mit Spielgeld legen, Zifferblatt mit Zeigern zum Ausschneiden, Zifferblatt mit Minutenkranz.
 - **Basis:** Sortierunterlage mit zwei Feldern (Küche und Werkstatt, zwei Farben oder ohne Bild zum Selbstbeschriften), Zuordnungsleiste „eins zu eins“ (unter jedes Bild ein echtes Ding legen) und Musterstreifen für Plättchen (AB, AAB/ABB, ABC oder leer zum Vorlegen).

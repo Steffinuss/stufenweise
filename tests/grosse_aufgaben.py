@@ -23,7 +23,7 @@ async def main():
         if not all(st): errs.append(f'Schalter wirken nicht: {st}')
         await pg.evaluate("app.sheet.tausch=false; app.sheet.ue='egal'")
 
-        topics = await pg.evaluate("[...document.querySelectorAll('#sh-topic option')].map(o=>o.value).filter(t=>!t.startsWith('K:') && !/^H:H[TML]$/.test(t))")
+        topics = await pg.evaluate("sheetTree().flatMap(f=>f.areas.flatMap(a=>a.items.map(x=>x[0]))).filter(t=>!t.startsWith('K:') && !/^H:H[TML]$/.test(t))")
         pp = await b.new_page(viewport={'width': 900, 'height': 1200}); over = []; small = []
         for t in topics:
             for zr in ([20, 100, 1000] if t.startswith('M:') else [None]):

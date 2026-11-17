@@ -680,6 +680,13 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 #sheet-body{display:grid;grid-template-columns:320px 1fr;gap:14px;flex:1;min-height:0}
 .sh-mode{display:flex}.hf-zone{display:flex;flex-direction:column;gap:6px;background:#fff;border:1.5px solid var(--line);border-left:5px solid #27834b;border-radius:12px;padding:10px 12px}.sh-mode button{flex:1}
 .hf-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:14px}.hf-list li{display:flex;align-items:center;gap:4px}.hf-list li span{flex:1;min-width:0}.hf-list .icon-btn{min-height:34px;min-width:34px;padding:2px 6px}
+.sh-nav{display:flex;flex-direction:column;gap:6px}.sh-lab{font-size:12px;font-weight:700;color:var(--muted);margin-top:4px}
+.sh-fach{display:grid;grid-template-columns:repeat(3,1fr)}.sh-fach button{min-height:40px;font-weight:700}
+.sh-areas,.sh-recent{display:flex;flex-wrap:wrap;gap:6px}.sh-areas .chip-toggle,.sh-recent .chip-toggle{min-height:36px;padding:4px 12px;font-size:15px}.sh-areas .lg{border:1.5px dashed #b9ac94}
+.sh-list{display:flex;flex-direction:column;border-radius:12px;background:#fff;box-shadow:var(--shadow);overflow:hidden}
+.sh-list button{box-shadow:none;border-radius:0;text-align:left;min-height:34px;padding:4px 12px;font-size:14.5px;border-bottom:1px solid var(--line)}.sh-list button:last-child{border-bottom:0}
+.sh-list button[aria-pressed=true]{background:#e3edf9;color:#1d4f91;font-weight:700}
+.sh-recent .chip-toggle{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
 .sheet-form{display:flex;flex-direction:column;gap:10px;overflow:auto}.sh-rows{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}.sh-rows>span{margin-right:4px}.sh-rows .cb{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}.sheet-form .row{min-width:0}.sheet-form select{min-width:0;max-width:100%;flex:1 1 auto}#sh-topic{width:100%}
 .sh-zones{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 #sh-frame{width:100%;height:100%;border:1px solid var(--line);border-radius:12px;background:#eee}
@@ -8054,7 +8061,7 @@ const M_SHEETS = {
       return T_(selbst && app.sheet.mat ? ['streiche', 'rechne'] : 'rechne', `§EK:${op === '+' ? 'p' : 'm'}§` + abEx(`<b>Beispiel:</b> ${selbst && app.sheet.mat ? `Streiche ${b} weg. ` : ''}Rechne über die 10.`, `${selbst && app.sheet.mat ? `Streiche ${b} weg. ` : ''}Rechne über die 10.`), `${fld}${abAst(a, b, op)}`, op === '+' ? `${a} + ${10 - a} + ${b - 10 + a} = ${a + b}` : `${a} − ${a - 10} − ${b - a + 10} = ${a - b}`, op === '+' ? a + b : 30 - a + b); }]},
   unterschied: {name:'Unterschiede bestimmen', cols:2, gens:[
     zr => { const T = zrMax(zr), a = rnd(Math.ceil(T*.1), Math.floor(T*.5)), b = a + rnd(Math.max(1, Math.floor(T*.1)), Math.floor(T*.4)); const nm = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']), nm2 = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_('rechne', `${nm} hat ${a} €. ${nm2} hat ${b} €. Wie viel mehr hat ${nm2}?`, `${app.sheet.mat && zr <= 20 ? `<div class="ab-bars"><span>${nm}</span>${abField(a, 0, '+', 20)}<span>${nm2}</span>${abField(b, 0, '+', 20)}</div>` : ''}${ans(18, '€')}`, b - a); },
-    zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${ans()}`, b - a); }]},
+    zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return {...T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${ans()}`, b - a), k:`${a}|${b}`}; }]}, /* k: gleiche Lösung ist erlaubt, gleiche Aufgabe nicht */
   plus: {name:'Plus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('+', zr, app.sheet.ue), D = app.sheet.mat && app.sheet.draw;
     if(D && zr <= 20) return T_(['male', 'rechne'], abEx('Rechne.', 'Male ins Feld und rechne.'), `${abEx(abField(a, b, '+', 20), abEmptyField(20))}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b);
     if(D) return T_(['skizze', 'rechne'], 'Zeichne beide Zahlen. Rechne.', `${abEx(`<div class="ab-matrow">${abSketch(a)}<b>+</b>${abSketch(b)}</div>${abKey(zr)}`, '<div class="ab-draw"></div>')}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b);
@@ -8453,6 +8460,31 @@ function sheetTopics(){
     ['Legeblätter für echtes Material: Basis', Object.entries(LEGE).filter(([, v]) => v.grp === 'B').map(([k, v]) => [`K:${k}`, v.name])]
   ];
 }
+/* Auswahl in drei Schritten (0.28.4, Stefan): Fach → Bereich → Blatt. Gebaut aus sheetTopics(), damit kein Blatt fehlt;
+   Legeblätter stehen beim jeweiligen Fach. */
+function sheetTree(){
+  const T = Object.fromEntries(sheetTopics().flatMap(([, o]) => o)), ks = Object.keys(T), of = pre => ks.filter(t => t.startsWith(pre)), lg = g => ks.filter(t => t.startsWith('K:') && LEGE[t.slice(2)]?.grp === g), M = a => a.map(k => 'M:' + k);
+  return [
+    {id:'B', name:'Basis', areas:[['Vergleichen', of('B:V')], ['Orientieren', of('B:O')], ['Legeblätter', lg('B')]]},
+    {id:'M', name:'Mathe', areas:[['Zahlen', M(['zaehlen', 'zahlenstrahl', 'zerlegen', 'stellenwert', 'zeichnen'])], ['Rechnen', M(['ergaenzen', 'zehnerpartner', 'ueber10', 'unterschied', 'plus', 'minus', 'einmaleins', 'schriftlich'])],
+      ['Hundertertafel', of('H:')], ['Uhr', of('U:')], ['Größen und Geld', ['M:geld', ...of('G:')]], ['Legeblätter', lg('M')]]},
+    {id:'D', name:'Deutsch', areas:[['Lesen', of('L:')], ['Schreiben', of('W:')], ['Legeblätter', lg('D')]]}
+  ].map(f => ({...f, areas: f.areas.map(([name, items]) => ({name, items: items.filter(t => T[t]).map(t => [t, T[t]])})).filter(a => a.items.length)}));
+}
+const sheetPlace = topic => { for(const f of sheetTree()) for(const [ai, a] of f.areas.entries()) if(a.items.some(([t]) => t === topic)) return {fach: f.id, ai, f, a}; return null; };
+function sheetNavHtml(){
+  const S = app.sheet, tree = sheetTree(), pl = sheetPlace(S.topic) || {fach:'M', ai:0, f: tree[1], a: tree[1].areas[0]}, last = app.sheetLast ||= {};
+  last[pl.fach] = last[`${pl.fach}|${pl.ai}`] = S.topic;
+  const names = Object.fromEntries(tree.flatMap(f => f.areas.flatMap(a => a.items.map(([t, n]) => [t, `${f.name} · ${n}`]))));
+  const recent = (S.recent || []).filter(t => names[t] && t !== S.topic).slice(0, 4);
+  return `<div class="sh-nav">
+    <span class="sh-lab">Fach</span><div class="seg sh-fach" role="group" aria-label="Fach">${tree.map(f => `<button data-shfach="${f.id}" aria-pressed="${f.id === pl.fach}">${f.name}</button>`).join('')}</div>
+    <span class="sh-lab">Bereich</span><div class="sh-areas" role="group" aria-label="Bereich">${pl.f.areas.map((a, i) => `<button class="chip-toggle${a.name === 'Legeblätter' ? ' lg' : ''}" data-sharea="${i}" aria-pressed="${i === pl.ai}">${escHtml(a.name)}</button>`).join('')}</div>
+    <span class="sh-lab">Blatt</span><div class="sh-list" role="group" aria-label="Blatt">${pl.a.items.map(([t, n]) => `<button data-shtopic="${t}" aria-pressed="${t === S.topic}">${escHtml(n)}</button>`).join('')}</div>
+    ${recent.length ? `<span class="sh-lab">Zuletzt benutzt</span><div class="sh-recent">${recent.map(t => `<button class="chip-toggle" data-shtopic="${t}" title="${escHtml(names[t])}">${escHtml(names[t])}</button>`).join('')}</div>` : ''}
+  </div>`;
+}
+const sheetUsed = () => { const S = app.sheet; S.recent = [S.topic, ...(S.recent || []).filter(t => t !== S.topic)].slice(0, 6); sheetSave(); };
 /* Zusätzliche Blätter zur Förderzone (Rechnen): Zehnerpartner und Rechnen über die 10 */
 const ZONE_EXTRA = {'R|R1':[['M:zehnerpartner', 'Zehnerpartner']], 'R|R2':[['M:zehnerpartner', 'Zehnerpartner']], 'R|R3':[['M:zehnerpartner', 'Zehnerpartner'], ['M:ueber10', 'Rechnen über die 10']]};
 function zoneToSheet(key){
@@ -8470,8 +8502,8 @@ function zoneToSheet(key){
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
-app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false};
-const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw'];
+app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[]};
+const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'recent'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
 function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch {} }
@@ -8647,9 +8679,9 @@ function buildSheet0(limit){
     } else {
       const want = fill ? (def.max || 30) : Math.min(S.n, def.max || S.n), seen = new Set();
       for(let i = 0; i < want; i++){
-        let g, t = 0; do { g = def.gens[i % def.gens.length](sj === 'M' ? S.zr : null); t++; } while(seen.has(String(g.a)) && t < 12);
-        if(fill && seen.has(String(g.a)) && i >= def.gens.length*2) break; /* Blatt füllen: keine Wiederholungen, wenn der Vorrat erschöpft ist */
-        seen.add(String(g.a)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
+        let g, t = 0; do { g = def.gens[i % def.gens.length](sj === 'M' ? S.zr : null); t++; } while(seen.has(String(g.k ?? g.a)) && t < 12);
+        if(fill && seen.has(String(g.k ?? g.a)) && i >= def.gens.length*2) break; /* Blatt füllen: keine Wiederholungen, wenn der Vorrat erschöpft ist */
+        seen.add(String(g.k ?? g.a)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
         G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${g.ops.map(abOp).join('')}</span><span>${g.text}</span></div><div class="ab-body">${g.body}</div></div>`);
       }
     }
@@ -8706,7 +8738,7 @@ function saveHeft(){ try{ localStorage.setItem(HEFT_KEY, JSON.stringify(app.heft
 const LOGO_SVG = '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="26" width="10" height="9.5" rx="1.6" fill="#27834b"/><rect x="15" y="26" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="15" y="15.5" width="10" height="9.5" rx="1.6" fill="#346bc3"/><rect x="26" y="26" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="15.5" width="10" height="9.5" rx="1.6" fill="#c9414a"/><rect x="26" y="5" width="10" height="9.5" rx="1.6" fill="#c9414a"/><path d="M2.5 37.8h35" stroke="#2b2930" stroke-width="2.2" stroke-linecap="round"/></svg>';
 /* aktuelles Blatt als Heftseite übernehmen: genau diese Aufgaben, ohne Name/Datum, ohne Lösungen */
 function heftAdd(){
-  const doc = app.sheetDoc; if(!doc) return;
+  const doc = app.sheetDoc; if(!doc) return; sheetUsed();
   const d = new DOMParser().parseFromString(doc.html, 'text/html'), pgs = [...d.querySelectorAll('.page:not(.sol)')]; if(!pgs.length) return;
   for(const pg of pgs){ pg.querySelector('.ab-meta')?.remove(); app.heft.items.push({title: pgs.length > 1 ? (pg.querySelector('h1')?.textContent || doc.title) : doc.title, html: pg.innerHTML, cls: pg.className.replace(/^page\s*/, '')}); }
   saveHeft(); toast(`Ins Arbeitsheft übernommen – jetzt ${app.heft.items.length} ${app.heft.items.length === 1 ? 'Seite' : 'Seiten'}.`);
@@ -8771,7 +8803,7 @@ function renderSheets(keep){
   $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Kind ${sel('sh-kid', [['none', 'ohne Namen'], ...kids().map(p => [p.id, escHtml(p.name)])], S.pid)}</label>
     ${zones.length ? `<div class="sh-zones"><span class="note">Passend zur Förderzone:</span>${zones.map(z => `<button class="chip-toggle" data-shzone="${z.key}" aria-pressed="${(() => { const t = zoneToSheet(z.key); return t.topic === S.topic && (!t.zr || t.zr === S.zr) && (!t.ue || t.ue === S.ue); })()}">${escHtml(cellLabel(z.key).replace(/ \(.*\)$/, ''))}</button>` + (ZONE_EXTRA[z.key] || []).filter(([t]) => !zones.some(y => zoneToSheet(y.key)?.topic === t) && !zones.some(y => y.key !== z.key && (ZONE_EXTRA[y.key] || []).some(([u]) => u === t) && zones.indexOf(y) < zones.indexOf(z))).map(([t, n]) => `<button class="chip-toggle" data-shtopic="${t}" aria-pressed="${S.topic === t}">${n}</button>`).join('')).join('')}</div>` : ''}
-    <label class="row">Thema <select id="sh-topic">${sheetTopics().map(([g, opts]) => `<optgroup label="${g}">${opts.map(([v, n]) => `<option value="${v}" ${v === S.topic ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</optgroup>`).join('')}</select></label>
+    ${sheetNavHtml()}
     ${isM && key === 'schriftlich' ? `<label class="row">Zahlenraum ${sel('sh-wzr', [[100, 'bis 100 (zweistellig)'], [1000, 'bis 1000 (dreistellig)'], [10000, 'bis 10 000 (vierstellig)']], S.wzr)}</label><label class="row">Rechenart ${sel('sh-wop', [['add', 'nur Plus'], ['sub', 'nur Minus'], ['both', 'gemischt']], S.wop)}</label>` : isM && key === 'ueber10' ? `<label class="row">Rechenart ${sel('sh-wop', [['add', 'nur Plus'], ['sub', 'nur Minus'], ['both', 'gemischt']], S.wop)}</label>` : isM && !['einmaleins', 'zehnerpartner'].includes(key) ? `<label class="row">Zahlenraum ${sel('sh-zr', [10, 20, 100, 1000].map(z => [z, 'bis ' + z]), S.zr)}</label>` : ''}
     ${isM && key === 'geld' ? `<label class="row">Geld ${sel('sh-gcent', [['euro', 'nur Euro'], ['cent10', 'Euro und Cent (10, 20, 50 Cent)'], ['exact', 'auf den Cent (auch 1, 2, 5 Cent)']], S.gcent || 'euro')}</label>` : ''}
     ${isM && key === 'einmaleins' ? `<div class="row sh-rows" role="group" aria-label="Reihen"><span>Reihen</span>${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<label class="cb"><input type="checkbox" data-shrow="${n}" ${sheetRows().includes(n) ? 'checked' : ''}>${n}</label>`).join('')}</div>` : ''}
@@ -8815,15 +8847,19 @@ function sheetEvents(e){
   if(e.target.closest('#hf-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
   if(e.target.closest('#hf-save')){ const doc = app.heftDoc || buildHeft(); return saveFile(`Arbeitsheft ${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
   const zt = e.target.closest('[data-shtopic]'); if(zt){ S.topic = zt.dataset.shtopic; sheetSave(); return renderSheets(); }
+  const sf = e.target.closest('[data-shfach]'); if(sf){ const id = sf.dataset.shfach; if(sheetPlace(S.topic)?.fach !== id){ const f = sheetTree().find(x => x.id === id); S.topic = app.sheetLast?.[id] || f.areas[0].items[0][0]; sheetSave(); } return renderSheets(); }
+  const sa = e.target.closest('[data-sharea]'); if(sa){ const pl = sheetPlace(S.topic), ai = +sa.dataset.sharea; if(pl && pl.ai !== ai){ S.topic = app.sheetLast?.[`${pl.fach}|${ai}`] || pl.f.areas[ai].items[0][0]; sheetSave(); } return renderSheets(); }
   const z = e.target.closest('[data-shzone]'); if(z){ const t = zoneToSheet(z.dataset.shzone); S.topic = t.topic; if(t.zr) S.zr = t.zr; S.ue = t.ue || 'egal'; sheetSave(); return renderSheets(); }
   if(e.target.closest('#sh-new')) return renderSheets();
+  if(e.target.closest('#sh-print') || e.target.closest('#sh-save')) sheetUsed();
   if(e.target.closest('#sh-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
   if(e.target.closest('#sh-save')){ const doc = app.sheetDoc; saveFile(`Arbeitsblatt ${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
 }
 function sheetChange(e){
   const S = app.sheet, t = e.target;
   if(t.id && t.id.startsWith('hf-')){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid') H.pid = t.value; if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; saveHeft(); return renderHeft(); }
-  if(t.id === 'sh-kid') S.pid = t.value;
+  if(t.id === 'sh-kid'){ S.pid = t.value; const zs = TEST_IDS.flatMap(sj => S.pid !== 'none' ? zoneReport(S.pid, sj).zones : []).map(z => zoneToSheet(z.key)).filter(z => z && sheetPlace(z.topic)); /* Fach mit Förderzone voreinstellen */
+    if(zs.length && !zs.some(z => sheetPlace(z.topic).fach === sheetPlace(S.topic)?.fach)){ S.topic = zs[0].topic; if(zs[0].zr) S.zr = zs[0].zr; } }
   if(t.id === 'sh-topic') S.topic = t.value;
   if(t.id === 'sh-zr') S.zr = +t.value;
   if(t.id === 'sh-wzr') S.wzr = +t.value;
@@ -9277,7 +9313,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.28.3 · 17.11.2026';
+const APP_VERSION = '0.28.4 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -9477,7 +9513,7 @@ $('#help-content').innerHTML = [
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
   ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung, während des Tests oben die Abschnitte und einen Balken, der nur vorwärts läuft (ohne richtig/falsch), und am Ende keine Ergebnisse. Während des Tests sind Leiste und Menü gesperrt; Beenden mit zweimal „Abbrechen“. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
   ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, der Weg am Material (Handeln, Bild, Zahl) mit Legeblatt, Ideen für den Alltag, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
-  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Wählbar sind unter anderem „Große Aufgaben“ und bei Mathe „Materialbilder: 1. Aufgabe vorgegeben, dann selbst zeichnen“; die Einstellungen bleiben auf diesem Gerät gespeichert. Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Basis“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden, Sortieren, eins zu eins zuordnen, mehr und weniger, Größen, Muster, Formen, Richtungen; die erste Aufgabe jeder Art ist vorgemacht, auf Wunsch mit Mustern statt Farben für den Schwarz-Weiß-Drucker. Unter „Legeblätter für echtes Material“ gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Sortierunterlage, Zuordnungsleiste, Musterstreifen, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
+  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Wählbar sind unter anderem „Große Aufgaben“ und bei Mathe „Materialbilder: 1. Aufgabe vorgegeben, dann selbst zeichnen“; die Einstellungen bleiben auf diesem Gerät gespeichert. Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Basis“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden, Sortieren, eins zu eins zuordnen, mehr und weniger, Größen, Muster, Formen, Richtungen; die erste Aufgabe jeder Art ist vorgemacht, auf Wunsch mit Mustern statt Farben für den Schwarz-Weiß-Drucker. Gewählt wird in drei Schritten: Fach, Bereich, Blatt; „Zuletzt benutzt“ hilft beim Wiederfinden. Beim Bereich „Legeblätter“ jedes Fachs gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Sortierunterlage, Zuordnungsleiste, Musterstreifen, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],
   ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Bis 100 und 1000 gibt es die Ansicht „Tafel“ bzw. „Tausenderbuch“: Das Kind springt mit +10 und +1 (bis 1000 auch +100, mit Seitenleiste zum Blättern), der Weg bleibt sichtbar. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln (wahlweise mit Hundertern oder Tausendern) oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schüler*innen selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch. Gemeinsam ausprobieren: dieselbe Menge auch mit echtem Material legen – beim Umtauschen bleibt die Menge gleich.'],
