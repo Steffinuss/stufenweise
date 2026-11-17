@@ -476,7 +476,7 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 #modes b small{font-size:12px;font-weight:800;letter-spacing:.02em}
 .rail-h{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;padding:6px 0 0}
 .rd-title{font-weight:700;font-size:18px;padding:0 6px}
-@media(max-width:760px){ .subj{grid-template-columns:1fr 1fr;flex:none;margin:0 4px 0 0;align-self:center}.subj button{min-width:76px} .rail-h{align-self:center;padding:0 4px} }
+@media(max-width:760px){ .subj{grid-template-columns:none;grid-auto-flow:column;flex:none;margin:0 4px 0 0;align-self:center}.subj button{min-width:76px} .rail-h{align-self:center;padding:0 4px} }
 
 .cl-table{border-collapse:collapse;width:100%;font-size:14px}
 .cl-table th,.cl-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
@@ -863,11 +863,40 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .home.wz .home-legal{margin-top:6px}
 
 /* ---------- Handy hochkant (bis 560 px breit): brauchbare Demo-Ansicht (Stefan, 16.11.2026) ---------- */
+/* Basis: Aufgaben mit Bildern (pick, sort, match, order, glance) */
+.bz{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;padding:14px 0}
+.bz-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px}.bz-row.base{align-items:flex-end}.bz-row.tight{gap:8px}.bz-row.line{gap:18px;padding-bottom:28px}
+.bz-c{background:#fff;border:3px solid transparent;border-radius:18px;padding:10px;min-height:0;line-height:0;position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:6px}
+.bz-c svg{display:block}.bz-c[aria-pressed=true],.bz-c.sel{border-color:var(--dark);background:#fff;box-shadow:0 0 0 3px #2b293022}
+.bz-c[aria-pressed=true]:hover{background:#faf6ee}
+.bz-c.fb-no{border-color:var(--bad);background:#fbe3e3}.bz-c.fb-ok,.bz-small.fb-ok{border-color:var(--ok);background:#d6ebdd}
+.bz-target{background:#fff;border:3px solid var(--dark);border-radius:18px;padding:8px 14px;line-height:0;box-shadow:var(--shadow)}
+.bz-row.sets .bz-c{padding:12px}.bz-set svg{width:230px;height:170px;display:block;background:#f7f2e8;border-radius:12px}
+.bz-eq{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:150px;height:170px;font-size:20px;font-weight:700;line-height:1.1}.bz-eq b{font-size:54px}
+.bz-pat{display:flex;gap:8px;align-items:center;background:#fff;border-radius:16px;padding:10px 14px;box-shadow:var(--shadow)}.bz-q{font-size:44px;font-weight:800;width:56px;text-align:center;line-height:1}
+.bz-pool{min-height:96px}.bz-done{font-size:18px;color:var(--muted)}
+.bz-boxes{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:min(760px,100%)}
+.bz-box{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:190px;border:3px dashed #9a948a;border-radius:20px;background:#fbf8f2;padding:10px}
+.bz-bl{display:flex;align-items:center;gap:10px;font-size:20px;line-height:1}.bz-bl svg{width:56px;height:56px}.bz-sw{width:60px!important;height:40px!important}
+.bz-in{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}.bz-small{display:inline-flex;border:3px solid transparent;border-radius:12px;background:#fff;padding:3px;line-height:0;box-shadow:var(--shadow)}.bz-small svg{width:52px;height:52px}.bz-small.fb-no{border-color:var(--bad);background:#fbe3e3}
+.bz-match{width:min(820px,100%);display:flex;flex-direction:column}
+.bz-mrow{display:grid;grid-template-columns:repeat(var(--n),1fr);justify-items:center}
+.bz-m{padding:8px}.bz-mrow:first-child .bz-m{flex-direction:column}.bz-mrow:last-child .bz-m{flex-direction:column-reverse}
+.bz-dot{width:16px;height:16px;border-radius:50%;background:var(--dark);display:block}.bz-m.linked .bz-dot{background:var(--z)}
+.bz-lines{width:100%;height:110px;display:block}.bz-lines line{stroke:var(--z);stroke-width:5;stroke-linecap:round;vector-effect:non-scaling-stroke}.bz-lines line.no{stroke:var(--bad)}.bz-lines line.ok{stroke:var(--ok)}
+.bz-yn{display:flex;align-items:center;gap:14px;font-size:24px;font-weight:700}.bz-yn button{font-size:24px;min-width:120px;min-height:60px;border:3px solid transparent}.bz-yn button[aria-pressed=true]{border-color:var(--dark)}.bz-yn button.fb-ok{border-color:var(--ok);background:#d6ebdd}.bz-yn button.fb-no{border-color:var(--bad);background:#fbe3e3}
+.bz-num{position:absolute;top:-12px;right:-12px;width:34px;height:34px;border-radius:50%;background:var(--dark);color:#fff;font-size:20px;font-weight:800;line-height:34px;text-align:center}
+.bz-c.start::after{content:'';position:absolute;left:50%;bottom:-24px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#2e8b57}
+.bz-glance{min-height:170px;display:flex;align-items:center;justify-content:center;line-height:0}.bz-glance.hid{width:170px;height:170px;border-radius:18px;background:var(--soft);font-size:70px;font-weight:800;color:var(--muted);line-height:1}
+.bz-few{display:flex;gap:10px}.bz-note{margin:0;font-size:18px;color:var(--muted)}.bz-again{display:inline-flex;align-items:center;gap:8px}.bz-again svg{width:24px;height:24px}
+.bz-ok .bz-target{border-color:var(--ok)}
+.bz-psym{display:inline-flex;vertical-align:middle;margin-right:8px;color:var(--ink)}.bz-rs{display:inline-flex;color:var(--ink)}.bz-rs svg{display:block}
 @media (max-width:560px){
   .rail{margin-right:170px;padding:6px 6px 0}
   .top-tools .profile-chip{max-width:112px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
   #modes button{min-width:64px;min-height:46px;font-size:12px}
-  .subj button{min-width:62px}
+  .subj{grid-template-columns:auto auto;grid-auto-flow:row}.subj button{min-width:0;min-height:30px;padding:3px 4px;font-size:11.5px}.rail .brand{width:64px;min-width:0}
+  .bz-boxes{gap:8px}.bz-box{min-width:0;padding:6px;min-height:150px}.bz-bl{flex-direction:column;gap:2px;font-size:15px}.bz-bl svg{width:40px;height:40px}.bz-small svg{width:40px;height:40px}
   /* Seite darf scrollen: Aufgabenfläche mindestens 380 px hoch, statt Inhalte übereinanderzulegen */
   .shell{height:auto;min-height:100vh;min-height:100dvh}
   main{height:auto}
@@ -1034,6 +1063,10 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
     <p class="note">Nach dem Test sieht jedes Kind nur die Bereiche und Stufen, die für es dran sind. Werkzeuge (Zahlen zeigen, Frei legen) bleiben immer sichtbar. Mit der PIN zeigt „Alles zeigen“ in der Leiste vorübergehend alle Bereiche.</p>
     <label class="row">Standard für alle Kinder <select data-key="guide"><option value="zone">Nur die Förderzone</option><option value="plus">Förderzone und Geschafftes</option><option value="all">Alles sichtbar (Förderzone markiert)</option></select></label>
     <div id="guide-list"></div>
+  </fieldset>
+  <fieldset><legend>Basis: Grundlagen vor Zählen und Lesen</legend>
+    <p class="note">Das Fach „Basis“ (Gleiches finden, Sortieren, Zuordnen, Mengen, Muster, Formen, Richtungen) sehen Kinder nur, wenn es hier eingeschaltet ist. Kinder, die schon zählen und lesen, brauchen es nicht.</p>
+    <div id="subjon-list"></div>
   </fieldset>
   <fieldset><legend>Lehrkraft-PIN</legend>
     <p class="note" id="pin-state"></p>
@@ -1439,7 +1472,10 @@ const testOfKey = k => testOfAxis(String(k)[0]);
 const subjTests = sj => SUBJECTS[sj]?.tests || [];
 const subjOfTest = t => TESTS[t]?.subj;
 const keyInTest = (k, t) => testOfKey(k) === t;
-const subjOfKey = k => subjOfTest(testOfKey(k)), subjOfLvl = l => subjOfTest(testOfAxis(String(l)[0]));
+const subjOfAxis = ax => subjOfTest(testOfAxis(ax)) || SUBJ_IDS.find(s => SUBJECTS[s].axes?.includes(ax)); /* Fächer ohne Test (noch): über SUBJECTS[…].axes */
+const subjOfKey = k => subjOfAxis(String(k)[0]), subjOfLvl = l => subjOfAxis(String(l)[0]);
+/* Stufen einer Achse, die Übungen haben */
+const axLevels = ax => AXES[ax].levels.filter(l => AXES[ax].items[l]?.length);
 /* Welche Fächer ein Kind sieht: optionale Fächer (z. B. „Basis“) nur, wenn für das Kind eingeschaltet (p.subjOn) oder
    automatisch nötig (auto; Standard: Förderzone in einem Test des Fachs); ohne Kind und in der Lehrkraft-Ansicht alle */
 const visSubjects = () => { const p = curProfile(); return SUBJ_IDS.filter(sj => !SUBJECTS[sj].optional || !p || teacherView() || p.subjOn?.[sj] || (SUBJECTS[sj].auto ? SUBJECTS[sj].auto(p) : subjTests(sj).some(t => zoneReport(p.id, t).zones.length))); };
@@ -1530,6 +1566,11 @@ function guideRailBtn(){
   const p = curProfile(); if(!p) return '';
   if(teacherView()) return `<button data-guide-off class="rail-guide">${icon('eye')}<span>Geführte Ansicht</span></button>`;
   return guideOn() ? `<button data-guide-all class="rail-guide" title="Lehrkraft: alle Bereiche zeigen">${icon('settings')}<span>Alles zeigen</span></button>` : '';
+}
+/* optionale Fächer pro Kind einschalten (p.subjOn) */
+function subjOnHtml(){
+  const opt = SUBJ_IDS.filter(sj => SUBJECTS[sj].optional);
+  return data.profiles.length ? `<table class="guide-tbl">${data.profiles.map(p => `<tr><th>${escHtml(p.name)}</th><td>${opt.map(sj => `<label class="cb"><input type="checkbox" data-subjon="${sj}" data-subjon-pid="${p.id}" ${p.subjOn?.[sj] ? 'checked' : ''}> ${escHtml(SUBJECTS[sj].name)} anzeigen</label>`).join(' ')}</td></tr>`).join('')}</table>` : '<p class="note">Noch keine Kinder angelegt.</p>';
 }
 function guideSettingsHtml(){
   const opt = (v, cur) => Object.entries(GUIDE_NAMES).map(([k, t]) => `<option value="${k}" ${cur === k ? 'selected' : ''}>${t}</option>`).join('');
@@ -3754,7 +3795,7 @@ function screenControl(btn){
 /* =====================================================================
    Lernstand-Übersicht
    ===================================================================== */
-const MODE_NAMES = {diag:'Test', warm:'Startrunde', number:'Zahlen', clock:'Uhr und Kalender', size:'Größen und Einkaufen', read:'Lesen', write:'Schreiben', add:'Plus', sub:'Minus', written:'Schriftlich', times:'Einmaleins', blitz:'Blitzblick', money:'Geld', find:'Zahlenstrahl: Zahl suchen', screen:'Starter-Screening', board:'Hundertertafel', tenpair:'Zehnerpartner'};
+const MODE_NAMES = {basis:'Basis', diag:'Test', warm:'Startrunde', number:'Zahlen', clock:'Uhr und Kalender', size:'Größen und Einkaufen', read:'Lesen', write:'Schreiben', add:'Plus', sub:'Minus', written:'Schriftlich', times:'Einmaleins', blitz:'Blitzblick', money:'Geld', find:'Zahlenstrahl: Zahl suchen', screen:'Starter-Screening', board:'Hundertertafel', tenpair:'Zehnerpartner'};
 const pct = (a, b) => b ? Math.round(a/b*100) + ' %' : '–';
 const frac = list => `${list.filter(e => e.ok).length} von ${list.length}`;
 function statsSections(id){
@@ -3764,7 +3805,7 @@ function statsSections(id){
     const s = prof.screening;
     out.push({title:'Starter-Screening', lines:[`am ${new Date(s.date).toLocaleDateString('de-DE')}: ${s.passed} von ${SCREEN.length} Stufen geschafft${s.passed ? ` (bis „${SCREEN[s.passed - 1].name}“)` : ''}`, `Empfehlung: ${REC[s.passed].text.join('; ')}`]});
   }
-  for(const mode of ['add','sub','written','times','money','blitz','find','clock','size','board','tenpair','read','write']){
+  for(const mode of ['add','sub','written','times','money','blitz','find','clock','size','board','tenpair','read','write', ...new Set(Object.values(AXES).map(a => a.mode))]){
     const E = L.filter(e => e.mode === mode); if(!E.length) continue;
     const lines = [`${E.length} ${E.length === 1 ? 'Aufgabe' : 'Aufgaben'}, beim ersten Versuch richtig: ${pct(E.filter(e => e.ok).length, E.length)}`];
     if(mode === 'add' || mode === 'sub'){
@@ -3809,6 +3850,7 @@ function statsSections(id){
       const [lv, info] = mode === 'clock' ? [U_LEVELS, U_INFO] : mode === 'board' ? [H_LEVELS, H_INFO] : mode === 'tenpair' ? [Z_LEVELS, Z_INFO] : [G_LEVELS, G_INFO];
       for(const l of lv){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${info[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
     }
+    for(const a of Object.values(AXES).filter(a => a.mode === mode)) for(const l of a.levels){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${a.info[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
     if(mode === 'read' && E.some(e => e.lvl === 'LX')) lines.push(`Meine Wörter lesen: ${frac(E.filter(e => e.lvl === 'LX'))} beim ersten Versuch richtig`);
     if(mode === 'find'){
       const ranges = [...new Set(E.map(e => e.range))].sort((a, b) => a - b);
@@ -5712,6 +5754,7 @@ const focusEmpty = () => { [...document.querySelectorAll('#stage .dg-in, #contro
 function evalItem(it, r, vals){
   if(it.type === 'write' || it.type === 'sent') return evalWrite(it, r);
   if(it.type === 'clockset') return evalClockSet(it, r);
+  if(BZ_TYPES.includes(it.type)) return bzEval(it, r);
   const obs = [];
   if(it.type === 'board'){
     if(it.mode === 'tap'){ if(r.sel == null) return null; const ok = r.sel === it.target; if(!ok) obs.push(it.swap === r.sel ? 'unten und rechts vertauscht' : hMiss(r.sel, it.target)); return {ok, given: String(r.sel), obs}; }
@@ -5773,6 +5816,7 @@ function itemStage(it, r, opt = {}){
   if(it.type === 'write') return writeStage(it, r, opt);
   if(it.type === 'sent') return sentStage(it, r);
   if(it.type === 'clockset') return clockSetStage(it, r);
+  if(BZ_TYPES.includes(it.type)) return bzStage(it, r, opt);
   if(it.type === 'board') return `<div class="it-wrap hb-wrap${it.side ? ' side' : ''}">${head}${boardHtml(it.bd, {tap: it.mode !== 'fill', sel: r.sel, set: r.set, want: it.set, vals: r.vals, wrong: r.wrong, fb: opt.feedback})}</div>`;
   switch(it.type){
     case 'scatter': {
@@ -5808,6 +5852,7 @@ function itemStage(it, r, opt = {}){
 function itemClick(e, it, r){
   if(it.type === 'write' || it.type === 'sent') return writeClick(e, it, r);
   if(it.type === 'clockset') return clockSetClick(e, it, r);
+  if(BZ_TYPES.includes(it.type)) return bzClick(e, it, r);
   if(it.type === 'board'){ const c = e.target.closest('[data-hb]'); if(!c) return false; const n = +c.dataset.hb;
     if(it.mode === 'tap'){ r.sel = n; return true; }
     if(it.mode === 'multi'){ r.set ||= []; const i = r.set.indexOf(n); if(i >= 0) r.set.splice(i, 1); else r.set.push(n); return true; }
@@ -5894,6 +5939,7 @@ function renderDiag(){
   $('#controls').innerHTML = c;
   setHint(it.hint || '');
   itFit();
+  glanceArm(it, r, () => app.mode === 'diag' && app.diag === d && d.items[d.idx] === it, renderDiag);
   if(it.type === 'flash' && !r.hidden){
     clearTimeout(d.timer);
     d.timer = setTimeout(() => { if(app.mode === 'diag' && app.diag === d && d.items[d.idx] === it){ r.hidden = true; renderDiag(); } }, it.ms);
@@ -5903,7 +5949,7 @@ function renderDiag(){
 function diagStageClick(e){
   const d = app.diag; if(!d || d.done) return;
   const it = d.items[d.idx], r = d.resp ||= {};
-  if(itemClick(e, it, r)){ const w = $('#stage .it-wrap'), top = w?.scrollTop || 0; $('#stage .dg-item').innerHTML = itemStage(it, r, {inline:true}); if(it.type === 'board' || it.html?.includes('class="hb')) hbFit(); itFit(); const w2 = $('#stage .it-wrap'); if(w2) w2.scrollTop = top; }
+  if(itemClick(e, it, r)){ const w = $('#stage .it-wrap'), top = w?.scrollTop || 0; $('#stage .dg-item').innerHTML = itemStage(it, r, {inline:true}); if(it.type === 'board' || it.html?.includes('class="hb')) hbFit(); itFit(); const w2 = $('#stage .it-wrap'); if(w2) w2.scrollTop = top; glanceArm(it, r, () => app.mode === 'diag' && app.diag === d && d.items[d.idx] === it, renderDiag); }
 }
 function diagControl(btn){
   const d = app.diag;
@@ -6034,7 +6080,8 @@ const matWay = key => { const [ax, a, b] = key.split('|'); return ax === 'M' ? m
    Basis: Grundlagen vor Zählen und Lesen (Konzept 17.11.2026, Schritt 1)
    Achse V „Vergleichen und Ordnen“ (eher Mathe), Achse O „Sehen und Orientieren“ (Mathe und Deutsch).
    Jede Stufe hat zwei Schwierigkeiten: a (leicht), b (schwerer) → erreicht / teilweise / noch nicht.
-   Fach und Test werden erst angemeldet, wenn Übungen und Test fertig sind (BASIS_ON).
+   Das Fach „Basis“ ist seit Schritt 3 (0.28.0) zum Üben angemeldet (optional: Kinder sehen es nur, wenn eingeschaltet).
+   Der Basis-Test kommt in Schritt 4 (BASIS_ON).
    ===================================================================== */
 const BASIS_ON = false;
 const V_LEVELS = ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8'];
@@ -6053,7 +6100,7 @@ const V_INFO = {
   V4:{name:'Eins zu eins zuordnen', short:'Zuordnen', a:'jeder Tasse einen Löffel geben', b:'„Reicht es?“ – ja oder nein',
       kann:'ordnet Dinge eins zu eins zu', ziel:'erkennt beim Zuordnen, ob es reicht oder ob etwas fehlt',
       analog:'Tisch decken: jedem Platz einen Teller, einen Becher, einen Löffel', ich:'Jeder bekommt eins.', bp:BP_FRUEH},
-  V5:{name:'Mehr, weniger, gleich viel', short:'Mehr/weniger', a:'großer Unterschied (2 gegen 7)', b:'kleiner Unterschied; gleich viele, aber anders verteilt',
+  V5:{name:'Mehr, weniger, gleich viel', short:'Mengen', a:'großer Unterschied (2 gegen 7)', b:'kleiner Unterschied; gleich viele, aber anders verteilt',
       kann:'erkennt bei deutlichem Unterschied, wo mehr ist', ziel:'vergleicht Mengen auch bei kleinem Unterschied und weiß: Auseinanderschieben ändert die Anzahl nicht',
       analog:'Zwei Teller mit Keksen vergleichen; Murmeln auseinanderschieben: Sind es jetzt mehr?', ich:'Ich sehe, wo mehr ist.', bp:BP_FRUEH},
   V6:{name:'Der Größe nach ordnen', short:'Größe', a:'3 Dinge vom kleinsten zum größten', b:'4–5 Dinge; das fehlende einordnen',
@@ -6187,6 +6234,251 @@ const bSym = (lvl, size = 40) => `<svg class="b-sym" viewBox="0 0 48 48" width="
 /* Achsen anmelden (Aufgaben folgen in Schritt 3; mindestens 3 je Stufe) */
 AXES.V = {place:'Vergleichen und Ordnen', levels:V_LEVELS, info:V_INFO, items:{}, mode:'basis'};
 AXES.O = {place:'Sehen und Orientieren', levels:O_LEVELS, info:O_INFO, items:{}, mode:'basis'};
+
+/* =====================================================================
+   Basis, Schritt 3: Aufgaben in der App (Üben; später auch im Basis-Test)
+   Neue Aufgabentypen, alle mit Bildern zum Antippen (nie ziehen nötig):
+   pick   – ein Bild (single) oder alle passenden Bilder antippen     {cells:[{h,a}], want:[i], single, top}
+   sort   – Ding antippen, dann Kiste antippen                         {things:[{h,a,box}], boxes:[{h,a}]}
+   match  – oben ein Bild antippen, unten eins → Linie                {up:[{h,a,k}], dn:[{h,a,k}], sol:[[i,j]], ask:{q, ok}}
+   order  – Bilder der Reihe nach antippen (Zahlen erscheinen)        {cells:[{h,a}], want:[i…]}
+   glance – Bild kurz zeigen, dann das passende Bild wählen           {show, ms, cells, want:[i]}
+   Rückmeldung nach „Prüfen“: r.mark = {bad:[…]} (rot), bei richtig grün.
+   ===================================================================== */
+const BZ_TYPES = ['pick', 'sort', 'match', 'order', 'glance'];
+const BZ = 100;
+const bzC = (h, a) => ({h, a});
+const bzO = (k, col = null, s = 1, size = BZ) => bzC(bObj(k, col, size, s), B_OBJ[k].name + (col ? ` (${B_COL_NAME[col]})` : '') + (s < 1 ? ' (klein)' : ''));
+const bzS = (f, col, fill = 'voll', size = BZ) => bzC(bShape(f, col, size, fill), `${B_FORM[f]}${fill === 'leer' ? '' : ' ' + B_COL_NAME[col]}`);
+const bzPick = (base, cells, ok, top = '') => ({...base, type:'pick', single:true, cells, want:[ok], top});
+const bzMulti = (base, cells, want, top = '') => ({...base, type:'pick', single:false, cells, want, top});
+const bzTarget = h => `<div class="bz-target">${h}</div>`;
+const bzSet = (k, n, spread = 1) => `<span class="bz-set">${bbScatter(k, null, n, spread)}</span>`;
+const bzNames = (cells, idx) => idx.map(i => cells[i].a).join(', ');
+const bzMark = (r, i, cls = '') => r.mark?.bad?.includes(i) ? ' fb-no' : r.mark?.ok && cls ? ' fb-ok' : '';
+
+function bzStage(it, r, opt = {}){
+  const okAll = opt.feedback?.ok, wrap = (inner, cls = '') => `<div class="it-wrap bz ${cls}${okAll ? ' bz-ok' : ''}">${it.top || ''}${inner}</div>`;
+  if(it.type === 'pick' || (it.type === 'glance' && r.hidden)){
+    const set = r.set || [], row = `<div class="bz-row ${it.cls || ''}">${it.cells.map((c, i) => { const on = set.includes(i); return `<button class="bz-c${on && okAll ? ' fb-ok' : ''}${bzMark(r, i)}" data-bz="${i}" aria-pressed="${on}" aria-label="${escHtml(c.a)}">${c.h}</button>`; }).join('')}</div>`;
+    if(it.type === 'glance') return wrap(`<div class="bz-glance hid" aria-hidden="true">?</div>${row}<button class="bz-again" data-bzagain="1">${icon('eye')}<span>Nochmal zeigen</span></button>`);
+    return wrap(row);
+  }
+  if(it.type === 'glance') return wrap(`<div class="bz-glance">${it.show}</div><p class="bz-note">Schau genau hin.</p>`);
+  if(it.type === 'sort'){
+    const pl = r.place || [], pool = it.things.map((t, i) => pl[i] == null ? `<button class="bz-c${r.sel === i ? ' sel' : ''}" data-bzt="${i}" aria-pressed="${r.sel === i}" aria-label="${escHtml(t.a)}">${t.h}</button>` : '').join('');
+    const boxes = it.boxes.map((b, j) => `<button class="bz-box" data-bzb="${j}" aria-label="Kiste: ${escHtml(b.a)}"><span class="bz-bl">${b.h}</span><span class="bz-in">${it.things.map((t, i) => pl[i] === j ? `<span class="bz-small${bzMark(r, i)}${okAll ? ' fb-ok' : ''}" data-bzt="${i}" role="button" aria-label="${escHtml(t.a)} zurücknehmen">${t.h}</span>` : '').join('')}</span></button>`).join('');
+    return wrap(`<div class="bz-row bz-pool">${pool || '<span class="bz-done">Alles einsortiert.</span>'}</div><div class="bz-boxes n${it.boxes.length}">${boxes}</div>`);
+  }
+  if(it.type === 'match'){
+    const nt = it.up.length, nb = it.dn.length, links = r.links || [], sel = r.sel;
+    const isL = (s, i) => links.some(l => (s === 't' ? l[0] : l[1]) === i);
+    const cell = (s, c, i) => `<button class="bz-c bz-m${sel && sel.s === s && sel.i === i ? ' sel' : ''}${isL(s, i) ? ' linked' : ''}" data-bzm="${s},${i}" aria-pressed="${!!(sel && sel.s === s && sel.i === i)}" aria-label="${escHtml(c.a)}">${c.h}<span class="bz-dot"></span></button>`;
+    const lines = links.map(([i, j], x) => `<line x1="${(i + .5)*100/nt}" y1="0" x2="${(j + .5)*100/nb}" y2="100" class="${r.mark?.bad?.includes(x) ? 'no' : okAll ? 'ok' : ''}"/>`).join('');
+    const ask = it.ask ? `<div class="bz-yn"><span>${escHtml(it.ask.q)}</span>${[[1, '✓', 'ja'], [0, '✗', 'nein']].map(([v, s, t]) => `<button data-bzyn="${v}" aria-pressed="${r.yes === v}" class="${r.yes === v && opt.feedback ? (okAll ? 'fb-ok' : 'fb-no') : ''}"><b aria-hidden="true">${s}</b> ${t}</button>`).join('')}</div>` : '';
+    return wrap(`<div class="bz-match"><div class="bz-mrow" style="--n:${nt}">${it.up.map((c, i) => cell('t', c, i)).join('')}</div><svg class="bz-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg><div class="bz-mrow" style="--n:${nb}">${it.dn.map((c, i) => cell('b', c, i)).join('')}</div></div>${ask}`);
+  }
+  if(it.type === 'order'){
+    const seq = r.seq || [];
+    return wrap(`<div class="bz-row ${it.cls || ''}">${it.cells.map((c, i) => { const p = seq.indexOf(i); return `<button class="bz-c${p >= 0 ? ' sel' : ''}${bzMark(r, i)}${p >= 0 && okAll ? ' fb-ok' : ''}${it.start === i ? ' start' : ''}" data-bzo="${i}" aria-pressed="${p >= 0}" aria-label="${escHtml(c.a)}${p >= 0 ? `, Nummer ${p + 1}` : ''}">${c.h}${p >= 0 ? `<span class="bz-num">${p + 1}</span>` : ''}</button>`; }).join('')}</div>`);
+  }
+  return wrap('');
+}
+function bzClick(e, it, r){
+  const t = e.target;
+  if(t.closest('[data-bzagain]')){ r.hidden = false; r.again = (r.again || 0) + 1; return true; }
+  const c = t.closest('[data-bz]');
+  if(c){ const i = +c.dataset.bz; r.mark = null; if(it.single || it.type === 'glance') r.set = [i]; else { r.set ||= []; const k = r.set.indexOf(i); k >= 0 ? r.set.splice(k, 1) : r.set.push(i); } return true; }
+  const th = t.closest('[data-bzt]');
+  if(th && it.type === 'sort' && r.sel != null && th.closest('[data-bzb]')) return bzClick({target: th.closest('[data-bzb]')}, it, r); /* Kiste voll getroffen: ausgewähltes Ding hinein */
+  if(th && it.type === 'sort'){ const i = +th.dataset.bzt; r.place ||= []; r.mark = null; if(r.place[i] != null){ r.place[i] = null; r.sel = i; } else r.sel = r.sel === i ? null : i; return true; }
+  const bx = t.closest('[data-bzb]');
+  if(bx && it.type === 'sort'){ if(r.sel == null) return false; r.place ||= []; r.place[r.sel] = +bx.dataset.bzb; r.mark = null; r.sel = null; return true; }
+  const m = t.closest('[data-bzm]');
+  if(m){ const [s, si] = m.dataset.bzm.split(','), i = +si; r.links ||= []; r.mark = null; const sel = r.sel;
+    if(sel && sel.s !== s){ const [ti, bi] = s === 't' ? [i, sel.i] : [sel.i, i]; r.links = r.links.filter(l => l[0] !== ti && l[1] !== bi); r.links.push([ti, bi]); r.sel = null; return true; }
+    if(sel && sel.i === i){ r.sel = null; return true; }
+    const li = r.links.findIndex(l => (s === 't' ? l[0] : l[1]) === i);
+    if(li >= 0 && !sel){ r.links.splice(li, 1); r.sel = {s, i}; return true; }
+    r.sel = {s, i}; return true; }
+  const yn = t.closest('[data-bzyn]'); if(yn){ r.yes = +yn.dataset.bzyn; r.mark = null; return true; }
+  const o = t.closest('[data-bzo]');
+  if(o){ const i = +o.dataset.bzo; r.seq ||= []; r.mark = null; const p = r.seq.indexOf(i); if(p >= 0) r.seq = r.seq.slice(0, p); else r.seq.push(i); return true; }
+  return false;
+}
+function bzEval(it, r){
+  const obs = [];
+  if(it.type === 'pick' || it.type === 'glance'){
+    const st = r.set || []; if(!st.length || (it.type === 'glance' && !r.hidden)) return null;
+    const want = new Set(it.want), miss = it.want.filter(i => !st.includes(i)), extra = st.filter(i => !want.has(i));
+    if(it.single || it.type === 'glance'){ if(extra.length) obs.push(`„${it.cells[st[0]].a}“ gewählt`); }
+    else { if(miss.length) obs.push(`${miss.length} nicht gefunden`); if(extra.length) obs.push(`${extra.length} zu viel angetippt`); }
+    if(r.again) obs.push('Bild nochmal angesehen');
+    return {ok: !miss.length && !extra.length, given: bzNames(it.cells, st), obs, mark:{bad: extra}};
+  }
+  if(it.type === 'sort'){
+    const pl = r.place || []; if(it.things.some((_, i) => pl[i] == null)) return null;
+    const bad = it.things.map((t, i) => pl[i] === t.box ? -1 : i).filter(i => i >= 0);
+    if(bad.length) obs.push(`${bad.length} falsch einsortiert`);
+    return {ok: !bad.length, given: it.boxes.map((b, j) => `${b.a}: ${it.things.filter((_, i) => pl[i] === j).map(t => t.a).join(', ')}`).join('; '), obs, mark:{bad}};
+  }
+  if(it.type === 'match'){
+    const links = r.links || [];
+    if(it.ask){ if(r.yes == null) return null; const ok = r.yes === (it.ask.ok ? 1 : 0); if(!links.length) obs.push('ohne Linien'); return {ok, given: r.yes ? 'ja' : 'nein', obs, mark:{}}; }
+    if(links.length < Math.min(it.up.length, it.dn.length)) return null;
+    const bad = links.map(([i, j], x) => it.up[i].k === it.dn[j].k ? -1 : x).filter(x => x >= 0);
+    if(bad.length) obs.push(`${bad.length} falsch verbunden`);
+    return {ok: !bad.length, given: links.map(([i, j]) => `${it.up[i].a} – ${it.dn[j].a}`).join(', '), obs, mark:{bad}};
+  }
+  if(it.type === 'order'){
+    const seq = r.seq || []; if(seq.length < it.want.length) return null;
+    const bad = seq.map((v, p) => v === it.want[p] ? -1 : v).filter(v => v >= 0);
+    if(bad.length) obs.push('Reihenfolge vertauscht');
+    return {ok: !bad.length, given: bzNames(it.cells, seq), obs, mark:{bad}};
+  }
+  return null;
+}
+/* Lösung zeigen / vormachen */
+function bzSolve(it, r){
+  r.mark = null; r.sel = null;
+  if(it.type === 'pick' || it.type === 'glance'){ r.set = [...it.want]; r.hidden = true; }
+  if(it.type === 'sort') r.place = it.things.map(t => t.box);
+  if(it.type === 'match'){ r.links = it.sol.map(l => [...l]); if(it.ask) r.yes = it.ask.ok ? 1 : 0; }
+  if(it.type === 'order') r.seq = [...it.want];
+}
+/* Kurz zeigen: nach it.ms Millisekunden abdecken (Üben und Test) */
+function glanceArm(it, r, still, redraw){
+  if(it?.type !== 'glance' || r.hidden) return;
+  clearTimeout(app.glanceT);
+  app.glanceT = setTimeout(() => { if(still()){ r.hidden = true; redraw(); } }, it.ms);
+}
+
+/* ---------- Aufgaben je Stufe (mindestens 3 Arten; die erste ist der Kern) ---------- */
+const bzKinds = (f = () => true) => bKinds(f);
+const bzPair = () => pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]);
+const BZ_JEDER = {tasse:'jeder Tasse', teller:'jedem Teller', schraube:'jeder Schraube'};
+const BZ_EIN = {loeffel:'einen Löffel', gabel:'eine Gabel', mutter:'eine Mutter'};
+const BZ_PAT = () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3); return fs.map((f, i) => [f, cs[i]]); };
+const bzPatRow = (u, seq, q = true) => `<div class="bz-pat">${seq.map(s => bShape(u[s][0], u[s][1], 64)).join('')}${q ? '<span class="bz-q">?</span>' : ''}</div>`;
+AXES.V.items = {
+  V1: [
+    () => { const k = pick(bzKinds()), others = shuffle(bzKinds(o => o !== B_OBJ[k])).slice(0, 3), cells = shuffle([k, ...others]);
+      return bzPick({kern:true, prompt:'Tippe das gleiche Bild an.', label:`Gleiches Bild: ${B_OBJ[k].name}`, tip:'Noch nicht. Schau das Bild oben genau an.'}, cells.map(x => bzO(x)), cells.indexOf(k), bzTarget(bObj(k, null, 104))); },
+    () => { const ks = shuffle(bzKinds()).slice(0, 3), bs = shuffle(ks);
+      return {type:'match', prompt:'Verbinde gleiche Bilder. Tippe oben ein Bild an, dann unten das gleiche.', label:`Gleiche verbinden: ${ks.map(k => B_OBJ[k].name).join(', ')}`, tip:'Noch nicht. Die rote Linie stimmt nicht.',
+        up: ks.map(k => ({...bzO(k), k})), dn: bs.map(k => ({...bzO(k), k})), sol: ks.map((k, i) => [i, bs.indexOf(k)])}; },
+    () => { const k = pick(bzKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), oc = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bzKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
+      const opts = shuffle([[k, col], [k, oc[0]], [k, oc[1]], [k2, col]]), ok = opts.findIndex(o => o[0] === k && o[1] === col);
+      return bzPick({prompt:'Tippe das gleiche Bild an. Schau genau!', label:`Gleiches Bild mit Farbe: ${B_OBJ[k].name} ${B_COL_NAME[col]}`, tip:'Noch nicht. Ding und Farbe müssen gleich sein.'}, opts.map(([x, c]) => bzO(x, c)), ok, bzTarget(bObj(k, col, 104))); },
+    () => { const cs = shuffle(B_COLS4).slice(0, 3), ks = shuffle(bzKinds(o => o.grp !== 'werkstatt')).slice(0, 6), ord = shuffle([0, 1, 2]);
+      return {type:'match', prompt:'Verbinde, was die gleiche Farbe hat.', label:`Gleiche Farbe verbinden: ${cs.map(c => B_COL_NAME[c]).join(', ')}`, tip:'Noch nicht. Schau auf die Farbe.',
+        up: cs.map((c, i) => ({...bzO(ks[i], c), k:c})), dn: ord.map(i => ({...bzO(ks[3 + i], cs[i]), k:cs[i]})), sol: cs.map((c, i) => [i, ord.indexOf(i)])}; }],
+  V2: [
+    () => { const k = pick(bzKinds()), k2 = pick(bzKinds(o => o.grp !== B_OBJ[k].grp)), i = rnd(0, 3), cells = [0, 1, 2, 3].map(j => bzO(j === i ? k2 : k));
+      return bzPick({kern:true, prompt:'Was passt nicht? Tippe es an.', label:`Passt nicht: ${B_OBJ[k2].name} bei ${B_OBJ[k].name}`, tip:'Noch nicht. Drei Bilder sind gleich. Eins ist anders.'}, cells, i); },
+    () => { const k = pick(bzKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), col2 = pick(B_COLS4.filter(c => c !== col)), i = rnd(0, 3);
+      return bzPick({prompt:'Was passt nicht? Schau genau!', label:`Passt nicht (Farbe): ${B_OBJ[k].name}`, tip:'Noch nicht. Schau auf die Farbe.'}, [0, 1, 2, 3].map(j => bzO(k, j === i ? col2 : col)), i); },
+    () => { const k = pick(bzKinds()), i = rnd(0, 3);
+      return bzPick({prompt:'Was passt nicht? Schau genau!', label:`Passt nicht (Größe): ${B_OBJ[k].name}`, tip:'Noch nicht. Schau, wie groß die Dinge sind.', cls:'base'}, [0, 1, 2, 3].map(j => bzO(k, null, j === i ? .55 : 1)), i); },
+    () => { const g = pick(['kueche', 'werkstatt']), same = shuffle(bzKinds(o => o.grp === g)).slice(0, 3), odd = pick(bzKinds(o => o.grp !== g)), i = rnd(0, 3), ks = [...same]; ks.splice(i, 0, odd);
+      return bzPick({prompt:'Was gehört nicht dazu? Tippe es an.', label:`Gehört nicht dazu: ${B_OBJ[odd].name} (${B_GRP[g]})`, tip:`Noch nicht. Drei Dinge gehören zusammen.`}, ks.map(x => bzO(x)), i); }],
+  V3: [
+    () => { const ga = shuffle(['tasse', 'loeffel', 'gabel', 'glas']).slice(0, 3), gb = shuffle(['schraube', 'mutter', 'zange', 'dreher']).slice(0, 3), all = shuffle([...ga, ...gb]), boxes = shuffle([['kueche', 'teller'], ['werkstatt', 'hammer']]);
+      return {kern:true, type:'sort', prompt:'Sortiere. Tippe ein Ding an, dann die richtige Kiste.', label:'Sortieren: Küche und Werkstatt', tip:'Noch nicht. Die roten Dinge sind in der falschen Kiste. Tippe sie an.',
+        things: all.map(k => ({...bzO(k, null, 1, 64), box: boxes.findIndex(b => B_OBJ[k].grp === b[0])})), boxes: boxes.map(([g, k]) => ({h:`${bObj(k, null, 60)}<b>${B_GRP[g]}</b>`, a:B_GRP[g]}))}; },
+    () => { const cs = shuffle(B_COLS4).slice(0, 2), ks = shuffle(bzKinds(o => o.grp !== 'werkstatt')).slice(0, 6), col = shuffle([0, 0, 0, 1, 1, 1]);
+      return {type:'sort', prompt:'Sortiere nach der Farbe.', label:`Sortieren nach Farbe: ${cs.map(c => B_COL_NAME[c]).join(' und ')}`, tip:'Noch nicht. Schau auf die Farbe.',
+        things: ks.map((k, i) => ({...bzO(k, cs[col[i]], 1, 64), box: col[i]})), boxes: cs.map(c => ({h:`<svg class="bz-sw" viewBox="0 0 60 40"><rect x="2" y="2" width="56" height="36" rx="6" fill="${B_COL[c]}" stroke="${INK}" stroke-width="2.4"/></svg>`, a:B_COL_NAME[c]}))}; },
+    () => { const ks = shuffle(bzKinds()).slice(0, 6), big = shuffle([1, 1, 1, 0, 0, 0]);
+      return {type:'sort', prompt:'Sortiere: große Dinge und kleine Dinge.', label:'Sortieren nach Größe', tip:'Noch nicht. Schau, wie groß die Dinge sind.',
+        things: ks.map((k, i) => ({...bzO(k, null, big[i] ? 1 : .5, 64), box: big[i] ? 0 : 1})), boxes: [['groß', 1], ['klein', .5]].map(([a, s]) => ({h:`<svg class="bz-sw" viewBox="0 0 60 40"><rect x="${30 - 18*s}" y="${38 - 34*s}" width="${36*s}" height="${34*s}" rx="3" fill="#fff" stroke="${INK}" stroke-width="2.4"/></svg><b>${a}</b>`, a}))}; }],
+  V4: [
+    () => { const [a, b] = bzPair(), n = rnd(3, 4), bs = Array(n).fill(0);
+      return {kern:true, type:'match', prompt:`Gib ${BZ_JEDER[a]} ${BZ_EIN[b]}. Verbinde.`, label:`Eins zu eins: ${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, tip:'Noch nicht. Jedes Ding oben braucht genau eine Linie.',
+        up: bs.map(() => ({...bzO(a), k:1})), dn: bs.map(() => ({...bzO(b), k:1})), sol: bs.map((_, i) => [i, i])}; },
+    () => { const [a, b] = bzPair(), n = 5, bs = Array(n).fill(0);
+      return {type:'match', prompt:`Gib ${BZ_JEDER[a]} ${BZ_EIN[b]}. Verbinde.`, label:`Eins zu eins: 5× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, tip:'Noch nicht. Jedes Ding oben braucht genau eine Linie.',
+        up: bs.map(() => ({...bzO(a, null, 1, 72), k:1})), dn: bs.map(() => ({...bzO(b, null, 1, 72), k:1})), sol: bs.map((_, i) => [i, i])}; },
+    () => { const [a, b] = bzPair(), n = rnd(3, 5), m = n === 3 ? n + pick([0, 1, -1]) : n + pick([-1, 0, 1, -1]), ok = m >= n;
+      return {type:'match', prompt:`Verbinde. Bekommt jede${a === 'teller' ? 'r' : ''} ${B_OBJ[a].name} ${BZ_EIN[b]}?`, label:`Reicht es? ${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}`, tip:'Noch nicht. Verbinde alle. Bleibt oben etwas ohne Linie?',
+        up: Array(n).fill(0).map(() => ({...bzO(a, null, 1, 72), k:1})), dn: Array(m).fill(0).map(() => ({...bzO(b, null, 1, 72), k:1})), sol: Array(Math.min(n, m)).fill(0).map((_, i) => [i, i]), ask:{q:'Reicht es?', ok}}; }],
+  V5: [
+    () => { const k = pick(['knopf', 'mutter', 'apfel', 'socke']), a = rnd(1, 3), b = rnd(6, 9), left = Math.random() < .5, L = left ? b : a, R = left ? a : b;
+      return bzPick({kern:true, prompt:'Wo sind mehr? Tippe an.', label:`Mehr: ${L} gegen ${R}`, tip:'Noch nicht. Wo liegen viele?', cls:'sets'}, [bzC(bzSet(k, L), `${L} links`), bzC(bzSet(k, R), `${R} rechts`)], L > R ? 0 : 1); },
+    () => { const k = pick(['knopf', 'mutter', 'apfel', 'stift']), a = rnd(1, 3), b = rnd(6, 9), left = Math.random() < .5, L = left ? b : a, R = left ? a : b;
+      return bzPick({prompt:'Wo sind weniger? Tippe an.', label:`Weniger: ${L} gegen ${R}`, tip:'Noch nicht. Wo liegen nur wenige?', cls:'sets'}, [bzC(bzSet(k, L), `${L} links`), bzC(bzSet(k, R), `${R} rechts`)], L < R ? 0 : 1); },
+    () => { const k = pick(['knopf', 'mutter', 'apfel']), eq = Math.random() < .45, a = rnd(4, 7), b = eq ? a : a + pick([-1, 1]), sp = Math.random() < .5;
+      const cells = [bzC(bzSet(k, a, sp ? 1 : 0), `${a} links`), bzC(bzSet(k, b, sp ? 0 : 1), `${b} rechts`), bzC('<span class="bz-eq"><b>=</b>gleich viele</span>', 'gleich viele')];
+      return bzPick({prompt:'Wo sind mehr? Oder sind es gleich viele?', label:`Mehr oder gleich: ${a} gegen ${b}`, tip:'Noch nicht. Zeige mit dem Finger: immer eins links und eins rechts.', cls:'sets'}, cells, eq ? 2 : a > b ? 0 : 1); }],
+  V6: [
+    () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle([.5, .75, 1]);
+      return bzPick({kern:true, prompt:'Tippe das größte an.', label:`Größtes: ${B_OBJ[k].name}`, tip:'Noch nicht. Welches ist am größten?', cls:'base'}, sizes.map(s => bzO(k, null, s, 104)), sizes.indexOf(1)); },
+    () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle([.5, .75, 1]);
+      return bzPick({prompt:'Tippe das kleinste an.', label:`Kleinstes: ${B_OBJ[k].name}`, tip:'Noch nicht. Welches ist am kleinsten?', cls:'base'}, sizes.map(s => bzO(k, null, s, 104)), sizes.indexOf(.5)); },
+    () => { const k = pick(['stift', 'schraube', 'tasse', 'glas']), sizes = shuffle([.5, .75, 1]);
+      return {type:'order', prompt:'Tippe der Reihe nach an: von klein nach groß.', label:`Ordnen (3): ${B_OBJ[k].name}`, tip:'Noch nicht. Fang mit dem kleinsten an. Tippe auf eine Zahl, um sie wegzunehmen.', cls:'base',
+        cells: sizes.map(s => bzC(bObj(k, null, 104, s), `${B_OBJ[k].name} ${s === 1 ? 'groß' : s === .5 ? 'klein' : 'mittel'}`)), want: [.5, .75, 1].map(s => sizes.indexOf(s))}; },
+    () => { const k = pick(['stift', 'schraube', 'glas']), n = rnd(4, 5), all = [.4, .55, .7, .85, 1].slice(5 - n), sizes = shuffle(all);
+      return {type:'order', prompt:'Tippe der Reihe nach an: von klein nach groß.', label:`Ordnen (${n}): ${B_OBJ[k].name}`, tip:'Noch nicht. Fang mit dem kleinsten an. Tippe auf eine Zahl, um sie wegzunehmen.', cls:'base',
+        cells: sizes.map(s => bzC(bObj(k, null, 96, s), `${B_OBJ[k].name} Größe ${all.indexOf(s) + 1}`)), want: all.map(s => sizes.indexOf(s))}; }],
+  V7: [
+    () => { const u = BZ_PAT(), seq = [0, 1, 0, 1, 0, 1], opts = shuffle([0, 1, 2]);
+      return bzPick({kern:true, prompt:'Was kommt als Nächstes? Tippe an.', label:`Muster AB: ${u.slice(0, 2).map(x => B_FORM[x[0]]).join(', ')}`, tip:'Noch nicht. Sprich das Muster mit: Was kommt immer abwechselnd?'}, opts.map(s => bzS(...u[s])), opts.indexOf(0), bzPatRow(u, seq)); },
+    () => { const u = BZ_PAT(), pat = pick([[0, 0, 1], [0, 1, 1], [0, 1, 2]]), seq = [...pat, ...pat, ...pat].slice(0, 7), nx = pat[7 % pat.length], opts = shuffle([0, 1, 2]);
+      return bzPick({prompt:'Was kommt als Nächstes? Tippe an.', label:`Muster ${pat.map(x => 'ABC'[x]).join('')}`, tip:'Noch nicht. Sprich das Muster mit.'}, opts.map(s => bzS(...u[s])), opts.indexOf(nx), bzPatRow(u, seq)); },
+    () => { const u = BZ_PAT(), pat = pick([[0, 1], [0, 0, 1], [0, 1, 2]]), seq = [...pat, ...pat, ...pat, ...pat].slice(0, 8), i = rnd(pat.length, 7), wrong = [0, 1, 2].find(x => x !== seq[i] && (pat.length === 3 || x !== 2) ) ?? 2;
+      const cells = seq.map((s, j) => bzS(...u[j === i ? wrong : s], 'voll', 64));
+      return bzPick({prompt:'Ein Bild ist falsch. Tippe es an.', label:`Fehler im Muster ${pat.map(x => 'ABC'[x]).join('')}`, tip:'Noch nicht. Sprich das Muster von vorne mit.', cls:'tight'}, cells, i); }],
+  V8: [
+    () => { const n = rnd(1, 3), v = 0;
+      return {kern:true, type:'glance', ms:1500, prompt:'Schau kurz hin. Wie viele Punkte waren es? Tippe das gleiche Bild an.', label:`Auf einen Blick: ${n}`, tip:'Noch nicht. Schau nochmal hin.', show: bDots(n, v, 150), cells:[1, 2, 3].map(x => bzC(bDots(x, 0, 96), `${x} Punkte`)), want:[n - 1]}; },
+    () => { const n = rnd(1, 3), k = pick(['apfel', 'knopf', 'tasse', 'mutter']);
+      return {type:'glance', ms:1500, prompt:'Schau kurz hin. Wie viele waren es? Tippe das passende Punktbild an.', label:`Auf einen Blick (Dinge): ${n}`, tip:'Noch nicht. Schau nochmal hin.', show:`<span class="bz-few">${Array(n).fill(bObj(k, null, 90)).join('')}</span>`, cells:[1, 2, 3].map(x => bzC(bDots(x, 0, 96), `${x} Punkte`)), want:[n - 1]}; },
+    () => { const n = rnd(2, 4), v = rnd(0, B_DOTS[n].length - 1);
+      return {type:'glance', ms:1200, prompt:'Schau kurz hin. Wie viele Punkte waren es? Tippe das passende Bild an.', label:`Auf einen Blick (1–4, Anordnung ${v + 1}): ${n}`, tip:'Noch nicht. Schau nochmal hin.', show: bDots(n, v, 150), cells:[1, 2, 3, 4].map(x => bzC(bDots(x, 0, 90), `${x} Punkte`)), want:[n - 1]}; }]
+};
+const BZ_FORMN = {kreis:['Kreise', 'den Kreis'], dreieck:['Dreiecke', 'das Dreieck'], quadrat:['Quadrate', 'das Quadrat']};
+AXES.O.items = {
+  O2: [
+    () => { const t = pick(['kreis', 'dreieck', 'quadrat']), nt = rnd(2, 3), list = shuffle([...Array(nt).fill(t), ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).flatMap(f => [f, f]).slice(0, 6 - nt)]);
+      return bzMulti({kern:true, prompt:`Tippe alle ${BZ_FORMN[t][0]} an.`, label:`Alle ${BZ_FORMN[t][0]} finden`, tip:'Noch nicht. Schau jede Form genau an.'}, list.map(f => bzS(f, pick(B_COLS4), pick(['voll', 'leer']), 80)), list.map((f, i) => f === t ? i : -1).filter(i => i >= 0), bzTarget(bShape(t, '#fff', 56, 'leer'))); },
+    () => { const t = pick(['kreis', 'dreieck', 'quadrat']), list = shuffle([t, ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).slice(0, 3)]);
+      return bzPick({prompt:`Tippe ${BZ_FORMN[t][1]} an.`, label:`Form finden: ${B_FORM[t]}`, tip:'Noch nicht. Schau auf die Ecken.'}, list.map(f => bzS(f, pick(B_COLS4))), list.indexOf(t), bzTarget(bShape(t, '#fff', 56, 'leer'))); },
+    () => { const list = shuffle(['quadrat', 'quadrat', 'quadrat', 'rechteck', 'rechteck', 'rechteck']);
+      return bzMulti({prompt:'Tippe nur die Quadrate an. Schau genau!', label:'Quadrat oder Rechteck', tip:'Noch nicht. Ein Quadrat ist überall gleich lang.'}, list.map(f => bzS(f, 'blau', 'leer', 80)), list.map((f, i) => f === 'quadrat' ? i : -1).filter(i => i >= 0), bzTarget(bShape('quadrat', '#fff', 56, 'leer'))); }],
+  O3: [
+    () => { const dirs = Object.keys(B_DIR), t = pick(dirs), list = shuffle([t, t, ...Array.from({length:4}, () => pick(dirs.filter(d => d !== t)))]);
+      return bzMulti({kern:true, prompt:`Tippe alle Pfeile nach ${t} an.`, label:`Pfeile nach ${t}`, tip:'Noch nicht. Wohin zeigt die Spitze?'}, list.map(d => bzC(bArrow(d, 80, '#fff'), `Pfeil nach ${d}`)), list.map((d, i) => d === t ? i : -1).filter(i => i >= 0), bzTarget(bArrow(t, 56))); },
+    () => { const dirs = shuffle(Object.keys(B_DIR)), t = pick(dirs);
+      return bzPick({prompt:'Tippe den gleichen Pfeil an.', label:`Gleicher Pfeil: ${t}`, tip:'Noch nicht. Wohin zeigt die Spitze?'}, dirs.map(d => bzC(bArrow(d, 84, '#fff'), `Pfeil nach ${d}`)), dirs.indexOf(t), bzTarget(bArrow(t, 64))); },
+    () => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), list = shuffle([t, t, ...shuffle([0, 1, 2, 3].filter(l => l !== t)), pick([0, 1, 2, 3].filter(l => l !== t))]);
+      return bzMulti({prompt:'Tippe alle an, die genau so aussehen wie oben.', label:`Spiegelzeichen ${g}, Lage ${t}`, tip:'Noch nicht. Schau, wohin das Zeichen zeigt.'}, list.map(l => bzC(bGlyph(g, l, 80), `Zeichen Lage ${l}`)), list.map((l, i) => l === t ? i : -1).filter(i => i >= 0), bzTarget(bGlyph(g, t, 64))); },
+    () => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), o = pick([0, 1, 2, 3].filter(l => l !== t)), i = rnd(0, 3);
+      return bzPick({prompt:'Ein Zeichen ist anders herum. Tippe es an.', label:`Anders herum: ${g}`, tip:'Noch nicht. Drei Zeichen zeigen in die gleiche Richtung.'}, [0, 1, 2, 3].map(j => bzC(bGlyph(g, j === i ? o : t, 84), j === i ? 'anders herum' : 'Zeichen')), i); }],
+  O4: [
+    () => { const ks = shuffle(bzKinds()).slice(0, 5);
+      return {kern:true, type:'order', prompt:'Fang beim grünen Punkt an. Tippe alle der Reihe nach an.', label:`Von links nach rechts: ${ks.map(k => B_OBJ[k].name).join(', ')}`, tip:'Noch nicht. Fang links beim grünen Punkt an und geh nach rechts.', start:0, cls:'line',
+        cells: ks.map(k => bzO(k, null, 1, 76)), want:[0, 1, 2, 3, 4]}; },
+    () => { const s = pick(B_SEQ), ord = shuffle([0, 1, 2]);
+      return {type:'order', prompt:'Was kommt zuerst, was dann? Tippe der Reihe nach an.', label:`Bildfolge: ${s.name}`, tip:`Noch nicht. Was war ganz am Anfang?`,
+        cells: ord.map(j => bzC(s.pics[j]().replace('<svg class="b-obj"', '<svg class="b-obj" width="104" height="104"'), `Bild ${j + 1}`)), want:[0, 1, 2].map(j => ord.indexOf(j))}; },
+    () => { const s = pick(B_SEQ), ord = shuffle([0, 1, 2]);
+      return bzPick({prompt:'Was kommt zuerst? Tippe an.', label:`Was kommt zuerst: ${s.name}`, tip:'Noch nicht. Was war ganz am Anfang?'}, ord.map(j => bzC(s.pics[j]().replace('<svg class="b-obj"', '<svg class="b-obj" width="104" height="104"'), `Bild ${j + 1}`)), ord.indexOf(0)); }]
+};
+
+/* ---------- Fach „Basis“ (Üben; Test folgt in Schritt 4) ---------- */
+const B_ILL = `<svg viewBox="0 0 120 70" aria-hidden="true"><g transform="translate(4 6) scale(.9)">${B_OBJ.tasse.d(B_COL.rot)}</g><g transform="translate(62 6) scale(.9)">${B_OBJ.loeffel.d(B_COL.grau)}</g><path d="M44 36h18" stroke="${INK}" stroke-width="3" stroke-dasharray="4 4"/><circle cx="102" cy="18" r="9" fill="${B_COL.gelb}" stroke="${INK}" stroke-width="2.4"/><path d="M93 62l9-16 9 16z" fill="${B_COL.gruen}" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/></svg>`;
+function railBasisHtml(g, lvOk){
+  const on = l => app.mode === 'read' && app.read.lvl === l;
+  const open = (app.railGrp && app.railGrpLvl === app.read.lvl && app.mode === 'read' && 'VO'.includes(app.railGrp) ? app.railGrp : null) || (app.mode === 'read' && String(app.read.lvl)[0] === 'O' ? 'O' : 'V');
+  const fold = (gp, name, n) => `<button class="rail-fold" data-railgrp="${gp}" aria-expanded="false" title="${name} aufklappen"><span>${name}</span><small>${n} Stufen ▾</small></button>`;
+  return ['V', 'O'].map(ax => { const L = axLevels(ax).filter(lvOk), name = ax === 'V' ? 'Vergleichen' : 'Orientieren';
+    return open !== ax ? fold(ax, name, L.length) : `<span class="rail-h">${name}</span>` + L.map(l => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true" class="bz-rs">${bSym(l, 26)}</b>${AXES[ax].info[l].short}</button>`).join(''); }).join('');
+}
+addSubject('B', {name:'Basis', long:'Basis: Grundlagen vor Zählen und Lesen', tests:[], axes:['V', 'O'], guideAxes:['V', 'O'], optional:true, ill: () => B_ILL,
+  rail: (g, lvOk) => railBasisHtml(g, lvOk),
+  areas: (g, lvOk) => ['V', 'O'].map(ax => [AXES[ax].place, axLevels(ax).filter(lvOk).map(l => ({mode:'read', lvl:l, sym:`<span class="bz-rs">${bSym(l, 30)}</span>`, label:AXES[ax].info[l].short}))]),
+  enter: () => { app.read.item = null; if(!/^[VO]/.test(String(app.read.lvl))) app.read.lvl = 'V1'; app.mode = 'read'; }});
 /* Typische Fehler beim Üben → nächster Schritt am Material */
 const ERR_MAT = {
   dreher: 'Zuerst die Zehnerstangen legen, dann die Einer, und beim Schreiben mit den Zehnern beginnen (Stellentafel).',
@@ -6322,7 +6614,7 @@ function readDefaultLevel(){
   return z || (L_LEVELS.some(l => m['L|' + l]) ? L_LEVELS.at(-1) : 'L4');
 }
 const rdMode = l => AXES[String(l)[0]]?.mode || ({W:'write', U:'clock', G:'size', H:'board', Z:'tenpair'})[String(l)[0]] || 'read';
-const rdLevels = l => AXES[String(l)[0]]?.levels || ({W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS})[String(l)[0]] || L_LEVELS;
+const rdLevels = l => (AXES[String(l)[0]] && axLevels(String(l)[0])) || ({W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS})[String(l)[0]] || L_LEVELS;
 const rdInfo = l => L_INFO[l] || W_INFO[l] || U_INFO[l] || G_INFO[l] || H_INFO[l] || Z_INFO[l] || AXES[String(l)[0]]?.info[l];
 function readNew(){
   const R = app.read; R.lvl ||= readDefaultLevel();
@@ -6342,6 +6634,7 @@ function renderTopRead(){
   if(R.lvl[0] === 'Z'){ $('#range-label').textContent = 'Partner'; $('#ranges').innerHTML = Z_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${Z_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   if(R.lvl[0] === 'H'){ $('#range-label').textContent = 'Tafel'; $('#ranges').innerHTML = H_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${H_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   if(R.lvl[0] === 'U'){ $('#range-label').textContent = 'Zeit'; $('#ranges').innerHTML = U_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${U_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
+  if(AXES[R.lvl[0]]){ const ax = R.lvl[0], g = guideOf(subjOfLvl(R.lvl)); $('#range-label').textContent = 'Stufe'; $('#ranges').innerHTML = axLevels(ax).filter(l => !g || g.lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${escHtml(AXES[ax].info[l].short)}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   $('#ranges').innerHTML = `<span class="rd-title">${escHtml(info.name)}</span>`;
   $('#inputs').innerHTML = R.lvl[0] === 'L' && !['L7', 'L8', 'L9'].includes(R.lvl) ? `<button data-rsyl aria-pressed="${R.colored}" class="chip-toggle">Silben färben</button>` : '';
   rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; rb.setAttribute('aria-label', 'Neue Aufgabe');
@@ -6353,7 +6646,7 @@ function renderRead(){
   $('#words').hidden = true; $('#btn-say').hidden = true;
   const isW = R.lvl[0] === 'W';
   $('#equation').innerHTML = ''; /* Stufe steht schon oben in der Leiste */
-  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
+  $('#prompt').innerHTML = `${B_SYM[R.lvl] ? `<span class="bz-psym" aria-hidden="true">${bSym(R.lvl, 34)}</span>` : ''}<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt)}</span>`;
   /* In Mathe keine Silbenfarben für kurze Angaben (1 m = 100 cm, 8 Uhr): Blau und Rot stehen dort für Zehner und Hunderter. Sachtexte ab 4 Wörtern dürfen gefärbt werden. */
   const colored = R.colored && (!/^[UGHZ]/.test(R.lvl) || (String(it.text || '').match(/[A-Za-zÄÖÜäöüß]{3,}/g) || []).length >= 3);
   $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, R.r, {colored, feedback: R.fb, inline: it.type === 'input'})}${it.type === 'input' && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : ''}</div>`;
@@ -6363,6 +6656,7 @@ function renderRead(){
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : (it.type === 'board' && it.mode === 'fill') || it.type === 'input' ? false : !evalItem(it, R.r, [])})) +
     (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '');
   itFit();
+  glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it, renderRead);
 }
 function readCheck(){
   const R = app.read, it = R.item, isFill = it.type === 'board' && it.mode === 'fill', isIn = it.type === 'input';
@@ -6372,6 +6666,7 @@ function readCheck(){
   if(!res && isIn) return focusEmpty();
   if(!res) return isFill ? focusEmpty() : undefined;
   if(isFill) R.r.wrong = new Set(res.wrong || []);
+  if(BZ_TYPES.includes(it.type)) R.r.mark = res.ok ? null : res.mark;
   R.fb = {choice: R.r.choice, ok: res.ok};
   if(res.ok){
     logAttempt({mode: rdMode(R.lvl), task: it.label, ok: R.tries === 0, tries: R.tries + 1, lvl: R.lvl, given: res.given});
@@ -6395,7 +6690,7 @@ function readControl(btn){
     case 'r-check': return readCheck();
     case 'r-next': skipMark(); setHint(''); return readNew();
     case 'r-up': case 'r-down': { const lv = rdLevels(R.lvl); Object.assign(R, {lvl: lv[lv.indexOf(R.lvl) + (btn.id === 'r-up' ? 1 : -1)], item:null, streak:0, miss:0}); setHint(''); return render(); }
-    case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; R.r.slots = null; R.r.marks = null; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else if(R.item.type === 'board'){ const it = R.item; if(it.mode === 'tap') R.r.sel = it.target; else if(it.mode === 'multi') R.r.set = [...it.set]; else { R.r.vals = it.fields.map(String); R.r.wrong = new Set(); } } else if(R.item.type === 'input') R.r.vals = R.item.fields.map(String); else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: rdMode(R.lvl), task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
+    case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; R.r.slots = null; R.r.marks = null; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else if(R.item.type === 'board'){ const it = R.item; if(it.mode === 'tap') R.r.sel = it.target; else if(it.mode === 'multi') R.r.set = [...it.set]; else { R.r.vals = it.fields.map(String); R.r.wrong = new Set(); } } else if(R.item.type === 'input') R.r.vals = R.item.fields.map(String); else if(BZ_TYPES.includes(R.item.type)) bzSolve(R.item, R.r); else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: rdMode(R.lvl), task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
   }
 }
 function readStageClick(e){
@@ -6915,7 +7210,11 @@ function picKey(){
     if(it.type === 'board') return 'grid';
     if(it.type === 'build') return 'cubes';
     if(it.type === 'line') return 'line';
-    if(it.type === 'flash') return 'eye';
+    if(it.type === 'flash' || it.type === 'glance') return 'eye';
+    if(it.type === 'pick') return 'choose';
+    if(it.type === 'sort') return 'cards';
+    if(it.type === 'match') return 'line';
+    if(it.type === 'order') return 'tap';
     return 'keypad';
   }
   return {number:'cubes', add:'cubes', sub:'cubes', written:'keypad', times:'grid', money:'coin', blitz:'eye'}[m] || null;
@@ -8833,7 +9132,7 @@ let holdTimer = null;
 let setTab = 'general';
 function showSetTab(k){ setTab = k; for(const b of dlgSet.querySelectorAll('[data-stab]')) b.setAttribute('aria-selected', b.dataset.stab === k); for(const p of dlgSet.querySelectorAll('[data-stab-panel]')) p.hidden = p.dataset.stabPanel !== k; }
 dlgSet.addEventListener('click', e => { const b = e.target.closest('[data-stab]'); if(b) showSetTab(b.dataset.stab); });
-const openSettings = () => { showSetTab(setTab); syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
+const openSettings = () => { showSetTab(setTab); syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); $('#subjon-list').innerHTML = subjOnHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
 $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings));
 document.addEventListener('change', e => {
   const t = e.target, pid = t.dataset?.pworld || t.dataset?.ppic; if(!pid || !teacherOn()) return;
@@ -8841,10 +9140,11 @@ document.addEventListener('change', e => {
   if(t.dataset.pworld) p.world = t.value; if(t.dataset.ppic) p.pic = t.checked;
   saveData(); renderProfiles(); render();
 });
+document.addEventListener('change', e => { const c = e.target.closest('[data-subjon]'); if(!c) return; const p = data.profiles.find(x => x.id === c.dataset.subjonPid); if(!p) return; p.subjOn ||= {}; if(c.checked) p.subjOn[c.dataset.subjon] = true; else delete p.subjOn[c.dataset.subjon]; if(!Object.keys(p.subjOn).length) delete p.subjOn; saveData(); render(); });
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.27.0 · 17.11.2026';
+const APP_VERSION = '0.28.0 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -9038,6 +9338,7 @@ $('#help-content').innerHTML = [
   ['edit','Mathe','Links wählst du: Zahlen legen, Hundertertafel, Plus, Minus, Zehnerpartner, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
   ['target','Zahlenstrahl vergrößern','Tippe auf einen Sprung (zum Beispiel +7), dann wird er groß. Noch einmal tippen: zurück. Mit + und − vergrößerst und verkleinerst du. Mit zwei Fingern kannst du auch zoomen und mit einem Finger verschieben. Unten zeigt der kleine Zahlenstrahl, wo du gerade bist – tippe dort, um hinzuspringen.'],
   ['line','Deutsch','Lesen in 9 Stufen (Bilder, Signalwörter, Buchstaben, Wörter, genau lesen, Sätze, kurze Texte, Pläne und Tabellen, lange Texte) und Schreiben in 6 Stufen (abschreiben, Anlaute, kurze und lange Wörter, Merkstellen, Sätze). Unter „Meine Wörter“ übst du Wörter, die deine Lehrkraft eingetragen hat: anschauen, merken, abdecken, auswendig schreiben, vergleichen. „Silben färben“ hilft bei langen Wörtern. Beim Schreiben gibt es Buchstaben auf dem Bildschirm.'],
+  ['blocks','Basis','Grundlagen vor dem Zählen und Lesen: Gleiches finden, Was passt nicht?, Sortieren, Eins zu eins zuordnen, Mengen vergleichen, Der Größe nach, Muster, Auf einen Blick, Formen, Richtung und Spiegelung, Von links nach rechts. Die Kinder tippen Bilder an: ein Ding und dann die Kiste, oben und unten zum Verbinden, der Reihe nach. Die Lehrkraft erklärt den Auftrag. Kinder sehen „Basis“ nur, wenn es in den Einstellungen unter „Kinder &amp; Daten“ für sie eingeschaltet ist. Dazu gibt es Arbeitsblätter und Legeblätter.'],
   ['next','Schwerer oder leichter','Wenn du 5 Aufgaben hintereinander richtig hast, schlägt Stufenweise die nächste Stufe vor. Nach 3 Fehlern gibt es eine leichtere Stufe. Du entscheidest selbst.'],
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],

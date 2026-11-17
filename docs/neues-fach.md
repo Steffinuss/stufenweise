@@ -23,6 +23,7 @@ Ein Schlüssel der Kompetenzmatrix sieht so aus: `Achse|Stufe`, zum Beispiel `V|
 - `rail(g, lvOk)`: Knöpfe der Leiste links.
 - `areas(g, lvOk)`: Kacheln auf der Startseite („Was möchtest du üben?“).
 - `enter()`: was beim Wechsel ins Fach passiert (z. B. erste Übung öffnen).
+- `axes`: Achsen des Fachs, solange es noch keinen Test hat (sonst kommen sie aus den Tests).
 - `optional: true`: Kinder sehen das Fach nur, wenn es für sie eingeschaltet ist (`p.subjOn[id]`) oder ein Test des Fachs eine Förderzone zeigt. Ohne gewähltes Kind und in der Lehrkraft-Ansicht ist es immer sichtbar.
 
 ## Test (`addTest`)
@@ -46,6 +47,8 @@ Ein Schlüssel der Kompetenzmatrix sieht so aus: `Achse|Stufe`, zum Beispiel `V|
 - `info[Stufe]`: `name`, `short`, `kann`, `ziel`, `bp` (Bezug zum Bildungsplan), `analog` (Ideen für zu Hause), `ich` (Satz für die Lernlandkarte), `offer` (`{text, set:{mode:'read', lvl}}`).
 - `items[Stufe]`: Liste von Aufgaben-Generatoren (mindestens 3 je Stufe; siehe `tests/test_nie_haengen.py`).
 - `mode`: Name im Übungsprotokoll.
+
+Für Aufgaben mit Bildern gibt es seit 0.28.0 die Typen `pick` (ein oder alle passenden Bilder antippen), `sort` (Ding, dann Kiste), `match` (oben, unten verbinden; optional mit „Reicht es? ja/nein“), `order` (der Reihe nach antippen) und `glance` (kurz zeigen, dann wählen). Beispiele: `AXES.V.items` in `index.html`.
 
 Arbeitsblätter eines neuen Fachs kommen in `SHEET_SETS[Kürzel]` und `SHEET_INFO[Kürzel]`. Den Weg am Material trägt man in `MAT_WAY` ein.
 

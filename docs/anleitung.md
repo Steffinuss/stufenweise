@@ -231,7 +231,19 @@ Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in 
 
 ### Basis: Grundlagen vor dem Zählen
 
-Unter „Basis: Vergleichen und Ordnen“ und „Basis: Sehen und Orientieren“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden (V1), Was passt nicht? (V2), Sortieren (V3), Eins zu eins zuordnen (V4), Mehr, weniger, gleich viel (V5), Der Größe nach ordnen (V6), Muster fortsetzen (V7), Formen unterscheiden (O2), Richtung und Spiegelung (O3) und Von links nach rechts (O4). Die Blätter kommen ohne Zahlen und fast ohne Lesen aus: Die Kinder verbinden, kreisen ein, streichen durch und malen weiter.
+**Üben in der App:** Oben in der Fachwahl steht neben Mathe und Deutsch **Basis**. Links wählst du die Stufe: unter „Vergleichen“ Gleiches, passt nicht, Sortieren, Zuordnen, Mengen, Größe, Muster, Blick; unter „Orientieren“ Formen, Richtung, Reihe. Die Kinder tippen nur Bilder an:
+
+- **Bild wählen:** das gleiche Bild, was nicht passt, wo mehr sind, das größte, was als Nächstes kommt. Bei „Tippe alle … an“ können es mehrere sein.
+- **Sortieren:** erst ein Ding antippen, dann die richtige Kiste. Ein Ding in der Kiste antippen nimmt es wieder heraus.
+- **Verbinden:** oben ein Bild antippen, dann unten eins: Es erscheint eine Linie. Bei „Reicht es?“ danach „ja“ oder „nein“ wählen.
+- **Der Reihe nach:** Die Bilder in der richtigen Reihenfolge antippen, es erscheinen Zahlen 1, 2, 3. Eine Zahl antippen nimmt sie (und alle danach) zurück.
+- **Auf einen Blick:** Das Bild ist kurz zu sehen und wird dann abgedeckt. „Nochmal zeigen“ zeigt es noch einmal.
+
+Nach „Prüfen“ wird Falsches rot markiert. Die Aufträge sind kurz, aber die meisten Kinder auf dieser Stufe lesen sie nicht selbst: Erkläre den Auftrag an der ersten Aufgabe. Jede Aufgabenart hat ein festes Bildsymbol vor dem Auftrag.
+
+**Wer Basis sieht:** Ohne gewähltes Kind (Gast) und in der Lehrkraft-Ansicht immer. Ein Kind sieht „Basis“ erst, wenn du es unter **Einstellungen → Kinder & Daten → Basis** für dieses Kind einschaltest. So werden Kinder, die schon zählen und lesen, nicht damit gelangweilt. Den Basis-Test gibt es noch nicht; er kommt mit der nächsten Version.
+
+**Arbeitsblätter:** Unter „Basis: Vergleichen und Ordnen“ und „Basis: Sehen und Orientieren“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden (V1), Was passt nicht? (V2), Sortieren (V3), Eins zu eins zuordnen (V4), Mehr, weniger, gleich viel (V5), Der Größe nach ordnen (V6), Muster fortsetzen (V7), Formen unterscheiden (O2), Richtung und Spiegelung (O3) und Von links nach rechts (O4). Die Blätter kommen ohne Zahlen und fast ohne Lesen aus: Die Kinder verbinden, kreisen ein, streichen durch und malen weiter.
 
 **Erklären statt lesen:** Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Lies den Auftrag vor und zeige ihn an dieser Aufgabe; die nächste Aufgabe derselben Art machen die Kinder selbst. Auf dem Lösungsblatt steht zu jeder Aufgabe, welches Bild gemeint ist (zum Beispiel „2. Bild (Gabel)“).
 
