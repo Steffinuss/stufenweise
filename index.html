@@ -6029,6 +6029,164 @@ const MAT_WAY = {
   W6: MW('Wortkarten zu Sätzen legen, die Punkt-Karte ans Ende, den Großbuchstaben am Anfang prüfen.', 'Wortkarten ordnen und den Satz abschreiben.', ['Wortkarten', 'Punkt-Karte'], 'W:W6')
 };
 const matWay = key => { const [ax, a, b] = key.split('|'); return ax === 'M' ? mWay(+a, b) : MAT_WAY[a] || null; };
+
+/* =====================================================================
+   Basis: Grundlagen vor Zählen und Lesen (Konzept 17.11.2026, Schritt 1)
+   Achse V „Vergleichen und Ordnen“ (eher Mathe), Achse O „Sehen und Orientieren“ (Mathe und Deutsch).
+   Jede Stufe hat zwei Schwierigkeiten: a (leicht), b (schwerer) → erreicht / teilweise / noch nicht.
+   Fach und Test werden erst angemeldet, wenn Übungen und Test fertig sind (BASIS_ON).
+   ===================================================================== */
+const BASIS_ON = false;
+const V_LEVELS = ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8'];
+const O_LEVELS = ['O1', 'O2', 'O3', 'O4', 'O5'];
+const BP_FRUEH = 'BP GENT 2022, M 2.1.1.1 Frühe mathematische Kompetenzen';
+const V_INFO = {
+  V1:{name:'Gleiches finden', short:'Gleiches', a:'dasselbe Bild finden', b:'gleich in einem Merkmal (Farbe oder Form)',
+      kann:'findet zu einem Bild das gleiche', ziel:'findet Gleiches, auch wenn nur ein Merkmal gleich ist (gleiche Farbe, gleiche Form)',
+      analog:'Socken paarweise zusammenlegen; Besteck in die richtigen Fächer räumen', ich:'Ich finde das Gleiche.', bp:BP_FRUEH},
+  V2:{name:'Was passt nicht?', short:'passt nicht', a:'einer ist ganz anders', b:'Unterschied nur in einem Merkmal',
+      kann:'erkennt, was nicht in eine Reihe passt', ziel:'erkennt den Unterschied auch dann, wenn er nur in einem Merkmal liegt',
+      analog:'Beim Aufräumen: Was gehört nicht in diese Kiste?', ich:'Ich sehe, was nicht dazu passt.', bp:BP_FRUEH},
+  V3:{name:'Sortieren', short:'Sortieren', a:'nach Art in zwei Kisten (Besteck / Werkzeug)', b:'nach Farbe oder Größe; die Regel selbst erkennen',
+      kann:'sortiert Dinge nach ihrer Art', ziel:'sortiert nach einem Merkmal (Farbe, Größe) und erkennt eine Sortierregel',
+      analog:'Wäsche nach Farben sortieren; Schrauben und Muttern in eine Sortierbox räumen', ich:'Ich kann sortieren.', bp:BP_FRUEH},
+  V4:{name:'Eins zu eins zuordnen', short:'Zuordnen', a:'jeder Tasse einen Löffel geben', b:'„Reicht es?“ – ja oder nein',
+      kann:'ordnet Dinge eins zu eins zu', ziel:'erkennt beim Zuordnen, ob es reicht oder ob etwas fehlt',
+      analog:'Tisch decken: jedem Platz einen Teller, einen Becher, einen Löffel', ich:'Jeder bekommt eins.', bp:BP_FRUEH},
+  V5:{name:'Mehr, weniger, gleich viel', short:'Mehr/weniger', a:'großer Unterschied (2 gegen 7)', b:'kleiner Unterschied; gleich viele, aber anders verteilt',
+      kann:'erkennt bei deutlichem Unterschied, wo mehr ist', ziel:'vergleicht Mengen auch bei kleinem Unterschied und weiß: Auseinanderschieben ändert die Anzahl nicht',
+      analog:'Zwei Teller mit Keksen vergleichen; Murmeln auseinanderschieben: Sind es jetzt mehr?', ich:'Ich sehe, wo mehr ist.', bp:BP_FRUEH},
+  V6:{name:'Der Größe nach ordnen', short:'Größe', a:'3 Dinge vom kleinsten zum größten', b:'4–5 Dinge; das fehlende einordnen',
+      kann:'ordnet drei Dinge der Größe nach', ziel:'ordnet mehrere Dinge der Größe nach und ergänzt das fehlende',
+      analog:'Stifte, Schrauben oder Becher der Länge nach hinlegen; Töpfe ineinanderstellen', ich:'Ich ordne von klein nach groß.', bp:'BP GENT 2022, M 2.1.1.1 Frühe mathematische Kompetenzen und 2.1.3 Größen und Messen'},
+  V7:{name:'Muster fortsetzen', short:'Muster', a:'AB AB (● ▲ ● ▲ ?)', b:'AAB, ABC; Fehler im Muster finden',
+      kann:'setzt ein einfaches Muster (AB) fort', ziel:'setzt auch längere Muster fort und findet Fehler im Muster',
+      analog:'Löffel und Gabeln abwechselnd legen; Perlen nach Muster auffädeln', ich:'Ich kann ein Muster weitermachen.', bp:BP_FRUEH},
+  V8:{name:'Auf einen Blick (1–4)', short:'Blick', a:'1–3 Punkte kurz sehen', b:'1–4 Punkte in verschiedenen Anordnungen',
+      kann:'erkennt bis zu drei Dinge auf einen Blick', ziel:'erkennt bis zu vier Dinge auf einen Blick, ohne zu zählen',
+      analog:'Würfelbilder und Fingerbilder kurz zeigen und sofort nennen', ich:'Ich sehe sofort, wie viele es sind.', bp:BP_FRUEH}
+};
+const O_INFO = {
+  O1:{name:'Lage im Raum', short:'Lage', a:'auf, unter, in', b:'neben, vor, hinter, zwischen',
+      kann:'versteht auf, unter und in', ziel:'versteht und zeigt auch neben, vor, hinter und zwischen',
+      analog:'Dinge im Klassenzimmer nach Auftrag hinlegen: „Leg den Ball unter den Tisch.“', ich:'Ich weiß, wo etwas liegt.', bp:'BP GENT 2022, M 2.1.2.1 Orientierung im Raum'},
+  O2:{name:'Formen unterscheiden', short:'Formen', a:'Kreis, Dreieck, Viereck finden', b:'ähnliche Zeichen unterscheiden',
+      kann:'findet Kreis, Dreieck und Viereck', ziel:'unterscheidet auch ähnliche Formen und Zeichen genau',
+      analog:'Formen ertasten (Fühlsäckchen); Teller, Brettchen und Dreieckstücher vergleichen', ich:'Ich kenne Kreis, Dreieck und Viereck.', bp:'BP GENT 2022, M 2.1.2.3 Geometrische Formen und Abbildungen'},
+  O3:{name:'Richtung und Spiegelung', short:'Richtung', a:'Pfeil nach links, rechts, oben, unten', b:'gespiegeltes Zeichen finden',
+      kann:'erkennt die Richtung von Pfeilen', ziel:'erkennt, ob ein Zeichen gespiegelt oder gedreht ist (Vorbereitung auf b – d, p – q)',
+      analog:'Pfeilen im Schulhaus folgen; mit dem Körper nachstellen: Arm nach links, nach rechts', ich:'Ich sehe, wohin der Pfeil zeigt.', bp:'BP GENT 2022, M 2.1.2.3 Geometrische Formen und Abbildungen; D 2.1.3.1 Lesen von Bildern und Symbolen'},
+  O4:{name:'Von links nach rechts', short:'Reihe', a:'Dinge in einer Reihe der Reihe nach antippen', b:'Bildfolge ordnen: Was kommt zuerst?',
+      kann:'geht eine Reihe von links nach rechts durch', ziel:'ordnet eine Bildfolge (zuerst, dann, zuletzt) und hält die Leserichtung ein',
+      analog:'Den Tagesplan von links nach rechts zeigen; Bildkarten einer Handlung (Brot schmieren) ordnen', ich:'Ich lese von links nach rechts.', bp:'BP GENT 2022, D 2.1.3.1 Lesen von Bildern, ikonischen Zeichen und Symbolen'},
+  O5:{name:'Sich etwas merken', short:'Merken', a:'2 Dinge sehen, abdecken, wiederfinden', b:'Was fehlt jetzt? (von 4 Dingen fehlt eines)',
+      kann:'merkt sich zwei Dinge', ziel:'merkt sich vier Dinge und erkennt, was fehlt',
+      analog:'Kim-Spiel mit Gegenständen aus der Werkstatt: abdecken, eins wegnehmen, was fehlt?', ich:'Ich kann mir Dinge merken.', bp:'BP GENT 2022, M 2.1.1.1 Frühe mathematische Kompetenzen; D 2.1.3.1'}
+};
+for(const [k, v] of [...Object.entries(V_INFO), ...Object.entries(O_INFO)]) v.offer = {text:`Basis: ${v.name}`, set:{mode:'read', lvl:k}};
+Object.assign(MAT_WAY, {
+  V1: MW('Echte Socken, Becher oder Schrauben: zu jedem Ding das gleiche suchen und daneben legen.', 'Gleiche Bilder mit einer Linie verbinden.', ['Socken oder Becher in Paaren']),
+  V2: MW('Vier Dinge auf den Tisch legen, eins passt nicht (drei Löffel, eine Schraube). Wegnehmen und sagen, warum.', 'In einer Bildreihe durchstreichen, was nicht passt.', ['Alltagsdinge']),
+  V3: MW('Besteck und Werkzeug in zwei Kisten sortieren, dann Becher nach Farbe.', 'Bilder ausschneiden und in die richtige Kiste kleben.', ['zwei Kisten', 'Besteck und Werkzeug']),
+  V4: MW('Tisch decken: auf jeden Teller genau einen Löffel. Bleibt etwas übrig? Fehlt etwas?', 'Tassen und Löffel mit Linien verbinden: Reicht es?', ['Teller oder Tassen', 'Löffel']),
+  V5: MW('Zwei Haufen Muttern vergleichen: eins zu eins nebeneinanderlegen, wo bleiben welche übrig?', 'Den Kasten mit mehr einkreisen.', ['Muttern oder Knöpfe']),
+  V6: MW('Stifte oder Schrauben der Länge nach hinlegen, mit dem kleinsten anfangen.', 'Bilder ausschneiden und der Größe nach aufkleben.', ['Stifte oder Schrauben in verschiedenen Längen']),
+  V7: MW('Löffel und Gabeln abwechselnd legen und weitermachen; Perlen nach Muster auffädeln.', 'Das Muster in der Reihe weitermalen.', ['Besteck', 'Perlen']),
+  V8: MW('Würfelbilder mit Plättchen legen, kurz zeigen, wieder abdecken: Wie viele waren es?', 'Punktbilder kurz ansehen und das gleiche Bild finden.', ['Wendeplättchen', 'Tuch zum Abdecken']),
+  O1: MW('Aufträge ausführen: „Leg den Löffel in die Tasse, unter den Teller, neben das Glas.“', 'Im Bild das Ding unter, auf oder neben dem Tisch einkreisen.', ['Tisch', 'Alltagsdinge']),
+  O2: MW('Formen ertasten: Teller (Kreis), Brettchen (Viereck), Dreieckstuch. Dann mit Plättchen Formen legen.', 'Alle Kreise anmalen, alle Dreiecke einkreisen.', ['Formenplättchen', 'Fühlsäckchen']),
+  O3: MW('Mit dem Körper zeigen: Arm nach links, nach rechts; Pfeilkarten auf dem Boden folgen.', 'Alle Pfeile nach rechts einkreisen; gespiegelte Zeichen durchstreichen.', ['Pfeilkarten']),
+  O4: MW('Bildkarten einer Handlung (Brot schmieren) von links nach rechts legen; mit dem Finger der Reihe nach tippen.', 'Bilder der Reihe nach verbinden; Bildfolge ordnen.', ['Bildkarten']),
+  O5: MW('Kim-Spiel: 4 Dinge zeigen, abdecken, eins wegnehmen. Was fehlt?', 'Bilder ansehen, abdecken, dann das Fehlende einkreisen.', ['Alltagsdinge', 'Tuch'])
+});
+
+/* ---------- Basis-Bilder: einfache, einfärbbare Gegenstände (viewBox 0 0 64 64) ----------
+   Farben bewusst kräftig und gut unterscheidbar; für Schwarz-Weiß-Druck gibt es bei Formen Muster statt Farbe. */
+const B_COL = {rot:'#c9414a', blau:'#346bc3', gelb:'#e8b92e', gruen:'#2e8b57', grau:'#9aa3ab'};
+const B_COL_NAME = {rot:'rot', blau:'blau', gelb:'gelb', gruen:'grün', grau:'grau'};
+const B_METAL = '#b8c0c7';
+const bS = 'stroke="' + INK + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"';
+const B_OBJ = {
+  /* Küche */
+  tasse:  {name:'Tasse', grp:'kueche', col:'rot', d: c => `<path d="M12 22h32v20q0 10-10 10H22q-10 0-10-10z" fill="${c}" ${bS}/><path d="M44 27q10 0 10 8t-10 8" fill="none" ${bS}/><path d="M12 22h32" ${bS}/>`},
+  teller: {name:'Teller', grp:'kueche', col:'blau', d: c => `<ellipse cx="32" cy="38" rx="27" ry="13" fill="${c}" ${bS}/><ellipse cx="32" cy="37" rx="16" ry="7" fill="#fff" fill-opacity=".45" stroke="${INK}" stroke-width="1.4"/>`},
+  loeffel:{name:'Löffel', grp:'kueche', col:'grau', d: c => `<ellipse cx="32" cy="16" rx="8" ry="11" fill="${c}" ${bS}/><path d="M30 26h4l1 30q0 3-3 3t-3-3z" fill="${c}" ${bS}/>`},
+  gabel:  {name:'Gabel', grp:'kueche', col:'grau', d: c => `<path d="M23 6v13q0 7 7 8l-1 29q0 3 3 3t3-3l-1-29q7-1 7-8V6M29 6v12M35 6v12" fill="none" ${bS}/><path d="M23 19q0 7 9 8 9-1 9-8" fill="${c}" ${bS}/><path d="M29 27h6l-1 29q0 3-2 3t-2-3z" fill="${c}" ${bS}/>`},
+  glas:   {name:'Glas', grp:'kueche', col:'gelb', d: c => `<path d="M16 8h32l-4 48H20z" fill="#eef3f6" ${bS}/><path d="M18.4 26h27.2l-2.6 30H21z" fill="${c}"/><path d="M16 8h32l-4 48H20z" fill="none" ${bS}/>`},
+  /* Werkstatt */
+  schraube:{name:'Schraube', grp:'werkstatt', col:'grau', d: c => `<path d="M18 8h28v9H18z" fill="${c}" ${bS}/><path d="M32 9v7" ${bS}/><path d="M27 17h10v34l-5 7-5-7z" fill="${c}" ${bS}/><path d="M27 23l10 3M27 30l10 3M27 37l10 3M27 44l10 3" stroke="${INK}" stroke-width="1.6"/>`},
+  mutter: {name:'Mutter', grp:'werkstatt', col:'grau', d: c => `<path d="M32 8l21 12v24L32 56 11 44V20z" fill="${c}" ${bS}/><circle cx="32" cy="32" r="10" fill="#fff" ${bS}/>`},
+  hammer: {name:'Hammer', grp:'werkstatt', col:'rot', d: c => `<path d="M10 10h30v14H10z" fill="${B_METAL}" ${bS}/><path d="M40 13h8v8h-8" fill="${B_METAL}" ${bS}/><path d="M21 24h8v32h-8z" fill="${c}" ${bS}/>`},
+  zange:  {name:'Zange', grp:'werkstatt', col:'blau', d: c => `<path d="M27 6l3 18M37 6l-3 18" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M27 6l3 18M37 6l-3 18" stroke="${B_METAL}" stroke-width="2.6" stroke-linecap="round"/><circle cx="32" cy="26" r="4" fill="${B_METAL}" ${bS}/><path d="M29 29q-6 12-9 27h6q3-13 6-25M35 29q6 12 9 27h-6q-3-13-6-25" fill="${c}" ${bS}/>`},
+  dreher: {name:'Schraubenzieher', grp:'werkstatt', col:'gelb', d: c => `<path d="M24 34h16v18q0 4-4 4h-8q-4 0-4-4z" fill="${c}" ${bS}/><path d="M30 34V10h4v24" fill="${B_METAL}" ${bS}/><path d="M30 10l2-4 2 4" fill="${B_METAL}" ${bS}/>`},
+  /* Kleidung */
+  socke:  {name:'Socke', grp:'kleidung', col:'blau', d: c => `<path d="M22 6h18v28q0 6 6 10 6 4 3 10-3 6-11 3L22 48q-6-4-6-10V6z" fill="${c}" ${bS}/><path d="M22 14h18" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>`},
+  muetze: {name:'Mütze', grp:'kleidung', col:'gruen', d: c => `<path d="M10 46q0-30 22-30t22 30z" fill="${c}" ${bS}/><path d="M8 46h48v8H8z" fill="${c}" ${bS}/><circle cx="32" cy="13" r="5" fill="#fff" ${bS}/>`},
+  shirt:  {name:'T-Shirt', grp:'kleidung', col:'rot', d: c => `<path d="M22 8l-14 9 6 11 6-3v31h24V25l6 3 6-11-14-9q-4 6-10 6t-10-6z" fill="${c}" ${bS}/>`},
+  /* Schreibtisch */
+  stift:  {name:'Stift', grp:'buero', col:'gelb', d: c => `<path d="M26 8h12v38H26z" fill="${c}" ${bS}/><path d="M26 46h12l-6 12z" fill="#f2d6a8" ${bS}/><path d="M30 54h4l-2 4z" fill="${INK}"/><path d="M26 14h12" ${bS}/>`},
+  knopf:  {name:'Knopf', grp:'buero', col:'rot', d: c => `<circle cx="32" cy="32" r="22" fill="${c}" ${bS}/><circle cx="32" cy="32" r="15" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2"/><circle cx="27" cy="27" r="2.6" fill="#fff" stroke="${INK}" stroke-width="1.4"/><circle cx="37" cy="27" r="2.6" fill="#fff" stroke="${INK}" stroke-width="1.4"/><circle cx="27" cy="37" r="2.6" fill="#fff" stroke="${INK}" stroke-width="1.4"/><circle cx="37" cy="37" r="2.6" fill="#fff" stroke="${INK}" stroke-width="1.4"/>`},
+  /* Obst */
+  apfel:  {name:'Apfel', grp:'obst', col:'rot', d: c => `<path d="M32 18q-6-4-12-2-10 4-9 18 2 16 12 21 4 2 9 0 5 2 9 0 10-5 12-21 1-14-9-18-6-2-12 2z" fill="${c}" ${bS}/><path d="M32 18q0-6 4-10" fill="none" ${bS}/><path d="M35 12q6-4 11 0-5 4-11 0z" fill="#2e8b57" ${bS}/>`},
+  birne:  {name:'Birne', grp:'obst', col:'gelb', d: c => `<path d="M32 12q-6 0-7 10-1 7-6 12-6 8-1 16 4 6 14 6t14-6q5-8-1-16-5-5-6-12-1-10-7-10z" fill="${c}" ${bS}/><path d="M32 12q0-4 3-7" fill="none" ${bS}/>`}
+};
+const B_GRP = {kueche:'Küche', werkstatt:'Werkstatt', kleidung:'Kleidung', buero:'Schreibtisch', obst:'Obst'};
+/* Gegenstand als SVG; size = Bildgröße in px; scale = Größe des Dings im Bild (für „größer/kleiner“), unten verankert */
+function bObj(kind, col, size = 64, scale = 1){
+  const o = B_OBJ[kind], c = B_COL[col || o.col] || col || B_COL[o.col];
+  const body = scale === 1 ? o.d(c) : `<g transform="translate(32 60) scale(${scale}) translate(-32 -60)">${o.d(c)}</g>`;
+  return `<svg class="b-obj" viewBox="0 0 64 64" width="${size}" height="${size}" role="img" aria-label="${escHtml(o.name)}">${body}</svg>`;
+}
+/* Formen: Kreis, Dreieck, Quadrat, Rechteck, Stern; fill: voll | leer | streifen | punkte (für Schwarz-Weiß-Druck) */
+const B_FORM = {kreis:'Kreis', dreieck:'Dreieck', quadrat:'Quadrat', rechteck:'Rechteck', stern:'Stern'};
+let bPid = 0;
+function bShape(form, col = 'blau', size = 64, fill = 'voll'){
+  const c = B_COL[col] || col, id = 'bp' + (++bPid);
+  const pat = fill === 'streifen' ? `<pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><rect width="3" height="6" fill="${c}"/></pattern>`
+    : fill === 'punkte' ? `<pattern id="${id}" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fff"/><circle cx="3.5" cy="3.5" r="1.8" fill="${c}"/></pattern>` : '';
+  const f = fill === 'leer' ? '#fff' : pat ? `url(#${id})` : c;
+  const p = {kreis:'<circle cx="32" cy="32" r="24"/>', dreieck:'<path d="M32 8l26 46H6z"/>', quadrat:'<rect x="10" y="10" width="44" height="44" rx="2"/>',
+    rechteck:'<rect x="5" y="18" width="54" height="28" rx="2"/>', stern:'<path d="M32 5l7.6 16.5 18 2-13.4 12.3 3.8 17.7L32 44.6 16 53.5l3.8-17.7L6.4 23.5l18-2z"/>'}[form];
+  return `<svg class="b-shape" viewBox="0 0 64 64" width="${size}" height="${size}" role="img" aria-label="${B_FORM[form]}">${pat ? `<defs>${pat}</defs>` : ''}<g fill="${f}" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round">${p}</g></svg>`;
+}
+/* Pfeile: rechts, links, oben, unten */
+const B_DIR = {rechts:0, unten:90, links:180, oben:270};
+const bArrow = (dir, size = 64, col = INK) => `<svg class="b-arrow" viewBox="0 0 64 64" width="${size}" height="${size}" role="img" aria-label="Pfeil nach ${dir}"><path transform="rotate(${B_DIR[dir]} 32 32)" d="M8 26h28V14l20 18-20 18V38H8z" fill="${col}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+/* Spiegel-Zeichen (Vorbereitung auf b/d, p/q – ohne echte Buchstaben): fahne, stiefel, kanne; lage 0 = Grundform, 1 = gespiegelt, 2 = auf dem Kopf, 3 = beides */
+const B_GLYPH = {
+  kanne:  '<path d="M16 22h26v24q0 8-8 8H24q-8 0-8-8z" stroke-width="4"/><path d="M42 28l12-8v6l-10 10" stroke-width="4"/><path d="M16 28q-8 0-8 7t8 7" fill="none" stroke-width="4"/><path d="M24 22v-6h10v6" stroke-width="4"/>',
+  fahne:  '<path d="M20 6v52" stroke-width="6"/><path d="M20 8h26l-8 10 8 10H20z" stroke-width="5"/>',
+  stiefel:'<path d="M22 8h12v32h16v14H22z" stroke-width="5"/>'
+};
+function bGlyph(kind, lage = 0, size = 64, col = INK){
+  const sx = lage & 1 ? -1 : 1, sy = lage & 2 ? -1 : 1;
+  return `<svg class="b-glyph" viewBox="0 0 64 64" width="${size}" height="${size}" role="img" aria-label="Zeichen"><g transform="translate(32 32) scale(${sx} ${sy}) translate(-32 -32)" stroke="${col}" fill="${col}" stroke-linecap="round" stroke-linejoin="round">${B_GLYPH[kind]}</g></svg>`;
+}
+/* Punktbilder 1–4 in verschiedenen Anordnungen (Auf einen Blick) */
+const B_DOTS = {1:[[[32, 32]]], 2:[[[20, 32], [44, 32]], [[22, 22], [42, 42]]], 3:[[[14, 32], [32, 32], [50, 32]], [[32, 16], [18, 44], [46, 44]], [[16, 16], [32, 32], [48, 48]]], 4:[[[20, 20], [44, 20], [20, 44], [44, 44]], [[14, 16], [36, 20], [28, 42], [50, 48]], [[32, 12], [14, 32], [50, 32], [32, 52]]]};
+const bDots = (n, var_ = 0, size = 64, col = B_COL.blau) => `<svg class="b-dots" viewBox="0 0 64 64" width="${size}" height="${size}" role="img" aria-label="${n} Punkte"><rect x="2" y="2" width="60" height="60" rx="8" fill="#fff" stroke="${INK}" stroke-width="2"/>${B_DOTS[n][var_ % B_DOTS[n].length].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="${col}" stroke="${INK}" stroke-width="1.6"/>`).join('')}</svg>`;
+
+/* ---------- Bildsymbole der Aufgabenarten (Strichzeichnung, viewBox 0 0 48 48) ---------- */
+const bsS = 'fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
+const B_SYM = {
+  V1: `<rect x="4" y="14" width="14" height="14" rx="2" ${bsS}/><rect x="30" y="14" width="14" height="14" rx="2" ${bsS}/><path d="M21 19h6M21 24h6" ${bsS}/><path d="M7 36h34" ${bsS} stroke-dasharray="2 4"/>`,
+  V2: `<circle cx="9" cy="24" r="5" ${bsS}/><circle cx="21" cy="24" r="5" ${bsS}/><path d="M33 19l6 10h-12z" ${bsS}/><path d="M27 13l14 22M41 13L27 35" ${bsS}/>`,
+  V3: `<path d="M3 26v12h18V26M27 26v12h18V26" ${bsS}/><circle cx="12" cy="10" r="4" ${bsS}/><path d="M36 6l4 7h-8z" ${bsS}/><path d="M12 16v7M36 16v7" ${bsS}/><path d="M9 20l3 3 3-3M33 20l3 3 3-3" ${bsS}/>`,
+  V4: `<circle cx="10" cy="10" r="4" ${bsS}/><circle cx="24" cy="10" r="4" ${bsS}/><circle cx="38" cy="10" r="4" ${bsS}/><rect x="6" y="34" width="8" height="8" ${bsS}/><rect x="20" y="34" width="8" height="8" ${bsS}/><rect x="34" y="34" width="8" height="8" ${bsS}/><path d="M10 15v18M24 15v18M38 15v18" ${bsS}/>`,
+  V5: `<circle cx="9" cy="24" r="3" fill="currentColor"/><circle cx="16" cy="24" r="3" fill="currentColor"/><path d="M24 10v28" ${bsS}/><circle cx="32" cy="16" r="3" fill="currentColor"/><circle cx="41" cy="16" r="3" fill="currentColor"/><circle cx="32" cy="25" r="3" fill="currentColor"/><circle cx="41" cy="25" r="3" fill="currentColor"/><circle cx="36.5" cy="34" r="3" fill="currentColor"/>`,
+  V6: `<rect x="5" y="30" width="9" height="12" ${bsS}/><rect x="19" y="20" width="9" height="22" ${bsS}/><rect x="33" y="8" width="9" height="34" ${bsS}/>`,
+  V7: `<circle cx="7" cy="24" r="4.5" fill="currentColor"/><path d="M17 28.5l4.5-9 4.5 9z" fill="currentColor"/><circle cx="34" cy="24" r="4.5" fill="currentColor"/><path d="M41 18q5-3 5 2t-4 5v3M42 33v.5" ${bsS}/>`,
+  V8: `<path d="M3 24q10-13 21-13t21 13q-10 13-21 13T3 24z" ${bsS}/><circle cx="18" cy="24" r="2.6" fill="currentColor"/><circle cx="24" cy="20" r="2.6" fill="currentColor"/><circle cx="30" cy="27" r="2.6" fill="currentColor"/>`,
+  O1: `<path d="M4 18h40M8 18v22M40 18v22" ${bsS}/><circle cx="24" cy="35" r="5" ${bsS}/>`,
+  O2: `<circle cx="10" cy="24" r="7" ${bsS}/><path d="M24 16l8 15H16z" ${bsS}/><rect x="34" y="17" width="12" height="13" ${bsS}/>`,
+  O3: `<path d="M24 6v36" ${bsS} stroke-dasharray="3 3"/><path d="M19 16H6M10 11l-5 5 5 5" ${bsS}/><path d="M29 32h13M38 27l5 5-5 5" ${bsS}/>`,
+  O4: `<rect x="3" y="10" width="11" height="11" rx="1.5" ${bsS}/><rect x="18.5" y="10" width="11" height="11" rx="1.5" ${bsS}/><rect x="34" y="10" width="11" height="11" rx="1.5" ${bsS}/><path d="M5 33h36M36 28l5 5-5 5" ${bsS}/>`,
+  O5: `<rect x="5" y="8" width="38" height="32" rx="3" ${bsS}/><circle cx="15" cy="18" r="3" fill="currentColor"/><circle cx="33" cy="18" r="3" fill="currentColor"/><path d="M5 26h38v11q0 3-3 3H8q-3 0-3-3z" fill="currentColor" opacity=".35"/><path d="M22 30v.5" ${bsS}/>`
+};
+const bSym = (lvl, size = 40) => `<svg class="b-sym" viewBox="0 0 48 48" width="${size}" height="${size}" aria-hidden="true">${B_SYM[lvl] || ''}</svg>`;
+/* Achsen anmelden (Aufgaben folgen in Schritt 3; mindestens 3 je Stufe) */
+AXES.V = {place:'Vergleichen und Ordnen', levels:V_LEVELS, info:V_INFO, items:{}, mode:'basis'};
+AXES.O = {place:'Sehen und Orientieren', levels:O_LEVELS, info:O_INFO, items:{}, mode:'basis'};
 /* Typische Fehler beim Üben → nächster Schritt am Material */
 const ERR_MAT = {
   dreher: 'Zuerst die Zehnerstangen legen, dann die Einer, und beim Schreiben mit den Zehnern beginnen (Stellentafel).',
@@ -8514,7 +8672,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.26.0 · 17.11.2026';
+const APP_VERSION = '0.26.1 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
