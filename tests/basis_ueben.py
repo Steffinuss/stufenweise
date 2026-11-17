@@ -1,19 +1,24 @@
-"""Basis, Schritt 3 (0.28.0): Üben in der App.
-Alle Aufgaben-Generatoren (V1–V8, O2–O4, je mindestens 3) erzeugen gültige Aufgaben ohne NaN/undefined;
+"""Basis, Schritt 3 (0.28.0, überarbeitet 0.28.1): Üben in der App.
+Alle Aufgabenarten (V1–V8, O2–O4, je mindestens 2, in den Schwierigkeiten st = 0, 1, 2) erzeugen gültige
+Aufgaben ohne NaN/undefined; bei st = 0 höchstens 4 Dinge (basal);
 die vorgemachte Lösung (bzSolve) wird als richtig gewertet, eine falsche Antwort als falsch.
 Mit echten Klicks: Bild wählen, Sortieren (Ding, dann Kiste), Verbinden (oben, unten), Reihenfolge,
 kurz zeigen (Bild verschwindet von selbst). Fach „Basis“ für Gast sichtbar, für ein Kind erst nach dem
-Einschalten in den Einstellungen; die Statistik zählt die Basis-Übungen."""
+Einschalten in den Einstellungen; die Statistik zählt die Basis-Übungen.
+Ablauf (Stefan, 17.11.: nicht mischen): Das Kind bleibt bei einer Aufgabenart; jede neue Art wird zuerst
+vorgemacht („Schau zu“, Klicks gesperrt, dann „Jetzt du“); nach 8 richtigen kommt „Nächste Aufgabe“;
+nach drei Fehlern in Folge wird es wieder leichter."""
 import asyncio
 from playwright.async_api import async_playwright
 from common import URL, launch  # noqa: E402
 
 CHECK = r"""(()=>{ const bad = [], n = {};
   for(const ax of ['V', 'O']) for(const l of axLevels(ax)){
-    const gens = AXES[ax].items[l]; if(gens.length < 3) bad.push(l + ' hat nur ' + gens.length + ' Arten');
-    if(!gens[0]().kern) bad.push(l + ': erste Art ohne kern');
-    gens.forEach((g, gi) => { for(let t = 0; t < 40; t++){
-      const it = g(), id = l + '#' + gi;
+    const arts = AXES[ax].arts[l]; if(arts.length < 2) bad.push(l + ' hat nur ' + arts.length + ' Arten');
+    if(!AXES[ax].items[l][0]().kern) bad.push(l + ': erste Art ohne kern');
+    arts.forEach(([name, g], gi) => { for(let t = 0; t < 45; t++){
+      const st = t % 3, it = g(st), id = l + '#' + gi + ' st' + st;
+      const nn = (it.cells || it.things || it.up || []).length; if(st === 0 && it.type !== 'order' && !it.label.startsWith('Fehler im Muster') && nn > 4) bad.push(id + ' bei st 0 schon ' + nn + ' Dinge');
       if(!BZ_TYPES.includes(it.type)) { bad.push(id + ' Typ ' + it.type); break; }
       if(!it.prompt || !it.label || !it.tip) bad.push(id + ' ohne Text');
       const h = bzStage(it, {}, {}); if(/NaN|undefined|\[object/.test(h)) { bad.push(id + ' kaputt'); break; }
@@ -78,13 +83,13 @@ async def main():
             for l in await pg.evaluate(f"axLevels('{ax}')"):
                 ng = await pg.evaluate(f"AXES['{ax}'].items['{l}'].length")
                 for g in range(ng):
-                    await pg.evaluate(f"(()=>{{Object.assign(app.read,{{lvl:'{l}', item:AXES['{ax}'].items['{l}'][{g}](), r:{{}}, fb:null, tries:0}}); render();}})()")
+                    await pg.evaluate(f"(()=>{{clearTimeout(app.demoT); Object.assign(app.read,{{lvl:'{l}', item:AXES['{ax}'].items['{l}'][{g}](), r:{{}}, fb:null, tries:0, demo:false}}); render();}})()")
                     ok, hint = await solve_by_clicks(pg)
                     if not ok: errs.append(f'{l}#{g} mit Klicks nicht richtig: {hint}')
                     done += 1
         print('mit Klicks gelöst:', done)
         # Falsch → rot markiert, dann Lösung zeigen nach 2 Versuchen
-        await pg.evaluate("(()=>{Object.assign(app.read,{lvl:'V3', item:AXES.V.items.V3[0](), r:{}, fb:null, tries:0}); render();})()")
+        await pg.evaluate("(()=>{clearTimeout(app.demoT); Object.assign(app.read,{lvl:'V3', item:AXES.V.items.V3[0](), r:{}, fb:null, tries:0, demo:false}); render();})()")
         boxes = await pg.evaluate("app.read.item.things.map(t=>t.box)")
         for i, bx in enumerate(boxes): await pg.click(f'#stage .bz-pool [data-bzt="{i}"]'); await pg.click(f'#stage [data-bzb="{1 - bx}"]')
         await pg.click('#r-check'); await pg.wait_for_timeout(60)
@@ -96,7 +101,7 @@ async def main():
             await pg.click('#r-show'); await pg.wait_for_timeout(60)
             if await pg.evaluate("document.querySelectorAll('#stage .bz-pool .bz-c').length") != 0: errs.append('Lösung zeigen sortiert nicht ein')
         # Kurz zeigen: verschwindet, „Nochmal zeigen“ zeigt wieder
-        await pg.evaluate("(()=>{Object.assign(app.read,{lvl:'V8', item:AXES.V.items.V8[0](), r:{}, fb:null, tries:0}); render();})()")
+        await pg.evaluate("(()=>{clearTimeout(app.demoT); Object.assign(app.read,{lvl:'V8', item:AXES.V.items.V8[0](), r:{}, fb:null, tries:0, demo:false}); render();})()")
         if await pg.query_selector('#stage [data-bz]'): errs.append('Kurz zeigen: Auswahl schon sichtbar')
         await pg.wait_for_timeout(1800)
         if not await pg.query_selector('#stage [data-bz]'): errs.append('Kurz zeigen: Bild verschwindet nicht')
@@ -106,7 +111,7 @@ async def main():
         if not await pg.query_selector('#stage [data-bz]'): errs.append('nach Nochmal zeigen kein Abdecken')
         # Statistik
         await pg.evaluate("(()=>{const p={id:'kb',name:'Bea',created:1};data.profiles.push(p);selectProfile(p.id);})()")
-        await pg.evaluate("(()=>{Object.assign(app.read,{lvl:'V2', item:AXES.V.items.V2[0](), r:{}, fb:null, tries:0}); app.mode='read'; settings.subject='B'; render();})()")
+        await pg.evaluate("(()=>{clearTimeout(app.demoT); Object.assign(app.read,{lvl:'V2', item:AXES.V.items.V2[0](), r:{}, fb:null, tries:0, demo:false}); app.mode='read'; settings.subject='B'; render();})()")
         await solve_by_clicks(pg)
         stats = await pg.evaluate("JSON.stringify(statsSections('kb'))")
         if 'Basis' not in stats or 'Was passt nicht?' not in stats: errs.append(f'Statistik ohne Basis: {stats[:200]}')
@@ -120,5 +125,41 @@ async def main():
         if subs != ['M,D,B', '{"B":true}']: errs.append(f'nach Einschalten: {subs}')
         await pg.uncheck('[data-subjon="B"][data-subjon-pid="kb"]'); await pg.wait_for_timeout(100)
         if await pg.evaluate("visSubjects().join()") != 'M,D': errs.append('Ausschalten geht nicht')
+        # Ablauf: vormachen, bei einer Art bleiben, nächste Art, leichter nach Fehlern
+        await pg.evaluate("(()=>{dlgSet.close(); selectProfile('kb'); curProfile().subjOn={B:true}; app.read.seen=new Set(); app.read.artMem={}; settings.subject='B'; app.mode='read'; app.read.lvl='V2'; app.read.item=null; render();})()")
+        st = await pg.evaluate("[app.read.demo, !!document.querySelector('#r-try'), document.querySelector('#prompt').textContent.includes('Schau zu'), !!document.querySelector('#r-check')]")
+        if st != [True, True, True, False]: errs.append(f'Vormachen am Anfang: {st}')
+        await pg.click('#stage [data-bz="0"]', force=True); await pg.wait_for_timeout(50)
+        if await pg.evaluate("(app.read.r.set||[]).length > 1"): errs.append('Klicks beim Vormachen nicht gesperrt')
+        await pg.wait_for_timeout(2600)
+        if not await pg.evaluate("app.read.r.set?.length === 1"): errs.append('Vormachen zeigt die Lösung nicht')
+        await pg.click('#r-try'); await pg.wait_for_timeout(80)
+        if await pg.evaluate("app.read.demo"): errs.append('Jetzt du beendet das Vormachen nicht')
+        names = set()
+        for i in range(9):
+            names.add(await pg.evaluate("app.read.item.label.split(':')[0]"))
+            ok, hint = await solve_by_clicks(pg)
+            if not ok: errs.append(f'Ablauf {i}: {hint}')
+            if i < 8: await pg.click('#r-next'); await pg.wait_for_timeout(40)
+        if names != {'Passt nicht'}: errs.append(f'Aufgabenarten gemischt: {names}')
+        if await pg.evaluate("app.read.item.cells.length") != 4: errs.append('nach 8 richtigen nicht schwerer (4 Bilder)')
+        if not await pg.query_selector('#r-art-up'): errs.append('nach 8 richtigen keine „Nächste Aufgabe“')
+        else:
+            await pg.click('#r-art-up'); await pg.wait_for_timeout(80)
+            st = await pg.evaluate("[bzMem().art, app.read.demo, app.read.item.label.split(':')[0]]")
+            if st != [1, True, 'Passt nicht (Farbe)']: errs.append(f'nächste Aufgabenart: {st}')
+            chips = await pg.evaluate("[...document.querySelectorAll('#ranges [data-rart]')].map(b=>b.textContent+':'+b.getAttribute('aria-pressed')).join()")
+            if 'Andere Farbe:true' not in chips: errs.append(f'Kopfleiste Aufgabenarten: {chips}')
+        await pg.click('#r-try'); await pg.wait_for_timeout(50)
+        await pg.evaluate("bzMem().ok = 7; app.read.item = null; render()")
+        if await pg.evaluate("app.read.item.cells.length") != 4: errs.append('st 2 erwartet')
+        for i in range(3):
+            w = await pg.evaluate("app.read.item.cells.findIndex((_, j) => !app.read.item.want.includes(j))")
+            await pg.click(f'#stage [data-bz="{w}"]'); await pg.click('#r-check'); await pg.wait_for_timeout(40)
+            await pg.evaluate("readNew()")
+        if await pg.evaluate("bzMem().ok") > 4: errs.append(f'nach 3 Fehlern nicht leichter: {await pg.evaluate("bzMem().ok")}')
+        # Andere Aufgabenart über die Kopfleiste
+        await pg.click('#ranges [data-rart="2"]'); await pg.wait_for_timeout(80)
+        if await pg.evaluate("[bzMem().art, app.read.demo].join()") != '2,true': errs.append('Kopfleiste wählt Aufgabenart nicht')
         print('ERR', errs[:10]); await b.close()
 asyncio.run(main())

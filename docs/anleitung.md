@@ -239,7 +239,11 @@ Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in 
 - **Der Reihe nach:** Die Bilder in der richtigen Reihenfolge antippen, es erscheinen Zahlen 1, 2, 3. Eine Zahl antippen nimmt sie (und alle danach) zurück.
 - **Auf einen Blick:** Das Bild ist kurz zu sehen und wird dann abgedeckt. „Nochmal zeigen“ zeigt es noch einmal.
 
-Nach „Prüfen“ wird Falsches rot markiert. Die Aufträge sind kurz, aber die meisten Kinder auf dieser Stufe lesen sie nicht selbst: Erkläre den Auftrag an der ersten Aufgabe. Jede Aufgabenart hat ein festes Bildsymbol vor dem Auftrag.
+Nach „Prüfen“ wird Falsches rot markiert. Jede Stufe hat ein festes Bildsymbol vor dem Auftrag.
+
+**Eine Aufgabenart nach der anderen:** Innerhalb einer Stufe gibt es mehrere Aufgabenarten, von leicht nach schwer (bei „Gleiches“ zum Beispiel: Gleiches Bild, Gleiche verbinden, Gleiche Farbe, Farbe verbinden). Das Kind bleibt bei einer Aufgabenart und wiederholt sie. Am Anfang sind es nur 2 oder 3 Bilder, nach einigen richtigen Aufgaben werden es mehr. Wer dreimal hintereinander danebenliegt, bekommt wieder leichtere Aufgaben. Nach 8 Aufgaben, die beim ersten Versuch richtig waren, erscheint „Nächste Aufgabe“ für die nächste Aufgabenart. Oben in der Leiste kannst du jede Aufgabenart auch direkt wählen.
+
+**Vormachen:** Bevor ein Kind eine Aufgabenart zum ersten Mal bekommt, macht Stufenweise sie einmal vor („Schau zu“): Schritt für Schritt wird angetippt, einsortiert oder verbunden. Das Kind kann dabei nichts antippen. Mit „Jetzt du“ beginnt das Kind selbst. „Vormachen“ unten zeigt das Beispiel jederzeit noch einmal. Erkläre den Auftrag dazu mit eigenen Worten.
 
 **Wer Basis sieht:** Ohne gewähltes Kind (Gast) und in der Lehrkraft-Ansicht immer. Ein Kind sieht „Basis“ erst, wenn du es unter **Einstellungen → Kinder & Daten → Basis** für dieses Kind einschaltest. So werden Kinder, die schon zählen und lesen, nicht damit gelangweilt. Den Basis-Test gibt es noch nicht; er kommt mit der nächsten Version.
 
