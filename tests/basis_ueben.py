@@ -187,5 +187,14 @@ async def main():
         # Andere Aufgabenart über die Kopfleiste
         await pg.click('#ranges [data-rart="2"]'); await pg.wait_for_timeout(80)
         if await pg.evaluate("[bzMem().art, app.read.demo].join()") != '2,true': errs.append('Kopfleiste wählt Aufgabenart nicht')
+        # Größe bleibt beim Vormachen und nach „Jetzt du“ gleich (0.28.5: Aufgabe sprang/wurde kleiner); kein Zahlenstrahl-Symbol im Bildmodus
+        await pg.set_viewport_size({'width': 1092, 'height': 851})
+        await pg.evaluate("curProfile().pic=true; app.read.artMem={}; app.read.seen=new Set(); app.read.lvl='V4'; bzMem().art=1; bzMem().ok=6; app.read.item=null; render()")
+        zs = set()
+        for _ in range(10):
+            zs.add(await pg.evaluate("[...document.querySelector('#stage .it-wrap').children].map(c=>c.style.zoom||'1').join('/') + (document.querySelector('#stage .it-wrap').classList.contains('it-more') ? ' mehr' : '')"))
+            await pg.wait_for_timeout(450)
+        if len(zs) != 1: errs.append(f'Vormachen: Größe springt {zs}')
+        if await pg.evaluate("!!document.querySelector('#prompt .pic-ic')"): errs.append('Bildmodus: fremdes Symbol vor dem Basis-Auftrag')
         print('ERR', errs[:10]); await b.close()
 asyncio.run(main())

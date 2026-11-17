@@ -871,20 +871,24 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 
 /* ---------- Handy hochkant (bis 560 px breit): brauchbare Demo-Ansicht (Stefan, 16.11.2026) ---------- */
 /* Basis: Aufgaben mit Bildern (pick, sort, match, order, glance) */
-.dg-stage.bz-demo{background:#fdf0dc;border:5px dashed var(--focus);border-radius:26px;padding:10px 12px 14px;position:relative}
+/* Vormachen ändert die Größe nicht (sonst springt der Inhalt): Rahmen als outline, Hinweise in einem festen Streifen oben */
+.dg-stage:has(>.bz),.dg-stage:has(.bz-watch),.dg-stage:has(.bz-you){position:relative}.dg-stage .it-wrap.bz{padding-top:62px}
+.dg-stage.bz-demo{background:#fdf0dc;outline:5px dashed var(--focus);outline-offset:-5px;border-radius:26px}
 .bz-demo .bz{pointer-events:none}.bz-demo .bz-goal{background:#e9eef6}.bz-demo .bz-c,.bz-demo .bz-tg{box-shadow:none}
-.bz-watch{display:inline-flex;align-items:center;gap:12px;font-size:30px;font-weight:800;color:#b45f06;background:#fff;border:4px solid var(--focus);border-radius:999px;padding:4px 26px 4px 14px;margin:0 auto 8px;animation:bzBlink 1.6s ease-in-out infinite}
-@keyframes bzBlink{50%{transform:scale(1.05)}}
-.bz-you{display:inline-flex;align-items:center;gap:10px;font-size:30px;font-weight:800;color:var(--ok);background:#fff;border:4px solid var(--ok);border-radius:999px;padding:4px 26px 4px 10px;margin:0 auto 8px;animation:bzYou 2.2s ease forwards}
+.bz-watch,.bz-you{position:absolute;top:8px;left:50%;z-index:9;display:inline-flex;align-items:center;gap:10px;font-size:26px;font-weight:800;background:#fff;border-radius:999px;padding:2px 22px 2px 10px;white-space:nowrap;transform:translateX(-50%)}
+.bz-watch{color:#b45f06;border:4px solid var(--focus);animation:bzBlink 1.6s ease-in-out infinite}.bz-watch svg{width:38px;height:38px}
+@keyframes bzBlink{50%{transform:translateX(-50%) scale(1.05)}}
+@keyframes bzPulse{50%{transform:scale(1.06)}}
+.bz-you{color:var(--ok);border:4px solid var(--ok);animation:bzYou 2.2s ease forwards}
 .bz-you-h{display:inline-flex}.bz-you-h svg{width:42px;height:42px}
-@keyframes bzYou{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.1)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0;height:0;padding:0;margin:0;border-width:0}}
+@keyframes bzYou{0%{opacity:0;transform:translateX(-50%) scale(.7)}15%{opacity:1;transform:translateX(-50%) scale(1.1)}25%{transform:translateX(-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) scale(1)}}
 .bz [data-bzd],.bz-yn button,.bz-c{position:relative}
 .bz-hand{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-4px 0 0 -4px;z-index:8;pointer-events:none;filter:drop-shadow(0 3px 4px #2b293055);animation:bzTap 1.1s ease-in-out infinite}.bz-hand svg{display:block}
 @keyframes bzTap{0%,100%{transform:translate(0,0)}40%{transform:translate(4px,6px) scale(.9)}}
-.tool.bz-go:not(:disabled){animation:bzBlink 1.2s ease-in-out infinite}
+.tool.bz-go:not(:disabled){animation:bzPulse 1.2s ease-in-out infinite}
 .bz-zone{width:min(900px,100%);border-radius:22px;padding:16px 18px;display:flex;justify-content:center}
 .bz-goal{background:#e3edf9;border:3px solid #c3d6ef}
-.bz-pool{background:#efe4cf;border:3px solid #ddcca9;box-shadow:inset 0 3px 8px #8a64361f;min-height:118px;align-items:center}.bz-pool.empty{min-height:0;padding:8px}.bz-pool .bz-done{font-size:16px}
+.bz-pool{background:#efe4cf;border:3px solid #ddcca9;box-shadow:inset 0 3px 8px #8a64361f;min-height:172px;align-items:center}.bz-pool .bz-done{font-size:16px}
 .bz-goal .bz-box{background:#fff;border-color:#9fbbe0}.bz-boxes{width:100%}
 .bz-cols{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:18px;width:100%}
 .bz-col{display:flex;flex-direction:column;align-items:center;gap:10px;border-radius:16px;padding:4px;cursor:pointer}
@@ -6306,7 +6310,7 @@ function bzStage(it, r, opt = {}){
     const slots = it.up.map((c, i) => { const j = at(i); return `<div class="bz-col" data-bzs="${i}" data-bzdrop="s${i}"><span class="bz-tg" aria-label="${escHtml(c.a)}">${c.h}</span><span class="bz-slot${j != null ? ' full' : ''}" role="button" aria-label="Platz unter ${escHtml(c.a)}">${j != null ? `<span class="bz-c bz-pl${bzMark(r, j)}${okAll ? ' fb-ok' : ''}" data-bzp="${j}" data-bzd="p${j}">${it.dn[j].h}</span>` : ''}</span></div>`; }).join('');
     const items = it.dn.map((c, j) => used.has(j) ? '' : `<button class="bz-c${r.sel === j ? ' sel' : ''}" data-bzp="${j}" data-bzd="p${j}" aria-pressed="${r.sel === j}" aria-label="${escHtml(c.a)}">${c.h}</button>`).join('');
     const ask = it.ask ? `<div class="bz-yn"><span>${escHtml(it.ask.q)}</span>${[[1, '✓', 'ja'], [0, '✗', 'nein']].map(([v, s, t]) => `<button data-bzyn="${v}" aria-pressed="${r.yes === v}" class="${r.yes === v && opt.feedback ? (okAll ? 'fb-ok' : 'fb-no') : ''}"><b aria-hidden="true">${s}</b> ${t}</button>`).join('')}</div>` : '';
-    return wrap(`<div class="bz-zone bz-goal"><div class="bz-cols" style="--n:${it.up.length}">${slots}</div></div>${pool(items, it.ask && used.size === it.dn.length ? 'empty' : '')}${ask}`);
+    return wrap(`<div class="bz-zone bz-goal"><div class="bz-cols" style="--n:${it.up.length}">${slots}</div></div>${pool(items)}${ask}`);
   }
   if(it.type === 'order' && it.slots){
     const at = r.seq || [], placed = new Set(at.filter(v => v != null));
@@ -6779,13 +6783,13 @@ function renderRead(){
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl);
   const arts = bzArts(R.lvl);
-  if(R.demo && R.r.hand) $('#stage').querySelector(R.r.hand)?.insertAdjacentHTML('beforeend', BZ_HAND);
-  if(bzPre) bzFlip(bzPre, R.demo ? 900 : 260);
-  if(arts && R.demo){ $('#controls').innerHTML = toolBtn({id:'r-demo', ic:'eye', label:'Nochmal vormachen', disabled: !R.demoEnd}) + toolBtn({id:'r-try', ic:'next', label:'Jetzt du', primary:true, disabled: !R.demoEnd, cls: R.demoEnd ? 'bz-go' : ''}); itFit(); return; }
+  /* Basis: erst einpassen, dann Hand und Bewegung – sonst zählen verschobene Dinge beim Einpassen mit und die Aufgabe springt */
+  const bzAfter = () => { itFit(); if(R.demo && R.r.hand) $('#stage').querySelector(R.r.hand)?.insertAdjacentHTML('beforeend', BZ_HAND); if(bzPre) bzFlip(bzPre, R.demo ? 900 : 260); };
+  if(arts && R.demo){ $('#controls').innerHTML = toolBtn({id:'r-demo', ic:'eye', label:'Nochmal vormachen', disabled: !R.demoEnd}) + toolBtn({id:'r-try', ic:'next', label:'Jetzt du', primary:true, disabled: !R.demoEnd, cls: R.demoEnd ? 'bz-go' : ''}); bzAfter(); return; }
   if(arts){ const m = bzMem(), nx = m.art < arts.length - 1 ? 'Nächste Aufgabe' : li >= 0 && li < lv.length - 1 && !guideOn() ? 'Nächste Stufe' : '', up = R.fb?.ok && m.ok >= BZ_NEXT && nx && !roundOn();
     $('#controls').innerHTML = (up ? toolBtn({id:'r-art-up', ic:'next', label:nx, primary:true}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label: up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: !evalItem(it, R.r, [])})) +
       (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '') + '<span class="sep"></span>' + toolBtn({id:'r-demo', ic:'eye', label:'Vormachen'});
-    itFit(); glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it && !R.demo, renderRead); return; }
+    bzAfter(); glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it && !R.demo, renderRead); return; }
   const up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn() && !roundOn(), down = R.miss >= 3 && li > 0;
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : (it.type === 'board' && it.mode === 'fill') || it.type === 'input' ? false : !evalItem(it, R.r, [])})) +
     (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '');
@@ -7349,7 +7353,8 @@ function picKey(){
     if(it.type === 'board') return 'grid';
     if(it.type === 'build') return 'cubes';
     if(it.type === 'line') return 'line';
-    if(it.type === 'flash' || it.type === 'glance') return 'eye';
+    if(BZ_TYPES.includes(it.type)) return null; /* Basis hat sein eigenes Stufen-Symbol vor dem Auftrag */
+    if(it.type === 'flash') return 'eye';
     if(it.type === 'pick') return 'choose';
     if(it.type === 'sort') return 'cards';
     if(it.type === 'match') return 'line';
@@ -9313,7 +9318,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.28.4 · 17.11.2026';
+const APP_VERSION = '0.28.5 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
