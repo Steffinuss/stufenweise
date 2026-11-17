@@ -39,6 +39,16 @@ Ein Schlüssel der Kompetenzmatrix sieht so aus: `Achse|Stufe`, zum Beispiel `V|
 - `infer(m, put, line)`: welche Stufen sich aus höheren ableiten lassen.
 - `log(e)`: welche Übungen zum Test zählen („seit dem letzten Test …“).
 - `buttons()`: eigene Start-Knöpfe im Lernstand (sonst einer).
+- `secName(k)`: Name des Abschnitts im Fortschrittsbalken für einen Schlüssel.
+
+Weitere Haken (seit dem Basis-Test, alle freiwillig):
+
+- `cellItems(d, key)`: Aufgaben einer Zelle (sonst je ein Generator aus `itemsFor`). Aufgaben mit `demo:true` werden im Test vorgemacht und nicht gewertet; „Jetzt du“ geht zur nächsten Aufgabe.
+- `decide(d)`: Einstufung der Zelle nach jeder Antwort (sonst `cellDecision`). Gibt `'erreicht'`, `'teilweise'`, `'nicht'` oder `null` (weiter) zurück und darf `d.items` hinter `d.idx` ergänzen, zum Beispiel einen zweiten Block. Antworten tragen `blk` der Aufgabe.
+- `ziel(z)`, `why(z)`: eigener Zielsatz bzw. Zusatz zur Begründung einer Förderzone; `noTeil: true` lässt „Teilweise gelingt …“ im ILEB weg.
+- `intro` (HTML) und `doneNote(d)`: zusätzlicher Text vor und nach dem Test.
+
+Beispiel: `TESTS.B` (Basis-Test) in `index.html` mit drei Teilen, Blöcken a und b und `tests/basis_test.py`.
 
 ## Achse (`AXES`)
 

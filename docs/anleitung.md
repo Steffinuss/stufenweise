@@ -247,7 +247,29 @@ Nach „Prüfen“ wird Falsches rot markiert. Jede Stufe hat ein festes Bildsym
 
 **Vormachen:** Bevor ein Kind eine Aufgabenart zum ersten Mal bekommt, macht Stufenweise sie einmal vor. Dann ist die ganze Aufgabe orange umrandet, oben steht groß „Schau zu“ mit einem Auge, und eine Hand zeigt, was angetippt und wohin geschoben wird. Das Kind kann dabei nichts antippen; auch „Jetzt du“ ist erst nach dem Vormachen frei. Mit „Jetzt du“ verschwindet der Rahmen, kurz erscheint grün „Jetzt du“, und das Kind ist dran. „Vormachen“ unten zeigt das Beispiel jederzeit noch einmal. Erkläre den Auftrag dazu mit eigenen Worten.
 
-**Wer Basis sieht:** Ohne gewähltes Kind (Gast) und in der Lehrkraft-Ansicht immer. Ein Kind sieht „Basis“ erst, wenn du es unter **Einstellungen → Kinder & Daten → Basis** für dieses Kind einschaltest. So werden Kinder, die schon zählen und lesen, nicht damit gelangweilt. Den Basis-Test gibt es noch nicht; er kommt mit der nächsten Version.
+**Wer Basis sieht:** Ohne gewähltes Kind (Gast) und in der Lehrkraft-Ansicht immer. Ein Kind sieht „Basis“, wenn du es unter **Einstellungen → Kinder & Daten → Basis** für dieses Kind einschaltest, oder automatisch, sobald der Basis-Test eine Förderzone zeigt. So werden Kinder, die schon zählen und lesen, nicht damit gelangweilt. Unter „Heute für dich“ steht Basis dann an erster Stelle.
+
+**Basis-Test:** Im Lernstand des Kindes unter „Basis“ gibt es drei kurze Teile, damit es für die Kinder nicht zu lang wird: **Teil 1** Gleiches, passt nicht, Sortieren, Zuordnen (V1–V4), **Teil 2** Mengen, Größe, Muster, auf einen Blick (V5–V8), **Teil 3** Formen, Richtung, von links nach rechts (O2–O4). Die Teile kann man an verschiedenen Tagen machen; jeder Teil hat etwa 12 bis 16 Aufgaben. Erkläre den Auftrag jeweils mit eigenen Worten.
+
+So läuft eine Stufe ab: Zuerst kommt die **leichte Form**. Stufenweise macht sie einmal vor (orange umrandet, „Schau zu“, nichts antippbar; das zählt nicht). Mit „Jetzt du“ folgen zwei oder drei Aufgaben derselben Art, erst mit wenigen, dann mit mehr Bildern. Nur wenn die leichte Form klappt (2 von 2 oder 2 von 3), kommt die **schwerere Form**: wieder erst vormachen, wenn es eine andere Aufgabenart ist, dann zwei oder drei Aufgaben. Das Ergebnis: beide Formen gelöst = **erreicht**, nur die leichte = **teilweise**, die leichte noch nicht = **nicht erreicht**. Bricht ein Kind ab, bleibt das bis dahin Getestete gespeichert.
+
+| Stufe | leichte Form | schwerere Form |
+| --- | --- | --- |
+| V1 Gleiches finden | gleiches Bild | gleiches Bild, gleiche Farbe |
+| V2 Was passt nicht? | eins ist ganz anders | nur die Farbe ist anders |
+| V3 Sortieren | gleiche Dinge nach Farbe | verschiedene Dinge nach Farbe |
+| V4 Eins zu eins | unter jede Tasse einen Löffel | „Reicht es?“ |
+| V5 Mengen | Wo sind mehr? | mehr oder gleich viele? |
+| V6 Größe | 3 Dinge ordnen | 4 Dinge ordnen |
+| V7 Muster | AB | AAB, ABB, ABC |
+| V8 Auf einen Blick | 1–3 Punkte | 1–4 Punkte, andere Anordnung |
+| O2 Formen | Form finden | Quadrat oder Rechteck |
+| O3 Richtung | gleicher Pfeil | Zeichen anders herum |
+| O4 Von links nach rechts | der Reihe nach antippen | Bildfolge ordnen |
+
+**Auswertung:** Die Kompetenzmatrix hat zwei Zeilen, „Vergleichen und Ordnen“ und „Sehen und Orientieren“. Es sind **Bereiche, keine Treppe**: Jeder Bereich wird für sich eingeschätzt, nichts wird aus einem anderen abgeleitet. Die Förderzone (höchstens zwei Bereiche) folgt der empfohlenen Reihenfolge V1 → V2 → O2 → V3 → V4 → V5 → V7 → O4 → V6 → O3 → V8. Dazu gibt es Begründung, Weg am Material, Arbeitsblatt, ILEB-Vorschlag und Ideen für zu Hause in der Elterninfo. Lage im Raum (O1) und Sich etwas merken (O5) kommen später dazu.
+
+**Hinweis im Lernstand:** Ist im Mathe-Test „Zahlen bis 10, Stufe I“ oder im Lese-Test „L1 Schilder und Bilder“ nicht erreicht, schlägt der Lernstand den Basis-Test vor. Der Mathe- und der Lese-Test werden dadurch nicht länger.
 
 **Arbeitsblätter:** Unter Fach „Basis“, Bereiche „Vergleichen“ und „Orientieren“, stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden (V1), Was passt nicht? (V2), Sortieren (V3), Eins zu eins zuordnen (V4), Mehr, weniger, gleich viel (V5), Der Größe nach ordnen (V6), Muster fortsetzen (V7), Formen unterscheiden (O2), Richtung und Spiegelung (O3) und Von links nach rechts (O4). Die Blätter kommen ohne Zahlen und fast ohne Lesen aus: Die Kinder verbinden, kreisen ein, streichen durch und malen weiter.
 

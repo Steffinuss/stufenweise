@@ -33,7 +33,7 @@ async def main():
         pg = await b.new_page(viewport={'width': 1180, 'height': 820}); pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_timeout(400)
         reg = await pg.evaluate(PROBE)
-        if reg != ['B,M,D,X', 'M,L,W,X']: errs.append(f'Anmeldung: {reg}')
+        if reg != ['B,M,D,X', 'M,L,W,B,X']: errs.append(f'Anmeldung: {reg}')
         # Gast: alle drei Fächer sichtbar
         await pg.evaluate("app.ctx='practice'; app.mode='number'; render()")
         subs = await pg.evaluate("[...document.querySelectorAll('.rail .subj button')].map(b=>b.textContent)")

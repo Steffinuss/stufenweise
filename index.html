@@ -873,6 +873,9 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 /* Basis: Aufgaben mit Bildern (pick, sort, match, order, glance) */
 /* Vormachen ändert die Größe nicht (sonst springt der Inhalt): Rahmen als outline, Hinweise in einem festen Streifen oben */
 .dg-stage:has(>.bz),.dg-stage:has(.bz-watch),.dg-stage:has(.bz-you){position:relative}.dg-stage .it-wrap.bz{padding-top:62px}
+.blitz.dg-stage.dg-t{position:absolute} /* Test: Bühne bleibt in ihrem Feld (Kopf mit Fortschritt ist höher) */
+.dg-t:not(.bz-demo) .it-wrap.bz{padding-top:6px} /* Test: Streifen für „Schau zu“ nur beim Vormachen; „Jetzt du“ steht vor dem Auftrag */
+.bz-you-l{color:var(--ok)}
 .dg-stage.bz-demo{background:#fdf0dc;outline:5px dashed var(--focus);outline-offset:-5px;border-radius:26px}
 .bz-demo .bz{pointer-events:none}.bz-demo .bz-goal{background:#e9eef6}.bz-demo .bz-c,.bz-demo .bz-tg{box-shadow:none}
 .bz-watch,.bz-you{position:absolute;top:8px;left:50%;z-index:9;display:inline-flex;align-items:center;gap:10px;font-size:26px;font-weight:800;background:#fff;border-radius:999px;padding:2px 22px 2px 10px;white-space:nowrap;transform:translateX(-50%)}
@@ -911,6 +914,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .bz-eq{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:150px;height:170px;font-size:20px;font-weight:700;line-height:1.1}.bz-eq b{font-size:54px}
 .bz-pat{display:flex;gap:8px;align-items:center;background:#fff;border-radius:16px;padding:10px 14px;box-shadow:var(--shadow)}.bz-q{font-size:44px;font-weight:800;width:56px;text-align:center;line-height:1}
 .bz-pool{min-height:96px}.bz-done{font-size:18px;color:var(--muted)}
+.it-wrap.bz>*{flex-shrink:0} /* nie stauchen: sonst ragen die Dinge aus dem Vorrat (Einpassen übernimmt itFit) */
 .bz-boxes{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:min(760px,100%)}
 .bz-box{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:190px;border:3px dashed #9a948a;border-radius:20px;background:#fbf8f2;padding:10px}
 .bz-bl{display:flex;align-items:center;gap:10px;font-size:20px;line-height:1}.bz-bl svg{width:56px;height:56px}.bz-sw{width:60px!important;height:40px!important}
@@ -1518,7 +1522,7 @@ const subjOfKey = k => subjOfAxis(String(k)[0]), subjOfLvl = l => subjOfAxis(Str
 const axLevels = ax => AXES[ax].levels.filter(l => AXES[ax].items[l]?.length);
 /* Welche Fächer ein Kind sieht: optionale Fächer (z. B. „Basis“) nur, wenn für das Kind eingeschaltet (p.subjOn) oder
    automatisch nötig (auto; Standard: Förderzone in einem Test des Fachs); ohne Kind und in der Lehrkraft-Ansicht alle */
-const visSubjects = () => { const p = curProfile(); return SUBJ_IDS.filter(sj => !SUBJECTS[sj].optional || !p || teacherView() || p.subjOn?.[sj] || (SUBJECTS[sj].auto ? SUBJECTS[sj].auto(p) : subjTests(sj).some(t => zoneReport(p.id, t).zones.length))); };
+const visSubjects = () => { const p = curProfile(); return SUBJ_IDS.filter(sj => !SUBJECTS[sj].optional || !p || teacherView() || p.subjOn?.[sj] || (app.mode === 'diag' && subjOfTest(app.diag?.subj) === sj) || (SUBJECTS[sj].auto ? SUBJECTS[sj].auto(p) : subjTests(sj).some(t => zoneReport(p.id, t).zones.length))); };
 const subjName = sj => SUBJECTS[sj]?.name || sj;
 /* Alle Matrix-Schlüssel eines Tests in Anzeige-Reihenfolge */
 function testKeys(t){
@@ -1576,7 +1580,7 @@ function frontierKeys(pid, subj){
 const guideZones = (pid, subj) => [...subjTests(subj).flatMap(sj => zoneReport(pid, sj).zones.map(z => z.key)), ...frontierKeys(pid, subj)];
 /* Aufsteigen: 10 Aufgaben in der Förderzone, mindestens 9 beim ersten Versuch richtig → Kurztest anbieten */
 function activeZoneKey(){
-  if(app.mode === 'read'){ const l = String(app.read.lvl); return /^[LWUGH]\d$/.test(l) ? `${l[0]}|${l}` : null; }
+  if(app.mode === 'read'){ const l = String(app.read.lvl); return /^[LWUGH]\d$/.test(l) || (TESTS.B && B_KEYS.includes(`${l[0]}|${l}`)) ? `${l[0]}|${l}` : null; }
   return app.activeZone || null;
 }
 function trackRun(e){
@@ -1705,7 +1709,7 @@ function leaveMode(){
   try{ speechSynthesis.cancel(); }catch{}
   setHint(''); app.sel.clear(); $('#error').hidden = true; $('#stage').innerHTML = '';
 }
-const homeMode = () => settings.subject === 'D' ? (app.read.item = null, ('UGHZ'.includes(String(app.read.lvl)[0]) ? app.read.lvl = 'L4' : 0), 'read') : (settings.lastMath === 'clock' ? (Object.assign(app.read, {lvl: app.read.ulvl || 'U1', item:null}), 'read') : settings.lastMath === 'size' ? (Object.assign(app.read, {lvl: app.read.glvl || 'G1', item:null}), 'read') : settings.lastMath === 'board' ? (Object.assign(app.read, {lvl: app.read.hlvl || 'H1', item:null}), 'read') : settings.lastMath === 'tenpair' ? (Object.assign(app.read, {lvl: app.read.zlvl || 'Z1', item:null}), 'read') : settings.lastMath || 'number');
+const homeMode = () => !['M', 'D'].includes(settings.subject) && SUBJECTS[settings.subject] ? (SUBJECTS[settings.subject].enter(), app.mode) : settings.subject === 'D' ? (app.read.item = null, ('UGHZ'.includes(String(app.read.lvl)[0]) ? app.read.lvl = 'L4' : 0), 'read') : (settings.lastMath === 'clock' ? (Object.assign(app.read, {lvl: app.read.ulvl || 'U1', item:null}), 'read') : settings.lastMath === 'size' ? (Object.assign(app.read, {lvl: app.read.glvl || 'G1', item:null}), 'read') : settings.lastMath === 'board' ? (Object.assign(app.read, {lvl: app.read.hlvl || 'H1', item:null}), 'read') : settings.lastMath === 'tenpair' ? (Object.assign(app.read, {lvl: app.read.zlvl || 'Z1', item:null}), 'read') : settings.lastMath || 'number');
 function setSubject(subj){
   if(app.busy) return;
   if(!SUBJECTS[subj]) subj = 'M';
@@ -5759,18 +5763,27 @@ function dgProgressHtml(d){
 function diagNextCell(){
   const d = app.diag, n = d.nItems >= (TESTS[d.subj]?.cap || 30) ? {done:true} : d.gen.next();
   if(n.done){ diagFinish(); return d.tested.length > 0; }
-  d.key = n.value; freshNew(); d.items = itemsFor(d.key).map(g => g()); d.answers = []; d.idx = 0; d.resp = null; d.t0 = performance.now(); d.spoken = false;
+  d.key = n.value; freshNew(); d.items = TESTS[d.subj]?.cellItems ? TESTS[d.subj].cellItems(d, d.key) : itemsFor(d.key).map(g => g()); d.answers = []; d.idx = 0; d.resp = null; d.t0 = performance.now(); d.spoken = false; d.dm = null;
   return true;
+}
+/* Vormachen im Test (Basis): Aufgaben mit demo:true werden Schritt für Schritt gezeigt, nicht gewertet; „Jetzt du“ geht weiter */
+function diagDemoRun(){
+  const d = app.diag, it = d.items[d.idx], steps = bzDemoSteps(it); let i = 0;
+  d.dm = {end:false}; d.resp = {...steps[0]}; clearTimeout(d.timer);
+  const tick = () => { if(app.mode !== 'diag' || app.diag !== d || d.items[d.idx] !== it) return; i++;
+    if(i >= steps.length){ d.dm.end = true; renderDiag(); return; }
+    d.resp = {...steps[i]}; renderDiag(); d.timer = setTimeout(tick, 1100); };
+  d.timer = setTimeout(tick, it.type === 'glance' ? it.ms : 1300);
 }
 function diagAnswer(skip){
   const d = app.diag, it = d.items[d.idx];
   let res;
   if(skip) res = {ok:false, given:'–', obs:['„Weiß ich nicht“']};
   else { res = evalItem(it, d.resp || {}, readFields()); if(!res) return focusEmpty(); }
-  d.answers.push({label: it.label, ok: res.ok, kern: !!it.kern, given: res.given, obs: res.obs || [], ms: Math.round(performance.now() - d.t0)});
+  d.answers.push({label: it.label, ok: res.ok, kern: !!it.kern, given: res.given, obs: res.obs || [], ms: Math.round(performance.now() - d.t0), ...(it.blk ? {blk: it.blk} : {})});
   logAttempt({mode:'diag', task: it.label, ok: res.ok, tries:1, cell: d.key});
   d.nItems++;
-  let st = cellDecision(d.answers);
+  let st = TESTS[d.subj]?.decide ? TESTS[d.subj].decide(d) : cellDecision(d.answers);
   if(!st && d.idx + 1 >= d.items.length) st = d.answers.some(a => a.ok) ? 'teilweise' : 'nicht'; /* keine Aufgabe mehr übrig: nie hängen bleiben */
   if(st){
     const ok = d.answers.filter(a => a.ok).length, obs = [...new Set(d.answers.flatMap(a => a.obs))];
@@ -5946,7 +5959,7 @@ function renderDiag(){
   if(!d.started){
     $('#equation').innerHTML = `<span class="screen-step">${title}${d.re ? ' · Wiederholung' : ''}</span>`;
     $('#prompt').textContent = '';
-    $('#stage').innerHTML = `<div class="home"><h2>${escHtml(curName() === 'Gast' ? 'Hallo!' : 'Hallo ' + curName() + '!')}</h2><div class="intro-card"><p>Gleich kommen ein paar Aufgaben.</p><p>Manche sind leicht. Manche sind schwer.<br><b>Das ist ganz normal.</b></p><p>Kennst du eine Aufgabe nicht? Dann tippe auf <b>„Weiß ich nicht“</b>.</p><p>Es gibt keine Noten. Wir wollen nur sehen, was du schon kannst.</p><p>Oben siehst du, wie weit du schon bist.</p></div></div>`;
+    $('#stage').innerHTML = `<div class="home"><h2>${escHtml(curName() === 'Gast' ? 'Hallo!' : 'Hallo ' + curName() + '!')}</h2><div class="intro-card"><p>Gleich kommen ein paar Aufgaben.</p><p>Manche sind leicht. Manche sind schwer.<br><b>Das ist ganz normal.</b></p><p>Kennst du eine Aufgabe nicht? Dann tippe auf <b>„Weiß ich nicht“</b>.</p><p>Es gibt keine Noten. Wir wollen nur sehen, was du schon kannst.</p>${TESTS[d.subj]?.intro || ''}<p>Oben siehst du, wie weit du schon bist.</p></div></div>`;
     $('#controls').innerHTML = toolBtn({id:'d-start', ic:'next', label:'Los geht’s', primary:true}) + '<span class="sep"></span>' + toolBtn({id:'d-close', ic:'close', label:'Abbrechen'});
     setHint(''); return;
   }
@@ -5960,18 +5973,29 @@ function renderDiag(){
   if(d.done){
     $('#equation').textContent = '';
     $('#prompt').textContent = '';
-    $('#stage').innerHTML = `<div class="home"><h2>Geschafft – danke!</h2><div class="intro-card"><p>Du hast ${d.nItems} Aufgaben bearbeitet.</p><p>Deine Lehrkraft schaut sich das an und sucht passende Übungen für dich aus.</p>${d.part === 1 ? '<p>Teil 2 (Uhr, Größen, Hundertertafel) machst du an einem anderen Tag.</p>' : ''}</div><p class="note">Für die Lehrkraft: Die Auswertung mit Begründung, Lernangeboten und ILEB-Vorschlag steht im Lernstand. Kriteriumsorientierte Einstufung, keine Normwerte.</p></div>`;
+    $('#stage').innerHTML = `<div class="home"><h2>Geschafft – danke!</h2><div class="intro-card"><p>Du hast ${d.nItems} Aufgaben bearbeitet.</p><p>Deine Lehrkraft schaut sich das an und sucht passende Übungen für dich aus.</p>${TESTS[d.subj]?.doneNote ? TESTS[d.subj].doneNote(d) : d.part === 1 ? '<p>Teil 2 (Uhr, Größen, Hundertertafel) machst du an einem anderen Tag.</p>' : ''}</div><p class="note">Für die Lehrkraft: Die Auswertung mit Begründung, Lernangeboten und ILEB-Vorschlag steht im Lernstand. Kriteriumsorientierte Einstufung, keine Normwerte.</p></div>`;
     $('#controls').innerHTML = toolBtn({id:'d-close', ic:'home', label:'Fertig', primary:true}) + '<span class="sep"></span>' + toolBtn({id:'d-stats', ic:'chart', label:'Lernstand (Lehrkraft)'});
     setHint(''); return;
   }
-  const it = d.items[d.idx], r = d.resp ||= {};
+  const it = d.items[d.idx];
+  if(it.demo && !d.dm) diagDemoRun();
+  const r = d.resp ||= {}, demo = !!it.demo, lvl = String(d.key).split('|')[1];
+  /* Vormachen: Bewegung nur innerhalb derselben Aufgabe (wie beim Üben) */
+  const pre = BZ_TYPES.includes(it.type) && app.bzFlipItem === it ? bzRects() : null; app.bzFlipItem = it;
   $('#equation').innerHTML = d.warm ? `<span class="screen-step">${title} · Aufgabe ${d.nItems + 1} von ${d.items.length}</span>` : `<span class="screen-step">${title}${d.re ? ' · Wiederholung' : ''}</span>${dgProgressHtml(d)}`;
-  $('#prompt').innerHTML = `<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt.replace('„Prüfen“', '„Weiter“'))}</span>`; /* im Test heißt der Knopf „Weiter“ */
+  $('#prompt').innerHTML = `${B_SYM[lvl] ? `<span class="bz-psym" aria-hidden="true">${bSym(lvl, 34)}</span>` : ''}${demo ? '<b class="bz-demo-l">Schau zu: </b>' : d.you === it ? '<b class="bz-you-l">Jetzt du: </b>' : ''}<span class="dg-prompt">${escHtml(qBelow(it) ? 'Lies genau. Dann wähle die Antwort.' : it.prompt.replace('„Prüfen“', '„Weiter“'))}</span>`; /* im Test heißt der Knopf „Weiter“ */
   /* Antwortfelder gehören zur Aufgabe: im „?“ der Rechnung oder direkt darunter – nicht unten in der Leiste */
   const ans = needsFields(it, r) && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : '';
-  $('#stage').innerHTML = `<div class="blitz dg-stage"><div class="dg-item">${itemStage(it, r, {inline:true})}</div>${ans}</div>`;
+  const badge = demo ? `<div class="bz-watch">${BZ_EYE}<span>Schau zu</span></div>` : '';
+  $('#stage').innerHTML = `<div class="blitz dg-stage dg-t${demo ? ' bz-demo' : ''}">${badge}<div class="dg-item">${itemStage(it, r, {inline:true})}</div>${ans}</div>`;
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   itFit();
+  if(demo){
+    if(r.hand) $('#stage').querySelector(r.hand)?.insertAdjacentHTML('beforeend', BZ_HAND);
+    if(pre) bzFlip(pre, 900);
+    $('#controls').innerHTML = toolBtn({id:'d-redemo', ic:'eye', label:'Nochmal vormachen', disabled: !d.dm.end}) + toolBtn({id:'d-go', ic:'next', label:'Jetzt du', primary:true, disabled: !d.dm.end, cls: d.dm.end ? 'bz-go' : ''}) + '<span class="sep"></span>' + toolBtn({id:'d-close', ic:'close', label:'Abbrechen'});
+    setHint(d.dm.end ? 'So geht es. Jetzt bist du dran.' : ''); return;
+  }
   let c = '';
   if(it.type === 'flash' && r.hidden) c += toolBtn({id:'d-again', ic:'eye', label:'Nochmal zeigen'});
   if(it.type !== 'flash' || r.hidden) c += toolBtn({id:'d-next', ic:'next', label:'Weiter', primary:true});
@@ -5989,12 +6013,15 @@ function renderDiag(){
 function diagStageClick(e){
   const d = app.diag; if(!d || d.done) return;
   const it = d.items[d.idx], r = d.resp ||= {};
+  if(it?.demo) return; /* beim Vormachen ist nichts antippbar */
   if(itemClick(e, it, r)){ const w = $('#stage .it-wrap'), top = w?.scrollTop || 0; $('#stage .dg-item').innerHTML = itemStage(it, r, {inline:true}); if(it.type === 'board' || it.html?.includes('class="hb')) hbFit(); itFit(); const w2 = $('#stage .it-wrap'); if(w2) w2.scrollTop = top; glanceArm(it, r, () => app.mode === 'diag' && app.diag === d && d.items[d.idx] === it, renderDiag); }
 }
 function diagControl(btn){
   const d = app.diag;
   switch(btn.id){
     case 'd-start': d.started = true; d.t0 = performance.now(); return renderDiag();
+    case 'd-go': if(!d.dm?.end) return; clearTimeout(d.timer); d.idx++; d.resp = null; d.dm = null; d.you = d.items[d.idx]; d.t0 = performance.now(); setHint(''); return renderDiag();
+    case 'd-redemo': if(!d.dm?.end) return; d.dm = null; setHint(''); return renderDiag();
     case 'd-next': return d.warm ? warmAnswer(false) : diagAnswer(false);
     case 'd-skip': return d.warm ? warmAnswer(true) : diagAnswer(true);
     case 'w-more': { const k = d.answers.find(a => !a.ok)?.key || d.answers[0]?.key; app.diag = null; $('#stage').innerHTML = ''; if(k){ leaveMode(); applyOffer(cellInfo(k).offer.set); } else { app.mode = 'home'; render(); } return; }
@@ -6121,9 +6148,8 @@ const matWay = key => { const [ax, a, b] = key.split('|'); return ax === 'M' ? m
    Achse V „Vergleichen und Ordnen“ (eher Mathe), Achse O „Sehen und Orientieren“ (Mathe und Deutsch).
    Jede Stufe hat zwei Schwierigkeiten: a (leicht), b (schwerer) → erreicht / teilweise / noch nicht.
    Das Fach „Basis“ ist seit Schritt 3 (0.28.0) zum Üben angemeldet (optional: Kinder sehen es nur, wenn eingeschaltet).
-   Der Basis-Test kommt in Schritt 4 (BASIS_ON).
+   Seit Schritt 4 gibt es den Basis-Test (TESTS.B, drei kurze Teile).
    ===================================================================== */
-const BASIS_ON = false;
 const V_LEVELS = ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8'];
 const O_LEVELS = ['O1', 'O2', 'O3', 'O4', 'O5'];
 const BP_FRUEH = 'BP GENT 2022, M 2.1.1.1 Frühe mathematische Kompetenzen';
@@ -6134,8 +6160,8 @@ const V_INFO = {
   V2:{name:'Was passt nicht?', short:'passt nicht', a:'einer ist ganz anders', b:'Unterschied nur in einem Merkmal',
       kann:'erkennt, was nicht in eine Reihe passt', ziel:'erkennt den Unterschied auch dann, wenn er nur in einem Merkmal liegt',
       analog:'Beim Aufräumen: Was gehört nicht in diese Kiste?', ich:'Ich sehe, was nicht dazu passt.', bp:BP_FRUEH},
-  V3:{name:'Sortieren', short:'Sortieren', a:'nach Art in zwei Kisten (Besteck / Werkzeug)', b:'nach Farbe oder Größe; die Regel selbst erkennen',
-      kann:'sortiert Dinge nach ihrer Art', ziel:'sortiert nach einem Merkmal (Farbe, Größe) und erkennt eine Sortierregel',
+  V3:{name:'Sortieren', short:'Sortieren', a:'gleiche Dinge nach Farbe in zwei Kisten', b:'verschiedene Dinge nach Farbe; die Regel selbst erkennen',
+      kann:'sortiert gleiche Dinge nach der Farbe', ziel:'sortiert nach einem Merkmal, auch wenn die Dinge verschieden sind, und erkennt eine Sortierregel',
       analog:'Wäsche nach Farben sortieren; Schrauben und Muttern in eine Sortierbox räumen', ich:'Ich kann sortieren.', bp:BP_FRUEH},
   V4:{name:'Eins zu eins zuordnen', short:'Zuordnen', a:'jeder Tasse einen Löffel geben', b:'„Reicht es?“ – ja oder nein',
       kann:'ordnet Dinge eins zu eins zu', ziel:'erkennt beim Zuordnen, ob es reicht oder ob etwas fehlt',
@@ -6143,8 +6169,8 @@ const V_INFO = {
   V5:{name:'Mehr, weniger, gleich viel', short:'Mengen', a:'großer Unterschied (2 gegen 7)', b:'kleiner Unterschied; gleich viele, aber anders verteilt',
       kann:'erkennt bei deutlichem Unterschied, wo mehr ist', ziel:'vergleicht Mengen auch bei kleinem Unterschied und weiß: Auseinanderschieben ändert die Anzahl nicht',
       analog:'Zwei Teller mit Keksen vergleichen; Murmeln auseinanderschieben: Sind es jetzt mehr?', ich:'Ich sehe, wo mehr ist.', bp:BP_FRUEH},
-  V6:{name:'Der Größe nach ordnen', short:'Größe', a:'3 Dinge vom kleinsten zum größten', b:'4–5 Dinge; das fehlende einordnen',
-      kann:'ordnet drei Dinge der Größe nach', ziel:'ordnet mehrere Dinge der Größe nach und ergänzt das fehlende',
+  V6:{name:'Der Größe nach ordnen', short:'Größe', a:'3 Dinge vom kleinsten zum größten', b:'4 Dinge der Größe nach ordnen',
+      kann:'ordnet drei Dinge der Größe nach', ziel:'ordnet auch vier und mehr Dinge der Größe nach',
       analog:'Stifte, Schrauben oder Becher der Länge nach hinlegen; Töpfe ineinanderstellen', ich:'Ich ordne von klein nach groß.', bp:'BP GENT 2022, M 2.1.1.1 Frühe mathematische Kompetenzen und 2.1.3 Größen und Messen'},
   V7:{name:'Muster fortsetzen', short:'Muster', a:'AB AB (● ▲ ● ▲ ?)', b:'AAB, ABC; Fehler im Muster finden',
       kann:'setzt ein einfaches Muster (AB) fort', ziel:'setzt auch längere Muster fort und findet Fehler im Muster',
@@ -6171,6 +6197,12 @@ const O_INFO = {
       analog:'Kim-Spiel mit Gegenständen aus der Werkstatt: abdecken, eins wegnehmen, was fehlt?', ich:'Ich kann mir Dinge merken.', bp:'BP GENT 2022, M 2.1.1.1 Frühe mathematische Kompetenzen; D 2.1.3.1'}
 };
 for(const [k, v] of [...Object.entries(V_INFO), ...Object.entries(O_INFO)]) v.offer = {text:`Basis: ${v.name}`, set:{mode:'read', lvl:k}};
+/* kb = „kann …“, wenn auch die schwerere Form (b) im Test gelöst ist (Lernstand, ILEB) */
+Object.entries({V1:'findet Gleiches, auch wenn nur die Farbe gleich ist', V2:'erkennt, was nicht passt, auch wenn der Unterschied nur in der Farbe liegt',
+  V3:'sortiert nach der Farbe, auch wenn die Dinge verschieden sind', V4:'ordnet eins zu eins zu und erkennt, ob es reicht',
+  V5:'vergleicht Mengen auch bei kleinem Unterschied und erkennt gleich viele', V6:'ordnet vier Dinge der Größe nach',
+  V7:'setzt auch längere Muster fort (AAB, ABC)', V8:'erkennt bis zu vier Punkte auf einen Blick, auch in verschiedenen Anordnungen',
+  O2:'unterscheidet ähnliche Formen genau (Quadrat und Rechteck)', O3:'erkennt ein gespiegeltes oder gedrehtes Zeichen', O4:'ordnet eine Bildfolge: zuerst, dann, zuletzt'}).forEach(([k, t]) => (V_INFO[k] || O_INFO[k]).kb = t);
 Object.assign(MAT_WAY, {
   V1: MW('Echte Socken, Becher oder Schrauben: zu jedem Ding das gleiche suchen und daneben legen.', 'Gleiche Bilder mit einer Linie verbinden.', ['Socken oder Becher in Paaren']),
   V2: MW('Vier Dinge auf den Tisch legen, eins passt nicht (drei Löffel, eine Schraube). Wegnehmen und sagen, warum.', 'In einer Bildreihe durchstreichen, was nicht passt.', ['Alltagsdinge']),
@@ -6408,7 +6440,7 @@ function bzSolve(it, r){
 /* ---------- Ziehen: Ding aus dem Vorrat zum Ziel schieben (Antippen geht weiter) ---------- */
 function bzHost(){
   if(app.mode === 'read'){ const R = app.read; if(!R.item || !BZ_TYPES.includes(R.item.type) || R.fb?.ok || R.demo) return null; return {it: R.item, r: R.r, redraw: () => { R.fb = null; setHint(''); renderRead(); }}; }
-  if(app.mode === 'diag' && app.diag && !app.diag.done){ const d = app.diag, it = d.items[d.idx]; if(!BZ_TYPES.includes(it?.type)) return null; return {it, r: d.resp ||= {}, redraw: () => bzRedrawDiag()}; }
+  if(app.mode === 'diag' && app.diag && !app.diag.done){ const d = app.diag, it = d.items[d.idx]; if(!BZ_TYPES.includes(it?.type) || it.demo) return null; return {it, r: d.resp ||= {}, redraw: () => bzRedrawDiag()}; }
   return null;
 }
 function bzRedrawDiag(){ const d = app.diag, it = d.items[d.idx], pre = {...bzRects(), ...(app.bzFlipFrom || {})}; $('#stage .dg-item').innerHTML = itemStage(it, d.resp, {inline:true}); itFit(); bzFlip(pre); }
@@ -6611,6 +6643,57 @@ addSubject('B', {name:'Basis', long:'Basis: Grundlagen vor Zählen und Lesen', t
   areas: (g, lvOk) => ['V', 'O'].map(ax => [AXES[ax].place, axLevels(ax).filter(lvOk).map(l => ({mode:'read', lvl:l, sym:`<span class="bz-rs">${bSym(l, 30)}</span>`, label:AXES[ax].info[l].short}))]),
   enter: () => { app.read.item = null; if(!/^[VO]/.test(String(app.read.lvl))) app.read.lvl = 'V1'; app.mode = 'read'; }});
 SUBJ_IDS.splice(SUBJ_IDS.indexOf('B'), 1); SUBJ_IDS.unshift('B'); /* Basis kommt am Anfang: in der Fachwahl zuerst (Stefan, 17.11.) */
+
+/* ---------- Basis-Test (Schritt 4) ----------
+   Drei kurze Teile (Stefan, 17.11.): Teil 1 V1–V4, Teil 2 V5–V8, Teil 3 O2–O4.
+   Je Stufe zwei Blöcke, jeder Block bleibt bei einer Aufgabenart (nicht mischen):
+   Block a (leicht): vormachen (nicht gewertet), dann 2–3 Aufgaben, erst mit wenigen, dann mit mehr Bildern.
+   Nur wenn a klappt, Block b (schwerer): vormachen, falls es eine andere Art ist, dann 2–3 Aufgaben.
+   Ein Block klappt bei 2 von 2 oder 2 von 3 richtig. Ergebnis: a und b → erreicht, nur a → teilweise, a nicht → nicht erreicht.
+   Bereiche statt Treppe: Keine Stufe wird aus einer anderen abgeleitet. */
+const B_TEST = {V1:[0, 2], V2:[0, 1], V3:[0, 3], V4:[0, 1], V5:[0, 2], V6:[2, 2], V7:[0, 1], V8:[0, 2], O2:[0, 2], O3:[0, 3], O4:[0, 2]}; /* [Art a, Art b] in AXES.X.arts */
+const B_ST = {a:[0, 1, 1], b:[1, 2, 2]}; /* Schwierigkeit (st) der Aufgaben im Block */
+const B_PARTS = {1:['V1', 'V2', 'V3', 'V4'], 2:['V5', 'V6', 'V7', 'V8'], 3:['O2', 'O3', 'O4']};
+const B_KEYS = Object.values(B_PARTS).flat().map(l => `${l[0]}|${l}`);
+/* Empfohlene Reihenfolge der Förderzone (Konzept) */
+const B_ZONE_ORDER = ['V1', 'V2', 'O2', 'V3', 'V4', 'V5', 'O1', 'V7', 'O4', 'V6', 'O3', 'V8', 'O5'].map(l => `${l[0]}|${l}`);
+function bBlock(key, blk, demo = true){
+  const l = key.split('|')[1], [, gen] = AXES[l[0]].arts[l][B_TEST[l][blk === 'a' ? 0 : 1]], out = [];
+  freshNew();
+  for(const st of B_ST[blk]){ let it, n = 0; do { it = gen(st); n++; } while(out.some(x => x.label === it.label) && n < 6); out.push({...it, blk}); }
+  if(demo) out.unshift({...gen(B_ST[blk][0]), blk, demo:true});
+  return out;
+}
+const bBlockOk = xs => { const ok = xs.filter(a => a.ok).length; return xs.length < 2 ? null : xs.length === 2 ? (ok === 2 ? true : ok === 0 ? false : null) : ok >= 2; };
+function bDecide(d){
+  const A = d.answers.filter(a => a.blk === 'a'), B = d.answers.filter(a => a.blk === 'b');
+  if(!B.length){
+    const r = bBlockOk(A); if(r === null) return null; if(!r) return 'nicht';
+    if(!d.items.some(x => x.blk === 'b')){ const l = d.key.split('|')[1]; d.items.splice(d.idx + 1, Infinity, ...bBlock(d.key, 'b', B_TEST[l][0] !== B_TEST[l][1])); }
+    return null;
+  }
+  const r = bBlockOk(B); return r === null ? null : r ? 'erreicht' : 'teilweise';
+}
+const bSecName = k => { const [ax, l] = k.split('|'); return AXES[ax].info[l].short; };
+const bLs = ax => ax === 'V' ? [...B_PARTS[1], ...B_PARTS[2]] : B_PARTS[3];
+addTest('B', {subj:'B', name:'Basis', long:'Basis: Grundlagen vor Zählen und Lesen', axes:['V', 'O'], cap:40, homeZones:2, start:'baut erste Grundlagen auf (Vergleichen, Ordnen, Sehen)',
+  plan: function*(d){ for(const l of B_PARTS[d.part] || Object.values(B_PARTS).flat()) yield* tst(d, `${l[0]}|${l}`); },
+  rePlan: function*(d){ const m = matrixOf(d.pid); for(const k of B_KEYS) if(m[k] && !isOk(m[k].status)) yield* tst(d, k); },
+  cellItems: (d, key) => bBlock(key, 'a'), decide: d => bDecide(d),
+  title: d => d.part ? `Basis-Test Teil ${d.part}` : 'Basis-Test',
+  sections: d => { const m = matrixOf(d.pid), ks = d.kurz ? [d.kurz] : d.re ? B_KEYS.filter(k => m[k] && !isOk(m[k].status)) : (B_PARTS[d.part] || Object.values(B_PARTS).flat()).map(l => `${l[0]}|${l}`); return ks.map(bSecName); },
+  secName: k => bSecName(k), noTeil: true,
+  intro: '<p>Vor jeder neuen Aufgabe zeigt Stufenweise einmal, wie es geht. <b>Schau gut zu.</b></p>',
+  doneNote: d => d.part && d.part < 3 ? `<p>Teil ${d.part + 1} machst du an einem anderen Tag.</p>` : '',
+  log: e => e.mode === 'basis', keys: () => B_KEYS, infer: () => {},
+  zoneCells: m => B_ZONE_ORDER.filter(k => m[k] && !isOk(m[k].status)).slice(0, 2),
+  kann: m => B_KEYS.filter(k => m[k] && m[k].status !== 'nicht').map(k => { const i = cellInfo(k); return isOk(m[k].status) ? i.kb || i.kann : i.kann; }),
+  ziel: z => z.cell?.status === 'nicht' ? z.info.kann : z.info.ziel, /* a noch nicht: Ziel ist die leichte Form */
+  why: z => z.cell?.status === 'teilweise' ? ` Die leichte Form gelingt (${z.info.a}), die schwerere noch nicht (${z.info.b}).` : z.cell?.status === 'nicht' ? ` Die leichte Form (${z.info.a}) gelingt noch nicht.` : '',
+  buttons: () => [[1, 'Teil 1: Gleiches, passt nicht, Sortieren, Zuordnen'], [2, 'Teil 2: Mengen, Größe, Muster, auf einen Blick'], [3, 'Teil 3: Formen, Richtung, von links nach rechts']].map(([n, t]) => `<button class="icon-btn" data-diag="new-B${n}">${icon('target')}<span style="display:inline">${t}</span></button>`).join(''),
+  matrix: m => { const row = ax => `<tr class="mx-gap"><th>${AXES[ax].place}</th>${bLs(ax).map(l => cellChip(m, `${ax}|${l}`)).join('')}</tr><tr class="mx-sub"><th></th>${bLs(ax).map(l => `<td><small>${l} ${escHtml(AXES[ax].info[l].short)}</small></td>`).join('')}</tr>`;
+    return `<div class="mx-scroll"><table class="mx-table b-mx"><tbody>${row('V')}${row('O')}</tbody></table></div><p class="note mx-legend">Bereiche, keine Treppe: Jeder Bereich wird für sich eingeschätzt, nichts wird abgeleitet. Je Bereich eine leichte und eine schwerere Form: ✓ beide gelöst · ½ nur die leichte Form · ✗ die leichte Form noch nicht · – nicht getestet. Antippen ändert die Einstufung (Lehrkraft). O1 Lage im Raum und O5 Sich etwas merken kommen später dazu. Bezug: BP GENT 2022, M 2.1.1.1, 2.1.2 und D 2.1.3.1.</p>`; },
+  mxTable: (m, sym) => ['V', 'O'].map(ax => `<table class="mx"><tr><th>${AXES[ax].place}</th>${bLs(ax).map(l => `<th>${l}<br><small>${escHtml(AXES[ax].info[l].short)}</small></th>`).join('')}</tr><tr><td></td>${bLs(ax).map(l => `<td>${sym(`${ax}|${l}`)}</td>`).join('')}</tr></table>`).join('')});
 /* Typische Fehler beim Üben → nächster Schritt am Material */
 const ERR_MAT = {
   dreher: 'Zuerst die Zehnerstangen legen, dann die Einer, und beim Schreiben mit den Zehnern beginnen (Stellentafel).',
@@ -6650,12 +6733,13 @@ function zoneReport(pid, subj){
   if(!Object.keys(m).some(k => prefix.some(p => k.startsWith(p)))) return out;
   for(const key of zoneCells(pid, subj)){
     const info = cellInfo(key), c = m[key], [ax, a] = key.split('|');
-    const row = ax === 'M' ? N_LEVELS.map(l => `M|${a}|${l}`) : (ax === 'S' ? S_LEVELS.map(l => 'S|' + l) : ax === 'U' ? U_LEVELS.map(l => 'U|' + l) : ax === 'G' ? G_LEVELS.map(l => 'G|' + l) : ax === 'H' ? H_LEVELS.map(l => 'H|' + l) : ax === 'Z' ? Z_LEVELS.map(l => 'Z|' + l) : ax === 'R' ? R_LEVELS.map(l => 'R|' + l) : ax === 'L' ? L_LEVELS.map(l => 'L|' + l) : ax === 'W' ? W_LEVELS.map(l => 'W|' + l) : P_LEVELS.map(l => 'P|' + l));
+    const row = AXES[ax] ? [] : ax === 'M' ? N_LEVELS.map(l => `M|${a}|${l}`) : (ax === 'S' ? S_LEVELS.map(l => 'S|' + l) : ax === 'U' ? U_LEVELS.map(l => 'U|' + l) : ax === 'G' ? G_LEVELS.map(l => 'G|' + l) : ax === 'H' ? H_LEVELS.map(l => 'H|' + l) : ax === 'Z' ? Z_LEVELS.map(l => 'Z|' + l) : ax === 'R' ? R_LEVELS.map(l => 'R|' + l) : ax === 'L' ? L_LEVELS.map(l => 'L|' + l) : ax === 'W' ? W_LEVELS.map(l => 'W|' + l) : P_LEVELS.map(l => 'P|' + l));
     const hi = highestIn(m, row);
     const fails = c?.items ? c.items.filter(x => !x.ok).map(x => x.label).slice(0, 2).join('; ') : '';
     const obs = c?.obs?.length ? ` Beobachtet: ${c.obs.join(', ')}.` : '';
-    const why = `${info.place}: ${hi ? `${cellInfo(hi).short} (${cellInfo(hi).name}) sicher, ` : ''}${info.short} (${info.name}) ${STATUS_TXT[c.status]}${c.sum ? ` (${c.sum}${fails ? `; nicht gelöst: ${fails}` : ''})` : ''}.${obs} Deshalb: ${info.offer.text}.`;
-    out.zones.push({key, info, why, cell: c});
+    const z = {key, info, cell: c}, more = TESTS[subj]?.why ? TESTS[subj].why(z) : '';
+    z.why = `${info.place}: ${hi ? `${cellInfo(hi).short} (${cellInfo(hi).name}) sicher, ` : ''}${info.short} (${info.name}) ${STATUS_TXT[c.status]}${c.sum ? ` (${c.sum}${fails ? `; nicht gelöst: ${fails}` : ''})` : ''}.${more}${obs} Deshalb: ${info.offer.text}.`;
+    out.zones.push(z);
   }
   // Lernstand: höchste sichere Stufe je Zeile
   const kann = [];
@@ -6674,8 +6758,8 @@ function zoneReport(pid, subj){
   }
   const teil = out.zones.filter(z => z.cell?.status === 'teilweise').map(z => z.info.name);
   out.ileb = {
-    lernstand: `${name} ${kann.length ? [...new Set(kann)].join('; ') : TESTS[subj]?.start || 'baut erste Grundlagen auf'}.${teil.length ? ` Teilweise gelingt: ${teil.join(', ')}.` : ''}`,
-    ziel: out.zones.map(z => `${name} ${z.info.ziel}.`).join(' '),
+    lernstand: `${name} ${kann.length ? [...new Set(kann)].join('; ') : TESTS[subj]?.start || 'baut erste Grundlagen auf'}.${teil.length && !TESTS[subj]?.noTeil ? ` Teilweise gelingt: ${teil.join(', ')}.` : ''}`,
+    ziel: out.zones.map(z => `${name} ${TESTS[subj]?.ziel ? TESTS[subj].ziel(z) : z.info.ziel}.`).join(' '),
     massnahmen: out.zones.map(z => { const w = matWay(z.key); return w ? `Am Material: ${w.hand.replace(/\.$/, '')}. Im Bild: ${w.bild.replace(/\.$/, '')}. In der App: ${z.info.offer.text}` : `${z.info.offer.text}; analog: ${z.info.analog}`; }).join('. ') + `. Re-Diagnose nach etwa 5 Übungseinheiten.`,
     bp: [...new Set(out.zones.map(z => z.info.bp))].join('; ')
   };
@@ -6716,12 +6800,19 @@ function subjectHtml(pid, subj, rep){
 }
 function teacherSectionHtml(pid){
   const rep = Object.fromEntries(TEST_IDS.map(t => [t, zoneReport(pid, t)]));
-  let h = TEST_IDS.map(t => subjectHtml(pid, t, rep[t])).join('') + progressHtml(pid);
+  let h = basisHintHtml(pid) + TEST_IDS.map(t => subjectHtml(pid, t, rep[t])).join('') + progressHtml(pid);
   const wm = (data.warm?.[pid] || []).slice(-5).reverse();
   if(wm.length) h += `<fieldset><legend>Startrunden (Kurz-Check zu Stundenbeginn)</legend><ul class="stat-lines">${wm.map(w => `<li>${dShort(w.date)} · ${w.res.filter(a => a.ok).length}/${w.res.length} · ${w.res.map(a => `${a.ok ? '✓' : '✗'} ${escHtml(cellLabel(a.key))}`).join(' · ')}</li>`).join('')}</ul><p class="note">Die Startrunde ändert die Einstufung nicht. Mehrmals alles richtig in einer Förderzone? Dann lohnt sich ein Wiederholungstest.</p></fieldset>`;
   const hist = (data.mhist?.[pid] || []).filter(e => e.quelle !== 'abgeleitet').slice(-12).reverse();
   if(hist.length) h += `<fieldset><legend>Verlauf der Einstufungen</legend><ul class="stat-lines">${hist.map(e => `<li>${new Date(e.date).toLocaleDateString('de-DE')} · ${escHtml(cellLabel(e.key))}: ${STATUS_TXT[e.status]}${e.quelle === 'lehrkraft' ? ' (Lehrkraft)' : e.quelle === 're-diagnose' ? ' (Re-Diagnose)' : ''}${e.sum ? ` – ${escHtml(e.sum)}` : ''}</li>`).join('')}</ul></fieldset>`;
   return {html: h, rep};
+}
+/* Basis-Test vorschlagen, wenn Mathe „Zahlen bis 10, Stufe I“ oder Lesen L1 nicht erreicht ist (und noch kein Basis-Test gemacht wurde) */
+function basisHintHtml(pid){
+  const m = matrixOf(pid); if(!TESTS.B || B_KEYS.some(k => m[k])) return '';
+  const low = [['M|10|I', 'In Mathe ist „Zahlen bis 10, Stufe I“'], ['L|L1', 'Im Lesen ist „L1 Schilder und Bilder“']].filter(([k]) => m[k] && !isOk(m[k].status)).map(x => x[1]);
+  if(!low.length) return '';
+  return `<fieldset class="b-hint"><legend>Hinweis: Basis-Test</legend><p>${low.join(', und ')} noch nicht erreicht. Der Basis-Test zeigt, welche Grundlagen schon da sind: Vergleichen, Ordnen, Sehen und Orientieren. Er hat drei kurze Teile; der Mathe- und der Lese-Test werden dadurch nicht länger.</p><div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${TESTS.B.buttons()}</div></fieldset>`;
 }
 const ilebText = r => `Lernstand: ${r.lernstand}\nNächstes Ziel: ${r.ziel}\nMaßnahmen: ${r.massnahmen}${r.bp ? `\nBezug: ${r.bp}` : ''}`;
 function teacherText(pid){
@@ -6902,7 +6993,7 @@ function renderHome(){
     body = `<h2>Wer übt heute?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}" class="${q.sym && ICON[q.sym] ? 'has-sym' : ''}">${q.sym && ICON[q.sym] ? `<i class="kid-sym">${iconSvg(q.sym, 64)}</i>` : `<b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>`}${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div>`;
   } else if(step === 'subj'){
     const cards = [];
-    if(p) for(const subj of TEST_IDS.filter(t => visSubjects().includes(subjOfTest(t)))){
+    if(p) for(const subj of TEST_IDS.filter(t => visSubjects().includes(subjOfTest(t))).sort((a, b) => SUBJ_IDS.indexOf(subjOfTest(a)) - SUBJ_IDS.indexOf(subjOfTest(b)))){
       let z = zoneReport(p.id, subj).zones[0];
       if(!z){ const f = frontierKeys(p.id, subjOfTest(subj)).find(k => TESTS[subj].homeKey ? TESTS[subj].homeKey(k) : keyInTest(k, subj)); if(f) z = {key:f, info:cellInfo(f)}; }
       if(z) cards.push(`<button class="home-card" data-home-offer="${subj}"><span class="hc-subj">${TESTS[subj].name}</span><span class="hc-title">${escHtml(kidTitle(z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>`);
@@ -8976,6 +9067,8 @@ function mapRoutes(pid){
   // Zahlen: aktueller Zahlenraum = kleinster mit offener Zone, sonst höchster mit Daten
   let zr = ZR.find(z => N_LEVELS.some(l => m[`M|${z}|${l}`] && !isOk(m[`M|${z}|${l}`].status)));
   if(!zr) zr = [...ZR].reverse().find(z => N_LEVELS.some(l => m[`M|${z}|${l}`])) || 20;
+  if(TESTS.B) for(const [ax, sym] of [['V', '=≠'], ['O', '↔']]){ const keys = bLs(ax).map(l => `${ax}|${l}`); if(has(keys)) routes.push({title: AXES[ax].place, sym, keys, free:true}); }
+  const bz = new Set(TESTS.B ? zoneReport(pid, 'B').zones.map(z => z.key) : []);
   routes.push({title:`Zahlen bis ${zr}`, sym:'123', keys: N_LEVELS.map(l => `M|${zr}|${l}`)});
   if(has(R_LEVELS.map(l => 'R|' + l))) routes.push({title:'Rechnen', sym:'+−', keys: R_LEVELS.map(l => 'R|' + l)});
   if(has(Z_LEVELS.map(l => 'Z|' + l))) routes.push({title:'Zehnerpartner', sym:'5+5', keys: Z_LEVELS.map(l => 'Z|' + l)});
@@ -8985,7 +9078,8 @@ function mapRoutes(pid){
   if(has(H_LEVELS.map(l => 'H|' + l))) routes.push({title:'Hundertertafel', sym:'▦', keys: H_LEVELS.map(l => 'H|' + l)});
   routes.push({title:'Lesen', sym:'Abc', keys: L_LEVELS.map(l => 'L|' + l)});
   routes.push({title:'Schreiben', sym:'✎', keys: W_LEVELS.map(l => 'W|' + l)});
-  return routes.map(r => { const st = r.keys.map(k => m[k]?.status === 'erreicht' ? 'ok' : m[k] ? 'now' : 'todo'); const first = st.findIndex(x => x !== 'ok'); const cur = first < 0 ? -1 : first; return {...r, st: st.map((x, i) => x === 'ok' ? 'ok' : i === cur ? 'now' : 'todo'), any: has(r.keys)}; });
+  return routes.map(r => { if(r.free) return {...r, st: r.keys.map(k => isOk(m[k]?.status) ? 'ok' : bz.has(k) ? 'now' : 'todo'), any: true};
+    const st = r.keys.map(k => m[k]?.status === 'erreicht' ? 'ok' : m[k] ? 'now' : 'todo'); const first = st.findIndex(x => x !== 'ok'); const cur = first < 0 ? -1 : first; return {...r, st: st.map((x, i) => x === 'ok' ? 'ok' : i === cur ? 'now' : 'todo'), any: has(r.keys)}; });
 }
 /* Lernfortschritt: welche Stufen sind seit dem ersten Test dazugekommen? */
 function progressOf(pid){
@@ -9044,7 +9138,7 @@ function buildReport(pid, kind){
       ${(() => { const pr = progressOf(pid); return pr?.gained.length ? `<h2>Das habe ich seit dem ${new Date(pr.start).toLocaleDateString('de-DE')} dazugelernt</h2><ul>${pr.gained.map(k => `<li>${escHtml(ichOf(k))}</li>`).join('')}</ul>` : ''; })()}
       <h2>Daran arbeite ich gerade</h2><ul>${now.length ? now.map(z => `<li><b>${escHtml(ichOf(z.key))}</b></li>`).join('') : '<li>Wir üben das Gelernte weiter.</li>'}</ul>
       <h2>So können Sie zu Hause helfen</h2><ul>${now.length ? now.map(z => `<li>${escHtml(String(z.info.analog || z.info.ziel || '').split(';')[0])}.</li>`).join('') : '<li>Im Alltag zählen, lesen und schreiben: beim Einkaufen, mit dem Busplan, mit der Uhr.</li>'}</ul>
-      <p>Kleine Übungen im Alltag helfen sehr: zum Beispiel Preise lesen, Geld zählen, die Uhrzeit sagen oder einen Einkaufszettel schreiben. Loben Sie, was schon gut klappt.</p>
+      <p>Kleine Übungen im Alltag helfen sehr: zum Beispiel ${now.some(z => keyInTest(z.key, 'B')) ? 'Socken sortieren, den Tisch decken oder Muster mit Löffeln und Gabeln legen' : 'Preise lesen, Geld zählen, die Uhrzeit sagen oder einen Einkaufszettel schreiben'}. Loben Sie, was schon gut klappt.</p>
       <p>Bei Fragen sprechen Sie mich gerne an.</p><p style="margin-top:12mm">______________________________<br><small>Unterschrift Lehrkraft</small></p></div>`;
   } else {
     const mm = matrixOf(pid), subjects = TEST_IDS.map(t => [t, TESTS[t].long]).filter(([sj]) => testKeys(sj).some(k => mm[k]));
@@ -9072,7 +9166,7 @@ function weekReportHtml(pid, head){
   const maxN = Math.max(1, ...days.map(d => d.es.length));
   const byMode = {}; for(const e of L) (byMode[e.mode] ??= []).push(e);
   const skBy = {}; for(const e of SK) skBy[e.mode] = (skBy[e.mode] || 0) + 1;
-  const lvName = e => e.lvl ? (L_INFO[e.lvl] || W_INFO[e.lvl] || U_INFO[e.lvl] || G_INFO[e.lvl] || H_INFO[e.lvl] || Z_INFO[e.lvl])?.name : e.range ? `bis ${e.range}` : '';
+  const lvName = e => e.lvl ? (L_INFO[e.lvl] || W_INFO[e.lvl] || U_INFO[e.lvl] || G_INFO[e.lvl] || H_INFO[e.lvl] || Z_INFO[e.lvl] || AXES[String(e.lvl)[0]]?.info[e.lvl])?.name : e.range ? `bis ${e.range}` : '';
   const wd = d => d.toLocaleDateString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit'});
   const rows = Object.entries(byMode).sort((a, b) => b[1].length - a[1].length).map(([m, es]) => {
     const lv = [...new Set(es.map(lvName).filter(Boolean))].slice(0, 4).join(', ');

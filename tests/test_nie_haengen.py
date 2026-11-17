@@ -17,17 +17,21 @@ async def main():
         short = await pg.evaluate(POOLS)
         if short: errs.append('zu wenige Aufgaben: ' + ', '.join(short))
         await pg.close()
-        for subj in ['M1'] * 12 + ['M2'] * 4 + ['L'] * 3 + ['W'] * 3:
+        for subj in ['M1'] * 12 + ['M2'] * 4 + ['L'] * 3 + ['W'] * 3 + ['B1', 'B2', 'B3']:
             pg = await b.new_page(viewport={'width': 1180, 'height': 820}); pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL); await pg.wait_for_timeout(300)
             await pg.evaluate(f"diagStart('{subj}')"); await pg.wait_for_timeout(150); await pg.click('#d-start')
             k, last, same = 0, None, 0
             while k < 90 and not await pg.evaluate("app.diag?.done ?? true"):
-                st = await pg.evaluate("[app.diag.key, app.diag.idx, app.diag.nItems, app.diag.items[app.diag.idx]?.type]")
+                st = await pg.evaluate("[app.diag.key, app.diag.idx, app.diag.nItems, app.diag.items[app.diag.idx]?.demo ? 'demo' : app.diag.items[app.diag.idx]?.type]")
                 same = same + 1 if st == last else 0; last = st
                 if same >= 2: errs.append(f'{subj} hängt bei {st}'); break
                 t = st[3]
-                if t == 'choice':  # meist falsch, manchmal richtig
+                if t == 'demo':  # Basis: Vormachen (nicht gewertet) überspringen
+                    await pg.evaluate("app.diag.dm.end = true; renderDiag()"); await pg.click('#d-go', force=True)
+                elif t in ('pick', 'sort', 'match', 'order', 'glance') and k % 3 == 0:  # Basis: manchmal richtig
+                    await pg.evaluate("(()=>{const d=app.diag; bzSolve(d.items[d.idx], d.resp ||= {});})()"); await pg.click('#d-next', force=True)
+                elif t == 'choice':  # meist falsch, manchmal richtig
                     await pg.evaluate(f"(()=>{{const it=app.diag.items[app.diag.idx]; app.diag.resp={{choice:{'it.correct' if k % 3 == 0 else '(it.correct+1)%it.options.length'}}};}})()")
                     await pg.click('#d-next')
                 elif t == 'input':

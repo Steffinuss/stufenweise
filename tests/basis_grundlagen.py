@@ -2,7 +2,7 @@
 Alle Gegenstände in allen Farben und Größen, Formen mit Mustern, Pfeile, Spiegel-Zeichen,
 Punktbilder und Bildsymbole lassen sich zeichnen (ohne NaN/undefined). Die Achsen V und O
 haben zu jeder Stufe alle Texte und einen Weg am Material. Seit 0.28.0 ist das Fach „Basis“ zum Üben
-angemeldet; der Basis-Test fehlt noch, solange BASIS_ON aus ist."""
+angemeldet, seit Schritt 4 auch der Basis-Test (TESTS.B)."""
 import asyncio
 from playwright.async_api import async_playwright
 from common import URL, launch  # noqa: E402
@@ -22,7 +22,7 @@ CHECK = r"""(()=>{ const bad=[]; const chk=(n,h)=>{ if(!/^<svg/.test(h) || /NaN|
     if(!/Vergleichen und Ordnen|Sehen und Orientieren/.test(cellLabel(l[0]+'|'+l))) bad.push(l+' cellLabel');
   }
   if(new Set(Object.values(B_COL)).size !== Object.keys(B_COL).length) bad.push('Farben doppelt');
-  return {bad, subj: SUBJ_IDS.join(), tests: TEST_IDS.join(), on: BASIS_ON};
+  return {bad, subj: SUBJ_IDS.join(), tests: TEST_IDS.join()};
 })()"""
 
 async def main():
@@ -32,7 +32,7 @@ async def main():
         await pg.goto(URL); await pg.wait_for_timeout(400)
         r = await pg.evaluate(CHECK)
         errs += r['bad']
-        if not r['on'] and (r['subj'] != 'B,M,D' or r['tests'] != 'M,L,W'): errs.append(f'Fach Basis (Üben) fehlt oder Test schon da: {r}')
-        print('Fächer', r['subj'], 'Tests', r['tests'], 'BASIS_ON', r['on'])
+        if r['subj'] != 'B,M,D' or r['tests'] != 'M,L,W,B': errs.append(f'Fach oder Test Basis fehlt: {r}')
+        print('Fächer', r['subj'], 'Tests', r['tests'])
         print('ERR', errs[:10]); await b.close()
 asyncio.run(main())
