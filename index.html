@@ -1161,6 +1161,15 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 
 <script>
 'use strict';
+/* ---------- Testversion (Zweig „entwicklung“, veröffentlicht unter /stufenweise-test/) ----------
+   Gleiche Adresse (steffinuss.github.io) wie die richtige App, also derselbe Browser-Speicher. Damit die Testversion
+   die Daten der richtigen App nie berührt, bekommen alle ihre Schlüssel den Vorsatz „test:“. Oben steht gut sichtbar „Testversion“. */
+const TEST_BUILD = /\/stufenweise-test\//.test(location.pathname);
+if(TEST_BUILD){ const P = 'test:', S = Storage.prototype, g = S.getItem, st = S.setItem, rm = S.removeItem;
+  S.getItem = function(k){ return g.call(this, P + k); }; S.setItem = function(k, v){ return st.call(this, P + k, v); }; S.removeItem = function(k){ return rm.call(this, P + k); };
+  document.title = 'Stufenweise – Testversion';
+  addEventListener('DOMContentLoaded', () => document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;left:50%;top:0;transform:translateX(-50%);z-index:3000;background:#b23a2e;color:#fff;font:700 14px system-ui,sans-serif;padding:3px 14px;border-radius:0 0 10px 10px;pointer-events:none">Testversion – nicht für den Unterricht</div>'));
+}
 /* ---------- Grundlagen ---------- */
 const $ = s => document.querySelector(s);
 const SIZE = {t:1000, h:100, z:10, e:1};
