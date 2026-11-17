@@ -31,6 +31,7 @@ Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. D
 | `arbeitsblaetter.py` | jedes Arbeitsblatt-Thema: passt auf die Seite, genug Aufgaben (`PRÜFEN` = ansehen) |
 | `arbeitsblatt_optionen.py` | Materialbilder „1. Aufgabe vorgegeben, dann selbst zeichnen“, Zehnerpartner, Rechnen über die 10 (Beispiel ausgefüllt), Geld mit Cent, Einmaleins-Reihen |
 | `basis_grundlagen.py` | Basis, Schritt 1: alle Bilder (Gegenstände, Farben, Größen, Formen, Pfeile, Spiegel-Zeichen, Punktbilder, Symbole) und vollständige Stufentexte V1–V8, O1–O5 |
+| `basis_blaetter.py` | Basis, Schritt 2: alle Basis-Arbeitsblätter (V1–V7, O2–O4) in allen Varianten, Lösungen passend, Vorgemachtes nur in der ersten Aufgabe jeder Art, Schwarz-Weiß mit Mustern; Legeblätter Sortierunterlage, Zuordnungsleiste, Musterstreifen |
 | `drittes_fach.py` | Mehr als zwei Fächer: ein Probe-Fach wird angemeldet und erscheint in Fachwahl, Startseite, Üben, Test, Lernstand, Klassenübersicht und Berichten; optional nur für eingeschaltete Kinder |
 | `handy.py` | Handy hochkant: Startseite, Leiste, Aufgaben ohne Überlappung, Zifferntastatur unten; quer Hinweis zum Drehen; iPad unverändert |
 | `test_passt.py` | Jede Testaufgabe passt auf kleinere iPads (1080 × 740 und Hochformat); nur lange Lesetexte scrollen mit Hinweis |

@@ -6087,11 +6087,11 @@ for(const [k, v] of [...Object.entries(V_INFO), ...Object.entries(O_INFO)]) v.of
 Object.assign(MAT_WAY, {
   V1: MW('Echte Socken, Becher oder Schrauben: zu jedem Ding das gleiche suchen und daneben legen.', 'Gleiche Bilder mit einer Linie verbinden.', ['Socken oder Becher in Paaren']),
   V2: MW('Vier Dinge auf den Tisch legen, eins passt nicht (drei Löffel, eine Schraube). Wegnehmen und sagen, warum.', 'In einer Bildreihe durchstreichen, was nicht passt.', ['Alltagsdinge']),
-  V3: MW('Besteck und Werkzeug in zwei Kisten sortieren, dann Becher nach Farbe.', 'Bilder ausschneiden und in die richtige Kiste kleben.', ['zwei Kisten', 'Besteck und Werkzeug']),
-  V4: MW('Tisch decken: auf jeden Teller genau einen Löffel. Bleibt etwas übrig? Fehlt etwas?', 'Tassen und Löffel mit Linien verbinden: Reicht es?', ['Teller oder Tassen', 'Löffel']),
+  V3: MW('Besteck und Werkzeug in zwei Kisten sortieren, dann Becher nach Farbe.', 'Echte Dinge auf die Sortierunterlage legen; auf dem Arbeitsblatt einkreisen, was dazugehört.', ['zwei Kisten', 'Besteck und Werkzeug'], 'K:sort2'),
+  V4: MW('Tisch decken: auf jeden Teller genau einen Löffel. Bleibt etwas übrig? Fehlt etwas?', 'Auf der Zuordnungsleiste unter jedes Bild ein Ding legen; dann Tassen und Löffel mit Linien verbinden: Reicht es?', ['Teller oder Tassen', 'Löffel'], 'K:paare'),
   V5: MW('Zwei Haufen Muttern vergleichen: eins zu eins nebeneinanderlegen, wo bleiben welche übrig?', 'Den Kasten mit mehr einkreisen.', ['Muttern oder Knöpfe']),
   V6: MW('Stifte oder Schrauben der Länge nach hinlegen, mit dem kleinsten anfangen.', 'Bilder ausschneiden und der Größe nach aufkleben.', ['Stifte oder Schrauben in verschiedenen Längen']),
-  V7: MW('Löffel und Gabeln abwechselnd legen und weitermachen; Perlen nach Muster auffädeln.', 'Das Muster in der Reihe weitermalen.', ['Besteck', 'Perlen']),
+  V7: MW('Löffel und Gabeln abwechselnd legen und weitermachen; Perlen nach Muster auffädeln.', 'Auf dem Musterstreifen mit Plättchen weiterlegen, dann das Muster in der Reihe weitermalen.', ['Besteck', 'Perlen', 'Wendeplättchen'], 'K:muster'),
   V8: MW('Würfelbilder mit Plättchen legen, kurz zeigen, wieder abdecken: Wie viele waren es?', 'Punktbilder kurz ansehen und das gleiche Bild finden.', ['Wendeplättchen', 'Tuch zum Abdecken']),
   O1: MW('Aufträge ausführen: „Leg den Löffel in die Tasse, unter den Teller, neben das Glas.“', 'Im Bild das Ding unter, auf oder neben dem Tisch einkreisen.', ['Tisch', 'Alltagsdinge']),
   O2: MW('Formen ertasten: Teller (Kreis), Brettchen (Viereck), Dreieckstuch. Dann mit Plättchen Formen legen.', 'Alle Kreise anmalen, alle Dreiecke einkreisen.', ['Formenplättchen', 'Fühlsäckchen']),
@@ -7776,7 +7776,10 @@ const LEGE = {
   wortv:    {name:'Wörter nachlegen (mit Vorlage)', grp:'D', kts:['zahl'], def:'zahl'},
   wortm:    {name:'Merkwörter nachlegen (Merkstelle farbig)', grp:'D', kts:['zahl'], def:'zahl'},
   silben:   {name:'Silben legen (ein Stein pro Silbe)', grp:'D', kts:['zahl'], def:'zahl'},
-  buchst:   {name:'Buchstabenkarten zum Ausschneiden', grp:'D', kts:['zahl'], def:'zahl'}
+  buchst:   {name:'Buchstabenkarten zum Ausschneiden', grp:'D', kts:['zahl'], def:'zahl'},
+  sort2:    {name:'Sortierunterlage mit zwei Feldern', grp:'B', kts:['grp', 'farbe', 'none'], ktn:{grp:'Küche und Werkstatt', farbe:'zwei Farben', none:'ohne Bild (selbst beschriften)'}, def:'grp'},
+  paare:    {name:'Zuordnungsleiste: eins zu eins', grp:'B', kts:['bild', 'none'], ktn:{bild:'mit Bildern oben', none:'ohne Bilder (echte Dinge oben)'}, def:'bild'},
+  muster:   {name:'Musterstreifen für Plättchen', grp:'B', kts:['ab', 'aab', 'abc', 'none'], ktn:{ab:'Muster AB', aab:'Muster AAB und ABB', abc:'Muster ABC', none:'leere Streifen'}, def:'ab'}
 };
 const legeKt = (def, S) => def.kts.includes(S.kt) ? S.kt : def.def;
 const lgBox = (w = 14) => `<span class="lg-box" style="width:${w}mm"></span>`;
@@ -7935,6 +7938,26 @@ function legeBuild(key, S){
     title = 'Silben legen'; how = 'Sprich das Wort und schwinge die Silben. Lege für jede Silbe einen Stein in einen Kreis.';
     body = `<div class="lg-words">${words.map(w => `<div class="lg-wr"><span class="lg-ic">${iconSvg(w, 100)}</span><div class="lg-syl">${'<span></span>'.repeat(4)}</div></div>`).join('')}</div>`;
   }
+  else if(key === 'sort2'){
+    const [a, b] = kt === 'grp' ? shuffle([['kueche', 'tasse'], ['werkstatt', 'hammer']]) : kt === 'farbe' ? shuffle(B_COLS4).slice(0, 2).map(c => [c]) : [[], []];
+    const lab = x => kt === 'grp' ? `<span class="lg-bic">${bObj(x[1], null, 100)}</span><b>${B_GRP[x[0]]}</b>` : kt === 'farbe' ? `<span class="lg-bsw">${bSwatch(x[0])}</span><b>${B_BW ? '' : B_COL_NAME[x[0]]}</b>` : '<span class="lg-blab"></span>';
+    title = 'Sortieren'; how = kt === 'none' ? 'Oben ein Bild oder Wort einkleben. Dann echte Dinge in das richtige Feld legen.' : kt === 'grp' ? 'Echte Dinge (Besteck, Becher, Schrauben, Werkzeug) in das richtige Feld legen.' : 'Dinge oder Plättchen nach der Farbe in das richtige Feld legen.';
+    body = `<div class="lg-sort">${[a, b].map(x => `<div class="lg-sf"><div class="lg-sl">${lab(x)}</div></div>`).join('')}</div>`;
+  }
+  else if(key === 'paare'){
+    const rows = kt === 'bild' ? shuffle([['tasse', 'Löffel'], ['teller', 'Gabel'], ['schraube', 'Mutter']]).slice(0, 2) : [[null], [null]];
+    title = 'Eins zu eins'; how = kt === 'bild' ? 'Auf jedes Feld unter einem Bild genau ein Ding legen. Reicht es? Bleibt etwas übrig?' : 'Oben echte Dinge in die Felder legen. Unten zu jedem Ding genau ein passendes Ding legen.';
+    body = rows.map(([k, b]) => `<div class="lg-unit">${k ? `<div class="lg-task"><span class="lg-tt">Zu jedem Bild ${b === 'Löffel' ? 'einen' : 'eine'} ${b}.</span></div>` : ''}<div class="lg-pair">${Array.from({length:5}, () => `<div class="lg-pc"><span class="lg-pt">${k ? bObj(k, null, 100) : ''}</span><span class="lg-pb"></span></div>`).join('')}</div></div>`).join('');
+  }
+  else if(key === 'muster'){
+    const C = shuffle(B_COLS4), pats = kt === 'ab' ? [[0, 1], [0, 1], [1, 2], [2, 3], [0, 2]] : kt === 'aab' ? [[0, 0, 1], [0, 1, 1], [2, 2, 3], [1, 1, 0], [3, 2, 2]] : kt === 'abc' ? [[0, 1, 2], [0, 1, 2], [3, 1, 0], [2, 0, 3], [1, 3, 2]] : [[], [], [], [], [], []];
+    const N = 7, dot = (c, ghost) => `<svg viewBox="0 0 20 20" width="20mm" height="20mm"><circle cx="10" cy="10" r="9.3" fill="${bFill(c)}" stroke="#222" stroke-width=".5"${ghost ? ' opacity=".35"' : ''}/></svg>`;
+    title = kt === 'none' ? 'Musterstreifen' : `Muster legen: ${def.ktn[kt].replace('Muster ', '')}`;
+    how = kt === 'none' ? 'Mit Plättchen, Steckwürfeln oder Dingen ein Muster vorlegen. Das Kind legt weiter.' : `Lege das Muster mit Plättchen weiter, bis der Streifen voll ist. Sprich dabei mit${B_BW ? '.' : ': „rot, blau, rot, blau …“'}`;
+    body = pats.map((pt, r) => { const show = pt.length ? (pt.length === 2 ? (r < 2 ? 4 : 2) : r === 0 ? 4 : 3) : 0, seq = Array.from({length:N}, (_, i) => pt.length ? pt[i % pt.length] : null);
+      if(pt.length) sols.push(seq.slice(show).map(i => B_COL_NAME[C[i]]).join(', '));
+      return `<div class="lg-strip">${seq.map((c, i) => `<span class="lg-ss">${i < show ? dot(C[c]) : ''}</span>`).join('')}</div>`; }).join('');
+  }
   else if(key === 'buchst'){
     const mode = S.bcase || 'mixed';
     title = 'Buchstabenkarten'; how = 'Ausschneiden (am besten auf Karton drucken oder laminieren). Der Strich zeigt, wo unten ist.';
@@ -7943,13 +7966,13 @@ function legeBuild(key, S){
   return {title, how, body, quer, sols, compact: key === 'buchst'};
 }
 function legeSheet(key){
-  const S = app.sheet, b = legeBuild(key, S), kid = S.pid && S.pid !== 'none' ? kids().find(p => p.id === S.pid) : null;
+  const S = app.sheet; B_BW = LEGE[key].grp === 'B' && !!S.bw; const b = legeBuild(key, S), kid = S.pid && S.pid !== 'none' ? kids().find(p => p.id === S.pid) : null;
   const head = b.compact ? `<div class="ab-top lg-top cmp"><h1>${escHtml(b.title)}</h1><p class="lg-how">${b.how}</p></div>` : `<div class="ab-top lg-top"><h1>${escHtml(b.title)}</h1><div class="ab-meta"><div>Name: <span>${kid ? escHtml(kid.name) : ''}</span></div><div>Datum: <span></span></div></div></div><p class="lg-how">${b.how}</p>`;
   const foot = `<div class="lg-foot"><span class="lg-cal"></span><span>Kontrolle: Dieser Strich ist genau 5 cm lang. Sonst beim Drucken „Tatsächliche Größe“ oder 100 % wählen (nicht „An Seite anpassen“).</span></div><p class="ab-foot ab-lic">Stufenweise · Legeblatt für echtes Material · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
   const page = `<div class="page lg${b.quer ? ' quer' : ''}"><div class="q">${head}<div class="lg-body">${b.body}</div>${foot}</div></div>`;
   const sol = S.sol && b.sols.length ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(b.title)}</h1></div><ol>${b.sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
   app.sheetGen = null;
-  return {title: b.title, n: b.sols.length, lege: true, quer: b.quer, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(b.title)}</title><style>${SHEET_CSS}</style></head><body>${page}${sol}</body></html>`};
+  return {title: b.title, n: b.sols.length, lege: true, quer: b.quer, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(b.title)}</title><style>${SHEET_CSS}${LEGE[key].grp === 'B' ? BB_CSS : ''}</style></head><body>${B_BW ? B_BW_DEFS : ''}${page}${sol}</body></html>`, _bw: B_BW = false};
 }
 const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:A4;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,Arial,sans-serif;color:#222;margin:0;font-size:13pt}
 .page{width:210mm;padding:12mm;margin:0 auto;page-break-after:always;-webkit-box-decoration-break:clone;box-decoration-break:clone}.page:last-child{page-break-after:auto}
@@ -7992,8 +8015,11 @@ function sheetTopics(){
     ['Hundertertafel und Tausenderbuch', Object.entries(H_SHEETS).map(([k, v]) => [`H:${k}`, v.mat ? v.name : `${k} ${v.name}`])],
     ['Größen und Einkaufen', Object.entries(G_SHEETS).map(([k, v]) => [`G:${k}`, `${k} ${v.name}`])],
     ['Uhr und Kalender', Object.entries(U_SHEETS).map(([k, v]) => [`U:${k}`, `${k} ${v.name.replace('Uhr: ', '')}`])],
+    ['Basis: Vergleichen und Ordnen', Object.entries(B_SHEETS).filter(([k]) => k[0] === 'V').map(([k, v]) => [`B:${k}`, `${k} ${v.name}`])],
+    ['Basis: Sehen und Orientieren', Object.entries(B_SHEETS).filter(([k]) => k[0] === 'O').map(([k, v]) => [`B:${k}`, `${k} ${v.name}`])],
     ['Legeblätter für echtes Material: Mathe', Object.entries(LEGE).filter(([, v]) => v.grp === 'M').map(([k, v]) => [`K:${k}`, v.name])],
-    ['Legeblätter für echtes Material: Deutsch', Object.entries(LEGE).filter(([, v]) => v.grp === 'D').map(([k, v]) => [`K:${k}`, v.name])]
+    ['Legeblätter für echtes Material: Deutsch', Object.entries(LEGE).filter(([, v]) => v.grp === 'D').map(([k, v]) => [`K:${k}`, v.name])],
+    ['Legeblätter für echtes Material: Basis', Object.entries(LEGE).filter(([, v]) => v.grp === 'B').map(([k, v]) => [`K:${k}`, v.name])]
   ];
 }
 /* Zusätzliche Blätter zur Förderzone (Rechnen): Zehnerpartner und Rechnen über die 10 */
@@ -8008,12 +8034,13 @@ function zoneToSheet(key){
   if(ax === 'G') return {topic:`G:${a}`};
   if(ax === 'H') return {topic:`H:${a}`};
   if(ax === 'Z') return {topic: a === 'Z3' ? 'M:ueber10' : 'M:zehnerpartner'};
+  if(ax === 'V' || ax === 'O') return B_SHEETS[a] ? {topic:`B:${a}`} : null;
   if(ax === 'R') return a === 'R7' ? {topic:'M:einmaleins'} : {topic:'M:plus', zr: R_CONF[a].range, ue: ({without:'ohne', with:'mit'})[R_CONF[a].ten] || 'egal'};
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
-app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt'};
-const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich'];
+app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false};
+const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
 function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch {} }
@@ -8030,9 +8057,151 @@ function buildSheet(limit){
 }
 /* Arbeitsblatt-Sammlungen weiterer Fächer: SHEET_SETS[Kürzel] = {Schlüssel: Blatt}, SHEET_INFO[Kürzel] = {Schlüssel: Stufeninfo} */
 const SHEET_SETS = {}, SHEET_INFO = {};
+
+/* ---------- Basis: Arbeitsblätter (Schritt 2) ----------
+   Erste Aufgabe jeder Art ist vorgemacht (grau gestrichelt). Option „Schwarz-Weiß“: Muster statt Farben. */
+let B_BW = false; /* beim Bauen eines Basis-Blatts gesetzt */
+const B_BW_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<pattern id="bw-rot" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#fff"/><rect width="2.4" height="5" fill="#222"/></pattern>
+<pattern id="bw-blau" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><circle cx="3" cy="3" r="1.7" fill="#222"/></pattern>
+<pattern id="bw-gruen" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><path d="M0 3h6M3 0v6" stroke="#222" stroke-width="1.1"/></pattern>
+<pattern id="bw-gelb" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/></pattern>
+<pattern id="bw-grau" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#cfd3d7"/></pattern></defs></svg>`;
+const bFill = col => B_BW ? `url(#bw-${col})` : B_COL[col];
+/* Gegenstand im Blatt (Farbe oder Muster); s = Größe im Bild */
+const bbObj = (kind, col, s = 1) => { const o = B_OBJ[kind], c = col || o.col; return bObj(kind, B_BW ? bFill(c) : c, 64, s); };
+const bbShape = (form, col, fill = 'voll') => bShape(form, B_BW ? bFill(col) : col, 64, fill);
+const bSwatch = col => `<svg class="bb-sw" viewBox="0 0 20 14" aria-label="${B_COL_NAME[col]}"><rect x="1" y="1" width="18" height="12" rx="2" fill="${bFill(col)}" stroke="#222" stroke-width="1.2"/></svg>`;
+const bbColName = col => B_BW ? 'mit diesem Muster' : B_COL_NAME[col];
+/* Bild mit Markierung: ring = eingekreist, weg = durchgestrichen (nur im vorgemachten Beispiel) */
+const bbIt = (svg, mark = '') => `<span class="bb-it${mark ? ' ' + mark : ''}">${svg}</span>`;
+const bbRow = (items, cls = '') => `<div class="bb-row ${cls}">${items.join('')}</div>`;
+/* Beispiel (mit Markierungen) und leere Aufgabe; abPick wählt beim Zusammensetzen */
+const bbEx = (fn) => abEx(fn(true), fn(false));
+const bKinds = (filter = () => true) => Object.keys(B_OBJ).filter(k => filter(B_OBJ[k]));
+const B_COLS4 = ['rot', 'blau', 'gelb', 'gruen'];
+/* Verbinden links ↔ rechts mit Beispiel-Linien: pairs = [[linksHTML, rechtsHTML]], perm[i] = Zeile rechts für links i */
+function bbMatch(lefts, rights, perm, ex){
+  const n = lefts.length;
+  const lines = ex ? `<svg class="bb-lines" viewBox="0 0 100 ${n*100}" preserveAspectRatio="none" style="grid-row:1/${n + 1}">${perm.map((j, i) => `<path d="M2 ${i*100 + 50}L98 ${j*100 + 50}" stroke="#888" stroke-width="3" stroke-dasharray="7 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '';
+  return `<div class="bb-match">${lefts.map((l, i) => `<div class="l" style="grid-row:${i + 1}">${l}<span class="ab-dot"></span></div>`).join('')}${lines}${rights.map((r, j) => `<div class="r" style="grid-row:${j + 1}"><span class="ab-dot"></span>${r}</div>`).join('')}</div>`;
+}
+/* Oben/unten verbinden (eins zu eins) mit Beispiel-Linien */
+function bbPairs(tops, bottoms, links, ex){
+  const n = tops.length, m = bottoms.length;
+  const lines = ex ? `<svg class="bb-vlines" viewBox="0 0 100 10" preserveAspectRatio="none">${links.map(([i, j]) => `<path d="M${100*(i + .5)/n} 0L${100*(j + .5)/m} 10" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '<div class="bb-vgap"></div>';
+  return `<div class="bb-pairs"><div class="bb-prow">${tops.map(t => `<span class="bb-pc">${t}<span class="ab-dot"></span></span>`).join('')}</div>${lines}<div class="bb-prow">${bottoms.map(b => `<span class="bb-pc"><span class="ab-dot"></span>${b}</span>`).join('')}</div></div>`;
+}
+/* Gegenstände verstreut in einem Kasten (Mengen vergleichen); spread: eng (0) oder weit (1) */
+function bbScatter(kind, col, n, spread = 1){
+  const slots = []; const cols = 4, rows = 3;
+  for(let r = 0; r < rows; r++) for(let c = 0; c < cols; c++) slots.push([c, r]);
+  const pick = spread ? shuffle(slots).slice(0, n) : slots.slice(0, n);
+  const o = B_OBJ[kind], c = B_BW ? bFill(col || o.col) : B_COL[col || o.col];
+  const g = pick.map(([x, y]) => { const jx = spread ? rnd(-4, 4) : 0, jy = spread ? rnd(-4, 4) : 0; return `<g transform="translate(${x*30 + 4 + jx} ${y*30 + 4 + jy}) scale(.42)">${o.d(c)}</g>`; }).join('');
+  return `<svg class="bb-scatter" viewBox="0 0 124 94">${g}</svg>`;
+}
+/* Glas mit Füllstand (0–1) und Kerze (Höhe 0–1) für Bildfolgen */
+const bGlas = (lv, col = 'blau') => { const y = 56 - 46*lv, xl = 16 + 4*(y - 8)/48, xr = 48 - 4*(y - 8)/48; return `<svg class="b-obj" viewBox="0 0 64 64"><path d="M16 8h32l-4 48H20z" fill="#eef3f6" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>${lv > 0 ? `<path d="M${xl} ${y}H${xr}L44 56H20z" fill="${bFill(col)}"/>` : ''}<path d="M16 8h32l-4 48H20z" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/></svg>`; };
+const bKerze = h => { const top = 58 - 44*h; return `<svg class="b-obj" viewBox="0 0 64 64"><rect x="24" y="${top}" width="16" height="${58 - top}" rx="2" fill="#f4efe4" stroke="${INK}" stroke-width="2.4"/><path d="M32 ${top}v-4" stroke="${INK}" stroke-width="2"/><path d="M32 ${top - 16}q6 7 0 12-6-5 0-12z" fill="#e8962e" stroke="${INK}" stroke-width="1.6"/></svg>`; };
+const B_APF = 'M32 18q-6-4-12-2-10 4-9 18 2 16 12 21 4 2 9 0 5 2 9 0 10-5 12-21 1-14-9-18-6-2-12 2z';
+const bApfelZ = st => `<svg class="b-obj" viewBox="0 0 64 64"><defs><clipPath id="bb-apf"><path d="${B_APF}"/></clipPath><mask id="bb-apfm"><rect width="64" height="64" fill="#fff"/><circle cx="52" cy="29" r="9"/><circle cx="51" cy="43" r="8"/><circle cx="58" cy="36" r="5"/></mask></defs>${st === 0 ? `<path d="${B_APF}" fill="${bFill('rot')}" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>`
+  : st === 1 ? `<g clip-path="url(#bb-apf)"><path d="${B_APF}" fill="${bFill('rot')}"/><circle cx="52" cy="29" r="13" fill="#f6f0d8"/><circle cx="51" cy="43" r="12" fill="#f6f0d8"/><circle cx="58" cy="36" r="8" fill="#f6f0d8"/></g><g clip-path="url(#bb-apf)" fill="none" stroke="${INK}" stroke-width="4"><circle cx="52" cy="29" r="9"/><circle cx="51" cy="43" r="8"/><circle cx="58" cy="36" r="5"/></g><g fill="#fff"><circle cx="52" cy="29" r="9"/><circle cx="51" cy="43" r="8"/><circle cx="58" cy="36" r="5"/></g><path d="${B_APF}" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round" mask="url(#bb-apfm)"/>`
+  : `<path d="M28 16q-4 4-4 8 4 4 4 9t-4 9q0 6 4 10h8q4-4 4-10-4-4-4-9t4-9q0-4-4-8z" fill="#f6f0d8" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/><path d="M27 52q5 3 10 0" fill="none" stroke="${INK}" stroke-width="2.4"/><circle cx="30" cy="31" r="1.6" fill="${INK}"/><circle cx="34" cy="35" r="1.6" fill="${INK}"/>`}<path d="M32 18q0-6 4-10" fill="none" stroke="${INK}" stroke-width="2.4"/></svg>`;
+const B_SEQ = [
+  {name:'Apfel wird gegessen', pics:[bApfelZ.bind(null, 0), bApfelZ.bind(null, 1), bApfelZ.bind(null, 2)], first:'der ganze Apfel'},
+  {name:'Kerze brennt ab', pics:[bKerze.bind(null, 1), bKerze.bind(null, .6), bKerze.bind(null, .25)], first:'die lange Kerze'}
+];
+const bPos = i => `${i + 1}. Bild`;
+const B_JEDE = {tasse:'Jede Tasse', teller:'Jeder Teller', schraube:'Jede Schraube'}, B_EIN = {loeffel:'einen Löffel', gabel:'eine Gabel', mutter:'eine Mutter'};
+const B_SHEETS = {
+  V1: {name:'Gleiches finden', cols:2, max:10, gens:[
+    () => { const ks = shuffle(bKinds()).slice(0, 4), perm = shuffle([0, 1, 2, 3]), rs = []; perm.forEach((j, i) => rs[j] = ks[i]);
+      return T_('verbinde', 'Verbinde gleiche Bilder.', bbEx(ex => bbMatch(ks.map(k => bbIt(bbObj(k))), rs.map(k => bbIt(bbObj(k))), perm, ex)), ks.map(k => B_OBJ[k].name).join(', '), 1); },
+    () => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), others = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
+      const opts = shuffle([[k, col, 1], [k, others[0], 0], [k, others[1], 0], [k2, col, 0]]), ok = opts.findIndex(o => o[2]);
+      return T_('kreise', 'Kreise das gleiche Bild ein.', bbEx(ex => `<div class="bb-target">${bbIt(bbObj(k, col))}</div>` + bbRow(opts.map((o, i) => bbIt(bbObj(o[0], o[1]), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${B_OBJ[k].name}, ${B_COL_NAME[col]})`, 2); },
+    () => { const cs = shuffle(B_COLS4).slice(0, 3), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), perm = shuffle([0, 1, 2]), rs = [];
+      perm.forEach((j, i) => rs[j] = [ks[3 + i], cs[i]]);
+      return T_('verbinde', B_BW ? 'Verbinde, was das gleiche Muster hat.' : 'Verbinde, was die gleiche Farbe hat.', bbEx(ex => bbMatch(cs.map((c, i) => bbIt(bbObj(ks[i], c))), rs.map(([k, c]) => bbIt(bbObj(k, c))), perm, ex)), cs.map((c, i) => `${B_OBJ[ks[i]].name} – ${B_OBJ[rs[perm[i]][0]].name} (${B_COL_NAME[c]})`).join(', '), 3); }]},
+  V2: {name:'Was passt nicht?', cols:1, max:8, gens:[
+    () => { const rows = [0, 1].map(() => { const k = pick(bKinds()), k2 = pick(bKinds(o => o.grp !== B_OBJ[k].grp)), i = rnd(0, 3); return {items:[0, 1, 2, 3].map(j => j === i ? [k2] : [k]), i}; });
+      return T_('streiche', 'Streiche durch, was nicht passt.', bbEx(ex => rows.map(r => bbRow(r.items.map(([k], j) => bbIt(bbObj(k), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name})`).join('; '), 1); },
+    () => { const rows = [0, 1].map(() => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), col2 = pick(B_COLS4.filter(c => c !== col)), i = rnd(0, 3), big = Math.random() < .5;
+      return {items:[0, 1, 2, 3].map(j => j === i ? (big ? [k, col, .6] : [k, col2, 1]) : [k, col, 1]), i}; });
+      return T_('streiche', 'Streiche durch, was nicht passt. Schau genau!', bbEx(ex => rows.map(r => bbRow(r.items.map(([k, c, s], j) => bbIt(bbObj(k, c, s), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name}${r.items[r.i][2] !== 1 ? ', kleiner' : ', andere Farbe'})`).join('; '), 2); },
+    () => { const rows = [0, 1].map(() => { const g = pick(['kueche', 'werkstatt', 'kleidung']), same = shuffle(bKinds(o => o.grp === g)).slice(0, 3), odd = pick(bKinds(o => o.grp !== g)), i = rnd(0, 3), items = [...same]; items.splice(i, 0, odd); return {items, i}; });
+      return T_('streiche', 'Was gehört nicht dazu? Streiche durch.', bbEx(ex => rows.map(r => bbRow(r.items.map((k, j) => bbIt(bbObj(k), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i]].name})`).join('; '), 3); }]},
+  V3: {name:'Sortieren', cols:1, max:6, gens:[
+    () => { const g = pick(['kueche', 'werkstatt', 'kleidung']), g2 = pick(['kueche', 'werkstatt', 'kleidung', 'obst'].filter(x => x !== g)), inn = shuffle(bKinds(o => o.grp === g)).slice(0, 3), out = shuffle(bKinds(o => o.grp === g2)).slice(0, 3), all = shuffle([...inn, ...out]);
+      return T_('kreise', `Kreise alles ein, was zur ${({kueche:'Küche', werkstatt:'Werkstatt', kleidung:'Kleidung'})[g]} gehört.`, bbEx(ex => bbRow(all.map(k => bbIt(bbObj(k), ex && inn.includes(k) ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); },
+    () => { const col = pick(B_COLS4), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), cs = shuffle([col, col, col, ...shuffle(B_COLS4.filter(c => c !== col)).slice(0, 3)]);
+      return T_('kreise', `Kreise alle Dinge ${bbColName(col)} ein: ${bSwatch(col)}`, bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, cs[i]), ex && cs[i] === col ? 'ring' : '')), 'wide')), ks.filter((k, i) => cs[i] === col).map(k => B_OBJ[k].name).join(', '), 2); },
+    () => { const ks = shuffle(bKinds()).slice(0, 6), big = shuffle([1, 1, 1, 0, 0, 0]);
+      return T_('kreise', 'Kreise alle großen Dinge ein.', bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, null, big[i] ? 1 : .55), ex && big[i] ? 'ring' : '')), 'wide')), ks.filter((k, i) => big[i]).map(k => B_OBJ[k].name).join(', '), 3); }]},
+  V4: {name:'Eins zu eins zuordnen', cols:1, max:6, gens:[
+    () => { const [a, b] = pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]), n = rnd(3, 5), perm = shuffle([...Array(n).keys()]);
+      return T_('verbinde', `${B_JEDE[a]} bekommt ${B_EIN[b]}. Verbinde.`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(n).fill(bbObj(b)), perm.map((j, i) => [i, j]), ex)), `${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, 1); },
+    () => { const [a, b] = pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]), n = rnd(3, 5), m = Math.max(2, n + pick([-1, 0, 1])), k = Math.min(n, m), ok = m >= n;
+      const yn = ex => `<p class="ab-row yn">Reicht es? <span class="bb-cb${ex && ok ? ' x' : ''}"></span> ja <span class="bb-cb${ex && !ok ? ' x' : ''}"></span> nein</p>`;
+      return T_(['verbinde', 'kreuze'], `Verbinde. Bekommt ${B_JEDE[a].replace('J', 'j')} ${B_EIN[b]}?`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(m).fill(bbObj(b)), [...Array(k).keys()].map(i => [i, i]), ex) + yn(ex)), `${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}: ${ok ? 'ja' : 'nein'}`, 2); }]},
+  V5: {name:'Mehr, weniger, gleich viel', cols:1, max:6, gens:[
+    () => { const k = pick(['knopf', 'mutter', 'apfel', 'socke', 'stift']), a = rnd(1, 3), b = rnd(6, 9), left = Math.random() < .5, more = Math.random() < .7;
+      const L = left ? b : a, R = left ? a : b, ans = (more ? L > R : L < R) ? 0 : 1;
+      return T_('kreise', more ? 'Kreise ein, wo mehr sind.' : 'Kreise ein, wo weniger sind.', bbEx(ex => `<div class="bb-two">${[L, R].map((n, i) => `<div class="bb-box${ex && i === ans ? ' ring' : ''}">${bbScatter(k, null, n)}</div>`).join('')}</div>`), `${ans ? 'rechts' : 'links'} (${L} gegen ${R})`, 1); },
+    () => { const k = pick(['knopf', 'mutter', 'apfel', 'stift']), eq = Math.random() < .4, a = rnd(4, 7), b = eq ? a : a + pick([-1, 1]), sp = Math.random() < .5;
+      const ans = eq ? 2 : a > b ? 0 : 1;
+      return T_(['kreise', 'kreuze'], 'Wo sind mehr? Kreise ein. Sind es gleich viele? Kreuze an.', bbEx(ex => `<div class="bb-two">${[[a, sp ? 1 : 0], [b, sp ? 0 : 1]].map(([n, s], i) => `<div class="bb-box${ex && i === ans ? ' ring' : ''}">${bbScatter(k, null, n, s)}</div>`).join('')}</div><p class="ab-row yn"><span class="bb-cb${ex && ans === 2 ? ' x' : ''}"></span> gleich viele</p>`), `${['links', 'rechts', 'gleich viele'][ans]} (${a} gegen ${b})`, 2); }]},
+  V6: {name:'Der Größe nach ordnen', cols:2, max:10, gens:[
+    () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle([.5, .75, 1]), big = Math.random() < .6, t = big ? 1 : .5, ok = sizes.indexOf(t);
+      return T_('kreise', big ? 'Kreise das größte ein.' : 'Kreise das kleinste ein.', bbEx(ex => bbRow(sizes.map((s, i) => bbIt(bbObj(k, null, s), ex && i === ok ? 'ring' : '')), 'base')), `${bPos(ok)} (${B_OBJ[k].name})`, 1); },
+    () => { const k = pick(['stift', 'schraube', 'tasse', 'glas']), n = rnd(4, 5), sizes = shuffle([.45, .6, .75, .88, 1].slice(5 - n)), ord = [...sizes].sort((a, b) => a - b).map(s => sizes.indexOf(s));
+      const lines = ex => ex ? `<svg class="bb-arcs" viewBox="0 0 100 20" preserveAspectRatio="none">${ord.slice(1).map((j, x) => { const a = 100*(ord[x] + .5)/n, b2 = 100*(j + .5)/n; return `<path d="M${a} 1Q${(a + b2)/2} ${4 + Math.abs(b2 - a)/5} ${b2} 1" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`; }).join('')}</svg>` : '<div class="bb-arcgap"></div>';
+      return T_('verbinde', 'Verbinde von klein nach groß.', bbEx(ex => `<div class="bb-ord">${bbRow(sizes.map(s => `<span class="bb-pc">${bbObj(k, null, s)}<span class="ab-dot"></span></span>`), 'base even')}${lines(ex)}</div>`), ord.map(bPos).join(' → '), 2); }]},
+  V7: {name:'Muster fortsetzen', cols:1, max:8, gens:[
+    () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 2), cs = shuffle(B_COLS4).slice(0, 2), u = [[fs[0], cs[0]], [fs[1], cs[1]]], seq = [0, 1, 0, 1, 0, 1, 0, 1];
+      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 5 || ex ? bbIt(bbShape(...u[s]), i >= 5 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(5).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 1); },
+    () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3), u = fs.map((f, i) => [f, cs[i]]), pat = pick([[0, 0, 1], [0, 1, 2], [0, 1, 1]]), seq = [...pat, ...pat, ...pat].slice(0, 9);
+      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 6 || ex ? bbIt(bbShape(...u[s]), i >= 6 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(6).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 2); },
+    () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3), u = fs.map((f, i) => [f, cs[i]]), pat = pick([[0, 1], [0, 0, 1], [0, 1, 2]]), seq = [...pat, ...pat, ...pat].slice(0, 7), next = pat[7 % pat.length];
+      const opts = shuffle([...new Set([next, 0, 1, 2])].slice(0, 3)), ok = opts.indexOf(next);
+      return T_('kreise', 'Was kommt als Nächstes? Kreise ein.', bbEx(ex => bbRow([...seq.map(s => bbIt(bbShape(...u[s]))), '<span class="bb-q">?</span>'], 'pat') + bbRow(opts.map((s, i) => bbIt(bbShape(...u[s]), ex && i === ok ? 'ring' : '')), 'opts')), `${bPos(ok)} (${B_FORM[u[next][0]]} ${B_COL_NAME[u[next][1]]})`, 3); }]},
+  O2: {name:'Formen unterscheiden', cols:1, max:6, gens:[
+    () => { const t = pick(['kreis', 'dreieck', 'quadrat']), nt = rnd(2, 4), list = shuffle([...Array(nt).fill(t), ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).flatMap(f => [f, f]).slice(0, 8 - nt)]), cs = list.map(() => pick(B_COLS4)), fl = list.map(() => pick(['voll', 'leer']));
+      return T_('kreise', `Kreise alle ${({kreis:'Kreise', dreieck:'Dreiecke', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')}`, bbEx(ex => bbRow(list.map((f, i) => bbIt(bbShape(f, cs[i], fl[i]), ex && f === t ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
+    () => { const [t, d] = ['quadrat', 'rechteck'], list = shuffle([t, t, t, d, d, d, 'dreieck', 'stern']);
+      return T_('kreise', `Kreise nur die ${({kreis:'Kreise', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')} Schau genau!`, bbEx(ex => bbRow(list.map(f => bbIt(bbShape(f, 'blau', 'leer'), ex && f === t ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
+  O3: {name:'Richtung und Spiegelung', cols:1, max:6, gens:[
+    () => { const dirs = Object.keys(B_DIR), t = pick(dirs), list = shuffle([t, t, t, ...Array.from({length:5}, () => pick(dirs.filter(d => d !== t)))]);
+      return T_('kreise', `Kreise alle Pfeile nach ${t} ein: ${bArrow(t, 22)}`, bbEx(ex => bbRow(list.map(d => bbIt(bArrow(d, 64, '#fff'), ex && d === t ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((d, i) => d === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
+    () => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), list = shuffle([t, t, ...shuffle([0, 1, 2, 3].filter(l => l !== t)), pick([0, 1, 2, 3].filter(l => l !== t))]);
+      return T_('kreise', 'Kreise alle ein, die genau so aussehen wie im Kasten.', bbEx(ex => `<div class="bb-target">${bbIt(bGlyph(g, t))}</div>` + bbRow(list.map(l => bbIt(bGlyph(g, l), ex && l === t ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((l, i) => l === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
+  O4: {name:'Von links nach rechts', cols:1, max:6, gens:[
+    () => { const ks = shuffle(bKinds()).slice(0, 6);
+      return T_('verbinde', 'Fang beim grünen Punkt an. Verbinde die Punkte von links nach rechts.', bbEx(ex => `<div class="bb-ord">${bbRow(ks.map((k, i) => `<span class="bb-pc">${bbObj(k)}<span class="ab-dot${i === 0 ? ' start' : ''}"></span></span>`), 'even')}${ex ? `<svg class="bb-ordl" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M${100*.5/6} 5H${100*5.5/6}" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></svg>` : ''}</div>`), ks.map(k => B_OBJ[k].name).join(' → '), 1); },
+    () => { const s = pick(B_SEQ), ord = shuffle([0, 1, 2]), ok = ord.indexOf(0);
+      return T_('kreise', 'Was kommt zuerst? Kreise ein.', bbEx(ex => bbRow(ord.map((j, i) => bbIt(s.pics[j](), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${s.first})`, 2); }]}
+};
+SHEET_SETS.B = B_SHEETS; SHEET_INFO.B = {...V_INFO, ...O_INFO};
+const BB_CSS = `.lg-sort{display:grid;grid-template-columns:1fr 1fr;gap:6mm;flex:1;min-height:200mm}.lg-sf{border:.6mm solid #222;border-radius:4mm;display:flex;flex-direction:column;align-items:center;padding:4mm}.lg-sl{display:flex;flex-direction:column;align-items:center;gap:2mm;font-size:16pt}.lg-bic svg{width:28mm;height:28mm;display:block}.lg-bsw .bb-sw{width:28mm;height:16mm;display:block}.lg-blab{width:40mm;height:28mm;border:.4mm dashed #888;border-radius:2mm;display:block}.lg-pair{display:flex;justify-content:space-between;gap:3mm}.lg-pc{display:flex;flex-direction:column;align-items:center;gap:6mm}.lg-pt{width:32mm;height:32mm;border:.4mm solid #bbb;border-radius:2mm;display:flex;align-items:center;justify-content:center}.lg-pt svg{width:26mm;height:26mm}.lg-pb{width:32mm;height:32mm;border:.5mm dashed #555;border-radius:2mm}.lg-unit+.lg-unit{margin-top:8mm}.lg-strip{display:flex;border:.5mm solid #222;border-radius:2mm;width:max-content;margin:0 auto 9mm}.lg-ss{width:25mm;height:25mm;display:flex;align-items:center;justify-content:center;border-left:.3mm solid #222}.lg-ss:first-child{border-left:0}.lg-ss svg{display:block}
+.bb-it{position:relative;display:inline-flex;align-items:center;justify-content:center}.bb-it svg{width:14mm;height:14mm;display:block}
+.bb-it.ring::after{content:'';position:absolute;inset:-2mm;border:.6mm dashed #888;border-radius:50%}
+.bb-it.weg::after{content:'';position:absolute;left:-2mm;right:-2mm;top:50%;border-top:.7mm dashed #888;transform:rotate(-35deg)}
+.bb-it.grau{opacity:.45}.bb-row{display:flex;justify-content:center;align-items:center;gap:5mm;flex-wrap:wrap;width:100%;margin:1mm 0}
+.bb-row.wide{gap:3.5mm 6mm}.bb-row.base{align-items:flex-end}.bb-row.even{justify-content:space-around;flex-wrap:nowrap}.bb-row.pat{gap:2.5mm}.bb-row.pat svg{width:11mm;height:11mm}.bb-row.shapes svg{width:12mm;height:12mm}
+.bb-row.opts{gap:8mm;margin-top:3mm;padding-top:2.5mm;border-top:1px dashed #bbb}
+.bb-empty{width:11mm;height:11mm;border:.4mm dashed #999;border-radius:1.5mm;display:inline-block}.bb-q{font-size:20pt;font-weight:700;width:11mm;text-align:center}
+.bb-target{display:flex;justify-content:center;padding:1.5mm 4mm;border:.5mm solid #222;border-radius:2mm;margin:0 auto}.bb-target svg{width:15mm;height:15mm}
+.bb-match{display:grid;grid-template-columns:1fr 30mm 1fr;align-items:center;row-gap:3mm;justify-content:center;width:100%}.bb-match .l{grid-column:1;display:flex;justify-content:flex-end;align-items:center;gap:3mm}.bb-match .r{grid-column:3;display:flex;align-items:center;gap:3mm}.bb-match .bb-lines{grid-column:2;width:100%;height:100%;display:block}
+.bb-pairs{display:flex;flex-direction:column;width:100%}.bb-prow{display:flex;justify-content:space-around}.bb-pc{display:inline-flex;flex-direction:column;align-items:center;gap:1.5mm}.bb-pc svg{width:13mm;height:13mm}.bb-vlines{width:100%;height:12mm;display:block}.bb-vgap{height:12mm}
+.bb-ord{width:100%;position:relative}.bb-arcs{width:100%;height:7mm;display:block}.bb-arcgap{height:7mm}.bb-ordl{position:absolute;left:0;right:0;bottom:0;width:100%;height:3mm}.ab-dot.start{background:#2e8b57;width:4.5mm;height:4.5mm}
+.bb-two{display:grid;grid-template-columns:1fr 1fr;gap:8mm;width:100%}.bb-box{position:relative;border:.5mm solid #222;border-radius:3mm;padding:2mm}.bb-box.ring::after{content:'';position:absolute;inset:-2.5mm;border:.6mm dashed #888;border-radius:6mm}.bb-scatter{width:100%;height:30mm;display:block}
+.bb-cb{display:inline-block;width:6mm;height:6mm;border:.45mm solid #222;border-radius:1mm;margin:0 1.5mm 0 4mm;vertical-align:middle;position:relative}.bb-cb.x::after{content:'✕';position:absolute;inset:0;color:#888;font-size:13pt;line-height:6mm;text-align:center}
+.bb-sw{width:8mm;height:5.5mm;vertical-align:middle;margin-left:1mm}.ab-ins svg.b-shape,.ab-ins svg.b-arrow{width:6mm;height:6mm;vertical-align:middle;margin-left:1mm}`;
 function buildSheet0(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
   if(sj === 'K') return legeSheet(key);
+  B_BW = sj === 'B' && !!S.bw;
   const def = ({M:M_SHEETS, L:R_SHEETS, U:U_SHEETS, G:G_SHEETS, H:H_SHEETS, W:W_SHEETS, ...SHEET_SETS})[sj]?.[key];
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : key === 'einmaleins' ? `: ${sheetRows().length === 10 ? 'alle Reihen' : sheetRows().length === 1 ? sheetRows()[0] + 'er-Reihe' : sheetRows().slice(0, -1).join('er-, ') + 'er- und ' + sheetRows().at(-1) + 'er-Reihe'}` : ['stellenwert', 'zehnerpartner', 'ueber10'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
@@ -8065,7 +8234,7 @@ function buildSheet0(limit){
   const info = ({L:L_INFO, W:W_INFO, U:U_INFO, G:G_INFO, H:H_INFO, ...SHEET_INFO})[sj]?.[key] || null;
   const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
   const sol = S.sol && !def.mat ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
-  return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}</style></head><body><div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`};
+  return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}${sj === 'B' ? BB_CSS : ''}</style></head><body>${B_BW ? B_BW_DEFS : ''}<div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`, _bw: B_BW = false};
 }
 /* Blatt füllen: in der Vorschau messen, wie viele volle Reihen auf die erste Seite passen */
 function sheetFit(fr, show = sheetShow){
@@ -8118,7 +8287,7 @@ function buildHeft(){
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><span class="cv-dots"></span><span>${i + 1}</span></li>`).join('')}</ol></div>` : '';
   const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1><div class="cv-name">Name: <span>${escHtml(name)}</span></div>${toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
   const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:268mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}@media print{.page.cover{padding-top:40mm;min-height:292mm}}`;
-  return {title: H.title || 'Mein Arbeitsheft', html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${css}</style></head><body>${cover}${pages}</body></html>`};
+  return {title: H.title || 'Mein Arbeitsheft', html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${css}</style></head><body>${B_BW_DEFS}${cover}${pages}</body></html>`};
 }
 /* Heft zur Förderzone: je Förderzone ein (oder zwei) passende Blätter, auf die Seite eingepasst */
 const heftZones = pid => TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones).filter(z => { const t = zoneToSheet(z.key); return t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic)); });
@@ -8183,12 +8352,14 @@ function renderSheets(keep){
     ${LD ? `${LD.zrs ? `<label class="row">Zahlenraum ${sel('sh-lzr', LD.zrs.map(z => [z, `bis ${z}${key === 'geld' ? ' €' : ''}`]), LD.zrs.includes(S.zr) ? S.zr : LD.zrs[0])}</label>` : ''}
       ${LD.kts.length > 1 ? `<label class="row">Aufgaben ${sel('sh-kt', LD.kts.map(k => [k, LD.ktn?.[k] || LK[k]]), lkt)}</label>` : ''}
       ${LD.ue && ['plus', 'minus'].includes(lkt) ? `<label class="row">Zehnerübergang ${sel('sh-ue', [['egal', 'gemischt'], ['ohne', 'ohne'], ['mit', 'mit']], S.ue)}</label>` : ''}
+      ${LD.grp === 'B' && key !== 'paare' ? `<label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}
       ${key === 'buchst' ? `<label class="row">Buchstaben ${sel('sh-bcase', [['mixed', 'groß und klein'], ['low', 'nur klein'], ['up', 'nur groß']], S.bcase || 'mixed')}</label>` : ''}
       ${key !== 'buchst' && lkt !== 'none' ? `<label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>` : ''}`
     : S.topic === 'H:HT' ? `<label class="row">Seite ${sel('sh-htp', [['all', 'ganzes Tausenderbuch (10 Seiten)'], ...Array.from({length:10}, (_, p) => [String(p), hPageName(p)]), ['rnd', 'zufällige Seite']], S.htp ?? 'all')}</label>`
     : /^H:H[ML]$/.test(S.topic) ? ''
     : `<label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
     <label class="row cb"><input type="checkbox" id="sh-gross" ${S.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label>
+    ${S.topic.startsWith('B:') ? `<label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Erkläre den Auftrag daran.</p>` : ''}
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
     ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge. Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
@@ -8234,6 +8405,7 @@ function sheetChange(e){
   if(t.id === 'sh-mstrich') S.mstrich = t.value;
   if(t.dataset.shrow){ const n = +t.dataset.shrow, r = new Set(sheetRows()); t.checked ? r.add(n) : r.delete(n); if(!r.size){ t.checked = true; return; } S.rows = [...r]; }
   if(t.id === 'sh-gross') S.gross = t.checked;
+  if(t.id === 'sh-bw') S.bw = t.checked;
   if(t.id === 'sh-tausch') S.tausch = t.checked;
   if(t.id === 'sh-n') S.n = t.value === 'fill' ? 'fill' : +t.value;
   if(t.id === 'sh-sol') S.sol = t.checked;
@@ -8672,7 +8844,7 @@ document.addEventListener('change', e => {
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.26.2 · 17.11.2026';
+const APP_VERSION = '0.27.0 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -8871,7 +9043,7 @@ $('#help-content').innerHTML = [
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
   ['target','Tests','„Wer übt?“ → Mathe-, Lese- oder Schreib-Test. Die Tests sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Die Kinder sehen eine ermutigende Einleitung, während des Tests oben die Abschnitte und einen Balken, der nur vorwärts läuft (ohne richtig/falsch), und am Ende keine Ergebnisse. Während des Tests sind Leiste und Menü gesperrt; Beenden mit zweimal „Abbrechen“. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
   ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, der Weg am Material (Handeln, Bild, Zahl) mit Legeblatt, Ideen für den Alltag, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
-  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Wählbar sind unter anderem „Große Aufgaben“ und bei Mathe „Materialbilder: 1. Aufgabe vorgegeben, dann selbst zeichnen“; die Einstellungen bleiben auf diesem Gerät gespeichert. Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Legeblätter für echtes Material“ gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
+  ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Wählbar sind unter anderem „Große Aufgaben“ und bei Mathe „Materialbilder: 1. Aufgabe vorgegeben, dann selbst zeichnen“; die Einstellungen bleiben auf diesem Gerät gespeichert. Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Basis“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden, Sortieren, eins zu eins zuordnen, mehr und weniger, Größen, Muster, Formen, Richtungen; die erste Aufgabe jeder Art ist vorgemacht, auf Wunsch mit Mustern statt Farben für den Schwarz-Weiß-Drucker. Unter „Legeblätter für echtes Material“ gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Sortierunterlage, Zuordnungsleiste, Musterstreifen, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],
   ['blocks','Material in Mathe','Stellenwerttafel mit Hundertern, Zehnern und Einern; Umtauschen durch Antippen von 10 Einern oder 1 Zehner. Plus: „Zusammenlegen“, dann bündeln. Minus: Teile antippen und „Wegnehmen“. Zahlenstrahl mit Sprüngen. Bis 100 und 1000 gibt es die Ansicht „Tafel“ bzw. „Tausenderbuch“: Das Kind springt mit +10 und +1 (bis 1000 auch +100, mit Seitenleiste zum Blättern), der Weg bleibt sichtbar. Schriftlich mit Ergänzungsverfahren und mitlaufendem Material. Frei legen mit Würfeln (wahlweise mit Hundertern oder Tausendern) oder Geld: Bei den Würfeln zeigt erst „Ordnen“ die Stellenwerttafel. Beim Geld gibt es auch Cent-Münzen; „Raster“ blendet die Spalten Euro-Scheine, Euro-Münzen und Cent-Münzen ein, damit die Schüler*innen selbst sortieren. „Raster prüfen“ markiert falsch liegende Teile, „Ordnen“ sortiert alles automatisch. Gemeinsam ausprobieren: dieselbe Menge auch mit echtem Material legen – beim Umtauschen bleibt die Menge gleich.'],

@@ -229,11 +229,20 @@ Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufe
 
 Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in Fünferreihen. Neu ist das Thema **Zahlen mit Material zeichnen**: Die Kinder zeichnen Zahlen in der Kurzschreibweise □ Hunderter, | Zehner, • Einer und lesen gezeichnete Zahlen ab. Wählst du eine Förderzone aus dem Rechnen, passt das Blatt genau dazu, zum Beispiel „Plus bis 20, mit Zehnerübergang“ für R3.
 
+### Basis: Grundlagen vor dem Zählen
+
+Unter „Basis: Vergleichen und Ordnen“ und „Basis: Sehen und Orientieren“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden (V1), Was passt nicht? (V2), Sortieren (V3), Eins zu eins zuordnen (V4), Mehr, weniger, gleich viel (V5), Der Größe nach ordnen (V6), Muster fortsetzen (V7), Formen unterscheiden (O2), Richtung und Spiegelung (O3) und Von links nach rechts (O4). Die Blätter kommen ohne Zahlen und fast ohne Lesen aus: Die Kinder verbinden, kreisen ein, streichen durch und malen weiter.
+
+**Erklären statt lesen:** Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Lies den Auftrag vor und zeige ihn an dieser Aufgabe; die nächste Aufgabe derselben Art machen die Kinder selbst. Auf dem Lösungsblatt steht zu jeder Aufgabe, welches Bild gemeint ist (zum Beispiel „2. Bild (Gabel)“).
+
+**Schwarz-Weiß-Drucker:** Mit dem Häkchen „Schwarz-Weiß-Drucker (Muster statt Farben)“ bekommen die Farben Muster (Streifen, Punkte, Karos). So lassen sich auch Farb-Aufgaben schwarz-weiß kopieren; der Auftrag heißt dann „gleiches Muster“ statt „gleiche Farbe“.
+
 ### Legeblätter für echtes Material
 
 Im Thema ganz unten stehen die **Legeblätter für echtes Material**. Auf diese Blätter legen die Kinder Wendeplättchen, Einerwürfel, Zehnerstangen oder Buchstabenkarten, bevor sie rechnen oder schreiben:
 
 - **Mathe:** Zehnerfeld, Zwanzigerfeld (Querformat), Zahlenstrahl bis 20, Zahlenstrahl bis 100 oder 1000, Hunderterfeld in 1 cm für Einerwürfel, Stellentafel (bis 100 hochkant, bis 1000 quer, breit genug für Hunderterplatten und Zehnerstangen), Preise mit Spielgeld legen, Zifferblatt mit Zeigern zum Ausschneiden, Zifferblatt mit Minutenkranz.
+- **Basis:** Sortierunterlage mit zwei Feldern (Küche und Werkstatt, zwei Farben oder ohne Bild zum Selbstbeschriften), Zuordnungsleiste „eins zu eins“ (unter jedes Bild ein echtes Ding legen) und Musterstreifen für Plättchen (AB, AAB/ABB, ABC oder leer zum Vorlegen).
 - **Deutsch:** Anfangsbuchstaben legen, Wörter legen (ein Kästchen pro Buchstabe), Wörter nachlegen mit Vorlage, Merkwörter nachlegen (Merkstelle farbig), Silben legen (ein Stein pro Silbe), Buchstabenkarten zum Ausschneiden (groß und klein, häufige Buchstaben öfter; ein Strich zeigt, wo unten ist).
 
 Bei den meisten Mathe-Blättern wählst du unter **Aufgaben**, was dazu auf dem Blatt steht, zum Beispiel „Plus“, „Ergänzen bis 20“ oder „ohne Aufgaben“ für das freie Legen. **Wichtig:** in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf jedem Legeblatt ist ein 5-cm-Strich: Ist er kürzer, wurde verkleinert. Im Lernstand öffnet **Legeblatt drucken** direkt das passende Blatt zur Förderzone. Legeblätter lassen sich auch ins Arbeitsheft übernehmen.
