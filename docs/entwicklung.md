@@ -10,7 +10,7 @@ Seit dem 17.11.2026 ist der Funktionsumfang eingefroren: Die App wird an Schulen
 ## Abläufe
 
 - **Fehler beheben:** in `main` ändern, testen, Version erhöhen, veröffentlichen. Danach `main` in `entwicklung` zusammenführen, damit beide Zweige gleich bleiben.
-- **Neue Funktion:** in `entwicklung` bauen und testen. Dann denselben Stand in das Repository `stufenweise-test` übertragen (`git push test entwicklung:main --force`). Dort wird nie direkt gearbeitet; es ist nur das Schaufenster.
+- **Neue Funktion:** in `entwicklung` bauen und testen. Dann denselben Stand in das Repository `stufenweise-test` übertragen: `sh tests/testversion.sh /pfad/zu/stufenweise-test`, danach dort committen und pushen. Das Skript ersetzt alle Dateien durch den Stand von `entwicklung`; die Geschichte bleibt im Haupt-Repository. Im Test-Repository wird nie direkt gearbeitet; es ist nur das Schaufenster.
 - **Freigabe:** Wenn Stefan die Testversion ausprobiert hat und einverstanden ist, wird `entwicklung` in `main` zusammengeführt. Das ist die nächste Nebenversion (z. B. 0.29.0). Freigegebene Stände bekommen in GitHub ein Release (`v0.29.0`).
 - **Mitarbeit von außen** (z. B. Sachunterricht): eigener Zweig oder Fork, Änderungen als Pull Request an `entwicklung`.
 
