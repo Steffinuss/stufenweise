@@ -864,6 +864,17 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 
 /* ---------- Handy hochkant (bis 560 px breit): brauchbare Demo-Ansicht (Stefan, 16.11.2026) ---------- */
 /* Basis: Aufgaben mit Bildern (pick, sort, match, order, glance) */
+.dg-stage.bz-demo{background:#fdf0dc;border:5px dashed var(--focus);border-radius:26px;padding:10px 12px 14px;position:relative}
+.bz-demo .bz{pointer-events:none}.bz-demo .bz-goal{background:#e9eef6}.bz-demo .bz-c,.bz-demo .bz-tg{box-shadow:none}
+.bz-watch{display:inline-flex;align-items:center;gap:12px;font-size:30px;font-weight:800;color:#b45f06;background:#fff;border:4px solid var(--focus);border-radius:999px;padding:4px 26px 4px 14px;margin:0 auto 8px;animation:bzBlink 1.6s ease-in-out infinite}
+@keyframes bzBlink{50%{transform:scale(1.05)}}
+.bz-you{display:inline-flex;align-items:center;gap:10px;font-size:30px;font-weight:800;color:var(--ok);background:#fff;border:4px solid var(--ok);border-radius:999px;padding:4px 26px 4px 10px;margin:0 auto 8px;animation:bzYou 2.2s ease forwards}
+.bz-you-h{display:inline-flex}.bz-you-h svg{width:42px;height:42px}
+@keyframes bzYou{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.1)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0;height:0;padding:0;margin:0;border-width:0}}
+.bz [data-bzd],.bz-yn button,.bz-c{position:relative}
+.bz-hand{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-4px 0 0 -4px;z-index:8;pointer-events:none;filter:drop-shadow(0 3px 4px #2b293055);animation:bzTap 1.1s ease-in-out infinite}.bz-hand svg{display:block}
+@keyframes bzTap{0%,100%{transform:translate(0,0)}40%{transform:translate(4px,6px) scale(.9)}}
+.tool.bz-go:not(:disabled){animation:bzBlink 1.2s ease-in-out infinite}
 .bz-zone{width:min(900px,100%);border-radius:22px;padding:16px 18px;display:flex;justify-content:center}
 .bz-goal{background:#e3edf9;border:3px solid #c3d6ef}
 .bz-pool{background:#efe4cf;border:3px solid #ddcca9;box-shadow:inset 0 3px 8px #8a64361f;min-height:118px;align-items:center}.bz-pool.empty{min-height:0;padding:8px}.bz-pool .bz-done{font-size:16px}
@@ -6427,7 +6438,8 @@ const bzPair = () => pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube
 const BZ_EIN = {loeffel:'einen Löffel', gabel:'eine Gabel', mutter:'eine Mutter'};
 const BZ_UNTER = {tasse:'jede Tasse', teller:'jeden Teller', schraube:'jede Schraube'};
 const BZ_PAT = () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3); return fs.map((f, i) => [f, cs[i]]); };
-const bzPatRow = (u, seq, q = true) => `<div class="bz-pat">${seq.map(s => bShape(u[s][0], u[s][1], 64)).join('')}${q ? '<span class="bz-q">?</span>' : ''}</div>`;
+const BZ_PS = 80; /* Muster: Vorgabe und Auswahl gleich groß (Stefan, 17.11.) */
+const bzPatRow = (u, seq, q = true) => `<div class="bz-pat">${seq.map(s => bShape(u[s][0], u[s][1], BZ_PS)).join('')}${q ? '<span class="bz-q">?</span>' : ''}</div>`;
 const bzSw = c => `<svg class="bz-sw" viewBox="0 0 60 40"><rect x="2" y="2" width="56" height="36" rx="6" fill="${B_COL[c]}" stroke="${INK}" stroke-width="2.4"/></svg>`;
 const bzSizeBox = s => `<svg class="bz-sw" viewBox="0 0 60 40"><rect x="${30 - 18*s}" y="${38 - 34*s}" width="${36*s}" height="${34*s}" rx="3" fill="#fff" stroke="${INK}" stroke-width="2.4"/></svg>`;
 const bzSortIt = (base, things, boxes) => ({...base, type:'sort', things, boxes});
@@ -6438,13 +6450,13 @@ const bzSeqPic = (s, j) => bzC(s.pics[j]().replace('<svg class="b-obj"', '<svg c
 AXES.V.arts = {
   V1: [
     ['Gleiches Bild', st => { const k = pick(bzKinds()), others = shuffle(bzKinds(o => o.grp !== B_OBJ[k].grp)).slice(0, bzN(st) - 1), cells = shuffle([k, ...others]);
-      return bzPick({prompt:'Tippe das gleiche Bild an.', label:`Gleiches Bild: ${B_OBJ[k].name} (${cells.length})`, tip:'Noch nicht. Schau das Bild oben genau an.'}, cells.map(x => bzO(x)), cells.indexOf(k), bzTarget(bObj(k, null, 104))); }],
+      return bzPick({prompt:'Tippe das gleiche Bild an.', label:`Gleiches Bild: ${B_OBJ[k].name} (${cells.length})`, tip:'Noch nicht. Schau das Bild oben genau an.'}, cells.map(x => bzO(x)), cells.indexOf(k), bzTarget(bObj(k, null, BZ))); }],
     ['Gleiches dazulegen', st => { const ks = shuffle(bzKinds()).slice(0, st ? 3 : 2), bs = shuffle(ks);
       return bzMatchIt({prompt:'Lege das gleiche Bild darunter.', label:`Gleiches dazulegen: ${ks.map(k => B_OBJ[k].name).join(', ')}`, tip:'Noch nicht. Das rote Bild liegt falsch. Schieb es an den richtigen Platz.'},
         ks.map(k => ({...bzO(k), k})), bs.map(k => ({...bzO(k), k})), ks.map((k, i) => [i, bs.indexOf(k)])); }],
     ['Gleiche Farbe', st => { const k = pick(bzKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), oc = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bzKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
       const opts = shuffle([[k, col], [k, oc[0]], ...(st >= 1 ? [[k, oc[1]]] : []), ...(st >= 2 ? [[k2, col]] : [])]), ok = opts.findIndex(o => o[0] === k && o[1] === col);
-      return bzPick({prompt:'Tippe das gleiche Bild an. Schau auf die Farbe!', label:`Gleiches Bild mit Farbe: ${B_OBJ[k].name} ${B_COL_NAME[col]} (${opts.length})`, tip:'Noch nicht. Ding und Farbe müssen gleich sein.'}, opts.map(([x, c]) => bzO(x, c)), ok, bzTarget(bObj(k, col, 104))); }],
+      return bzPick({prompt:'Tippe das gleiche Bild an. Schau auf die Farbe!', label:`Gleiches Bild mit Farbe: ${B_OBJ[k].name} ${B_COL_NAME[col]} (${opts.length})`, tip:'Noch nicht. Ding und Farbe müssen gleich sein.'}, opts.map(([x, c]) => bzO(x, c)), ok, bzTarget(bObj(k, col, BZ))); }],
     ['Farbe dazulegen', st => { const n = st ? 3 : 2, cs = shuffle(B_COLS4).slice(0, n), ks = shuffle(bzKinds(o => o.grp !== 'werkstatt')).slice(0, 2*n), ord = shuffle([...Array(n).keys()]);
       return bzMatchIt({prompt:'Lege jedes Ding unter die gleiche Farbe.', label:`Gleiche Farbe dazulegen: ${cs.map(c => B_COL_NAME[c]).join(', ')}`, tip:'Noch nicht. Schau auf die Farbe. Schieb das rote Ding an den richtigen Platz.'},
         cs.map((c, i) => ({...bzO(ks[i], c), k:c})), ord.map(i => ({...bzO(ks[n + i], cs[i]), k:cs[i]})), cs.map((c, i) => [i, ord.indexOf(i)])); }]],
@@ -6495,11 +6507,11 @@ AXES.V.arts = {
         cells: sizes.map(s => bzC(bObj(k, null, 104, s), `${B_OBJ[k].name} Größe ${all.indexOf(s) + 1}`)), want: all.map(s => sizes.indexOf(s))}; }]],
   V7: [
     ['Was kommt dann?', st => { const u = BZ_PAT(), seq = [0, 1, 0, 1, 0, 1], opts = shuffle(st ? [0, 1, 2] : [0, 1]);
-      return bzPick({prompt:'Was kommt als Nächstes? Tippe an.', label:`Muster AB: ${u.slice(0, 2).map(x => B_FORM[x[0]]).join(', ')} (${opts.length})`, tip:'Noch nicht. Sprich das Muster mit: Was kommt immer abwechselnd?'}, opts.map(s => bzS(...u[s])), opts.indexOf(0), bzPatRow(u, seq)); }],
+      return bzPick({prompt:'Was kommt als Nächstes? Tippe an.', label:`Muster AB: ${u.slice(0, 2).map(x => B_FORM[x[0]]).join(', ')} (${opts.length})`, tip:'Noch nicht. Sprich das Muster mit: Was kommt immer abwechselnd?'}, opts.map(s => bzS(u[s][0], u[s][1], 'voll', BZ_PS)), opts.indexOf(0), bzPatRow(u, seq)); }],
     ['Längere Muster', st => { const u = BZ_PAT(), pat = st ? pick([[0, 0, 1], [0, 1, 1], [0, 1, 2]]) : pick([[0, 0, 1], [0, 1, 1]]), seq = [...pat, ...pat, ...pat].slice(0, 7), nx = pat[7 % pat.length], opts = shuffle([0, 1, 2]);
-      return bzPick({prompt:'Was kommt als Nächstes? Tippe an.', label:`Muster ${pat.map(x => 'ABC'[x]).join('')}`, tip:'Noch nicht. Sprich das Muster mit.'}, opts.map(s => bzS(...u[s])), opts.indexOf(nx), bzPatRow(u, seq)); }],
+      return bzPick({prompt:'Was kommt als Nächstes? Tippe an.', label:`Muster ${pat.map(x => 'ABC'[x]).join('')}`, tip:'Noch nicht. Sprich das Muster mit.'}, opts.map(s => bzS(u[s][0], u[s][1], 'voll', BZ_PS)), opts.indexOf(nx), bzPatRow(u, seq)); }],
     ['Fehler finden', st => { const u = BZ_PAT(), pat = st ? pick([[0, 1], [0, 0, 1], [0, 1, 2]]) : [0, 1], seq = [...pat, ...pat, ...pat, ...pat].slice(0, st ? 8 : 6), i = rnd(pat.length, seq.length - 1), wrong = [0, 1, 2].find(x => x !== seq[i] && (pat.length === 3 || x !== 2)) ?? 2;
-      return bzPick({prompt:'Ein Bild ist falsch. Tippe es an.', label:`Fehler im Muster ${pat.map(x => 'ABC'[x]).join('')}`, tip:'Noch nicht. Sprich das Muster von vorne mit.', cls:'tight'}, seq.map((s, j) => bzS(...u[j === i ? wrong : s], 'voll', 64)), i); }]],
+      return bzPick({prompt:'Ein Bild ist falsch. Tippe es an.', label:`Fehler im Muster ${pat.map(x => 'ABC'[x]).join('')}`, tip:'Noch nicht. Sprich das Muster von vorne mit.', cls:'tight'}, seq.map((s, j) => bzS(...u[j === i ? wrong : s], 'voll', 72)), i); }]],
   V8: [
     ['Punkte', st => { const mx = st ? 3 : 2, n = rnd(1, mx);
       return {type:'glance', ms: [2000, 1500, 1200][st ?? 2], prompt:'Schau kurz hin. Wie viele Punkte waren es? Tippe das gleiche Bild an.', label:`Auf einen Blick: ${n} von 1–${mx}`, tip:'Noch nicht. Schau nochmal hin.', show: bDots(n, 0, 150), cells:[...Array(mx).keys()].map(x => bzC(bDots(x + 1, 0, 96), `${x + 1} Punkte`)), want:[n - 1]}; }],
@@ -6511,18 +6523,18 @@ AXES.V.arts = {
 AXES.O.arts = {
   O2: [
     ['Form finden', st => { const t = pick(['kreis', 'dreieck', 'quadrat']), list = shuffle([t, ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).slice(0, bzN(st) - 1)]);
-      return bzPick({prompt:`Tippe ${BZ_FORMN[t][1]} an.`, label:`Form finden: ${B_FORM[t]} (${list.length})`, tip:'Noch nicht. Schau auf die Ecken.'}, list.map(f => bzS(f, 'blau')), list.indexOf(t), bzTarget(bShape(t, '#fff', 56, 'leer'))); }],
+      return bzPick({prompt:`Tippe ${BZ_FORMN[t][1]} an.`, label:`Form finden: ${B_FORM[t]} (${list.length})`, tip:'Noch nicht. Schau auf die Ecken.'}, list.map(f => bzS(f, 'blau')), list.indexOf(t), bzTarget(bShape(t, '#fff', BZ, 'leer'))); }],
     ['Alle finden', st => { const t = pick(['kreis', 'dreieck', 'quadrat']), nt = 2, n = st ? 6 : 4, list = shuffle([...Array(nt).fill(t), ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).flatMap(f => [f, f]).slice(0, n - nt)]);
-      return bzMulti({prompt:`Tippe alle ${BZ_FORMN[t][0]} an.`, label:`Alle ${BZ_FORMN[t][0]} finden (${n})`, tip:'Noch nicht. Schau jede Form genau an.'}, list.map(f => bzS(f, st >= 2 ? pick(B_COLS4) : 'blau', st >= 2 ? pick(['voll', 'leer']) : 'voll', 80)), list.map((f, i) => f === t ? i : -1).filter(i => i >= 0), bzTarget(bShape(t, '#fff', 56, 'leer'))); }],
+      return bzMulti({prompt:`Tippe alle ${BZ_FORMN[t][0]} an.`, label:`Alle ${BZ_FORMN[t][0]} finden (${n})`, tip:'Noch nicht. Schau jede Form genau an.'}, list.map(f => bzS(f, st >= 2 ? pick(B_COLS4) : 'blau', st >= 2 ? pick(['voll', 'leer']) : 'voll', 80)), list.map((f, i) => f === t ? i : -1).filter(i => i >= 0), bzTarget(bShape(t, '#fff', 80, 'leer'))); }],
     ['Quadrat oder Rechteck', st => { const list = shuffle(st ? ['quadrat', 'quadrat', 'quadrat', 'rechteck', 'rechteck', 'rechteck'] : ['quadrat', 'quadrat', 'rechteck', 'rechteck']);
-      return bzMulti({prompt:'Tippe nur die Quadrate an. Schau genau!', label:`Quadrat oder Rechteck (${list.length})`, tip:'Noch nicht. Ein Quadrat ist überall gleich lang.'}, list.map(f => bzS(f, 'blau', 'leer', 80)), list.map((f, i) => f === 'quadrat' ? i : -1).filter(i => i >= 0), bzTarget(bShape('quadrat', '#fff', 56, 'leer'))); }]],
+      return bzMulti({prompt:'Tippe nur die Quadrate an. Schau genau!', label:`Quadrat oder Rechteck (${list.length})`, tip:'Noch nicht. Ein Quadrat ist überall gleich lang.'}, list.map(f => bzS(f, 'blau', 'leer', 80)), list.map((f, i) => f === 'quadrat' ? i : -1).filter(i => i >= 0), bzTarget(bShape('quadrat', '#fff', 80, 'leer'))); }]],
   O3: [
     ['Gleicher Pfeil', st => { const all = st ? shuffle(Object.keys(B_DIR)).slice(0, bzN(st)) : shuffle(pick([['rechts', 'links'], ['oben', 'unten']])), t = pick(all);
-      return bzPick({prompt:'Tippe den gleichen Pfeil an.', label:`Gleicher Pfeil: ${t} (${all.length})`, tip:'Noch nicht. Wohin zeigt die Spitze?'}, all.map(d => bzC(bArrow(d, 84, '#fff'), `Pfeil nach ${d}`)), all.indexOf(t), bzTarget(bArrow(t, 64))); }],
+      return bzPick({prompt:'Tippe den gleichen Pfeil an.', label:`Gleicher Pfeil: ${t} (${all.length})`, tip:'Noch nicht. Wohin zeigt die Spitze?'}, all.map(d => bzC(bArrow(d, 84, '#fff'), `Pfeil nach ${d}`)), all.indexOf(t), bzTarget(bArrow(t, 84, '#fff'))); }],
     ['Alle Pfeile nach …', st => { const t = pick(['rechts', 'links']), other = st ? Object.keys(B_DIR).filter(d => d !== t) : [t === 'rechts' ? 'links' : 'rechts'], n = st ? 6 : 4, list = shuffle([t, t, ...Array.from({length:n - 2}, () => pick(other))]);
-      return bzMulti({prompt:`Tippe alle Pfeile nach ${t} an.`, label:`Pfeile nach ${t} (${n})`, tip:'Noch nicht. Wohin zeigt die Spitze?'}, list.map(d => bzC(bArrow(d, 80, '#fff'), `Pfeil nach ${d}`)), list.map((d, i) => d === t ? i : -1).filter(i => i >= 0), bzTarget(bArrow(t, 56))); }],
+      return bzMulti({prompt:`Tippe alle Pfeile nach ${t} an.`, label:`Pfeile nach ${t} (${n})`, tip:'Noch nicht. Wohin zeigt die Spitze?'}, list.map(d => bzC(bArrow(d, 80, '#fff'), `Pfeil nach ${d}`)), list.map((d, i) => d === t ? i : -1).filter(i => i >= 0), bzTarget(bArrow(t, 80, '#fff'))); }],
     ['Gleiches Zeichen', st => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), others = [0, 1, 2, 3].filter(l => l !== t), n = st ? 6 : 4, list = shuffle([t, t, ...shuffle(st ? [...others, pick(others)] : [t ^ 1, t ^ 1]).slice(0, n - 2)]);
-      return bzMulti({prompt:'Tippe alle an, die genau so aussehen wie oben.', label:`Spiegelzeichen ${g}, Lage ${t} (${n})`, tip:'Noch nicht. Schau, wohin das Zeichen zeigt.'}, list.map(l => bzC(bGlyph(g, l, 80), `Zeichen Lage ${l}`)), list.map((l, i) => l === t ? i : -1).filter(i => i >= 0), bzTarget(bGlyph(g, t, 64))); }],
+      return bzMulti({prompt:'Tippe alle an, die genau so aussehen wie oben.', label:`Spiegelzeichen ${g}, Lage ${t} (${n})`, tip:'Noch nicht. Schau, wohin das Zeichen zeigt.'}, list.map(l => bzC(bGlyph(g, l, 80), `Zeichen Lage ${l}`)), list.map((l, i) => l === t ? i : -1).filter(i => i >= 0), bzTarget(bGlyph(g, t, 80))); }],
     ['Anders herum', st => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), o = st ? pick([0, 1, 2, 3].filter(l => l !== t)) : t ^ 1, n = st ? 4 : 3, i = rnd(0, n - 1);
       return bzPick({prompt:'Ein Zeichen ist anders herum. Tippe es an.', label:`Anders herum: ${g} (${n})`, tip:'Noch nicht. Die anderen zeigen in die gleiche Richtung.'}, [...Array(n).keys()].map(j => bzC(bGlyph(g, j === i ? o : t, 84), j === i ? 'anders herum' : 'Zeichen')), i); }]],
   O4: [
@@ -6545,20 +6557,25 @@ const bzStep = m => m.ok < 3 ? 0 : m.ok < 6 ? 1 : 2;
 /* Vormachen: Zwischenstände der Lösung, Schritt für Schritt */
 function bzDemoSteps(it){
   const S = [{}];
-  if(it.type === 'pick') it.want.forEach((_, n) => S.push({set: it.want.slice(0, n + 1)}));
-  if(it.type === 'glance'){ S.push({hidden:true}); S.push({hidden:true, set:[...it.want]}); }
-  if(it.type === 'sort'){ const place = []; it.things.forEach((t, i) => { S.push({place:[...place], sel:i}); place[i] = t.box; S.push({place:[...place]}); }); }
-  if(it.type === 'match'){ const links = []; it.sol.forEach(([i, j]) => { S.push({links:[...links], sel:j}); links.push([i, j]); S.push({links:[...links]}); }); if(it.ask) S.push({links:[...links], yes: it.ask.ok ? 1 : 0}); }
-  if(it.type === 'order') it.want.forEach((_, n) => S.push({seq: it.want.slice(0, n + 1)}));
+  /* hand = wo die zeigende Hand steht (CSS-Selektor) */
+  if(it.type === 'pick') it.want.forEach((w, n) => S.push({set: it.want.slice(0, n + 1), hand:`[data-bz="${w}"]`}));
+  if(it.type === 'glance'){ S.push({hidden:true}); S.push({hidden:true, set:[...it.want], hand:`[data-bz="${it.want[0]}"]`}); }
+  if(it.type === 'sort'){ const place = []; it.things.forEach((t, i) => { S.push({place:[...place], sel:i, hand:`[data-bzt="${i}"]`}); place[i] = t.box; S.push({place:[...place], hand:`[data-bzt="${i}"]`}); }); }
+  if(it.type === 'match'){ const links = []; it.sol.forEach(([i, j]) => { S.push({links:[...links], sel:j, hand:`[data-bzp="${j}"]`}); links.push([i, j]); S.push({links:[...links], hand:`[data-bzp="${j}"]`}); }); if(it.ask) S.push({links:[...links], yes: it.ask.ok ? 1 : 0, hand:`[data-bzyn="${it.ask.ok ? 1 : 0}"]`}); }
+  if(it.type === 'order') it.want.forEach((w, n) => S.push({seq: it.want.slice(0, n + 1), hand:`[data-bzo="${w}"]`}));
   return S;
 }
 function bzDemoStart(){
   const R = app.read, it = R.item, steps = bzDemoSteps(it); let i = 0;
   R.demo = true; R.r = {...steps[0]}; R.demoEnd = false; clearTimeout(app.demoT);
   const tick = () => { if(app.mode !== 'read' || !R.demo || R.item !== it) return; i++; if(i >= steps.length){ R.demoEnd = true; renderRead(); return; }
-    R.r = {...steps[i]}; renderRead(); app.demoT = setTimeout(tick, 900); };
-  app.demoT = setTimeout(tick, it.type === 'glance' ? it.ms : 1100);
+    R.r = {...steps[i]}; renderRead(); app.demoT = setTimeout(tick, 1100); };
+  app.demoT = setTimeout(tick, it.type === 'glance' ? it.ms : 1300);
 }
+
+/* Zeigende Hand beim Vormachen (Fingerspitze oben links = Mitte des Dings) */
+const BZ_HAND = `<span class="bz-hand" aria-hidden="true"><svg viewBox="0 0 64 64" width="64" height="64"><path d="M6 4q4-3 8 1l13 17q2-4 7-3 3-3 7-1 3-2 7 1l7 9q5 7 2 15l-4 9q-3 6-10 7H34q-6 0-10-5L13 38q-3-4 1-7 3-2 6 0l4 4L5 10q-3-4 1-6z" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M27 22l6 9M34 19l5 9M41 20l4 7" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/></svg></span>`;
+const BZ_EYE = '<svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><path d="M3 24q21-22 42 0q-21 22-42 0z" fill="#fff" stroke="currentColor" stroke-width="3.5"/><circle cx="24" cy="24" r="8" fill="currentColor"/><circle cx="27" cy="21" r="2.5" fill="#fff"/></svg>';
 
 /* ---------- Fach „Basis“ (Üben; Test folgt in Schritt 4) ---------- */
 const B_ILL = `<svg viewBox="0 0 120 70" aria-hidden="true"><g transform="translate(4 6) scale(.9)">${B_OBJ.tasse.d(B_COL.rot)}</g><g transform="translate(62 6) scale(.9)">${B_OBJ.loeffel.d(B_COL.grau)}</g><path d="M44 36h18" stroke="${INK}" stroke-width="3" stroke-dasharray="4 4"/><circle cx="102" cy="18" r="9" fill="${B_COL.gelb}" stroke="${INK}" stroke-width="2.4"/><path d="M93 62l9-16 9 16z" fill="${B_COL.gruen}" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/></svg>`;
@@ -6573,6 +6590,7 @@ addSubject('B', {name:'Basis', long:'Basis: Grundlagen vor Zählen und Lesen', t
   rail: (g, lvOk) => railBasisHtml(g, lvOk),
   areas: (g, lvOk) => ['V', 'O'].map(ax => [AXES[ax].place, axLevels(ax).filter(lvOk).map(l => ({mode:'read', lvl:l, sym:`<span class="bz-rs">${bSym(l, 30)}</span>`, label:AXES[ax].info[l].short}))]),
   enter: () => { app.read.item = null; if(!/^[VO]/.test(String(app.read.lvl))) app.read.lvl = 'V1'; app.mode = 'read'; }});
+SUBJ_IDS.splice(SUBJ_IDS.indexOf('B'), 1); SUBJ_IDS.unshift('B'); /* Basis kommt am Anfang: in der Fachwahl zuerst (Stefan, 17.11.) */
 /* Typische Fehler beim Üben → nächster Schritt am Material */
 const ERR_MAT = {
   dreher: 'Zuerst die Zehnerstangen legen, dann die Einer, und beim Schreiben mit den Zehnern beginnen (Stellentafel).',
@@ -6748,13 +6766,15 @@ function renderRead(){
   /* In Mathe keine Silbenfarben für kurze Angaben (1 m = 100 cm, 8 Uhr): Blau und Rot stehen dort für Zehner und Hunderter. Sachtexte ab 4 Wörtern dürfen gefärbt werden. */
   const colored = R.colored && (!/^[UGHZ]/.test(R.lvl) || (String(it.text || '').match(/[A-Za-zÄÖÜäöüß]{3,}/g) || []).length >= 3);
   const bzPre = BZ_TYPES.includes(it.type) && app.bzFlipItem === it ? {...bzRects(), ...(app.bzFlipFrom || {})} : null; app.bzFlipItem = it; /* Bewegung nur innerhalb derselben Aufgabe */
-  $('#stage').innerHTML = `<div class="blitz dg-stage">${itemStage(it, R.r, {colored, feedback: R.fb, inline: it.type === 'input'})}${it.type === 'input' && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : ''}</div>`;
+  const bzBadge = R.demo ? `<div class="bz-watch">${BZ_EYE}<span>Schau zu</span></div>` : R.showYou ? `<div class="bz-you">${BZ_HAND.replace('bz-hand', 'bz-you-h')}<span>Jetzt du</span></div>` : ''; R.showYou = false;
+  $('#stage').innerHTML = `<div class="blitz dg-stage${R.demo ? ' bz-demo' : ''}">${bzBadge}${itemStage(it, R.r, {colored, feedback: R.fb, inline: it.type === 'input'})}${it.type === 'input' && !inlineQ(it) ? `<div class="dg-ans">${fieldsHtml(it)}</div>` : ''}</div>`;
   if(it.type === 'input' && R.r.vals){ const ins = [...document.querySelectorAll('#stage .dg-in')]; R.r.vals.forEach((v, i) => { if(ins[i]) ins[i].value = v; }); if(R.fb) ins.forEach((x, i) => x.classList.add(R.fb.ok || Number(x.value) === it.fields[i] ? 'fb-ok' : 'fb-no')); }
   if(it.type === 'board' || it.html?.includes('class="hb')) hbFit();
   const lv = rdLevels(R.lvl), li = lv.indexOf(R.lvl);
   const arts = bzArts(R.lvl);
-  if(bzPre) bzFlip(bzPre, R.demo ? 750 : 260);
-  if(arts && R.demo){ $('#controls').innerHTML = toolBtn({id:'r-demo', ic:'eye', label:'Nochmal vormachen'}) + toolBtn({id:'r-try', ic:'next', label:'Jetzt du', primary:true}); itFit(); return; }
+  if(R.demo && R.r.hand) $('#stage').querySelector(R.r.hand)?.insertAdjacentHTML('beforeend', BZ_HAND);
+  if(bzPre) bzFlip(bzPre, R.demo ? 900 : 260);
+  if(arts && R.demo){ $('#controls').innerHTML = toolBtn({id:'r-demo', ic:'eye', label:'Nochmal vormachen', disabled: !R.demoEnd}) + toolBtn({id:'r-try', ic:'next', label:'Jetzt du', primary:true, disabled: !R.demoEnd, cls: R.demoEnd ? 'bz-go' : ''}); itFit(); return; }
   if(arts){ const m = bzMem(), nx = m.art < arts.length - 1 ? 'Nächste Aufgabe' : li >= 0 && li < lv.length - 1 && !guideOn() ? 'Nächste Stufe' : '', up = R.fb?.ok && m.ok >= BZ_NEXT && nx && !roundOn();
     $('#controls').innerHTML = (up ? toolBtn({id:'r-art-up', ic:'next', label:nx, primary:true}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label: up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: !evalItem(it, R.r, [])})) +
       (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '') + '<span class="sep"></span>' + toolBtn({id:'r-demo', ic:'eye', label:'Vormachen'});
@@ -6797,7 +6817,7 @@ function readControl(btn){
   const R = app.read;
   switch(btn.id){
     case 'r-check': return readCheck();
-    case 'r-try': clearTimeout(app.demoT); R.demo = false; setHint(''); return readNew();
+    case 'r-try': clearTimeout(app.demoT); R.demo = false; setHint(''); readNew(); if(!R.demo){ R.showYou = true; renderRead(); } return;
     case 'r-demo': clearTimeout(app.demoT); setHint(''); R.fb = null; R.tries = 0; bzDemoStart(); return renderRead();
     case 'r-art-up': { const arts = bzArts(R.lvl), m = bzMem(); if(m.art < arts.length - 1) Object.assign(m, {art: m.art + 1, ok:0}); else { const lv = rdLevels(R.lvl); R.lvl = lv[lv.indexOf(R.lvl) + 1]; } Object.assign(R, {item:null, streak:0, miss:0}); setHint(''); return render(); }
     case 'r-next': skipMark(); setHint(''); return readNew();
@@ -9257,7 +9277,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.28.2 · 17.11.2026';
+const APP_VERSION = '0.28.3 · 17.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -9451,7 +9471,7 @@ $('#help-content').innerHTML = [
   ['edit','Mathe','Links wählst du: Zahlen legen, Hundertertafel, Plus, Minus, Zehnerpartner, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
   ['target','Zahlenstrahl vergrößern','Tippe auf einen Sprung (zum Beispiel +7), dann wird er groß. Noch einmal tippen: zurück. Mit + und − vergrößerst und verkleinerst du. Mit zwei Fingern kannst du auch zoomen und mit einem Finger verschieben. Unten zeigt der kleine Zahlenstrahl, wo du gerade bist – tippe dort, um hinzuspringen.'],
   ['line','Deutsch','Lesen in 9 Stufen (Bilder, Signalwörter, Buchstaben, Wörter, genau lesen, Sätze, kurze Texte, Pläne und Tabellen, lange Texte) und Schreiben in 6 Stufen (abschreiben, Anlaute, kurze und lange Wörter, Merkstellen, Sätze). Unter „Meine Wörter“ übst du Wörter, die deine Lehrkraft eingetragen hat: anschauen, merken, abdecken, auswendig schreiben, vergleichen. „Silben färben“ hilft bei langen Wörtern. Beim Schreiben gibt es Buchstaben auf dem Bildschirm.'],
-  ['blocks','Basis','Grundlagen vor dem Zählen und Lesen: Gleiches finden, Was passt nicht?, Sortieren, Eins zu eins zuordnen, Mengen vergleichen, Der Größe nach, Muster, Auf einen Blick, Formen, Richtung und Spiegelung, Von links nach rechts. Oben hellblau steht die Vorgabe oder das Ziel, unten beige der Vorrat: Die Kinder schieben Dinge an ihren Platz (oder tippen das Ding und dann den Platz an). Jede Aufgabenart wird zuerst vorgemacht; das Kind bleibt bei ihr, bis es sie sicher kann (erst wenige, dann mehr Bilder). Die Lehrkraft erklärt den Auftrag. Kinder sehen „Basis“ nur, wenn es in den Einstellungen unter „Kinder &amp; Daten“ für sie eingeschaltet ist. Dazu gibt es Arbeitsblätter und Legeblätter.'],
+  ['blocks','Basis','Grundlagen vor dem Zählen und Lesen: Gleiches finden, Was passt nicht?, Sortieren, Eins zu eins zuordnen, Mengen vergleichen, Der Größe nach, Muster, Auf einen Blick, Formen, Richtung und Spiegelung, Von links nach rechts. Oben hellblau steht die Vorgabe oder das Ziel, unten beige der Vorrat: Die Kinder schieben Dinge an ihren Platz (oder tippen das Ding und dann den Platz an). Jede Aufgabenart wird zuerst vorgemacht (orange Rahmen, „Schau zu“, eine Hand zeigt es); das Kind bleibt bei ihr, bis es sie sicher kann (erst wenige, dann mehr Bilder). Die Lehrkraft erklärt den Auftrag. Kinder sehen „Basis“ nur, wenn es in den Einstellungen unter „Kinder &amp; Daten“ für sie eingeschaltet ist. Dazu gibt es Arbeitsblätter und Legeblätter.'],
   ['next','Schwerer oder leichter','Wenn du 5 Aufgaben hintereinander richtig hast, schlägt Stufenweise die nächste Stufe vor. Nach 3 Fehlern gibt es eine leichtere Stufe. Du entscheidest selbst.'],
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],

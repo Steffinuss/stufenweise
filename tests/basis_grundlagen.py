@@ -32,7 +32,7 @@ async def main():
         await pg.goto(URL); await pg.wait_for_timeout(400)
         r = await pg.evaluate(CHECK)
         errs += r['bad']
-        if not r['on'] and (r['subj'] != 'M,D,B' or r['tests'] != 'M,L,W'): errs.append(f'Fach Basis (Üben) fehlt oder Test schon da: {r}')
+        if not r['on'] and (r['subj'] != 'B,M,D' or r['tests'] != 'M,L,W'): errs.append(f'Fach Basis (Üben) fehlt oder Test schon da: {r}')
         print('Fächer', r['subj'], 'Tests', r['tests'], 'BASIS_ON', r['on'])
         print('ERR', errs[:10]); await b.close()
 asyncio.run(main())
