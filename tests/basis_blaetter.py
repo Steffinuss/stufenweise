@@ -59,5 +59,11 @@ async def main():
           return out; })()""")
         if ui != {'B:V1': True, 'M:plus': False, 'K:muster': True, 'K:zehner': False}: errs.append(f'Schwarz-Weiß-Option {ui}')
         print('Schwarz-Weiß-Option sichtbar:', ui)
+        # Beispiel je Aufgabenart nur ein Schritt (Stefan, 19.11.): höchstens eine Markierung bzw. Linie je vorgemachter Aufgabe
+        ex = await pg.evaluate("""(()=>{ const bad=[]; for(const t of ['B:V1','B:V2','B:V3','B:V4','B:V6','B:V7','B:O2','B:O3','B:O4']) for(let k=0;k<6;k++){ app.sheet.topic=t; app.sheet.n='fill'; app.sheet.bsim=k%3;
+          const d=document.createElement('div'); d.innerHTML=buildSheet().html.replace(/^[\\s\\S]*?<body>/,''); const page=d.querySelector('.page'); if(!page) continue;
+          for(const task of page.querySelectorAll('.ab-task, .ab-card, section')){ const n = task.querySelectorAll('.bb-it.weg, .bb-it.ring, .bb-it.grau, .bb-box.ring').length + [...task.querySelectorAll('svg.bb-lines path, svg.bb-vlines path, svg.bb-arcs path')].length; if(n > 1) bad.push(t+': '+n); } }
+          return bad.slice(0,5); })()""")
+        if ex: errs.append(f'mehr als ein Beispiel-Schritt: {ex}')
         print('ERR', errs[:10]); await b.close()
 asyncio.run(main())

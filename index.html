@@ -8790,19 +8790,22 @@ const bbColName = col => B_BW ? 'mit diesem Muster' : B_COL_NAME[col];
 const bbIt = (svg, mark = '') => `<span class="bb-it${mark ? ' ' + mark : ''}">${svg}</span>`;
 const bbRow = (items, cls = '') => `<div class="bb-row ${cls}">${items.join('')}</div>`;
 /* Beispiel (mit Markierungen) und leere Aufgabe; abPick wählt beim Zusammensetzen */
-const bbEx = (fn) => abEx(fn(true), fn(false));
+/* Beispiel je Aufgabenart: nur der erste Schritt ist vorgemacht (eine Zeile, eine Linie, ein Kreis) – Stefan, 19.11. */
+let BB_ONE = false;
+const bbEx = (fn) => { BB_ONE = false; const a = fn(true); BB_ONE = false; return abEx(a, fn(false)); };
+const bbFirst = (ex, c) => ex && c && !BB_ONE ? (BB_ONE = true) : false;
 const bKinds = (filter = () => true, withVar = false) => Object.keys(B_OBJ).filter(k => (withVar || !B_OBJ[k].v) && filter(B_OBJ[k]));
 const B_COLS4 = ['rot', 'blau', 'gelb', 'gruen'];
 /* Verbinden links ↔ rechts mit Beispiel-Linien: pairs = [[linksHTML, rechtsHTML]], perm[i] = Zeile rechts für links i */
 function bbMatch(lefts, rights, perm, ex){
   const n = lefts.length;
-  const lines = ex ? `<svg class="bb-lines" viewBox="0 0 100 ${n*100}" preserveAspectRatio="none" style="grid-row:1/${n + 1}">${perm.map((j, i) => `<path d="M2 ${i*100 + 50}L98 ${j*100 + 50}" stroke="#888" stroke-width="3" stroke-dasharray="7 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '';
+  const lines = ex ? `<svg class="bb-lines" viewBox="0 0 100 ${n*100}" preserveAspectRatio="none" style="grid-row:1/${n + 1}">${perm.slice(0, 1).map((j, i) => `<path d="M2 ${i*100 + 50}L98 ${j*100 + 50}" stroke="#888" stroke-width="3" stroke-dasharray="7 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '';
   return `<div class="bb-match">${lefts.map((l, i) => `<div class="l" style="grid-row:${i + 1}">${l}<span class="ab-dot"></span></div>`).join('')}${lines}${rights.map((r, j) => `<div class="r" style="grid-row:${j + 1}"><span class="ab-dot"></span>${r}</div>`).join('')}</div>`;
 }
 /* Oben/unten verbinden (eins zu eins) mit Beispiel-Linien */
 function bbPairs(tops, bottoms, links, ex){
   const n = tops.length, m = bottoms.length;
-  const lines = ex ? `<svg class="bb-vlines" viewBox="0 0 100 10" preserveAspectRatio="none">${links.map(([i, j]) => `<path d="M${100*(i + .5)/n} 0L${100*(j + .5)/m} 10" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '<div class="bb-vgap"></div>';
+  const lines = ex ? `<svg class="bb-vlines" viewBox="0 0 100 10" preserveAspectRatio="none">${links.slice(0, 1).map(([i, j]) => `<path d="M${100*(i + .5)/n} 0L${100*(j + .5)/m} 10" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '<div class="bb-vgap"></div>';
   return `<div class="bb-pairs"><div class="bb-prow">${tops.map(t => `<span class="bb-pc">${t}<span class="ab-dot"></span></span>`).join('')}</div>${lines}<div class="bb-prow">${bottoms.map(b => `<span class="bb-pc"><span class="ab-dot"></span>${b}</span>`).join('')}</div></div>`;
 }
 /* Gegenstände verstreut in einem Kasten (Mengen vergleichen); spread: eng (0) oder weit (1) */
@@ -8844,32 +8847,32 @@ const B_SHEETS = {
       return T_('verbinde', B_BW ? 'Verbinde, was das gleiche Muster hat.' : 'Verbinde, was die gleiche Farbe hat.', bbEx(ex => bbMatch(cs.map((c, i) => bbIt(bbObj(ks[i], c))), rs.map(([k, c]) => bbIt(bbObj(k, c))), perm, ex)), cs.map((c, i) => `${B_OBJ[ks[i]].name} – ${B_OBJ[rs[perm[i]][0]].name} (${B_COL_NAME[c]})`).join(', '), 3); }]},
   V2: {name:'Was passt nicht?', cols:1, max:8, gens:[
     () => { const rows = [0, 1].map(() => { const k = bzSimTarget(B_SIM), k2 = bzSimOthers(k, B_SIM, 1)[0], i = rnd(0, 3); return {items:[0, 1, 2, 3].map(j => j === i ? [k2] : [k]), i}; });
-      return T_('streiche', 'Streiche durch, was nicht passt.', bbEx(ex => rows.map(r => bbRow(r.items.map(([k], j) => bbIt(bbObj(k), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name})`).join('; '), 1); },
+      return T_('streiche', 'Streiche durch, was nicht passt.', bbEx(ex => rows.map((r, ri) => bbRow(r.items.map(([k], j) => bbIt(bbObj(k), ex && ri === 0 && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name})`).join('; '), 1); },
     () => { const rows = [0, 1].map(() => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), col2 = pick(B_COLS4.filter(c => c !== col)), i = rnd(0, 3), big = Math.random() < .5;
       return {items:[0, 1, 2, 3].map(j => j === i ? (big ? [k, col, .6] : [k, col2, 1]) : [k, col, 1]), i}; });
-      return T_('streiche', 'Streiche durch, was nicht passt. Schau genau!', bbEx(ex => rows.map(r => bbRow(r.items.map(([k, c, s], j) => bbIt(bbObj(k, c, s), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name}${r.items[r.i][2] !== 1 ? ', kleiner' : ', andere Farbe'})`).join('; '), 2); },
+      return T_('streiche', 'Streiche durch, was nicht passt. Schau genau!', bbEx(ex => rows.map((r, ri) => bbRow(r.items.map(([k, c, s], j) => bbIt(bbObj(k, c, s), ex && ri === 0 && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name}${r.items[r.i][2] !== 1 ? ', kleiner' : ', andere Farbe'})`).join('; '), 2); },
     () => { const rows = [0, 1].map(() => { const g = pick(B_SIM ? ['kueche', 'werkstatt'] : ['kueche', 'werkstatt', 'kleidung']), sub = g === 'kueche' ? pick(['besteck', 'geschirr']) : 'werkzeug';
       const same = B_SIM ? shuffle(bzSubKinds(sub, B_SIM === 2)).slice(0, 3) : shuffle(bKinds(o => o.grp === g)).slice(0, 3), odd = B_SIM === 2 ? pick(bKinds(o => o.grp === g && o.sub && o.sub !== sub)) : pick(bKinds(o => o.grp !== g)), i = rnd(0, 3), items = [...same]; items.splice(i, 0, odd); return {items, i}; });
-      return T_('streiche', 'Was gehört nicht dazu? Streiche durch.', bbEx(ex => rows.map(r => bbRow(r.items.map((k, j) => bbIt(bbObj(k), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i]].name})`).join('; '), 3); }]},
+      return T_('streiche', 'Was gehört nicht dazu? Streiche durch.', bbEx(ex => rows.map((r, ri) => bbRow(r.items.map((k, j) => bbIt(bbObj(k), ex && ri === 0 && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i]].name})`).join('; '), 3); }]},
   V3: {name:'Sortieren', cols:1, max:6, gens:[
     () => { if(B_SIM){ /* ähnlich: Untergruppen (alles Besteck), fein: Familien mit Varianten (alle Löffel) */
         const [a, b] = B_SIM === 1 ? pick([['besteck', 'geschirr'], ['werkzeug', 'kleinteil'], ['geschirr', 'besteck']]) : pick([['loeffel', 'gabel'], ['hammer', 'dreher'], ['dreher', 'schluessel'], ['gabel', 'loeffel']]);
         const ks = x => B_SIM === 1 ? bzSubKinds(x) : B_FAM[x], take = x => { const p = shuffle(ks(x)); while(p.length < 3) p.push(pick(ks(x))); return p.slice(0, 3); };
         const inn = take(a), out = take(b), all = shuffle([...inn.map((k, i) => [k, 1, i]), ...out.map((k, i) => [k, 0, i])]);
         const what = B_SIM === 1 ? {besteck:'alles Besteck', geschirr:'alles Geschirr', werkzeug:'alle Werkzeuge'}[a] : `alle ${BZ_FAMN[a]}`;
-        return T_('kreise', `Kreise ${what} ein.`, bbEx(ex => bbRow(all.map(([k, y]) => bbIt(bbObj(k), ex && y ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); }
+        return T_('kreise', `Kreise ${what} ein.`, bbEx(ex => bbRow(all.map(([k, y]) => bbIt(bbObj(k), bbFirst(ex, y) ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); }
       const g = pick(['kueche', 'werkstatt', 'kleidung']), g2 = pick(['kueche', 'werkstatt', 'kleidung', 'obst'].filter(x => x !== g)), inn = shuffle(bKinds(o => o.grp === g)).slice(0, 3), out = shuffle(bKinds(o => o.grp === g2)).slice(0, 3), all = shuffle([...inn, ...out]);
-      return T_('kreise', `Kreise alles ein, was zur ${({kueche:'Küche', werkstatt:'Werkstatt', kleidung:'Kleidung'})[g]} gehört.`, bbEx(ex => bbRow(all.map(k => bbIt(bbObj(k), ex && inn.includes(k) ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); },
+      return T_('kreise', `Kreise alles ein, was zur ${({kueche:'Küche', werkstatt:'Werkstatt', kleidung:'Kleidung'})[g]} gehört.`, bbEx(ex => bbRow(all.map(k => bbIt(bbObj(k), bbFirst(ex, inn.includes(k)) ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); },
     () => { const col = pick(B_COLS4), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), cs = shuffle([col, col, col, ...shuffle(B_COLS4.filter(c => c !== col)).slice(0, 3)]);
-      return T_('kreise', `Kreise alle Dinge ${bbColName(col)} ein: ${bSwatch(col)}`, bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, cs[i]), ex && cs[i] === col ? 'ring' : '')), 'wide')), ks.filter((k, i) => cs[i] === col).map(k => B_OBJ[k].name).join(', '), 2); },
+      return T_('kreise', `Kreise alle Dinge ${bbColName(col)} ein: ${bSwatch(col)}`, bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, cs[i]), bbFirst(ex, cs[i] === col) ? 'ring' : '')), 'wide')), ks.filter((k, i) => cs[i] === col).map(k => B_OBJ[k].name).join(', '), 2); },
     () => { const ks = shuffle(bKinds()).slice(0, 6), big = shuffle([1, 1, 1, 0, 0, 0]), sm = [.55, .68, .8][B_SIM];
-      return T_('kreise', 'Kreise alle großen Dinge ein.', bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, null, big[i] ? 1 : sm), ex && big[i] ? 'ring' : '')), 'wide')), ks.filter((k, i) => big[i]).map(k => B_OBJ[k].name).join(', '), 3); }]},
+      return T_('kreise', 'Kreise alle großen Dinge ein.', bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, null, big[i] ? 1 : sm), bbFirst(ex, big[i]) ? 'ring' : '')), 'wide')), ks.filter((k, i) => big[i]).map(k => B_OBJ[k].name).join(', '), 3); }]},
   V4: {name:'Eins zu eins zuordnen', cols:1, max:6, gens:[
     () => { const [a, b] = pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]), n = rnd(3, 5), perm = shuffle([...Array(n).keys()]);
       return T_('verbinde', `${B_JEDE[a]} bekommt ${B_EIN[b]}. Verbinde.`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(n).fill(bbObj(b)), perm.map((j, i) => [i, j]), ex)), `${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, 1); },
     () => { const [a, b] = pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]), n = rnd(3, 5), m = Math.max(2, n + pick([-1, 0, 1])), k = Math.min(n, m), ok = m >= n;
       const yn = ex => `<p class="ab-row yn">Reicht es? <span class="bb-cb${ex && ok ? ' x' : ''}"></span> ja <span class="bb-cb${ex && !ok ? ' x' : ''}"></span> nein</p>`;
-      return T_(['verbinde', 'kreuze'], `Verbinde. Bekommt ${B_JEDE[a].replace('J', 'j')} ${B_EIN[b]}?`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(m).fill(bbObj(b)), [...Array(k).keys()].map(i => [i, i]), ex) + yn(ex)), `${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}: ${ok ? 'ja' : 'nein'}`, 2); }]},
+      return T_(['verbinde', 'kreuze'], `Verbinde. Bekommt ${B_JEDE[a].replace('J', 'j')} ${B_EIN[b]}?`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(m).fill(bbObj(b)), [...Array(k).keys()].map(i => [i, i]), ex) + yn(false)), `${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}: ${ok ? 'ja' : 'nein'}`, 2); }]},
   V5: {name:'Mehr, weniger, gleich viel', cols:1, max:6, gens:[
     () => { const k = pick(['knopf', 'mutter', 'apfel', 'socke', 'stift']), a = rnd(1, 3), b = rnd(6, 9), left = Math.random() < .5, more = Math.random() < .7;
       const L = left ? b : a, R = left ? a : b, ans = (more ? L > R : L < R) ? 0 : 1;
@@ -8881,29 +8884,29 @@ const B_SHEETS = {
     () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle([.5, .75, 1]), big = Math.random() < .6, t = big ? 1 : .5, ok = sizes.indexOf(t);
       return T_('kreise', big ? 'Kreise das größte ein.' : 'Kreise das kleinste ein.', bbEx(ex => bbRow(sizes.map((s, i) => bbIt(bbObj(k, null, s), ex && i === ok ? 'ring' : '')), 'base')), `${bPos(ok)} (${B_OBJ[k].name})`, 1); },
     () => { const k = pick(['stift', 'schraube', 'tasse', 'glas']), n = rnd(4, 5), sizes = shuffle([.45, .6, .75, .88, 1].slice(5 - n)), ord = [...sizes].sort((a, b) => a - b).map(s => sizes.indexOf(s));
-      const lines = ex => ex ? `<svg class="bb-arcs" viewBox="0 0 100 20" preserveAspectRatio="none">${ord.slice(1).map((j, x) => { const a = 100*(ord[x] + .5)/n, b2 = 100*(j + .5)/n; return `<path d="M${a} 1Q${(a + b2)/2} ${4 + Math.abs(b2 - a)/5} ${b2} 1" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`; }).join('')}</svg>` : '<div class="bb-arcgap"></div>';
+      const lines = ex => ex ? `<svg class="bb-arcs" viewBox="0 0 100 20" preserveAspectRatio="none">${ord.slice(1, 2).map((j, x) => { const a = 100*(ord[x] + .5)/n, b2 = 100*(j + .5)/n; return `<path d="M${a} 1Q${(a + b2)/2} ${4 + Math.abs(b2 - a)/5} ${b2} 1" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`; }).join('')}</svg>` : '<div class="bb-arcgap"></div>';
       return T_('verbinde', 'Verbinde von klein nach groß.', bbEx(ex => `<div class="bb-ord">${bbRow(sizes.map(s => `<span class="bb-pc">${bbObj(k, null, s)}<span class="ab-dot"></span></span>`), 'base even')}${lines(ex)}</div>`), ord.map(bPos).join(' → '), 2); }]},
   V7: {name:'Muster fortsetzen', cols:1, max:8, gens:[
     () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 2), cs = shuffle(B_COLS4).slice(0, 2), u = [[fs[0], cs[0]], [fs[1], cs[1]]], seq = [0, 1, 0, 1, 0, 1, 0, 1];
-      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 5 || ex ? bbIt(bbShape(...u[s]), i >= 5 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(5).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 1); },
+      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 5 || (ex && i === 5) ? bbIt(bbShape(...u[s]), i >= 5 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(5).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 1); },
     () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3), u = fs.map((f, i) => [f, cs[i]]), pat = pick([[0, 0, 1], [0, 1, 2], [0, 1, 1]]), seq = [...pat, ...pat, ...pat].slice(0, 9);
-      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 6 || ex ? bbIt(bbShape(...u[s]), i >= 6 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(6).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 2); },
+      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 6 || (ex && i === 6) ? bbIt(bbShape(...u[s]), i >= 6 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(6).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 2); },
     () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3), u = fs.map((f, i) => [f, cs[i]]), pat = pick([[0, 1], [0, 0, 1], [0, 1, 2]]), seq = [...pat, ...pat, ...pat].slice(0, 7), next = pat[7 % pat.length];
       const opts = shuffle([...new Set([next, 0, 1, 2])].slice(0, 3)), ok = opts.indexOf(next);
       return T_('kreise', 'Was kommt als Nächstes? Kreise ein.', bbEx(ex => bbRow([...seq.map(s => bbIt(bbShape(...u[s]))), '<span class="bb-q">?</span>'], 'pat') + bbRow(opts.map((s, i) => bbIt(bbShape(...u[s]), ex && i === ok ? 'ring' : '')), 'opts')), `${bPos(ok)} (${B_FORM[u[next][0]]} ${B_COL_NAME[u[next][1]]})`, 3); }]},
   O2: {name:'Formen unterscheiden', cols:1, max:6, gens:[
     () => { const t = pick(['kreis', 'dreieck', 'quadrat']), nt = rnd(2, 4), list = shuffle([...Array(nt).fill(t), ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).flatMap(f => [f, f]).slice(0, 8 - nt)]), cs = list.map(() => pick(B_COLS4)), fl = list.map(() => pick(['voll', 'leer']));
-      return T_('kreise', `Kreise alle ${({kreis:'Kreise', dreieck:'Dreiecke', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')}`, bbEx(ex => bbRow(list.map((f, i) => bbIt(bbShape(f, cs[i], fl[i]), ex && f === t ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
+      return T_('kreise', `Kreise alle ${({kreis:'Kreise', dreieck:'Dreiecke', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')}`, bbEx(ex => bbRow(list.map((f, i) => bbIt(bbShape(f, cs[i], fl[i]), bbFirst(ex, f === t) ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
     () => { const [t, d] = ['quadrat', 'rechteck'], list = shuffle([t, t, t, d, d, d, 'dreieck', 'stern']);
-      return T_('kreise', `Kreise nur die ${({kreis:'Kreise', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')} Schau genau!`, bbEx(ex => bbRow(list.map(f => bbIt(bbShape(f, 'blau', 'leer'), ex && f === t ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
+      return T_('kreise', `Kreise nur die ${({kreis:'Kreise', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')} Schau genau!`, bbEx(ex => bbRow(list.map(f => bbIt(bbShape(f, 'blau', 'leer'), bbFirst(ex, f === t) ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
   O3: {name:'Richtung und Spiegelung', cols:1, max:6, gens:[
     () => { const dirs = Object.keys(B_DIR), t = pick(dirs), list = shuffle([t, t, t, ...Array.from({length:5}, () => pick(dirs.filter(d => d !== t)))]);
-      return T_('kreise', `Kreise alle Pfeile nach ${t} ein: ${bArrow(t, 22)}`, bbEx(ex => bbRow(list.map(d => bbIt(bArrow(d, 64, '#fff'), ex && d === t ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((d, i) => d === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
+      return T_('kreise', `Kreise alle Pfeile nach ${t} ein: ${bArrow(t, 22)}`, bbEx(ex => bbRow(list.map(d => bbIt(bArrow(d, 64, '#fff'), bbFirst(ex, d === t) ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((d, i) => d === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
     () => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), list = shuffle([t, t, ...shuffle([0, 1, 2, 3].filter(l => l !== t)), pick([0, 1, 2, 3].filter(l => l !== t))]);
-      return T_('kreise', 'Kreise alle ein, die genau so aussehen wie im Kasten.', bbEx(ex => `<div class="bb-target">${bbIt(bGlyph(g, t))}</div>` + bbRow(list.map(l => bbIt(bGlyph(g, l), ex && l === t ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((l, i) => l === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
+      return T_('kreise', 'Kreise alle ein, die genau so aussehen wie im Kasten.', bbEx(ex => `<div class="bb-target">${bbIt(bGlyph(g, t))}</div>` + bbRow(list.map(l => bbIt(bGlyph(g, l), bbFirst(ex, l === t) ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((l, i) => l === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
   O4: {name:'Von links nach rechts', cols:1, max:6, gens:[
     () => { const ks = shuffle(bKinds()).slice(0, 6);
-      return T_('verbinde', 'Fang beim grünen Punkt an. Verbinde die Punkte von links nach rechts.', bbEx(ex => `<div class="bb-ord">${bbRow(ks.map((k, i) => `<span class="bb-pc">${bbObj(k)}<span class="ab-dot${i === 0 ? ' start' : ''}"></span></span>`), 'even')}${ex ? `<svg class="bb-ordl" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M${100*.5/6} 5H${100*5.5/6}" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></svg>` : ''}</div>`), ks.map(k => B_OBJ[k].name).join(' → '), 1); },
+      return T_('verbinde', 'Fang beim grünen Punkt an. Verbinde die Punkte von links nach rechts.', bbEx(ex => `<div class="bb-ord">${bbRow(ks.map((k, i) => `<span class="bb-pc">${bbObj(k)}<span class="ab-dot${i === 0 ? ' start' : ''}"></span></span>`), 'even')}${ex ? `<svg class="bb-ordl" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M${100*.5/6} 5H${100*1.5/6}" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></svg>` : ''}</div>`), ks.map(k => B_OBJ[k].name).join(' → '), 1); },
     () => { const s = pick(B_SEQ), ord = shuffle([0, 1, 2]), ok = ord.indexOf(0);
       return T_('kreise', 'Was kommt zuerst? Kreise ein.', bbEx(ex => bbRow(ord.map((j, i) => bbIt(s.pics[j](), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${s.first})`, 2); }]}
 };
