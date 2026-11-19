@@ -25,6 +25,7 @@ Umgesetzt:
 Rückmeldungen beim Ausprobieren (19.11.2026, eingearbeitet, Testversion cb56bb1):
 - Basis-Test war schwer zu finden → jetzt auch im Fenster „Wer übt?“ (eine Zeile je Fach: Basis, Mathe, Deutsch).
 - Bei „Zuordnen“ konnte man nichts falsch machen → „Jedem eins“ frei hinlegen: mehr im Vorrat, unter ein Bild passen auch mehrere, richtig nur mit genau einem je Bild (Üben und Test).
+- Basis-Häkchen pro Kind direkt im Fenster „Wer übt?“ neben „ohne Lesen“; die Basis-Test-Knöpfe dort erscheinen nur, wenn es beim gewählten Kind angehakt ist.
 - Testversion zeigte 0.28.5 → zeigt jetzt „0.29.0 · Testversion <Stand> · <Datum>“.
 
 Noch offen, bevor der Basis-Test freigegeben wird:
