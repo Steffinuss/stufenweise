@@ -12,7 +12,7 @@ Stand: 19.11.2026
 | --- | --- | --- | --- |
 | 0 | Basis-Test abschließen (`IN_PROGRESS.md`) | klein | fertig gebaut, braucht nur Ausprobieren und Freigabe |
 | 1 | **C** Basis: bessere Progression | mittel | betrifft dieselben Aufgabenarten wie der Basis-Test; besser jetzt klären, bevor viele Kinder mit dem Test eingestuft werden |
-| 2 | **B** Unterricht: Zahl im Zwanzigerfeld | klein | vieles ist schon da, geringes Risiko, schnell nutzbar |
+| 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | erledigt 19.11.2026 (Testversion), siehe `CHANGELOG.md` |
 | 3 | **A** Plus und Minus aufteilen | groß | größter Nutzen beim Üben, aber Umbau eines zentralen Mathe-Moduls; zuerst Konzept mit Stefan |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
@@ -45,7 +45,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## B: Unterricht – Zahlen im Zwanzigerfeld darstellen
 
-**Status:** aufgenommen 19.11.2026 · nicht begonnen
+**Status:** erledigt 19.11.2026 in `entwicklung` (Testversion), wartet auf Freigabe
 
 **Ausgangslage:** Das Zwanzigerfeld (Unterricht, Tafelwerkzeug) wird vor allem mit Rechnungen genutzt.
 

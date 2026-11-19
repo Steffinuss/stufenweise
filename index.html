@@ -602,6 +602,7 @@ body.class-mode #controls button{min-height:58px}
 .tw-word.bows .syl{display:inline-block;padding:0 .04em .14em;border-bottom:.07em solid currentColor;border-radius:0 0 50% 50%/0 0 .45em .45em;margin:0 .03em}
 .tw-text{font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1.45;max-width:1100px;text-align:center;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,sans-serif}
 .tw-in input{width:min(360px,40vw);font-size:20px}
+.tf-in{display:flex;align-items:center;gap:6px;font-weight:700}.tf-in input{width:3.2em;font-size:20px;text-align:center}.tf-reveal.open{border-style:solid;border-color:#e6e0d4;background:#fff}
 .adapt-tip.up{border:2px solid #1f7a45}
 .round-bar{position:absolute;left:18px;top:12px;z-index:5;display:flex;align-items:flex-end;gap:3px;height:34px;pointer-events:none}
 .round-bar i{width:9px;border-radius:3px 3px 1px 1px;background:#e7dfd0}
@@ -6039,7 +6040,7 @@ function diagControl(btn){
     case 'd-close':
       /* Versehentliches Abbrechen vermeiden (Durchsicht 16.11.): im laufenden Test zweimal tippen */
       if(d && !d.done && d.started && !d.warm && !btn.dataset.sure){ btn.dataset.sure = '1'; btn.classList.add('sure'); btn.querySelector('.lbl').textContent = 'Wirklich beenden?'; setTimeout(() => { if(btn.isConnected){ delete btn.dataset.sure; btn.classList.remove('sure'); btn.querySelector('.lbl').textContent = 'Abbrechen'; } }, 4000); return; }
-      clearTimeout(d?.timer); if(d && !d.done && d.tested.length){ inferCells(d.pid, d.subj); saveData(); } if(d?.kurz && d.done){ app.diag = null; app.run = {}; app.mode = homeMode(); $('#stage').innerHTML = ''; render(); return; } app.mode = d?.done ? 'home' : homeMode(); app.diag = null; $('#stage').innerHTML = ''; render(); return;
+      clearTimeout(d?.timer); if(d && !d.done && d.tested.length){ inferCells(d.pid, d.subj); saveData(); } if(d?.kurz && d.done){ app.diag = null; app.run = {}; app.mode = homeMode(); $('#stage').innerHTML = ''; render(); return; } app.mode = d?.done || app.wz?.test ? 'home' : homeMode(); /* aus „Testen“ gestartet: zurück zur Testauswahl */ app.diag = null; $('#stage').innerHTML = ''; render(); return;
   }
 }
 
@@ -7346,7 +7347,9 @@ function tfSvg(t = app.tf){
 function renderTfield(){
   const t = app.tf, eq = tfEquation();
   $('#equation').innerHTML = '';
-  $('#prompt').innerHTML = eq ? `<span class="nl-path tf-eq">${escHtml(eq.txt)}${eq.res == null ? '' : ` = ${t.hide && !t.shown ? '<button class="tf-reveal" data-tf-reveal aria-label="Ergebnis zeigen">?</button>' : eq.res}`}</span>` : `<span class="tf-hint">Tippe ins Feld oder auf die Knöpfe, um Punkte zu legen.</span>`;
+  /* Zahl verdecken (Stefan, 19.11.): wirkt auf die Anzahl allein und auf das Ergebnis einer Rechnung; „?“ deckt auf, die aufgedeckte Zahl antippen deckt wieder zu */
+  const val = v => !t.hide ? v : t.shown ? `<button class="tf-reveal open" data-tf-cover aria-label="Wieder verdecken">${v}</button>` : `<button class="tf-reveal" data-tf-reveal aria-label="${eq?.res == null ? 'Zahl' : 'Ergebnis'} zeigen">?</button>`;
+  $('#prompt').innerHTML = eq ? `<span class="nl-path tf-eq">${eq.res == null ? val(escHtml(eq.txt)) : `${escHtml(eq.txt)} = ${val(eq.res)}`}</span>` : `<span class="tf-hint">Tippe ins Feld oder auf die Knöpfe, um Punkte zu legen. Oben kannst du auch eine Zahl eingeben.</span>`;
   $('#stage').innerHTML = `<div class="tf-wrap">${tfSvg()}</div>`;
   const n = t.dots.length, live = n - t.cross, st = t.tool === 'x';
   const dot = c => `<i class="tf-dot" style="background:${TF_COL[c]}"></i>`;
@@ -7354,6 +7357,13 @@ function renderTfield(){
     + `<div class="nl-jumps tf-steps">${(st ? [1, 5] : [1, 5, 10]).map(k => `<button data-tfk="${k}" ${st ? (live >= k ? '' : 'disabled') : (n + k <= t.cap ? '' : 'disabled')} style="--c:${st ? '#c9414a' : TF_COL[t.tool]}">${st ? '−' : '+'}${k}</button>`).join('')}</div>`
     + toolBtn({id:'tf-undo', ic:'undo', label:'Zurück', disabled: !t.hist.length}) + toolBtn({id:'tf-new', ic:'trash', label:'Neu', disabled: !n});
   setHint('');
+}
+/* Zahl vorgeben (Stefan, 19.11.): Feld neu füllen, eine Farbe, ohne Rechnung */
+function tfSetNum(v, rand){
+  const t = app.tf, n = parseInt(v, 10), inp = $('#tf-num');
+  if(!Number.isFinite(n) || n < 0 || n > t.cap){ setHint(`Gib eine Zahl von 0 bis ${t.cap} ein.`); inp?.focus(); return; }
+  t.hist.push(tfSnap()); t.dots = Array(n).fill(t.tool === 'x' ? 'b' : t.tool); t.cross = 0; t.shown = false;
+  if(inp) inp.value = rand ? '' : String(n); renderTfield(); inp?.blur();
 }
 function tfAdd(k){ const t = app.tf; if(t.cross){ t.cross = 0; } for(let j = 0; j < k && t.dots.length < t.cap; j++) t.dots.push(t.tool === 'x' ? 'b' : t.tool); }
 function tfieldClick(e){
@@ -7465,7 +7475,7 @@ function renderTopTool(){
   if(m === 'tfield'){
     $('#range-label').textContent = 'Feld bis';
     $('#ranges').innerHTML = [10, 20].map(r => `<button data-tfr="${r}" aria-pressed="${app.tf.cap === r}">${r}</button>`).join('');
-    $('#inputs').innerHTML = `<button class="chip-toggle" data-tfh aria-pressed="${app.tf.hide}" title="Das Ergebnis erst zeigen, wenn es angetippt wird">Ergebnis verdecken</button>`;
+    $('#inputs').innerHTML = `<label class="tf-in"><span>Zahl</span><input id="tf-num" inputmode="numeric" autocomplete="off" maxlength="2" aria-label="Zahl, die gelegt wird"></label><button id="tf-set" class="primary">Legen</button><button id="tf-rand" title="Eine Zahl auslosen und legen">Zufallszahl</button><button class="chip-toggle" data-tfh aria-pressed="${app.tf.hide}" title="Die Zahl (bei einer Rechnung das Ergebnis) erst zeigen, wenn man auf ? tippt">Zahl verdecken</button>`;
     return true;
   }
   $('#range-label').textContent = ''; $('#ranges').innerHTML = '';
@@ -7530,6 +7540,7 @@ function renderTool(){
 document.addEventListener('click', e => {
   if(!TOOL_MODES.includes(app.mode)) return;
   if(e.target.closest('[data-tf-reveal]')){ app.tf.shown = true; return renderTfield(); }
+  if(e.target.closest('[data-tf-cover]')){ app.tf.shown = false; return renderTfield(); }
   const inStage = e.target.closest('#stage'), inCtl = e.target.closest('#controls'), inTop = e.target.closest('.toolbar');
   if(inStage){ if(app.mode === 'tfield') tfieldClick(e); if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
   const b = e.target.closest('button'); if(!b || !(inCtl || inTop)) return;
@@ -7540,6 +7551,8 @@ document.addEventListener('click', e => {
     if(b.hasAttribute('data-nlh')){ app.nl.hide = !app.nl.hide; app.nl.shown = false; return render(); }
     if(b.dataset.tfr){ const t = app.tf; t.cap = +b.dataset.tfr; t.hist.push(tfSnap()); t.dots = t.dots.slice(0, t.cap); t.cross = Math.min(t.cross, t.dots.length); t.shown = false; return render(); }
     if(b.hasAttribute('data-tfh')){ app.tf.hide = !app.tf.hide; app.tf.shown = false; return render(); }
+    if(b.id === 'tf-set') return tfSetNum($('#tf-num')?.value);
+    if(b.id === 'tf-rand'){ const t = app.tf, cur = t.dots.length - t.cross; let n; do n = rnd(1, t.cap); while(n === cur && t.cap > 1); return tfSetNum(n, true); }
     if(b.id === 'tw-go'){ app.tw.text = $('#tw-text').value; return renderTword(); }
     return;
   }
@@ -9296,7 +9309,7 @@ $('#ranges').addEventListener('click', e => {
   render();
 });
 $('#inputs').addEventListener('input', () => { const t = draftOwner(); t.draft = [$('#in-a')?.value ?? '', $('#in-b')?.value ?? '']; $('#error').hidden = true; });
-$('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(app.mode === 'tword'){ app.tw.text = e.target.value || ''; return renderTword(); } if(TOOL_MODES.includes(app.mode)) return; commitAny(); } });
+$('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(app.mode === 'tword'){ app.tw.text = e.target.value || ''; return renderTword(); } if(app.mode === 'tfield' && e.target.id === 'tf-num') return tfSetNum(e.target.value); if(TOOL_MODES.includes(app.mode)) return; commitAny(); } });
 $('#inputs').addEventListener('click', e => {
   const fp = e.target.closest('[data-fplace]'); if(fp){ const b = board(); if(b.place !== fp.dataset.fplace){ freeSave(b); b.place = fp.dataset.fplace; { const keep = freeCols(), gone = [...new Set(b.pieces.filter(q => !keep.includes(q.kind)).map(q => NAME[q.kind]))]; if(gone.length){ b.pieces = b.pieces.filter(q => keep.includes(q.kind)); toast(`${gone.join(' und ')} wurden weggelegt.`); } } b.sel.clear(); if(b.ordered) b.pieces = freeArrange(b.pieces); $('#stage').innerHTML = ''; render(); } return; }
   const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'H') app.read.hlvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'Z') app.read.zlvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }

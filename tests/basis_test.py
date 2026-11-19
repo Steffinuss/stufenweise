@@ -169,6 +169,8 @@ async def main():
         if t1 != 'B1,B2,B3,M1,M2,L,W': errs.append(f'Testen mit Basis: {t1}')
         await pg.click('[data-tstart="B2"]'); await pg.wait_for_timeout(150)
         if await pg.evaluate("[app.mode, app.diag?.subj, app.diag?.part, app.diag?.pid].join()") != 'diag,B,2,kt': errs.append('Testen startet nicht')
+        await pg.click('#d-close', force=True); await pg.wait_for_timeout(100)
+        if await pg.evaluate("[app.mode, !!document.querySelector('[data-tstart]')].join()") != 'home,true': errs.append('Abbrechen führt nicht zur Testauswahl')
         await pg.evaluate("app.diag=null; app.wz=null; app.mode='home'; data.current='ka'; render()")
         # Hinweis im Lernstand: Mathe „Zahlen bis 10, Stufe I“ nicht erreicht, noch kein Basis-Test
         await pg.evaluate("(()=>{const p={id:'kc',name:'Cem',created:1};data.profiles.push(p);setCell('kc','M|10|I',{status:'nicht',quelle:'test',sum:'0 von 2'});setCell('kc','L|L1',{status:'teilweise',quelle:'test'});})()")

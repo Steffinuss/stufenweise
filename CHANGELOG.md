@@ -7,6 +7,8 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 - **Basis-Test** in drei kurzen Teilen (V1–V4, V5–V8, O2–O4) mit Vormachen vor jeder neuen Aufgabenart, Blöcken für leichte und schwerere Form, Kompetenzmatrix mit zwei Bereichszeilen, Förderzone, ILEB-Vorschlägen, Elterninfo, Lernlandkarte und Hinweis im Lernstand bei Mathe „Zahlen bis 10, Stufe I“ / Lesen L1 (17.11.2026, Commit 329ab57). Wartet auf Freigabe, siehe `IN_PROGRESS.md`.
 - Testversion mit eigenem Speicher und rotem Hinweis; Skript `tests/testversion.sh`; Arbeitsweise mit zwei Zweigen in `docs/entwicklung.md` (17.11.2026).
+- **Unterricht, Zwanzigerfeld: Zahl vorgeben** (Backlog B): Zahl eingeben oder „Zufallszahl“ legt die Menge ohne Rechnung; „Zahl verdecken“ wirkt auch auf die Anzahl allein, „?“ deckt auf, noch einmal antippen deckt zu (19.11.2026).
+- **Eingang „Testen“** auf der Startseite (Testen → Wer? → Welcher Test?), Basis-Häkchen pro Kind in „Wer übt?“, Zuordnen „Jedem eins“ frei hinlegen, Testversion mit eigener Kennung (19.11.2026, Rückmeldungen Stefan).
 - Dokumentation `BACKLOG.md`, `IN_PROGRESS.md`, `CHANGELOG.md` (19.11.2026).
 
 ## 0.28.5 – 17.11.2026 (Release v0.28.5, eingefrorener Stand für Schulen)
