@@ -159,6 +159,17 @@ async def main():
           const two=evalItem(it,{links:[[0,0],[0,1]]},[]), ok=evalItem(it,{links:it.sol.map(l=>[...l])},[]), none=evalItem(it,{},[]);
           out.push(it.free && it.dn.length>n && two.ok===false && ok.ok===true && none===null); } return out.every(Boolean); })()""")
         if not fr: errs.append('V4 frei hinlegen: falsch gewertet')
+        # Startseite → Testen → Kind → Test (Stefan, 19.11.): Basis nur bei Häkchen, Ergebnissen oder Vorschlag
+        await pg.evaluate("(()=>{const p={id:'kt',name:'Tom',created:1};data.profiles.push(p); data.current=null; app.diag=null; app.ctx=null; app.wz=null; app.mode='home'; render();})()")
+        await pg.click('[data-ctx-test]'); await pg.wait_for_timeout(150); await pg.click('[data-home-pick="kt"]'); await pg.wait_for_timeout(150)
+        t0 = await pg.evaluate("[...document.querySelectorAll('[data-tstart]')].map(x=>x.dataset.tstart).join()")
+        if t0 != 'M1,M2,L,W': errs.append(f'Testen ohne Basis: {t0}')
+        await pg.evaluate("curProfile().subjOn={B:true}; render()")
+        t1 = await pg.evaluate("[...document.querySelectorAll('[data-tstart]')].map(x=>x.dataset.tstart).join()")
+        if t1 != 'B1,B2,B3,M1,M2,L,W': errs.append(f'Testen mit Basis: {t1}')
+        await pg.click('[data-tstart="B2"]'); await pg.wait_for_timeout(150)
+        if await pg.evaluate("[app.mode, app.diag?.subj, app.diag?.part, app.diag?.pid].join()") != 'diag,B,2,kt': errs.append('Testen startet nicht')
+        await pg.evaluate("app.diag=null; app.wz=null; app.mode='home'; data.current='ka'; render()")
         # Hinweis im Lernstand: Mathe „Zahlen bis 10, Stufe I“ nicht erreicht, noch kein Basis-Test
         await pg.evaluate("(()=>{const p={id:'kc',name:'Cem',created:1};data.profiles.push(p);setCell('kc','M|10|I',{status:'nicht',quelle:'test',sum:'0 von 2'});setCell('kc','L|L1',{status:'teilweise',quelle:'test'});})()")
         h = await pg.evaluate("teacherSectionHtml('kc').html")

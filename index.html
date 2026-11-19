@@ -541,10 +541,10 @@ body.rail-off .rail-show{display:block}
 @media(max-width:760px){ .rail-toggle,.rail-show{display:none!important} body.rail-off .rail{display:flex} }
 /* Start: Üben oder Unterricht */
 .ctx-tiles{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
-.ctx-tile{width:min(300px,42vw);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:26px;border:3px solid transparent;padding:18px}
+.ctx-tile{width:min(260px,29vw);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:26px;border:3px solid transparent;padding:18px}
 .ctx-tile svg{width:190px;height:auto}
 .ctx-tile b{font-size:34px;line-height:1.1}.ctx-tile span{font-size:18px;color:var(--muted);font-weight:700}
-.ctx-tile.practice{background:#eaf5ee;border-color:#9fd3ae}.ctx-tile.class{background:#e8effa;border-color:#8fb3ea}
+.ctx-tile.practice{background:#eaf5ee;border-color:#9fd3ae}.ctx-tile.class{background:#e8effa;border-color:#8fb3ea}.ctx-tile.test{background:#fdf1e1;border-color:#f0c48a}
 .ctx-tile:hover{transform:translateY(-3px)}
 .ct-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;width:min(980px,100%)}
 .ct-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;min-height:150px;border-radius:20px}
@@ -873,7 +873,10 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 /* Basis: Aufgaben mit Bildern (pick, sort, match, order, glance) */
 /* Vormachen ändert die Größe nicht (sonst springt der Inhalt): Rahmen als outline, Hinweise in einem festen Streifen oben */
 .dg-stage:has(>.bz),.dg-stage:has(.bz-watch),.dg-stage:has(.bz-you){position:relative}.dg-stage .it-wrap.bz{padding-top:62px}
-.ptests{margin-top:14px;display:flex;flex-direction:column;gap:8px}.ptest-row{display:flex;gap:8px;align-items:flex-start}.ptest-row>b{min-width:78px;padding-top:12px}.ptest-btns{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.tst-list{display:flex;flex-direction:column;gap:14px;width:min(860px,100%);text-align:left}.tst-subj h3{margin:0 0 6px;font-size:20px}.tst-hint{margin:0 0 6px}
+.tst-btns{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.tst-btn{display:flex;align-items:center;gap:10px;text-align:left;padding:12px 14px;min-height:64px;border:3px solid #f6d6a8;background:#fffaf2}.tst-btn>svg,.tst-btn>.ic,.tst-btn>i{width:28px;height:28px;flex:none}.tst-btn svg{width:28px;height:28px;flex:none}.tst-btn>span{display:flex;flex-direction:column;gap:2px}.tst-btn small{color:var(--muted);font-weight:400}
+.tst-btn.done{border-color:#e6e0d4;background:#fff}.tst-btn.re{border-style:dashed;border-color:#cfc6b4;background:#fff}.tst-btn.re.rec{border-color:var(--focus)}
 .blitz.dg-stage.dg-t{position:absolute} /* Test: Bühne bleibt in ihrem Feld (Kopf mit Fortschritt ist höher) */
 .dg-t:not(.bz-demo) .it-wrap.bz{padding-top:6px} /* Test: Streifen für „Schau zu“ nur beim Vormachen; „Jetzt du“ steht vor dem Auftrag */
 .bz-you-l{color:var(--ok)}
@@ -950,7 +953,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
   .wz-logo svg{width:36px;height:36px}
   .wz-brand b{font-size:22px}
   .wz-brand span{font-size:13px}
-  .ctx-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+  .ctx-tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%}
   .ctx-tile{width:auto;min-height:0;padding:12px 6px;border-radius:18px;gap:2px}
   .ctx-tile svg{width:100%;max-width:130px}
   .ctx-tile b{font-size:24px}
@@ -3999,15 +4002,14 @@ const PRIVACY_BOX = `<div class="privacy-box" role="note"><h3>Bevor du Kinder an
 <li><b>Schützen:</b> Gerätecode einschalten und eine Lehrkraft-PIN festlegen. Sicherungsdateien nur dort ablegen, wo die Schule Schülerdaten erlaubt.</li>
 <li><b>Löschen:</b> Kinder löschen, wenn sie die Lerngruppe verlassen, spätestens am Ende des folgenden Schuljahres.</li>
 </ul><div class="row" style="justify-content:flex-start;gap:12px;flex-wrap:wrap"><button type="button" class="icon-btn primary" id="privacy-ok">Verstanden</button><button type="button" class="link-btn" data-legal>Impressum und Datenschutz</button></div></div>`;
-/* Tests direkt starten (Fenster „Wer übt?“): eine Zeile je Fach, in der Reihenfolge der Fachwahl (Basis zuerst) */
+/* Tests und ihre Teile (Startseite → Testen): je Fach in der Reihenfolge der Fachwahl (Basis zuerst) */
 const PTESTS = {B:[['B1', 'Teil 1: Gleiches, Sortieren, Zuordnen'], ['B2', 'Teil 2: Mengen, Größe, Muster'], ['B3', 'Teil 3: Formen, Richtung, Reihe']],
   M:[['M1', 'Teil 1: Zahlen und Rechnen'], ['M2', 'Teil 2: Uhr, Größen, Hundertertafel']], D:[['L', 'Lese-Test'], ['W', 'Schreib-Test']]};
-const ptestRows = () => SUBJ_IDS.filter(sj => PTESTS[sj] && (!SUBJECTS[sj].optional || curProfile()?.subjOn?.[sj])).map(sj => `<div class="ptest-row"><b>${escHtml(SUBJECTS[sj].name)}</b><div class="ptest-btns">${PTESTS[sj].filter(([t]) => TESTS[t.replace(/\d$/, '')]).map(([t, l]) => `<button data-ptest="${t}" class="icon-btn primary">${icon('target')}<span style="display:inline">${l}</span></button>`).join('')}</div></div>`).join('');
 function renderProfiles(){
   const locked = !teacherOn();
   $('#profile-body').innerHTML = `<div class="plist">${[...data.profiles, {id:null, name:'Gast'}].map(p => `<div class="prow"><button class="pick ${p.id === data.current ? 'primary' : ''}" data-pid="${p.id ?? ''}">${p.sym && ICON[p.sym] ? iconSvg(p.sym, 26) + ' ' : ''}${escHtml(p.name)}${p.screening ? ' <small>✓ Screening</small>' : ''}</button>${p.id && !locked ? `<span class="popts"><select data-pworld="${p.id}" aria-label="Themenwelt für ${escHtml(p.name)}" title="Themenwelt: Wörter, Texte und Sachaufgaben">${Object.entries(WORLDS).map(([k, v]) => `<option value="${k}" ${(p.world || settings.world || 'HS') === k ? 'selected' : ''}>${k} · ${v}</option>`).join('')}</select><span class="psym"><button type="button" class="psym-btn" data-psym-open="${p.id}" aria-expanded="false" aria-label="Erkennungsbild für ${escHtml(p.name)} wählen" title="Erkennungsbild: So findet das Kind seinen Namen auch ohne Lesen">${p.sym && ICON[p.sym] ? iconSvg(p.sym, 30) : '<small>Bild</small>'}</button><span class="psym-grid" hidden><button type="button" data-psym-set="${p.id}" data-v="" aria-label="kein Bild" class="${p.sym ? '' : 'on'}">✕</button>${KID_SYMS.filter(k => ICON[k]).map(k => `<button type="button" data-psym-set="${p.id}" data-v="${k}" aria-label="${k}" title="${k}" class="${p.sym === k ? 'on' : ''}">${iconSvg(k, 34)}</button>`).join('')}</span></span><label class="ppic" title="Bildmodus: Anweisungen als Bilder, Rückmeldung als Zeichen – für Kinder, die (noch) nicht lesen"><input type="checkbox" data-ppic="${p.id}" ${p.pic ? 'checked' : ''}> ohne Lesen</label>${SUBJ_IDS.filter(sj => SUBJECTS[sj].optional).map(sj => `<label class="ppic" title="${escHtml(SUBJECTS[sj].long || SUBJECTS[sj].name)}: für dieses Kind anzeigen (Üben und Tests)"><input type="checkbox" data-subjon="${sj}" data-subjon-pid="${p.id}" ${p.subjOn?.[sj] ? 'checked' : ''}> ${escHtml(SUBJECTS[sj].name)}</label>`).join('')}</span><button class="icon-btn pdel" data-del="${p.id}" aria-label="${escHtml(p.name)} löschen">${icon('trash')}</button>` : ''}</div>`).join('')}</div>` +
     (locked ? `<p class="note">Kinder anlegen, löschen und Tests starten kann nur die Lehrkraft. <button class="linkish" id="p-unlock">Lehrkraft-PIN eingeben</button></p>` : !settings.privacyAck ? PRIVACY_BOX : `<form id="padd" class="row" style="margin-top:12px"><input id="pname" maxlength="20" placeholder="Vorname oder Kürzel" style="flex:1"><button class="primary" type="submit">Hinzufügen</button></form>`) +
-    `<div class="ptests">${ptestRows()}<span class="note">für ${escHtml(curName())}</span></div>
+    `
     <p class="note" style="margin-top:12px">Namen und Ergebnisse bleiben nur auf diesem Gerät gespeichert. Am besten Vornamen oder Kürzel verwenden.</p>`;
   { const p = curProfile(); $('#btn-profile').innerHTML = (p?.sym && ICON[p.sym] ? `<span class="psym-ic">${iconSvg(p.sym, 30)}</span>` : icon('user')) + `<span class="pname">${escHtml(curName())}</span>`; }
 }
@@ -6988,6 +6990,7 @@ function renderHome(){
   if(!app.ctx) return renderCtx();
   if(classMode()) return renderClassHome();
   const p = curProfile(), W = app.wz ||= {};
+  if(W.test) return renderTestHome(p, W);
   const needWho = data.profiles.length > 0;
   let step = W.step || (needWho && !p && !W.guest ? 'who' : 'subj');
   if(step === 'area' && !W.subj) step = 'subj';
@@ -7072,11 +7075,43 @@ const CTX_ILL = {
   practice:'<svg viewBox="0 0 160 110" aria-hidden="true"><rect x="38" y="30" width="84" height="64" rx="9" fill="#2b2930"/><rect x="45" y="37" width="70" height="50" rx="4" fill="#fdfbf6"/><rect x="54" y="68" width="12" height="12" rx="2" fill="#27834b"/><rect x="68" y="58" width="12" height="22" rx="2" fill="#346bc3"/><rect x="82" y="48" width="12" height="32" rx="2" fill="#c9414a"/><path d="M98 52l5 5 9-11" fill="none" stroke="#1f7a45" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="44" r="11" fill="#e8b45c"/><path d="M8 94c0-18 7-30 16-30s16 12 16 30z" fill="#e8890c"/><path d="M34 76l10 0" stroke="#e8890c" stroke-width="7" stroke-linecap="round"/></svg>',
   class:'<svg viewBox="0 0 160 110" aria-hidden="true"><rect x="22" y="6" width="116" height="62" rx="6" fill="#fff" stroke="#2b2930" stroke-width="4"/><path d="M34 48h92" stroke="#2b2930" stroke-width="2.5"/><path d="M40 44v8M58 44v8M76 44v8M94 44v8M112 44v8" stroke="#2b2930" stroke-width="2"/><path d="M40 44Q58 14 76 44" fill="none" stroke="#346bc3" stroke-width="3.5"/><path d="M76 44Q85 30 94 44" fill="none" stroke="#27834b" stroke-width="3.5"/><path d="M80 68v10" stroke="#2b2930" stroke-width="4"/><circle cx="36" cy="88" r="8" fill="#e8b45c"/><path d="M24 108c0-10 5-14 12-14s12 4 12 14z" fill="#346bc3"/><circle cx="80" cy="88" r="8" fill="#c98a5a"/><path d="M68 108c0-10 5-14 12-14s12 4 12 14z" fill="#27834b"/><circle cx="124" cy="88" r="8" fill="#8a6436"/><path d="M112 108c0-10 5-14 12-14s12 4 12 14z" fill="#c9414a"/></svg>'
 };
+CTX_ILL.test = '<svg viewBox="0 0 160 110" aria-hidden="true"><rect x="40" y="8" width="80" height="96" rx="8" fill="#fff" stroke="#2b2930" stroke-width="4"/><rect x="62" y="2" width="36" height="14" rx="4" fill="#2b2930"/><path d="M54 38l6 6 11-12M54 62l6 6 11-12" fill="none" stroke="#1f7a45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M80 40h26M80 64h26M80 88h26" stroke="#2b2930" stroke-width="4" stroke-linecap="round"/><rect x="54" y="80" width="16" height="16" rx="3" fill="none" stroke="#e8890c" stroke-width="4"/></svg>';
 const classMode = () => app.ctx === 'class';
+/* ---------- Testen: eigener Eingang auf der Startseite (Stefan, 19.11.) ----------
+   Testen → Wer? → Welcher Test? Nur für die Lehrkraft (PIN). Je Fach die Teile mit Stand; Basis nur, wenn beim Kind
+   eingeschaltet, schon getestet oder vom Lernstand vorgeschlagen (Mathe I / L1 nicht erreicht). */
+const PART_KEYS = {M1: k => /^[MRSZ]\|/.test(k), M2: k => /^[UGH]\|/.test(k), L: k => k.startsWith('L|'), W: k => k.startsWith('W|')};
+for(const [n, ls] of Object.entries(B_PARTS)) PART_KEYS['B' + n] = k => ls.includes(k.split('|')[1]);
+function testChoices(p){
+  const m = matrixOf(p.id), ks = Object.keys(m), low = ['M|10|I', 'L|L1'].filter(k => m[k] && !isOk(m[k].status)).length;
+  return SUBJ_IDS.filter(sj => PTESTS[sj]).map(sj => {
+    const tests = PTESTS[sj].filter(([t]) => TESTS[t.replace(/\d$/, '')]);
+    if(sj === 'B' && !p.subjOn?.B && !ks.some(k => PART_KEYS.B1(k) || PART_KEYS.B2(k) || PART_KEYS.B3(k)) && !low) return null;
+    const ids = [...new Set(tests.map(([t]) => t.replace(/\d$/, '')))];
+    const re = ids.filter(t => zoneReport(p.id, t).zones.length).map(t => ({t, since: practiceSinceDiag(p.id, t)}));
+    return {sj, hint: sj === 'B' && low && !ks.some(k => /^[VO]\|/.test(k)) ? 'Vorgeschlagen: Mathe „Zahlen bis 10, Stufe I“ oder Lesen L1 ist noch nicht erreicht.' : '',
+      tests: tests.map(([t, l]) => { const tid = t.replace(/\d$/, ''), done = ks.some(k => PART_KEYS[t]?.(k) && m[k].quelle !== 'abgeleitet'), at = p['lastDiag' + tid];
+        return {t, l, st: done ? `gemacht${at ? ` · zuletzt ${new Date(at).toLocaleDateString('de-DE')}` : ''}` : 'noch nicht gemacht', done}; }), re};
+  }).filter(Boolean);
+}
+function renderTestHome(p, W){
+  const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Testen mit der Lehrkraft</span></div></header>`, Q = '<b class="wz-q">?</b>';
+  const step = !data.profiles.length ? 'none' : p && W.step !== 'who' ? 'tst' : 'who';
+  const steps = [['ctx', 'Testen', CTX_ILL.test], ['who', p && step === 'tst' ? escHtml(p.name) : 'Wer?', p && step === 'tst' ? (p.sym && ICON[p.sym] ? iconSvg(p.sym, 40) : `<b class="wz-ini">${escHtml(p.name.slice(0, 1).toUpperCase())}</b>`) : Q], ['tst', 'Welcher Test?', Q]];
+  const si = Math.max(0, steps.findIndex(x => x[0] === step));
+  const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l, pic], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : 'next'}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben, Unterricht oder Testen wählen"' : `data-wz-step="${k}" title="Zurück zu diesem Schritt"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk">${pic}</span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
+  let body;
+  if(step === 'none') body = `<h2>Noch keine Kinder angelegt</h2><p class="home-sub">Lege zuerst oben rechts unter „Wer übt?“ ein Kind an. Dann kannst du hier einen Test starten.</p>`;
+  else if(step === 'who') body = `<h2>Wer macht den Test?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}" class="${q.sym && ICON[q.sym] ? 'has-sym' : ''}">${q.sym && ICON[q.sym] ? `<i class="kid-sym">${iconSvg(q.sym, 64)}</i>` : `<b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>`}${escHtml(q.name)}</button>`).join('')}</div>`;
+  else body = `<h2>Welcher Test für ${escHtml(p.name)}?</h2><div class="tst-list">${testChoices(p).map(c => `<section class="tst-subj"><h3>${escHtml(subjName(c.sj))}</h3>${c.hint ? `<p class="note tst-hint">${escHtml(c.hint)}</p>` : ''}<div class="tst-btns">${c.tests.map(x => `<button class="tst-btn${x.done ? ' done' : ''}" data-tstart="${x.t}">${icon('target')}<span><b>${escHtml(x.l)}</b><small>${escHtml(x.st)}</small></span></button>`).join('')}${c.re.map(r => `<button class="tst-btn re${r.since >= 25 ? ' rec' : ''}" data-tre="${r.t}">${icon('redo')}<span><b>Wiederholung${c.re.length > 1 ? ` ${escHtml(TESTS[r.t].name)}` : ''}</b><small>nur offene Stufen${r.since >= 25 ? ' · empfohlen' : ''}</small></span></button>`).join('')}</div></section>`).join('')}</div>
+    ${testChoices(p).some(c => c.sj === 'B') ? '' : '<p class="note">Basis (Grundlagen vor Zählen und Lesen) erscheint hier, wenn du es bei dem Kind unter „Wer übt?“ anhakst.</p>'}`;
+  const switchBtn = step === 'tst' ? `<button class="linkish home-switch" data-home-pick-again>Anderes Kind</button>` : '';
+  $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}${stair}</div><section class="wz-body">${body}</section>${switchBtn}<button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
+}
 function renderCtx(){
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
   $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}</div><section class="wz-body"><h2>Was machen wir?</h2>
-    <div class="ctx-tiles"><button class="ctx-tile practice" data-ctx="practice">${CTX_ILL.practice}<b>Üben</b><span>mit deinem Namen</span></button><button class="ctx-tile class" data-ctx="class">${CTX_ILL.class}<b>Unterricht</b><span>an der Tafel zeigen</span></button></div></section>
+    <div class="ctx-tiles"><button class="ctx-tile practice" data-ctx="practice">${CTX_ILL.practice}<b>Üben</b><span>mit deinem Namen</span></button><button class="ctx-tile class" data-ctx="class">${CTX_ILL.class}<b>Unterricht</b><span>an der Tafel zeigen</span></button><button class="ctx-tile test" data-ctx-test>${CTX_ILL.test}<b>Testen</b><span>mit der Lehrkraft</span></button></div></section>
     <button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
 }
 function renderClassHome(){
@@ -7517,11 +7552,13 @@ document.addEventListener('click', e => {
 
 function homeClick(e){
   const cx = e.target.closest('[data-ctx]'); if(cx){ setCtx(cx.dataset.ctx); return; }
+  if(e.target.closest('[data-ctx-test]')){ requireTeacher(() => { setCtx('practice'); app.wz = {test:true, step:'who'}; render(); }); return; }
+  const ts = e.target.closest('[data-tstart],[data-tre]'); if(ts){ requireTeacher(() => ts.dataset.tre ? diagStart(ts.dataset.tre, true) : diagStart(ts.dataset.tstart, false)); return; }
   if(e.target.closest('[data-ctx-reset]')){ setCtx(null); return; }
   const ct = e.target.closest('[data-ctool]'); if(ct){ setTool(ct.dataset.ctool); return; }
   const cw = e.target.closest('[data-ctworld]'); if(cw){ settings.world = cw.dataset.ctworld; saveSettings(); renderHome(); return; }
-  const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; app.wz = {step:'subj', guest: !data.current}; saveData(); renderProfiles(); render(); return; }
-  if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {step:'who'}; saveData(); renderProfiles(); render(); return; }
+  const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; app.wz = app.wz?.test ? {test:true, step:'tst'} : {step:'subj', guest: !data.current}; saveData(); renderProfiles(); render(); return; }
+  if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {...(app.wz?.test ? {test:true} : {}), step:'who'}; saveData(); renderProfiles(); render(); return; }
   const ws = e.target.closest('[data-wz-step]'); if(ws){ app.wz = {...app.wz, step: ws.dataset.wzStep}; renderHome(); return; }
   const wt = e.target.closest('[data-wz-mode]'); if(wt){ wzGo(wt.dataset); return; }
   const of = e.target.closest('[data-home-offer]'); if(of){ const sj = of.dataset.homeOffer; let z = zoneReport(data.current, sj).zones[0]; if(!z){ const f = frontierKeys(data.current, subjOfTest(sj)).find(k => TESTS[sj]?.homeKey ? TESTS[sj].homeKey(k) : keyInTest(k, sj)); if(f) z = {key:f, info:cellInfo(f)}; } if(z){ leaveMode(); applyOffer(z.info.offer.set); } return; }

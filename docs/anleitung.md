@@ -37,24 +37,25 @@ Jedes Kind bekommt ein eigenes Profil. Nimm Vornamen oder Kürzel.
 
 ![Fenster „Wer übt?“ mit eingetragenem Namen](bilder/03_kind.png)
 
-Das neue Kind ist jetzt ausgewählt (dunkel hinterlegt). Darunter stehen die vier Tests:
+Das neue Kind ist jetzt ausgewählt (dunkel hinterlegt).
 
-- **Mathe Teil 1:** Zahlen und Rechnen
-- **Mathe Teil 2:** Uhr und Größen
-- **Lese-Test**
-- **Schreib-Test**
+**Test starten:** Auf der Startseite gibt es neben „Üben“ und „Unterricht“ die Kachel **Testen** (mit Lehrkraft-PIN, falls eine eingestellt ist). Dann wählst du das Kind und danach den Test. Die Tests stehen nach Fach geordnet, jeweils mit dem Stand („noch nicht gemacht“ oder „gemacht · zuletzt am …“):
 
-Tipp auf den Test, den das Kind jetzt machen soll. Mach Teil 1 und Teil 2 am besten an verschiedenen Tagen.
+- **Basis** Teil 1 bis 3, nur wenn bei dem Kind „Basis“ angehakt ist, es schon Basis-Ergebnisse hat oder Mathe „Zahlen bis 10, Stufe I“ bzw. Lesen L1 nicht erreicht ist (dann mit Hinweis „Vorgeschlagen“)
+- **Mathe** Teil 1: Zahlen und Rechnen, Teil 2: Uhr, Größen, Hundertertafel
+- **Deutsch:** Lese-Test, Schreib-Test
+- **Wiederholung:** testet nur die offenen Stufen eines Tests noch einmal; „empfohlen“, wenn seit dem letzten Test viel geübt wurde
+
+Tipp auf den Test, den das Kind jetzt machen soll. Mach die Teile am besten an verschiedenen Tagen. Nach dem Test kommst du wieder zur Testauswahl; mit „Anderes Kind“ geht es mit dem nächsten Kind weiter. Im Lernstand eines Kindes kannst du Tests ebenfalls starten, direkt beim jeweiligen Fach.
 
 ### Themenwelt, Erkennungsbild und „ohne Lesen“
 
-Neben jedem Namen stehen (mit Lehrkraft-PIN) drei Einstellungen:
+Neben jedem Namen stehen (mit Lehrkraft-PIN) diese Einstellungen (dazu das Häkchen **Basis**, siehe „Basis: Grundlagen vor dem Zählen“):
 
 - **Themenwelt GS, HS oder BSS:** Stufen, Tests und Kompetenzmatrix bleiben gleich. Es ändern sich nur die Inhalte: Lesetexte, Pläne, Sachaufgaben und Einkaufszettel. In der Grundstufe geht es zum Beispiel um Pause, Tiere, Geburtstag und Stundenplan, in der Hauptstufe um Freizeit, Einkaufen und Kino, in der Berufsschulstufe zusätzlich um Praktikum, Arbeit und Wohnen. Die Ergebnisse bleiben dadurch vergleichbar. Auch Arbeitsblätter für ein Kind nehmen seine Themenwelt. Für Gast und Unterricht stellst du die Themenwelt in den Einstellungen (Hilfen) ein, im Unterricht auch direkt auf der Startseite.
 - **Erkennungsbild:** Tipp auf das Bildfeld und wähl eines der Bilder (Fisch, Ball, Sonne …). Es erscheint auf der Startseite statt des Anfangsbuchstabens. So finden auch Kinder, die ihren Namen noch nicht lesen, ihr Feld.
 - **ohne Lesen (Bildmodus):** für Kinder, die (noch) nicht lesen. Über jeder Übung steht ein Bild, das zeigt, was zu tun ist (antippen, auswählen, legen, eintippen, Uhr stellen). Der Satz steht nur noch klein darunter, für Erwachsene. Rückmeldungen kommen als großes Zeichen: grüner Haken für richtig, orangefarbener Pfeil für „noch einmal“. Knöpfe zeigen nur ihre Symbole, und der Rückblick nach einer Runde hat drei Bildknöpfe (Treppe = schwerer, Kreispfeil = noch eine Runde, Haus = Pause). Im Test bleibt der Text normal groß, weil dort die Lehrkraft mitliest.
 
-![Testkind A ist ausgewählt, Mathe Teil 1 ist markiert](bilder/04_tests.png)
 
 ## Schritt 3: Der Test
 
@@ -249,7 +250,7 @@ Nach „Prüfen“ wird Falsches rot markiert. Jede Stufe hat ein festes Bildsym
 
 **Wer Basis sieht:** Ohne gewähltes Kind (Gast) und in der Lehrkraft-Ansicht immer. Ein Kind sieht „Basis“, wenn du im Fenster **„Wer übt?“** neben „ohne Lesen“ das Häkchen **Basis** setzt (oder unter **Einstellungen → Kinder & Daten → Basis**), oder automatisch, sobald der Basis-Test eine Förderzone zeigt. So werden Kinder, die schon zählen und lesen, nicht damit gelangweilt. Unter „Heute für dich“ steht Basis dann an erster Stelle.
 
-**Basis-Test:** Im Fenster „Wer übt?“ (nur wenn bei dem gewählten Kind „Basis“ angehakt ist) und im Lernstand des Kindes unter „Basis“ gibt es drei kurze Teile, damit es für die Kinder nicht zu lang wird: **Teil 1** Gleiches, passt nicht, Sortieren, Zuordnen (V1–V4), **Teil 2** Mengen, Größe, Muster, auf einen Blick (V5–V8), **Teil 3** Formen, Richtung, von links nach rechts (O2–O4). Die Teile kann man an verschiedenen Tagen machen; jeder Teil hat etwa 12 bis 16 Aufgaben. Erkläre den Auftrag jeweils mit eigenen Worten.
+**Basis-Test:** Unter **Testen** auf der Startseite und im Lernstand des Kindes unter „Basis“ gibt es drei kurze Teile, damit es für die Kinder nicht zu lang wird: **Teil 1** Gleiches, passt nicht, Sortieren, Zuordnen (V1–V4), **Teil 2** Mengen, Größe, Muster, auf einen Blick (V5–V8), **Teil 3** Formen, Richtung, von links nach rechts (O2–O4). Die Teile kann man an verschiedenen Tagen machen; jeder Teil hat etwa 12 bis 16 Aufgaben. Erkläre den Auftrag jeweils mit eigenen Worten.
 
 So läuft eine Stufe ab: Zuerst kommt die **leichte Form**. Stufenweise macht sie einmal vor (orange umrandet, „Schau zu“, nichts antippbar; das zählt nicht). Mit „Jetzt du“ folgen zwei oder drei Aufgaben derselben Art, erst mit wenigen, dann mit mehr Bildern. Nur wenn die leichte Form klappt (2 von 2 oder 2 von 3), kommt die **schwerere Form**: wieder erst vormachen, wenn es eine andere Aufgabenart ist, dann zwei oder drei Aufgaben. Das Ergebnis: beide Formen gelöst = **erreicht**, nur die leichte = **teilweise**, die leichte noch nicht = **nicht erreicht**. Bricht ein Kind ab, bleibt das bis dahin Getestete gespeichert.
 

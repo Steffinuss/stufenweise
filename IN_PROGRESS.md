@@ -26,12 +26,13 @@ Rückmeldungen beim Ausprobieren (19.11.2026, eingearbeitet, Testversion cb56bb1
 - Basis-Test war schwer zu finden → jetzt auch im Fenster „Wer übt?“ (eine Zeile je Fach: Basis, Mathe, Deutsch).
 - Bei „Zuordnen“ konnte man nichts falsch machen → „Jedem eins“ frei hinlegen: mehr im Vorrat, unter ein Bild passen auch mehrere, richtig nur mit genau einem je Bild (Üben und Test).
 - Basis-Häkchen pro Kind direkt im Fenster „Wer übt?“ neben „ohne Lesen“; die Basis-Test-Knöpfe dort erscheinen nur, wenn es beim gewählten Kind angehakt ist.
+- Tests haben einen eigenen Eingang: Startseite → **Testen** (Lehrkraft-PIN) → Kind → Test, nach Fach geordnet mit Stand („noch nicht gemacht“ / „gemacht · zuletzt …“) und Wiederholung. Die Test-Knöpfe in „Wer übt?“ sind wieder entfernt; dort bleibt nur das Häkchen Basis. Lernstand behält seine Knöpfe.
 - Testversion zeigte 0.28.5 → zeigt jetzt „0.29.0 · Testversion <Stand> · <Datum>“.
 
 Noch offen, bevor der Basis-Test freigegeben wird:
 1. Stefan probiert den Test in der Testversion aus (am besten am Schul-iPad) und sieht sich die geänderten Texte V3/V6 an.
 2. Rückmeldung einarbeiten, `sh tests/run_all.sh lang`, Testversion aktualisieren.
 3. Nach Stefans OK: `entwicklung` in `main` zusammenführen, Version 0.29.0, `CHANGELOG.md` ergänzen, Release anlegen (Stefan, GitHub-Oberfläche).
-4. Bildschirmfotos der Anleitung erneuern (dafür zuerst `tests/anleitung_bilder.py` reparieren, bricht seit 0.24.0 ab).
+4. Bildschirmfotos der Anleitung erneuern (das Bild `04_tests.png` ist entfernt, weil es die alten Test-Knöpfe zeigte) (dafür zuerst `tests/anleitung_bilder.py` reparieren, bricht seit 0.24.0 ab).
 
 Achtung: Backlog-Punkt C (Progression in Basis) betrifft dieselben Aufgabenarten, auf denen der Test aufbaut. Siehe `BACKLOG.md`.
