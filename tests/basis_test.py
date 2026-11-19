@@ -154,6 +154,11 @@ async def main():
         await pg.click('#d-close', force=True); await pg.click('#d-close', force=True); await pg.wait_for_timeout(100)
         if await pg.evaluate("Object.keys(matrixOf('kb')).join()") != 'V|V1' or await pg.evaluate("app.mode") == 'diag': errs.append('Abbrechen: Ergebnis fehlt oder Test läuft weiter')
         if await pg.evaluate("settings.subject") != 'B' or await pg.evaluate("app.mode") != 'read': errs.append(f"nach Abbrechen: {await pg.evaluate('[settings.subject, app.mode, app.read.lvl]')}")
+        # V4 „Jedem eins“: frei hinlegen, mehr im Vorrat – man kann sich vertun (Stefan, 19.11.)
+        fr = await pg.evaluate("""(()=>{ const out=[]; for(let k=0;k<20;k++){ const it=AXES.V.arts.V4[0][1](k%3); const n=it.up.length;
+          const two=evalItem(it,{links:[[0,0],[0,1]]},[]), ok=evalItem(it,{links:it.sol.map(l=>[...l])},[]), none=evalItem(it,{},[]);
+          out.push(it.free && it.dn.length>n && two.ok===false && ok.ok===true && none===null); } return out.every(Boolean); })()""")
+        if not fr: errs.append('V4 frei hinlegen: falsch gewertet')
         # Hinweis im Lernstand: Mathe „Zahlen bis 10, Stufe I“ nicht erreicht, noch kein Basis-Test
         await pg.evaluate("(()=>{const p={id:'kc',name:'Cem',created:1};data.profiles.push(p);setCell('kc','M|10|I',{status:'nicht',quelle:'test',sum:'0 von 2'});setCell('kc','L|L1',{status:'teilweise',quelle:'test'});})()")
         h = await pg.evaluate("teacherSectionHtml('kc').html")

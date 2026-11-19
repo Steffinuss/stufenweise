@@ -899,6 +899,8 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .bz-tg{display:inline-flex;background:#fff;border-radius:16px;padding:8px;line-height:0;box-shadow:var(--shadow)}.bz-tg svg{width:80px;height:80px}
 .bz-slot{display:flex;align-items:center;justify-content:center;width:104px;height:104px;border:3px dashed #8fb0dc;border-radius:16px;background:#f6f9fe;position:relative;cursor:pointer}.bz-slot.full{border-style:solid;border-color:transparent;background:none}
 .bz-slot .bz-pl{padding:6px}.bz-slot .bz-pl svg{width:80px;height:80px}
+.bz-slot.multi{flex-wrap:wrap;gap:2px;align-content:center}.bz-slot.multi .bz-pl{padding:2px}.bz-slot.multi .bz-pl svg{width:44px;height:44px}
+.bz-slot.fb-no{border-color:var(--bad);border-style:dashed;background:#fbe3e3}
 .bz-slots{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.bz-slots .bz-slot{width:128px;height:128px}.bz-slots .bz-slot .bz-pl svg{width:104px;height:104px}.bz-slots.base .bz-slot{align-items:flex-end}
 .bz-sn{position:absolute;top:4px;left:8px;font-size:15px;font-weight:800;color:#6b88b3}.bz-arr{font-size:26px;color:#8fb0dc;font-weight:800}
 .bz-over{outline:4px solid var(--focus);outline-offset:3px}.bz-box.bz-over,.bz-col.bz-over .bz-slot,.bz-slot.bz-over{background:#fdf0dc}
@@ -6352,8 +6354,8 @@ function bzStage(it, r, opt = {}){
     return wrap(`<div class="bz-zone bz-goal"><div class="bz-boxes n${it.boxes.length}">${boxes}</div></div>${pool(things)}`);
   }
   if(it.type === 'match'){
-    const links = r.links || [], at = i => links.find(l => l[0] === i)?.[1], used = new Set(links.map(l => l[1]));
-    const slots = it.up.map((c, i) => { const j = at(i); return `<div class="bz-col" data-bzs="${i}" data-bzdrop="s${i}"><span class="bz-tg" aria-label="${escHtml(c.a)}">${c.h}</span><span class="bz-slot${j != null ? ' full' : ''}" role="button" aria-label="Platz unter ${escHtml(c.a)}">${j != null ? `<span class="bz-c bz-pl${bzMark(r, j)}${okAll ? ' fb-ok' : ''}" data-bzp="${j}" data-bzd="p${j}">${it.dn[j].h}</span>` : ''}</span></div>`; }).join('');
+    const links = r.links || [], used = new Set(links.map(l => l[1]));
+    const slots = it.up.map((c, i) => { const js = links.filter(l => l[0] === i).map(l => l[1]); return `<div class="bz-col" data-bzs="${i}" data-bzdrop="s${i}"><span class="bz-tg" aria-label="${escHtml(c.a)}">${c.h}</span><span class="bz-slot${js.length ? ' full' : ''}${js.length > 1 ? ' multi' : ''}${r.mark?.slots?.includes(i) ? ' fb-no' : ''}" role="button" aria-label="Platz unter ${escHtml(c.a)}">${js.map(j => `<span class="bz-c bz-pl${bzMark(r, j)}${okAll ? ' fb-ok' : ''}" data-bzp="${j}" data-bzd="p${j}">${it.dn[j].h}</span>`).join('')}</span></div>`; }).join('');
     const items = it.dn.map((c, j) => used.has(j) ? '' : `<button class="bz-c${r.sel === j ? ' sel' : ''}" data-bzp="${j}" data-bzd="p${j}" aria-pressed="${r.sel === j}" aria-label="${escHtml(c.a)}">${c.h}</button>`).join('');
     const ask = it.ask ? `<div class="bz-yn"><span>${escHtml(it.ask.q)}</span>${[[1, '✓', 'ja'], [0, '✗', 'nein']].map(([v, s, t]) => `<button data-bzyn="${v}" aria-pressed="${r.yes === v}" class="${r.yes === v && opt.feedback ? (okAll ? 'fb-ok' : 'fb-no') : ''}"><b aria-hidden="true">${s}</b> ${t}</button>`).join('')}</div>` : '';
     return wrap(`<div class="bz-zone bz-goal"><div class="bz-cols" style="--n:${it.up.length}">${slots}</div></div>${pool(items)}${ask}`);
@@ -6374,7 +6376,7 @@ function bzStage(it, r, opt = {}){
 function bzDrop(it, r, key, drop){
   const i = +key.slice(1); r.mark = null; r.sel = null;
   if(it.type === 'sort'){ r.place ||= []; r.place[i] = drop === 'pool' ? null : +drop.slice(3); return true; }
-  if(it.type === 'match'){ let L = (r.links || []).filter(l => l[1] !== i); if(drop !== 'pool'){ const s = +drop.slice(1); L = L.filter(l => l[0] !== s); L.push([s, i]); } r.links = L; return true; }
+  if(it.type === 'match'){ let L = (r.links || []).filter(l => l[1] !== i); if(drop !== 'pool'){ const s = +drop.slice(1); if(!it.free) L = L.filter(l => l[0] !== s); L.push([s, i]); } r.links = L; return true; }
   if(it.type === 'order' && it.slots){ const at = r.seq ||= []; const o = at.indexOf(i); if(o >= 0) at[o] = null; if(drop !== 'pool') at[+drop.slice(1)] = i; while(at.length && at.at(-1) == null) at.pop(); return true; }
   return false;
 }
@@ -6421,6 +6423,11 @@ function bzEval(it, r){
   if(it.type === 'match'){
     const links = r.links || [];
     if(it.ask){ if(r.yes == null) return null; const ok = r.yes === (it.ask.ok ? 1 : 0); if(!links.length) obs.push('ohne Hinlegen'); return {ok, given: r.yes ? 'ja' : 'nein', obs, mark:{}}; }
+    if(it.free){ if(!links.length) return null;
+      const cnt = it.up.map((_, i) => links.filter(l => l[0] === i).length), empty = cnt.map((c, i) => c ? -1 : i).filter(i => i >= 0);
+      const extra = it.up.flatMap((_, i) => links.filter(l => l[0] === i).slice(1).map(l => l[1])), wrong = links.filter(([i, j]) => it.up[i].k !== it.dn[j].k).map(l => l[1]);
+      if(empty.length) obs.push(`${empty.length}× leer gelassen`); if(extra.length) obs.push(`${extra.length}× zwei unter einem`); if(wrong.length) obs.push(`${wrong.length} falsch hingelegt`);
+      return {ok: !empty.length && !extra.length && !wrong.length, given: cnt.join(' / '), obs, mark:{bad:[...extra, ...wrong], slots: empty}}; }
     if(links.length < Math.min(it.up.length, it.dn.length)) return null;
     const bad = links.filter(([i, j]) => it.up[i].k !== it.dn[j].k).map(l => l[1]);
     if(bad.length) obs.push(`${bad.length} falsch hingelegt`);
@@ -6540,9 +6547,9 @@ AXES.V.arts = {
       return bzSortIt({prompt:'Lege jedes Ding in die Kiste mit der gleichen Farbe. Schau nur auf die Farbe!', label:`Sortieren nach Farbe, gemischt: ${cs.map(c => B_COL_NAME[c]).join(' und ')} (${n})`, tip:'Noch nicht. Schau nur auf die Farbe.'},
         ks.map((k, i) => ({...bzO(k, cs[col[i]], 1, 64), box: col[i]})), cs.map(c => ({h: bzSw(c), a: B_COL_NAME[c]}))); }]],
   V4: [
-    ['Jedem eins', st => { const [a, b] = bzPair(), n = bzN(st, [2, 3, 4]), bs = Array(n).fill(0);
-      return bzMatchIt({prompt:`Lege unter ${BZ_UNTER[a]} ${BZ_EIN[b]}.`, label:`Eins zu eins: ${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, tip:'Noch nicht. Unter jedes Ding gehört genau eins.'},
-        bs.map(() => ({...bzO(a), k:1})), bs.map(() => ({...bzO(b), k:1})), bs.map((_, i) => [i, i])); }],
+    ['Jedem eins', st => { const [a, b] = bzPair(), n = bzN(st, [2, 3, 4]), x = st ? pick([1, 2]) : 1, bs = Array(n).fill(0); /* frei hinlegen, mehr im Vorrat (Stefan, 19.11.) */
+      return {...bzMatchIt({prompt:`Lege unter ${BZ_UNTER[a]} ${BZ_EIN[b]}.`, label:`Eins zu eins: ${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name} (${n + x} im Vorrat)`, tip:'Noch nicht. Unter jedes Ding gehört genau eins. Es darf etwas übrig bleiben.'},
+        bs.map(() => ({...bzO(a), k:1})), Array(n + x).fill(0).map(() => ({...bzO(b), k:1})), bs.map((_, i) => [i, i])), free:true}; }],
     ['Reicht es?', st => { const [a, b] = bzPair(), n = bzN(st, [3, 4, 5]), m = n + pick(st ? [-1, 0, 1] : [-1, 1]), ok = m >= n;
       return bzMatchIt({prompt:`Lege unter ${BZ_UNTER[a]} ${BZ_EIN[b]}. Reicht es?`, label:`Reicht es? ${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}`, tip:'Noch nicht. Lege alle hin. Bleibt oben ein Platz leer? Bleibt unten etwas übrig?'},
         Array(n).fill(0).map(() => ({...bzO(a, null, 1, 72), k:1})), Array(m).fill(0).map(() => ({...bzO(b, null, 1, 72), k:1})), Array(Math.min(n, m)).fill(0).map((_, i) => [i, i]), {q:'Reicht es?', ok}); }]],

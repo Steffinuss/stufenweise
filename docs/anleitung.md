@@ -237,7 +237,7 @@ Die Aufgaben sind klar geteilt: **Oben hellblau** liegt die Vorgabe oder das Zie
 
 - **Bild wählen:** das gleiche Bild, was nicht passt, wo mehr sind, das größte, was als Nächstes kommt. Bei „Tippe alle … an“ können es mehrere sein.
 - **Sortieren:** jedes Ding in die richtige Kiste schieben. Ein Ding zurück in den Vorrat schieben (oder antippen) nimmt es wieder heraus.
-- **Dazulegen:** das gleiche Bild oder einen Löffel unter jede Tasse legen. Bei „Reicht es?“ sieht man dann, ob ein Platz leer bleibt oder etwas übrig ist, und wählt „ja“ oder „nein“.
+- **Dazulegen:** das gleiche Bild oder einen Löffel unter jede Tasse legen. Bei „Jedem eins“ liegen mehr Dinge im Vorrat als nötig, und unter eine Tasse passen auch zwei: Richtig ist es erst, wenn unter jeder Tasse genau eins liegt. So kann man sich wirklich vertun. Bei „Reicht es?“ sieht man, ob ein Platz leer bleibt oder etwas übrig ist, und wählt „ja“ oder „nein“.
 - **Der Reihe nach legen:** von klein nach groß oder die Bildfolge auf die Plätze 1, 2, 3 legen. Bei „Von links nach rechts“ tippen die Kinder die Bilder der Reihe nach an.
 - **Auf einen Blick:** Das Bild ist kurz zu sehen und wird dann abgedeckt. „Nochmal zeigen“ zeigt es noch einmal.
 
@@ -258,7 +258,7 @@ So läuft eine Stufe ab: Zuerst kommt die **leichte Form**. Stufenweise macht si
 | V1 Gleiches finden | gleiches Bild | gleiches Bild, gleiche Farbe |
 | V2 Was passt nicht? | eins ist ganz anders | nur die Farbe ist anders |
 | V3 Sortieren | gleiche Dinge nach Farbe | verschiedene Dinge nach Farbe |
-| V4 Eins zu eins | unter jede Tasse einen Löffel | „Reicht es?“ |
+| V4 Eins zu eins | unter jede Tasse genau einen Löffel (es bleibt etwas übrig) | „Reicht es?“ |
 | V5 Mengen | Wo sind mehr? | mehr oder gleich viele? |
 | V6 Größe | 3 Dinge ordnen | 4 Dinge ordnen |
 | V7 Muster | AB | AAB, ABB, ABC |
