@@ -17,3 +17,11 @@ Seit dem 17.11.2026 ist der Funktionsumfang eingefroren: Die App wird an Schulen
 ## Testversion und Daten
 
 Beide Versionen laufen unter derselben Adresse `steffinuss.github.io` und teilen sich damit den Speicher des Browsers. Die Testversion erkennt ihren Pfad (`/stufenweise-test/`) und setzt vor alle gespeicherten Schlüssel `test:`. So berührt sie die Daten der richtigen App nie. Oben steht in Rot „Testversion – nicht für den Unterricht“.
+
+## Planung und Stand
+
+- `BACKLOG.md`: geplante Aufgaben mit Status, offenen Fragen und vorgeschlagener Reihenfolge
+- `IN_PROGRESS.md`: was gerade begonnen ist und was bis zur Freigabe noch fehlt
+- `CHANGELOG.md`: abgeschlossene Änderungen je Version
+
+Wer eine Aufgabe beginnt, verschiebt sie vom Backlog nach `IN_PROGRESS.md`; nach der Freigabe kommt sie ins `CHANGELOG.md`.
