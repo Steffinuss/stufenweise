@@ -6248,6 +6248,19 @@ const B_OBJ = {
   hammer: {name:'Hammer', grp:'werkstatt', col:'rot', d: c => `<path d="M10 10h30v14H10z" fill="${B_METAL}" ${bS}/><path d="M40 13h8v8h-8" fill="${B_METAL}" ${bS}/><path d="M21 24h8v32h-8z" fill="${c}" ${bS}/>`},
   zange:  {name:'Zange', grp:'werkstatt', col:'blau', d: c => `<path d="M27 6l3 18M37 6l-3 18" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M27 6l3 18M37 6l-3 18" stroke="${B_METAL}" stroke-width="2.6" stroke-linecap="round"/><circle cx="32" cy="26" r="4" fill="${B_METAL}" ${bS}/><path d="M29 29q-6 12-9 27h6q3-13 6-25M35 29q6 12 9 27h-6q-3-13-6-25" fill="${c}" ${bS}/>`},
   dreher: {name:'Schraubenzieher', grp:'werkstatt', col:'gelb', d: c => `<path d="M24 34h16v18q0 4-4 4h-8q-4 0-4-4z" fill="${c}" ${bS}/><path d="M30 34V10h4v24" fill="${B_METAL}" ${bS}/><path d="M30 10l2-4 2 4" fill="${B_METAL}" ${bS}/>`},
+  /* Ähnlichkeit (Backlog C, Stefan 19.11.): sub = Untergruppe, fam = Familie mit Varianten, v = Variante (nur für die Stufe „fein“) */
+  messer: {name:'Messer', grp:'kueche', col:'grau', d: c => `<path d="M28 6q9 5 9 24v4h-9z" fill="${c}" ${bS}/><path d="M28 34h9l-1 20q0 4-3.5 4T29 54z" fill="${c}" ${bS}/>`},
+  teeloeffel:{name:'Teelöffel', grp:'kueche', col:'grau', v:1, d: c => `<ellipse cx="32" cy="22" rx="5.5" ry="8" fill="${c}" ${bS}/><path d="M31 30h2l.8 26q0 2-1.8 2t-1.8-2z" fill="${c}" ${bS}/>`},
+  kochloeffel:{name:'Kochlöffel', grp:'kueche', col:'gelb', v:1, d: c => `<ellipse cx="32" cy="15" rx="9" ry="10" fill="${c}" ${bS}/><path d="M29.5 24h5l.5 32q0 3-3 3t-3-3z" fill="${c}" ${bS}/>`},
+  kuchengabel:{name:'Kuchengabel', grp:'kueche', col:'grau', v:1, d: c => `<path d="M32 9v12M39 9v12" fill="none" ${bS}/><path d="M24 9h3.5v12H24z" fill="${c}" ${bS}/><path d="M24 21q0 6 8 7 7-1 7-7z" fill="${c}" ${bS}/><path d="M30 28h4l-1 28q0 3-1 3t-1-3z" fill="${c}" ${bS}/>`},
+  becher: {name:'Becher', grp:'kueche', col:'rot', v:1, d: c => `<path d="M16 10h26v40q0 6-6 6H22q-6 0-6-6z" fill="${c}" ${bS}/><path d="M42 18q11 0 11 11t-11 11" fill="none" ${bS}/>`},
+  schluessel:{name:'Schraubenschlüssel', grp:'werkstatt', col:'grau', d: c => `<path d="M23 6v8a9 9 0 0 0 18 0V6h-5v7a4 4 0 0 1-8 0V6z" fill="${c}" ${bS}/><path d="M29 22h6v33q0 4-3 4t-3-4z" fill="${c}" ${bS}/>`},
+  ringschluessel:{name:'Ringschlüssel', grp:'werkstatt', col:'grau', v:1, d: c => `<circle cx="32" cy="14" r="10" fill="${c}" ${bS}/><circle cx="32" cy="14" r="4.5" fill="#fff" ${bS}/><path d="M29 23h6v32q0 4-3 4t-3-4z" fill="${c}" ${bS}/>`},
+  faeustel:{name:'großer Hammer', grp:'werkstatt', col:'rot', v:1, d: c => `<path d="M10 8h44v18H10z" fill="${B_METAL}" ${bS}/><path d="M27 26h10v30H27z" fill="${c}" ${bS}/>`},
+  klauenhammer:{name:'Klauenhammer', grp:'werkstatt', col:'rot', v:1, d: c => `<path d="M12 10h26v14H12z" fill="${B_METAL}" ${bS}/><path d="M38 12q12 0 16 12l-5 2q-3-8-11-8z" fill="${B_METAL}" ${bS}/><path d="M21 24h8v32h-8z" fill="${c}" ${bS}/>`},
+  kreuzdreher:{name:'Kreuz-Schraubenzieher', grp:'werkstatt', col:'gelb', v:1, d: c => `<path d="M24 34h16v18q0 4-4 4h-8q-4 0-4-4z" fill="${c}" ${bS}/><path d="M28.5 38v14M32 38v14M35.5 38v14" stroke="${INK}" stroke-width="1.6"/><path d="M30 34V11h4v23" fill="${B_METAL}" ${bS}/><path d="M30 11l2-6 2 6" fill="${B_METAL}" ${bS}/>`},
+  kurzdreher:{name:'kurzer Schraubenzieher', grp:'werkstatt', col:'gelb', v:1, d: c => `<path d="M21 30h22v22q0 5-5 5H26q-5 0-5-5z" fill="${c}" ${bS}/><path d="M30 30V18h4v12" fill="${B_METAL}" ${bS}/><path d="M30 18l2-4 2 4" fill="${B_METAL}" ${bS}/>`},
+  nagel:  {name:'Nagel', grp:'werkstatt', col:'grau', d: c => `<path d="M22 8h20v5H22z" fill="${c}" ${bS}/><path d="M30 13h4v37l-2 8-2-8z" fill="${c}" ${bS}/>`},
   /* Kleidung */
   socke:  {name:'Socke', grp:'kleidung', col:'blau', d: c => `<path d="M22 6h18v28q0 6 6 10 6 4 3 10-3 6-11 3L22 48q-6-4-6-10V6z" fill="${c}" ${bS}/><path d="M22 14h18" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>`},
   muetze: {name:'Mütze', grp:'kleidung', col:'gruen', d: c => `<path d="M10 46q0-30 22-30t22 30z" fill="${c}" ${bS}/><path d="M8 46h48v8H8z" fill="${c}" ${bS}/><circle cx="32" cy="13" r="5" fill="#fff" ${bS}/>`},
@@ -6260,6 +6273,13 @@ const B_OBJ = {
   birne:  {name:'Birne', grp:'obst', col:'gelb', d: c => `<path d="M32 12q-6 0-7 10-1 7-6 12-6 8-1 16 4 6 14 6t14-6q5-8-1-16-5-5-6-12-1-10-7-10z" fill="${c}" ${bS}/><path d="M32 12q0-4 3-7" fill="none" ${bS}/>`}
 };
 const B_GRP = {kueche:'Küche', werkstatt:'Werkstatt', kleidung:'Kleidung', buero:'Schreibtisch', obst:'Obst'};
+/* Untergruppen und Familien (Backlog C): deutlich = andere Gruppe, ähnlich = gleiche Untergruppe, fein = Varianten derselben Familie */
+const B_SUB = {geschirr:['Geschirr', 'teller'], besteck:['Besteck', 'loeffel'], werkzeug:['Werkzeug', 'hammer'], kleinteil:['Schrauben, Nägel', 'schraube']};
+const B_FAM = {hammer:['hammer', 'faeustel', 'klauenhammer'], dreher:['dreher', 'kreuzdreher', 'kurzdreher'], schluessel:['schluessel', 'ringschluessel'],
+  loeffel:['loeffel', 'teeloeffel', 'kochloeffel'], gabel:['gabel', 'kuchengabel'], tasse:['tasse', 'becher']};
+Object.entries({geschirr:['tasse', 'teller', 'glas', 'becher'], besteck:['loeffel', 'gabel', 'messer', 'teeloeffel', 'kochloeffel', 'kuchengabel'],
+  werkzeug:['hammer', 'zange', 'dreher', 'schluessel', 'ringschluessel', 'faeustel', 'klauenhammer', 'kreuzdreher', 'kurzdreher'], kleinteil:['schraube', 'mutter', 'nagel']}).forEach(([sub, ks]) => ks.forEach(k => B_OBJ[k].sub = sub));
+Object.entries(B_FAM).forEach(([f, ks]) => ks.forEach(k => B_OBJ[k].fam = f));
 /* Gegenstand als SVG; size = Bildgröße in px; scale = Größe des Dings im Bild (für „größer/kleiner“), unten verankert */
 function bObj(kind, col, size = 64, scale = 1){
   const o = B_OBJ[kind], c = B_COL[col || o.col] || col || B_COL[o.col];
@@ -6498,10 +6518,28 @@ function glanceArm(it, r, still, redraw){
 /* ---------- Aufgaben je Stufe: Aufgabenarten von leicht nach schwer (Stefan, 17.11.: nicht mischen, viel wiederholen) ----------
    AXES.X.arts[Stufe] = [[Name, gen(st)], …]. Beim Üben bleibt das Kind bei einer Aufgabenart; vor jeder neuen Art wird sie
    einmal vorgemacht. st = 0, 1, 2 macht die Aufgabe innerhalb der Art schrittweise schwerer (weniger → mehr Bilder).
+   Arten mit drittem Eintrag {sim:true} haben st = 0…5 (siehe bzSim): zusätzlich deutlich → ähnlich → fein.
    Die erste Art ist der Kern (für den späteren Basis-Test). items[Stufe] = die Generatoren (st = 2). */
 const bzN = (st, a = [2, 3, 4]) => a[Math.min(st ?? 2, a.length - 1)];
 const bzKinds = (f = () => true) => bKinds(f);
 const bzPair = () => pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]);
+/* Zwei Richtungen der Schwierigkeit (Backlog C, Stefan 19.11.): mehr Bilder und größere Ähnlichkeit, bei gleichen Inhalten.
+   Aufgabenarten mit {sim:true} haben 6 Schritte st = 0…5: deutlich (wenige, mehr) → ähnlich (wenige, mehr) → fein (wenige, mehr).
+   deutlich = andere Gruppe (Küche – Werkstatt), ähnlich = gleiche Untergruppe (Hammer – Zange), fein = Varianten (Hammer – Klauenhammer). */
+const BZ_SIM = ['deutlich', 'ähnlich', 'fein'];
+const bzSim = st => { const sim = Math.min(2, (st || 0) >> 1); return {sim, q: sim ? ((st & 1) ? 2 : 1) : ((st & 1) ? 1 : 0)}; };
+const bzSubKinds = (sub, withVar) => bKinds(o => o.sub === sub, withVar);
+/* Ziel passend zur Ähnlichkeit: fein nur aus Familien, ähnlich aus Untergruppen mit genug Mitgliedern */
+const bzSimTarget = sim => sim === 2 ? pick(Object.values(B_FAM).flat()) : sim === 1 ? pick(bKinds(o => !!o.sub)) : pick(bzKinds());
+/* n Dinge, die anders sind als k – je nach Ähnlichkeit aus anderer Gruppe, gleicher Untergruppe oder gleicher Familie (bei Bedarf wiederholt) */
+function bzSimOthers(k, sim, n){
+  const o = B_OBJ[k], pool = sim === 2 ? B_FAM[o.fam].filter(x => x !== k) : sim === 1 ? bzSubKinds(o.sub).filter(x => x !== k) : bzKinds(x => x.grp !== o.grp);
+  const fill = sim === 2 ? bzSubKinds(o.sub).filter(x => x !== k && !pool.includes(x)) : [];
+  const out = shuffle(pool).slice(0, n); for(const x of shuffle(fill)) if(out.length < n) out.push(x); while(out.length < n) out.push(pick(pool));
+  return out;
+}
+const bzSimTag = sim => sim ? ` – ${BZ_SIM[sim]}` : '';
+const BZ_FAMN = {loeffel:'Löffel', gabel:'Gabeln', hammer:'Hämmer', dreher:'Schraubenzieher', tasse:'Tassen und Becher', schluessel:'Schlüssel'};
 const BZ_EIN = {loeffel:'einen Löffel', gabel:'eine Gabel', mutter:'eine Mutter'};
 const BZ_UNTER = {tasse:'jede Tasse', teller:'jeden Teller', schraube:'jede Schraube'};
 const BZ_PAT = () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3); return fs.map((f, i) => [f, cs[i]]); };
@@ -6516,11 +6554,11 @@ const bzSeqPic = (s, j) => bzC(s.pics[j]().replace('<svg class="b-obj"', '<svg c
 
 AXES.V.arts = {
   V1: [
-    ['Gleiches Bild', st => { const k = pick(bzKinds()), others = shuffle(bzKinds(o => o.grp !== B_OBJ[k].grp)).slice(0, bzN(st) - 1), cells = shuffle([k, ...others]);
-      return bzPick({prompt:'Tippe das gleiche Bild an.', label:`Gleiches Bild: ${B_OBJ[k].name} (${cells.length})`, tip:'Noch nicht. Schau das Bild oben genau an.'}, cells.map(x => bzO(x)), cells.indexOf(k), bzTarget(bObj(k, null, BZ))); }],
-    ['Gleiches dazulegen', st => { const ks = shuffle(bzKinds()).slice(0, st ? 3 : 2), bs = shuffle(ks);
-      return bzMatchIt({prompt:'Lege das gleiche Bild darunter.', label:`Gleiches dazulegen: ${ks.map(k => B_OBJ[k].name).join(', ')}`, tip:'Noch nicht. Das rote Bild liegt falsch. Schieb es an den richtigen Platz.'},
-        ks.map(k => ({...bzO(k), k})), bs.map(k => ({...bzO(k), k})), ks.map((k, i) => [i, bs.indexOf(k)])); }],
+    ['Gleiches Bild', st => { const {sim, q} = bzSim(st), k = bzSimTarget(sim), others = bzSimOthers(k, sim, bzN(q) - 1), cells = shuffle([k, ...others]);
+      return bzPick({prompt:'Tippe das gleiche Bild an.', label:`Gleiches Bild${bzSimTag(sim)}: ${B_OBJ[k].name} (${cells.length})`, tip:'Noch nicht. Schau das Bild oben genau an.'}, cells.map(x => bzO(x)), cells.indexOf(k), bzTarget(bObj(k, null, BZ))); }, {sim:true}],
+    ['Gleiches dazulegen', st => { const {sim, q} = bzSim(st), n = q ? 3 : 2, k0 = bzSimTarget(sim), ks = sim ? [k0, ...shuffle(sim === 2 ? B_FAM[B_OBJ[k0].fam].filter(x => x !== k0) : bzSubKinds(B_OBJ[k0].sub).filter(x => x !== k0)).slice(0, n - 1)] : shuffle(bzKinds()).slice(0, n), bs = shuffle(ks);
+      return bzMatchIt({prompt:'Lege das gleiche Bild darunter.', label:`Gleiches dazulegen${bzSimTag(sim)}: ${ks.map(k => B_OBJ[k].name).join(', ')}`, tip:'Noch nicht. Das rote Bild liegt falsch. Schieb es an den richtigen Platz.'},
+        ks.map(k => ({...bzO(k), k})), bs.map(k => ({...bzO(k), k})), ks.map((k, i) => [i, bs.indexOf(k)])); }, {sim:true}],
     ['Gleiche Farbe', st => { const k = pick(bzKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), oc = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bzKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
       const opts = shuffle([[k, col], [k, oc[0]], ...(st >= 1 ? [[k, oc[1]]] : []), ...(st >= 2 ? [[k2, col]] : [])]), ok = opts.findIndex(o => o[0] === k && o[1] === col);
       return bzPick({prompt:'Tippe das gleiche Bild an. Schau auf die Farbe!', label:`Gleiches Bild mit Farbe: ${B_OBJ[k].name} ${B_COL_NAME[col]} (${opts.length})`, tip:'Noch nicht. Ding und Farbe müssen gleich sein.'}, opts.map(([x, c]) => bzO(x, c)), ok, bzTarget(bObj(k, col, BZ))); }],
@@ -6528,24 +6566,34 @@ AXES.V.arts = {
       return bzMatchIt({prompt:'Lege jedes Ding unter die gleiche Farbe.', label:`Gleiche Farbe dazulegen: ${cs.map(c => B_COL_NAME[c]).join(', ')}`, tip:'Noch nicht. Schau auf die Farbe. Schieb das rote Ding an den richtigen Platz.'},
         cs.map((c, i) => ({...bzO(ks[i], c), k:c})), ord.map(i => ({...bzO(ks[n + i], cs[i]), k:cs[i]})), cs.map((c, i) => [i, ord.indexOf(i)])); }]],
   V2: [
-    ['Ganz anders', st => { const n = st ? 4 : 3, k = pick(bzKinds()), k2 = pick(bzKinds(o => o.grp !== B_OBJ[k].grp)), i = rnd(0, n - 1);
-      return bzPick({prompt:'Was passt nicht? Tippe es an.', label:`Passt nicht: ${B_OBJ[k2].name} bei ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Die anderen sind alle gleich.'}, [...Array(n).keys()].map(j => bzO(j === i ? k2 : k)), i); }],
+    ['Ganz anders', st => { const {sim, q} = bzSim(st), n = q ? 4 : 3, k = bzSimTarget(sim), k2 = bzSimOthers(k, sim, 1)[0], i = rnd(0, n - 1);
+      return bzPick({prompt:'Was passt nicht? Tippe es an.', label:`Passt nicht${bzSimTag(sim)}: ${B_OBJ[k2].name} bei ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Die anderen sind alle gleich.'}, [...Array(n).keys()].map(j => bzO(j === i ? k2 : k)), i); }, {sim:true}],
     ['Andere Farbe', st => { const n = st ? 4 : 3, k = pick(bzKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), col2 = pick(B_COLS4.filter(c => c !== col)), i = rnd(0, n - 1);
       return bzPick({prompt:'Was passt nicht? Schau auf die Farbe!', label:`Passt nicht (Farbe): ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Schau auf die Farbe.'}, [...Array(n).keys()].map(j => bzO(k, j === i ? col2 : col)), i); }],
     ['Andere Größe', st => { const n = st ? 4 : 3, k = pick(bzKinds()), i = rnd(0, n - 1);
       return bzPick({prompt:'Was passt nicht? Schau, wie groß es ist!', label:`Passt nicht (Größe): ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Schau, wie groß die Dinge sind.', cls:'base'}, [...Array(n).keys()].map(j => bzO(k, null, j === i ? (st < 2 ? .5 : .65) : 1)), i); }],
-    ['Gehört nicht dazu', st => { const n = st ? 4 : 3, g = pick(['kueche', 'werkstatt']), same = shuffle(bzKinds(o => o.grp === g)).slice(0, n - 1), odd = pick(bzKinds(o => o.grp !== g)), i = rnd(0, n - 1), ks = [...same]; ks.splice(i, 0, odd);
-      return bzPick({prompt:'Was gehört nicht dazu? Tippe es an.', label:`Gehört nicht dazu: ${B_OBJ[odd].name} (${B_GRP[g]}, ${n})`, tip:'Noch nicht. Die anderen gehören zusammen.'}, ks.map(x => bzO(x)), i); }]],
+    ['Gehört nicht dazu', st => { const {sim, q} = bzSim(st), n = q ? 4 : 3, g = pick(['kueche', 'werkstatt']), sub = g === 'kueche' ? pick(['besteck', 'geschirr']) : 'werkzeug', i = rnd(0, n - 1);
+      /* deutlich: Dinge aus Küche oder Werkstatt + eins von woanders; ähnlich: nur eine Untergruppe (Werkzeug, Besteck …) + eins von woanders;
+         fein: Varianten aus der Untergruppe + eins aus derselben Gruppe, aber anderer Untergruppe (z. B. Schraube bei Werkzeugen) */
+      const same = sim === 0 ? shuffle(bzKinds(o => o.grp === g)).slice(0, n - 1) : shuffle(bzSubKinds(sub, sim === 2)).slice(0, n - 1);
+      const odd = sim === 2 ? pick(bzKinds(o => o.grp === g && o.sub && o.sub !== sub)) : pick(bzKinds(o => o.grp !== g)), ks = [...same]; ks.splice(i, 0, odd);
+      return bzPick({prompt:'Was gehört nicht dazu? Tippe es an.', label:`Gehört nicht dazu${bzSimTag(sim)}: ${B_OBJ[odd].name} (${sim ? B_SUB[sub][0] : B_GRP[g]}, ${n})`, tip:'Noch nicht. Die anderen gehören zusammen.'}, ks.map(x => bzO(x)), i); }, {sim:true}]],
   V3: [
     ['Nach Farbe', st => { const n = st ? 6 : 4, k = pick(['tasse', 'socke', 'knopf', 'teller', 'muetze']), cs = shuffle(B_COLS4).slice(0, 2), col = shuffle([...Array(n).keys()].map(i => i % 2));
       return bzSortIt({prompt:'Lege jedes Ding in die Kiste mit der gleichen Farbe.', label:`Sortieren nach Farbe: ${B_OBJ[k].name}, ${cs.map(c => B_COL_NAME[c]).join(' und ')} (${n})`, tip:'Noch nicht. Die rot markierten Dinge sind in der falschen Kiste. Schieb sie in die andere Kiste.'},
         col.map(c => ({...bzO(k, cs[c], 1, 64), box:c})), cs.map(c => ({h: bzSw(c), a: B_COL_NAME[c]}))); }],
-    ['Nach Größe', st => { const n = st ? 6 : 4, k = pick(['tasse', 'apfel', 'schraube', 'stift', 'glas']), big = shuffle([...Array(n).keys()].map(i => i % 2));
-      return bzSortIt({prompt:'Lege die großen Dinge in eine Kiste und die kleinen in die andere.', label:`Sortieren nach Größe: ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Schau, wie groß die Dinge sind.'},
-        big.map(b => ({...bzO(k, null, b ? .5 : 1, 64), box:b})), [['groß', 1], ['klein', .5]].map(([a, s]) => ({h:`${bzSizeBox(s)}<b>${a}</b>`, a}))); }],
-    ['Küche und Werkstatt', st => { const n = st ? 3 : 2, ga = shuffle(['tasse', 'loeffel', 'gabel', 'glas']).slice(0, n), gb = shuffle(['schraube', 'mutter', 'zange', 'dreher']).slice(0, n), all = shuffle([...ga, ...gb]), boxes = shuffle([['kueche', 'teller'], ['werkstatt', 'hammer']]);
-      return bzSortIt({prompt:'Was gehört in die Küche, was in die Werkstatt? Lege es in die richtige Kiste.', label:`Sortieren: Küche und Werkstatt (${2*n})`, tip:'Noch nicht. Die rot markierten Dinge sind in der falschen Kiste. Schieb sie in die andere Kiste.'},
-        all.map(k => ({...bzO(k, null, 1, 64), box: boxes.findIndex(b => B_OBJ[k].grp === b[0])})), boxes.map(([g, k]) => ({h:`${bObj(k, null, 60)}<b>${B_GRP[g]}</b>`, a:B_GRP[g]}))); }],
+    ['Nach Größe', st => { const {sim, q} = bzSim(st), n = q ? 6 : 4, k = pick(['tasse', 'apfel', 'schraube', 'stift', 'glas']), sm = [.5, .65, .78][sim], big = shuffle([...Array(n).keys()].map(i => i % 2));
+      return bzSortIt({prompt:'Lege die großen Dinge in eine Kiste und die kleinen in die andere.', label:`Sortieren nach Größe${bzSimTag(sim)}: ${B_OBJ[k].name} (${n})`, tip:'Noch nicht. Schau, wie groß die Dinge sind.'},
+        big.map(b => ({...bzO(k, null, b ? sm : 1, 64), box:b})), [['groß', 1], ['klein', sm]].map(([a, s]) => ({h:`${bzSizeBox(s)}<b>${a}</b>`, a}))); }, {sim:true}],
+    ['Nach Art', st => { const {sim, q} = bzSim(st), n = q ? 3 : 2;
+      /* deutlich: Küche – Werkstatt; ähnlich: Untergruppen einer Gruppe (Besteck – Geschirr, Werkzeug – Schrauben und Nägel); fein: zwei Familien mit Varianten (Löffel – Gabeln, Hammer – Schraubenzieher) */
+      const sets = sim === 0 ? [['kueche', 'teller', B_GRP.kueche, bzKinds(o => o.grp === 'kueche')], ['werkstatt', 'hammer', B_GRP.werkstatt, bzKinds(o => o.grp === 'werkstatt')]]
+        : sim === 1 ? pick([['besteck', 'geschirr'], ['werkzeug', 'kleinteil']]).map(sb => [sb, B_SUB[sb][1], B_SUB[sb][0], bzSubKinds(sb)])
+        : pick([['loeffel', 'gabel'], ['hammer', 'dreher'], ['tasse', 'loeffel']]).map(f => [f, f, BZ_FAMN[f], B_FAM[f]]);
+      const boxes = shuffle(sets), pickN = ks => sim === 2 ? shuffle(ks).slice(0, n).concat(shuffle(ks).slice(0, Math.max(0, n - ks.length))) : shuffle(ks).slice(0, n);
+      const all = shuffle(boxes.flatMap((b, j) => pickN(b[3]).map(k => [k, j])));
+      return bzSortIt({prompt: sim === 0 ? 'Was gehört in die Küche, was in die Werkstatt? Lege es in die richtige Kiste.' : 'Was gehört zusammen? Lege jedes Ding in die richtige Kiste.', label:`Sortieren nach Art${bzSimTag(sim)}: ${boxes.map(b => b[2]).join(' und ')} (${all.length})`, tip:'Noch nicht. Die rot markierten Dinge sind in der falschen Kiste. Schieb sie in die andere Kiste.'},
+        all.map(([k, j]) => ({...bzO(k, null, 1, 64), box:j})), boxes.map(b => ({h:`${bObj(b[1], null, 60)}<b>${b[2]}</b>`, a:b[2]}))); }, {sim:true}],
     ['Farbe, verschiedene Dinge', st => { const n = st ? 6 : 4, cs = shuffle(B_COLS4).slice(0, 2), ks = shuffle(bzKinds(o => o.grp !== 'werkstatt')).slice(0, n), col = shuffle([...Array(n).keys()].map(i => i % 2));
       return bzSortIt({prompt:'Lege jedes Ding in die Kiste mit der gleichen Farbe. Schau nur auf die Farbe!', label:`Sortieren nach Farbe, gemischt: ${cs.map(c => B_COL_NAME[c]).join(' und ')} (${n})`, tip:'Noch nicht. Schau nur auf die Farbe.'},
         ks.map((k, i) => ({...bzO(k, cs[col[i]], 1, 64), box: col[i]})), cs.map(c => ({h: bzSw(c), a: B_COL_NAME[c]}))); }]],
@@ -6614,13 +6662,15 @@ AXES.O.arts = {
       return {type:'order', slots:true, prompt:'Lege die Bilder der Reihe nach hin: Was war zuerst, was dann?', label:`Bildfolge: ${s.name}`, tip:'Noch nicht. Was war ganz am Anfang? Das kommt auf Platz 1.',
         cells: ord.map(j => bzSeqPic(s, j)), want:[0, 1, 2].map(j => ord.indexOf(j))}; }]]
 };
-for(const ax of ['V', 'O']) for(const [l, arts] of Object.entries(AXES[ax].arts)) AXES[ax].items[l] = arts.map(([, g], i) => () => ({...g(2), ...(i ? {} : {kern:true})}));
+for(const ax of ['V', 'O']) for(const [l, arts] of Object.entries(AXES[ax].arts)) AXES[ax].items[l] = arts.map(([, g, o], i) => () => ({...g(o?.sim ? 1 : 2), ...(i ? {} : {kern:true})}));
 
 /* ---------- Üben: bei einer Aufgabenart bleiben, vorher vormachen ---------- */
 const BZ_NEXT = 8; /* so oft beim ersten Versuch richtig, dann wird die nächste Aufgabenart angeboten */
 const bzArts = l => AXES[String(l)[0]]?.arts?.[l];
 const bzMem = (l = app.read.lvl) => { const R = app.read, k = `${data.current || 'guest'}|${l}`; return (R.artMem ||= {})[k] ||= {art:0, ok:0}; };
-const bzStep = m => m.ok < 3 ? 0 : m.ok < 6 ? 1 : 2;
+const bzStep = (m, art) => art?.[2]?.sim ? Math.min(5, m.ok >> 1) : m.ok < 3 ? 0 : m.ok < 6 ? 1 : 2; /* Arten mit Ähnlichkeit: alle 2 Richtigen ein Schritt (0…5) */
+const bzNextAt = art => art?.[2]?.sim ? 12 : BZ_NEXT; /* ab hier „Nächste Aufgabe“ */
+const bzTop = art => art?.[2]?.sim ? 10 : 6;
 /* Vormachen: Zwischenstände der Lösung, Schritt für Schritt */
 function bzDemoSteps(it){
   const S = [{}];
@@ -6860,7 +6910,7 @@ function readNew(){
   if(!READ[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl] && !Z_ITEMS[R.lvl] && !axBank(R.lvl)) R.lvl = 'L4';
   const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl);
   const arts = bzArts(R.lvl), m = arts && bzMem(); if(m && !arts[m.art]) Object.assign(m, {art:0, ok:0});
-  freshNew(); let it, tries = 0; do { it = arts ? arts[m.art][1](bzStep(m)) : pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
+  freshNew(); let it, tries = 0; do { it = arts ? arts[m.art][1](bzStep(m, arts[m.art])) : pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
   Object.assign(R, {item: it, r:{}, fb:null, tries:0, spoken:false, demo:false});
   setHint(''); /* neue Aufgabe: „Richtig“ der vorigen Aufgabe weg, auch über „Neue Aufgabe“ oben */
   /* Basis: vor jeder neuen Aufgabenart einmal vormachen (je Kind und Sitzung) */
@@ -6901,7 +6951,7 @@ function renderRead(){
   /* Basis: erst einpassen, dann Hand und Bewegung – sonst zählen verschobene Dinge beim Einpassen mit und die Aufgabe springt */
   const bzAfter = () => { itFit(); if(R.demo && R.r.hand) $('#stage').querySelector(R.r.hand)?.insertAdjacentHTML('beforeend', BZ_HAND); if(bzPre) bzFlip(bzPre, R.demo ? 900 : 260); };
   if(arts && R.demo){ $('#controls').innerHTML = toolBtn({id:'r-demo', ic:'eye', label:'Nochmal vormachen', disabled: !R.demoEnd}) + toolBtn({id:'r-try', ic:'next', label:'Jetzt du', primary:true, disabled: !R.demoEnd, cls: R.demoEnd ? 'bz-go' : ''}); bzAfter(); return; }
-  if(arts){ const m = bzMem(), nx = m.art < arts.length - 1 ? 'Nächste Aufgabe' : li >= 0 && li < lv.length - 1 && !guideOn() ? 'Nächste Stufe' : '', up = R.fb?.ok && m.ok >= BZ_NEXT && nx && !roundOn();
+  if(arts){ const m = bzMem(), nx = m.art < arts.length - 1 ? 'Nächste Aufgabe' : li >= 0 && li < lv.length - 1 && !guideOn() ? 'Nächste Stufe' : '', up = R.fb?.ok && m.ok >= bzNextAt(arts[m.art]) && nx && !roundOn();
     $('#controls').innerHTML = (up ? toolBtn({id:'r-art-up', ic:'next', label:nx, primary:true}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label: up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: !evalItem(it, R.r, [])})) +
       (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '') + '<span class="sep"></span>' + toolBtn({id:'r-demo', ic:'eye', label:'Vormachen'});
     bzAfter(); glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it && !R.demo, renderRead); return; }
@@ -6921,12 +6971,12 @@ function readCheck(){
   if(isFill) R.r.wrong = new Set(res.wrong || []);
   if(BZ_TYPES.includes(it.type)) R.r.mark = res.ok ? null : res.mark;
   R.fb = {choice: R.r.choice, ok: res.ok};
-  const bzm = bzArts(R.lvl) && bzMem();
-  if(bzm){ if(res.ok && R.tries === 0) bzm.ok++; else if(!res.ok && R.tries === 0 && (R.miss || 0) >= 2) bzm.ok = Math.max(0, Math.min(bzm.ok, 6) - 3); /* dreimal daneben: wieder leichter */ }
+  const bzm = bzArts(R.lvl) && bzMem(), bzArt = bzm && bzArts(R.lvl)[bzm.art];
+  if(bzm){ if(res.ok && R.tries === 0) bzm.ok++; else if(!res.ok && R.tries === 0 && (R.miss || 0) >= 2) bzm.ok = Math.max(0, Math.min(bzm.ok, bzTop(bzArt)) - 3); /* dreimal daneben: wieder leichter */ }
   if(res.ok){
     logAttempt({mode: rdMode(R.lvl), task: it.label, ok: R.tries === 0, tries: R.tries + 1, lvl: R.lvl, given: res.given, ...(bzm ? {art: bzm.art} : {})});
     if(R.tries === 0){ R.streak = (R.streak || 0) + 1; R.miss = 0; } else R.streak = 0;
-    renderRead(); if(bzm) setHint(bzm.ok === BZ_NEXT && R.tries === 0 ? 'Richtig! Das kannst du schon gut.' : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); else setHint(R.streak >= 5 && !roundOn() && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS, H_LEVELS, Z_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
+    renderRead(); if(bzm) setHint(bzm.ok === bzNextAt(bzArt) && R.tries === 0 ? 'Richtig! Das kannst du schon gut.' : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); else setHint(R.streak >= 5 && !roundOn() && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS, H_LEVELS, Z_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
     celebrate(document.querySelector('#stage .fb-ok'));
   } else {
     if(R.tries === 0){ R.miss = (R.miss || 0) + 1; R.streak = 0; }
@@ -8669,8 +8719,8 @@ function zoneToSheet(key){
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
-app.sheet = {pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[]};
-const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'recent'];
+app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[]};
+const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'recent'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
 function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch {} }
@@ -8691,6 +8741,7 @@ const SHEET_SETS = {}, SHEET_INFO = {};
 /* ---------- Basis: Arbeitsblätter (Schritt 2) ----------
    Erste Aufgabe jeder Art ist vorgemacht (grau gestrichelt). Option „Schwarz-Weiß“: Muster statt Farben. */
 let B_BW = false; /* beim Bauen eines Basis-Blatts gesetzt */
+let B_SIM = 0; /* Ähnlichkeit auf Basis-Blättern V1–V3: 0 deutlich, 1 ähnlich, 2 fein (Backlog C) */
 const B_BW_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <pattern id="bw-rot" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#fff"/><rect width="2.4" height="5" fill="#222"/></pattern>
 <pattern id="bw-blau" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><circle cx="3" cy="3" r="1.7" fill="#222"/></pattern>
@@ -8708,7 +8759,7 @@ const bbIt = (svg, mark = '') => `<span class="bb-it${mark ? ' ' + mark : ''}">$
 const bbRow = (items, cls = '') => `<div class="bb-row ${cls}">${items.join('')}</div>`;
 /* Beispiel (mit Markierungen) und leere Aufgabe; abPick wählt beim Zusammensetzen */
 const bbEx = (fn) => abEx(fn(true), fn(false));
-const bKinds = (filter = () => true) => Object.keys(B_OBJ).filter(k => filter(B_OBJ[k]));
+const bKinds = (filter = () => true, withVar = false) => Object.keys(B_OBJ).filter(k => (withVar || !B_OBJ[k].v) && filter(B_OBJ[k]));
 const B_COLS4 = ['rot', 'blau', 'gelb', 'gruen'];
 /* Verbinden links ↔ rechts mit Beispiel-Linien: pairs = [[linksHTML, rechtsHTML]], perm[i] = Zeile rechts für links i */
 function bbMatch(lefts, rights, perm, ex){
@@ -8744,9 +8795,14 @@ const B_SEQ = [
 ];
 const bPos = i => `${i + 1}. Bild`;
 const B_JEDE = {tasse:'Jede Tasse', teller:'Jeder Teller', schraube:'Jede Schraube'}, B_EIN = {loeffel:'einen Löffel', gabel:'eine Gabel', mutter:'eine Mutter'};
+/* n verschiedene Dinge passend zur Ähnlichkeit (Blatt „Verbinde gleiche Bilder“) */
+const bbSimSet = n => { if(!B_SIM) return shuffle(bKinds()).slice(0, n);
+  const pool = B_SIM === 1 ? shuffle(bzSubKinds(pick(['werkzeug', 'besteck', 'geschirr']))) : shuffle([...B_FAM[pick(['hammer', 'dreher', 'loeffel'])], ...B_FAM[pick(['schluessel', 'gabel', 'tasse'])]]);
+  const fill = shuffle(bKinds(o => o.grp === B_OBJ[pool[0]].grp));
+  return [...new Set([...pool, ...fill])].slice(0, n); };
 const B_SHEETS = {
   V1: {name:'Gleiches finden', cols:2, max:10, gens:[
-    () => { const ks = shuffle(bKinds()).slice(0, 4), perm = shuffle([0, 1, 2, 3]), rs = []; perm.forEach((j, i) => rs[j] = ks[i]);
+    () => { const ks = bbSimSet(4), perm = shuffle([0, 1, 2, 3]), rs = []; perm.forEach((j, i) => rs[j] = ks[i]);
       return T_('verbinde', 'Verbinde gleiche Bilder.', bbEx(ex => bbMatch(ks.map(k => bbIt(bbObj(k))), rs.map(k => bbIt(bbObj(k))), perm, ex)), ks.map(k => B_OBJ[k].name).join(', '), 1); },
     () => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), others = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
       const opts = shuffle([[k, col, 1], [k, others[0], 0], [k, others[1], 0], [k2, col, 0]]), ok = opts.findIndex(o => o[2]);
@@ -8755,20 +8811,27 @@ const B_SHEETS = {
       perm.forEach((j, i) => rs[j] = [ks[3 + i], cs[i]]);
       return T_('verbinde', B_BW ? 'Verbinde, was das gleiche Muster hat.' : 'Verbinde, was die gleiche Farbe hat.', bbEx(ex => bbMatch(cs.map((c, i) => bbIt(bbObj(ks[i], c))), rs.map(([k, c]) => bbIt(bbObj(k, c))), perm, ex)), cs.map((c, i) => `${B_OBJ[ks[i]].name} – ${B_OBJ[rs[perm[i]][0]].name} (${B_COL_NAME[c]})`).join(', '), 3); }]},
   V2: {name:'Was passt nicht?', cols:1, max:8, gens:[
-    () => { const rows = [0, 1].map(() => { const k = pick(bKinds()), k2 = pick(bKinds(o => o.grp !== B_OBJ[k].grp)), i = rnd(0, 3); return {items:[0, 1, 2, 3].map(j => j === i ? [k2] : [k]), i}; });
+    () => { const rows = [0, 1].map(() => { const k = bzSimTarget(B_SIM), k2 = bzSimOthers(k, B_SIM, 1)[0], i = rnd(0, 3); return {items:[0, 1, 2, 3].map(j => j === i ? [k2] : [k]), i}; });
       return T_('streiche', 'Streiche durch, was nicht passt.', bbEx(ex => rows.map(r => bbRow(r.items.map(([k], j) => bbIt(bbObj(k), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name})`).join('; '), 1); },
     () => { const rows = [0, 1].map(() => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), col2 = pick(B_COLS4.filter(c => c !== col)), i = rnd(0, 3), big = Math.random() < .5;
       return {items:[0, 1, 2, 3].map(j => j === i ? (big ? [k, col, .6] : [k, col2, 1]) : [k, col, 1]), i}; });
       return T_('streiche', 'Streiche durch, was nicht passt. Schau genau!', bbEx(ex => rows.map(r => bbRow(r.items.map(([k, c, s], j) => bbIt(bbObj(k, c, s), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name}${r.items[r.i][2] !== 1 ? ', kleiner' : ', andere Farbe'})`).join('; '), 2); },
-    () => { const rows = [0, 1].map(() => { const g = pick(['kueche', 'werkstatt', 'kleidung']), same = shuffle(bKinds(o => o.grp === g)).slice(0, 3), odd = pick(bKinds(o => o.grp !== g)), i = rnd(0, 3), items = [...same]; items.splice(i, 0, odd); return {items, i}; });
+    () => { const rows = [0, 1].map(() => { const g = pick(B_SIM ? ['kueche', 'werkstatt'] : ['kueche', 'werkstatt', 'kleidung']), sub = g === 'kueche' ? pick(['besteck', 'geschirr']) : 'werkzeug';
+      const same = B_SIM ? shuffle(bzSubKinds(sub, B_SIM === 2)).slice(0, 3) : shuffle(bKinds(o => o.grp === g)).slice(0, 3), odd = B_SIM === 2 ? pick(bKinds(o => o.grp === g && o.sub && o.sub !== sub)) : pick(bKinds(o => o.grp !== g)), i = rnd(0, 3), items = [...same]; items.splice(i, 0, odd); return {items, i}; });
       return T_('streiche', 'Was gehört nicht dazu? Streiche durch.', bbEx(ex => rows.map(r => bbRow(r.items.map((k, j) => bbIt(bbObj(k), ex && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i]].name})`).join('; '), 3); }]},
   V3: {name:'Sortieren', cols:1, max:6, gens:[
-    () => { const g = pick(['kueche', 'werkstatt', 'kleidung']), g2 = pick(['kueche', 'werkstatt', 'kleidung', 'obst'].filter(x => x !== g)), inn = shuffle(bKinds(o => o.grp === g)).slice(0, 3), out = shuffle(bKinds(o => o.grp === g2)).slice(0, 3), all = shuffle([...inn, ...out]);
+    () => { if(B_SIM){ /* ähnlich: Untergruppen (alles Besteck), fein: Familien mit Varianten (alle Löffel) */
+        const [a, b] = B_SIM === 1 ? pick([['besteck', 'geschirr'], ['werkzeug', 'kleinteil'], ['geschirr', 'besteck']]) : pick([['loeffel', 'gabel'], ['hammer', 'dreher'], ['dreher', 'schluessel'], ['gabel', 'loeffel']]);
+        const ks = x => B_SIM === 1 ? bzSubKinds(x) : B_FAM[x], take = x => { const p = shuffle(ks(x)); while(p.length < 3) p.push(pick(ks(x))); return p.slice(0, 3); };
+        const inn = take(a), out = take(b), all = shuffle([...inn.map((k, i) => [k, 1, i]), ...out.map((k, i) => [k, 0, i])]);
+        const what = B_SIM === 1 ? {besteck:'alles Besteck', geschirr:'alles Geschirr', werkzeug:'alle Werkzeuge'}[a] : `alle ${BZ_FAMN[a]}`;
+        return T_('kreise', `Kreise ${what} ein.`, bbEx(ex => bbRow(all.map(([k, y]) => bbIt(bbObj(k), ex && y ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); }
+      const g = pick(['kueche', 'werkstatt', 'kleidung']), g2 = pick(['kueche', 'werkstatt', 'kleidung', 'obst'].filter(x => x !== g)), inn = shuffle(bKinds(o => o.grp === g)).slice(0, 3), out = shuffle(bKinds(o => o.grp === g2)).slice(0, 3), all = shuffle([...inn, ...out]);
       return T_('kreise', `Kreise alles ein, was zur ${({kueche:'Küche', werkstatt:'Werkstatt', kleidung:'Kleidung'})[g]} gehört.`, bbEx(ex => bbRow(all.map(k => bbIt(bbObj(k), ex && inn.includes(k) ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); },
     () => { const col = pick(B_COLS4), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), cs = shuffle([col, col, col, ...shuffle(B_COLS4.filter(c => c !== col)).slice(0, 3)]);
       return T_('kreise', `Kreise alle Dinge ${bbColName(col)} ein: ${bSwatch(col)}`, bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, cs[i]), ex && cs[i] === col ? 'ring' : '')), 'wide')), ks.filter((k, i) => cs[i] === col).map(k => B_OBJ[k].name).join(', '), 2); },
-    () => { const ks = shuffle(bKinds()).slice(0, 6), big = shuffle([1, 1, 1, 0, 0, 0]);
-      return T_('kreise', 'Kreise alle großen Dinge ein.', bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, null, big[i] ? 1 : .55), ex && big[i] ? 'ring' : '')), 'wide')), ks.filter((k, i) => big[i]).map(k => B_OBJ[k].name).join(', '), 3); }]},
+    () => { const ks = shuffle(bKinds()).slice(0, 6), big = shuffle([1, 1, 1, 0, 0, 0]), sm = [.55, .68, .8][B_SIM];
+      return T_('kreise', 'Kreise alle großen Dinge ein.', bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, null, big[i] ? 1 : sm), ex && big[i] ? 'ring' : '')), 'wide')), ks.filter((k, i) => big[i]).map(k => B_OBJ[k].name).join(', '), 3); }]},
   V4: {name:'Eins zu eins zuordnen', cols:1, max:6, gens:[
     () => { const [a, b] = pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]), n = rnd(3, 5), perm = shuffle([...Array(n).keys()]);
       return T_('verbinde', `${B_JEDE[a]} bekommt ${B_EIN[b]}. Verbinde.`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(n).fill(bbObj(b)), perm.map((j, i) => [i, j]), ex)), `${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, 1); },
@@ -8831,7 +8894,7 @@ const BB_CSS = `.lg-sort{display:grid;grid-template-columns:1fr 1fr;gap:6mm;flex
 function buildSheet0(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
   if(sj === 'K') return legeSheet(key);
-  B_BW = sj === 'B' && !!S.bw;
+  B_BW = sj === 'B' && !!S.bw; B_SIM = sj === 'B' && [0, 1, 2].includes(S.bsim) ? S.bsim : 0;
   const def = ({M:M_SHEETS, L:R_SHEETS, U:U_SHEETS, G:G_SHEETS, H:H_SHEETS, W:W_SHEETS, ...SHEET_SETS})[sj]?.[key];
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : key === 'einmaleins' ? `: ${sheetRows().length === 10 ? 'alle Reihen' : sheetRows().length === 1 ? sheetRows()[0] + 'er-Reihe' : sheetRows().slice(0, -1).join('er-, ') + 'er- und ' + sheetRows().at(-1) + 'er-Reihe'}` : ['stellenwert', 'zehnerpartner', 'ueber10'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
@@ -8864,7 +8927,7 @@ function buildSheet0(limit){
   const info = ({L:L_INFO, W:W_INFO, U:U_INFO, G:G_INFO, H:H_INFO, ...SHEET_INFO})[sj]?.[key] || null;
   const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
   const sol = S.sol && !def.mat ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
-  return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}${sj === 'B' ? BB_CSS : ''}</style></head><body>${B_BW ? B_BW_DEFS : ''}<div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`, _bw: B_BW = false};
+  return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}${sj === 'B' ? BB_CSS : ''}</style></head><body>${B_BW ? B_BW_DEFS : ''}<div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`, _bw: B_BW = false, _sim: B_SIM = 0};
 }
 /* Blatt füllen: in der Vorschau messen, wie viele volle Reihen auf die erste Seite passen */
 function sheetFit(fr, show = sheetShow){
@@ -8989,7 +9052,7 @@ function renderSheets(keep){
     : /^H:H[ML]$/.test(S.topic) ? ''
     : `<label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
     <label class="row cb"><input type="checkbox" id="sh-gross" ${S.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label>
-    ${S.topic.startsWith('B:') ? `<label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Erkläre den Auftrag daran.</p>` : ''}
+    ${S.topic.startsWith('B:') ? `<label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${['B:V1', 'B:V2', 'B:V3'].includes(S.topic) ? `<label class="row">Ähnlichkeit <select id="sh-bsim">${BZ_SIM.map((t, i) => `<option value="${i}" ${(S.bsim || 0) === i ? 'selected' : ''}>${['deutlich (andere Gruppe)', 'ähnlich (gleiche Gruppe)', 'fein (Varianten)'][i]}</option>`).join('')}</select></label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Erkläre den Auftrag daran.</p>` : ''}
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
     ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge. Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
@@ -9040,6 +9103,7 @@ function sheetChange(e){
   if(t.dataset.shrow){ const n = +t.dataset.shrow, r = new Set(sheetRows()); t.checked ? r.add(n) : r.delete(n); if(!r.size){ t.checked = true; return; } S.rows = [...r]; }
   if(t.id === 'sh-gross') S.gross = t.checked;
   if(t.id === 'sh-bw') S.bw = t.checked;
+  if(t.id === 'sh-bsim') S.bsim = +t.value || 0;
   if(t.id === 'sh-tausch') S.tausch = t.checked;
   if(t.id === 'sh-n') S.n = t.value === 'fill' ? 'fill' : +t.value;
   if(t.id === 'sh-sol') S.sol = t.checked;

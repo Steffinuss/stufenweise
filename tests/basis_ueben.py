@@ -163,14 +163,18 @@ async def main():
         if await pg.evaluate("app.read.demo || !!document.querySelector('#stage .bz-demo')"): errs.append('Jetzt du beendet das Vormachen nicht')
         if not await pg.evaluate("!!document.querySelector('#stage .bz-you')"): errs.append('kein „Jetzt du“-Zeichen')
         names = set()
-        for i in range(9):
-            names.add(await pg.evaluate("app.read.item.label.split(':')[0]"))
+        # „Ganz anders“ hat seit Backlog C sechs Schritte (deutlich → ähnlich → fein): „Nächste Aufgabe“ nach 12 richtigen
+        sims = []
+        for i in range(13):
+            lab = await pg.evaluate("app.read.item.label.split(':')[0]"); names.add(lab.split(' – ')[0]); sims.append(lab.split(' – ')[1] if ' – ' in lab else 'deutlich')
             ok, hint = await solve_by_clicks(pg)
             if not ok: errs.append(f'Ablauf {i}: {hint}')
-            if i < 8: await pg.click('#r-next'); await pg.wait_for_timeout(40)
+            if i == 7 and await pg.query_selector('#r-art-up'): errs.append('„Nächste Aufgabe“ schon nach 8 (Art mit Ähnlichkeit)')
+            if i < 12: await pg.click('#r-next'); await pg.wait_for_timeout(40)
         if names != {'Passt nicht'}: errs.append(f'Aufgabenarten gemischt: {names}')
-        if await pg.evaluate("app.read.item.cells.length") != 4: errs.append('nach 8 richtigen nicht schwerer (4 Bilder)')
-        if not await pg.query_selector('#r-art-up'): errs.append('nach 8 richtigen keine „Nächste Aufgabe“')
+        if sims[:4] != ['deutlich'] * 4 or 'ähnlich' not in sims or sims[-1] != 'fein': errs.append(f'Ähnlichkeit steigt nicht: {sims}')
+        if await pg.evaluate("app.read.item.cells.length") != 4: errs.append('nach 12 richtigen nicht schwerer (4 Bilder)')
+        if not await pg.query_selector('#r-art-up'): errs.append('nach 12 richtigen keine „Nächste Aufgabe“')
         else:
             await pg.click('#r-art-up'); await pg.wait_for_timeout(80)
             st = await pg.evaluate("[bzMem().art, app.read.demo, app.read.item.label.split(':')[0]]")

@@ -172,6 +172,15 @@ async def main():
         await pg.click('#d-close', force=True); await pg.wait_for_timeout(100)
         if await pg.evaluate("[app.mode, !!document.querySelector('[data-tstart]')].join()") != 'home,true': errs.append('Abbrechen führt nicht zur Testauswahl')
         await pg.evaluate("app.diag=null; app.wz=null; app.mode='home'; data.current='ka'; render()")
+        # Backlog C: Ähnlichkeit (deutlich → ähnlich → fein) in V1–V3; Varianten nur bei „fein“; Lösung stimmt
+        c = await pg.evaluate("""(()=>{ const bad=[], VAR = new Set(Object.keys(B_OBJ).filter(k=>B_OBJ[k].v)), names = new Set([...VAR].map(k=>B_OBJ[k].name));
+          for(const l of ['V1','V2','V3']) AXES.V.arts[l].forEach(([n, g, o]) => { if(!o?.sim) return; for(let st=0; st<6; st++) for(let k=0;k<40;k++){
+            const it=g(st), sol={}; bzSolve(it, sol); if(!evalItem(it, sol, [])?.ok) bad.push('Lösung '+it.label);
+            const sim = Math.min(2, st>>1), tag = it.label.split(':')[0]; if((sim===0) !== !tag.includes(' – ') || (sim && !tag.endsWith(BZ_SIM[sim]))) bad.push('Stufe '+st+' '+it.label);
+            const txt = JSON.stringify(it); if(sim < 2 && [...names].some(nm => txt.includes('"'+nm+'"') || txt.includes(nm+' ('))) bad.push('Variante zu früh '+it.label); } });
+          for(let k=0;k<300;k++){ if(bzKinds().some(x=>VAR.has(x))) bad.push('Variante in bzKinds'); }
+          return bad.slice(0,6); })()""")
+        if c: errs.append(f'Ähnlichkeit: {c}')
         # Hinweis im Lernstand: Mathe „Zahlen bis 10, Stufe I“ nicht erreicht, noch kein Basis-Test
         await pg.evaluate("(()=>{const p={id:'kc',name:'Cem',created:1};data.profiles.push(p);setCell('kc','M|10|I',{status:'nicht',quelle:'test',sum:'0 von 2'});setCell('kc','L|L1',{status:'teilweise',quelle:'test'});})()")
         h = await pg.evaluate("teacherSectionHtml('kc').html")
