@@ -5,14 +5,29 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- **Basis-Test** in drei kurzen Teilen (V1–V4, V5–V8, O2–O4) mit Vormachen vor jeder neuen Aufgabenart, Blöcken für leichte und schwerere Form, Kompetenzmatrix mit zwei Bereichszeilen, Förderzone, ILEB-Vorschlägen, Elterninfo, Lernlandkarte und Hinweis im Lernstand bei Mathe „Zahlen bis 10, Stufe I“ / Lesen L1 (17.11.2026, Commit 329ab57). Wartet auf Freigabe, siehe `IN_PROGRESS.md`.
-- Testversion mit eigenem Speicher und rotem Hinweis; Skript `tests/testversion.sh`; Arbeitsweise mit zwei Zweigen in `docs/entwicklung.md` (17.11.2026).
-- **Basis-Arbeitsblätter:** Das Beispiel vor jeder Aufgabenart zeigt nur noch den ersten Schritt (eine Zeile, eine Linie, ein Kreis) statt der ganzen Aufgabe; Kuchengabel symmetrisch mit 3 Zinken (19.11.2026, Stefan).
-- **Plus und Minus aufgeteilt** (Backlog A): „Plus“/„Minus“ = Üben mit Zufallsaufgaben, Darstellung kommt von selbst nacheinander (bis 20 Material → Zwanzigerfeld → Zahlenstrahl, bis 100 Material → Hundertertafel → Zahlenstrahl, bis 1000 Material → Zahlenstrahl; nach 8 richtigen weiter, nach 3 Fehlern zurück); neue „Rechenhilfe“ für eigene Aufgaben mit freier Darstellung (19.11.2026).
-- **Basis: Schwerer durch Ähnlichkeit** (Backlog C): V1–V3 steigen in zwei Richtungen – mehr Bilder und deutlich → ähnlich → fein, mit denselben Dingen; 12 neue Bilder (Werkzeug-, Besteck- und Tassen-Varianten, Messer, Nagel, Schraubenschlüssel); Arbeitsblätter V1–V3 mit Auswahl „Ähnlichkeit“ (19.11.2026).
-- **Unterricht, Zwanzigerfeld: Zahl vorgeben** (Backlog B): Zahl eingeben oder „Zufallszahl“ legt die Menge ohne Rechnung; „Zahl verdecken“ wirkt auch auf die Anzahl allein, „?“ deckt auf, noch einmal antippen deckt zu (19.11.2026).
-- **Eingang „Testen“** auf der Startseite (Testen → Wer? → Welcher Test?), Basis-Häkchen pro Kind in „Wer übt?“, Zuordnen „Jedem eins“ frei hinlegen, Testversion mit eigener Kennung (19.11.2026, Rückmeldungen Stefan).
-- Dokumentation `BACKLOG.md`, `IN_PROGRESS.md`, `CHANGELOG.md` (19.11.2026).
+- noch nichts
+
+## 0.29.0 – 20.11.2026
+
+Neu:
+- **Basis-Test** in drei kurzen Teilen (V1–V4, V5–V8, O2–O4): Vormachen vor jeder neuen Aufgabenart, je Stufe leichte und schwerere Form, Kompetenzmatrix mit zwei Bereichszeilen, Förderzone, ILEB-Vorschläge, Elterninfo, Lernlandkarte; Hinweis im Lernstand, wenn Mathe „Zahlen bis 10, Stufe I“ oder Lesen L1 nicht erreicht ist.
+- **Eingang „Testen“** auf der Startseite (Testen → Wer? → Welcher Test?), nach Fach geordnet mit Stand und Wiederholung. Die Test-Knöpfe im Fenster „Wer übt?“ sind weg; dort gibt es das Häkchen Basis pro Kind.
+- **Plus und Minus aufgeteilt** (Backlog A): Üben mit Zufallsaufgaben, die Darstellung kommt von selbst nacheinander (bis 20 Material → Zwanzigerfeld → Zahlenstrahl, bis 100 Material → Hundertertafel → Zahlenstrahl, bis 1000 Material → Zahlenstrahl; nach 8 richtigen weiter, nach 3 Fehlern zurück); neue **Rechenhilfe** für eigene Aufgaben mit freier Darstellung, für alle Kinder.
+- **Basis: schwerer durch Ähnlichkeit** (Backlog C): V1–V3 steigen in zwei Richtungen, mehr Bilder und deutlich → ähnlich → fein; 12 neue Bilder; Arbeitsblätter V1–V3 mit Auswahl „Ähnlichkeit“.
+- **Unterricht, Zwanzigerfeld: Zahl vorgeben** (Backlog B): Zahl eingeben oder „Zufallszahl“; „Zahl verdecken“ wirkt auch auf die Anzahl allein.
+
+Geändert:
+- Basis „Jedem eins“: frei hinlegen mit mehr im Vorrat, damit man auch etwas falsch machen kann.
+- Basis-Arbeitsblätter: Das Beispiel zeigt nur den ersten Schritt; Kuchengabel mit 3 Zinken.
+- Texte V3 und V6 passen zu dem, was der Test prüft.
+- Anleitung und Hilfe in der App beschreiben Testen, Basis-Test, Rechenhilfe und Ähnlichkeit; Bildschirmfotos erneuert.
+
+Durchsicht vor der Freigabe (20.11.2026):
+- Rechenhilfe schlägt kein „Schwerer/Leichter“ mehr vor (sonst wurde aus der eigenen Aufgabe eine Zufallsaufgabe).
+- Rechenhilfe endet sauber, wenn man über die Startseite in eine andere Übung geht.
+- Toter Knopf-Code der alten Test-Knöpfe entfernt; `tests/anleitung_bilder.py` läuft wieder (über „Testen“).
+
+Für Entwickler*innen: Testversion mit eigenem Speicher (`TEST_BUILD`, Vorsatz `test:`) und Skript `tests/testversion.sh`; Arbeitsweise mit zwei Zweigen in `docs/entwicklung.md`; `BACKLOG.md`, `IN_PROGRESS.md`, `CHANGELOG.md`; neue Test-Haken in `docs/neues-fach.md`.
 
 ## 0.28.5 – 17.11.2026 (Release v0.28.5, eingefrorener Stand für Schulen)
 

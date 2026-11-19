@@ -46,6 +46,8 @@ Das neue Kind ist jetzt ausgewählt (dunkel hinterlegt).
 - **Deutsch:** Lese-Test, Schreib-Test
 - **Wiederholung:** testet nur die offenen Stufen eines Tests noch einmal; „empfohlen“, wenn seit dem letzten Test viel geübt wurde
 
+![Testauswahl für ein Kind: Mathe Teil 1 und 2, Lese- und Schreib-Test](bilder/04_tests.png)
+
 Tipp auf den Test, den das Kind jetzt machen soll. Mach die Teile am besten an verschiedenen Tagen. Nach dem Test kommst du wieder zur Testauswahl; mit „Anderes Kind“ geht es mit dem nächsten Kind weiter. Im Lernstand eines Kindes kannst du Tests ebenfalls starten, direkt beim jeweiligen Fach.
 
 ### Themenwelt, Erkennungsbild und „ohne Lesen“

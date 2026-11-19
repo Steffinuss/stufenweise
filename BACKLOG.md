@@ -11,9 +11,9 @@ Stand: 19.11.2026
 | Nr. | Aufgabe | Größe | Warum an dieser Stelle |
 | --- | --- | --- | --- |
 | 0 | Basis-Test abschließen (`IN_PROGRESS.md`) | klein | fertig gebaut, braucht nur Ausprobieren und Freigabe |
-| 1 | ~~**C** Basis: bessere Progression~~ | mittel | erledigt 19.11.2026 (Testversion), siehe `CHANGELOG.md` |
-| 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | erledigt 19.11.2026 (Testversion), siehe `CHANGELOG.md` |
-| 3 | ~~**A** Plus und Minus aufteilen~~ | groß | erledigt 19.11.2026 (Testversion), siehe `CHANGELOG.md` | 
+| 1 | ~~**C** Basis: bessere Progression~~ | mittel | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
+| 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
+| 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -21,7 +21,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## A: Modul Plus und Minus aufteilen
 
-**Status:** erledigt 19.11.2026 in `entwicklung` (Testversion), wartet auf Freigabe. Umsetzung: `app.calc` (Rechenhilfe) statt neuem Modus; `pmPractice`, `pmViews`, `pmMem`, `pmTrack` (Leiter je Kind, Rechenart und Zahlenraum); Rail-Eintrag und Startseiten-Kachel „Rechenhilfe“; Test `tests/plusminus_ueben.py`.
+**Status:** erledigt 19.11.2026, freigegeben in 0.29.0 (20.11.2026). Umsetzung: `app.calc` (Rechenhilfe) statt neuem Modus; `pmPractice`, `pmViews`, `pmMem`, `pmTrack` (Leiter je Kind, Rechenart und Zahlenraum); Rail-Eintrag und Startseiten-Kachel „Rechenhilfe“; Test `tests/plusminus_ueben.py`.
 **Entscheidungen Stefan (19.11.):** Darstellung wechselt automatisch wie bei Basis (nach 8 auf Anhieb richtigen die nächste, nach 3 Fehlern in Folge zurück; Lehrkraft kann oben jede wählen). Reihenfolge: bis 20 Material → Zwanzigerfeld → Zahlenstrahl; bis 100 Material → Hundertertafel → Zahlenstrahl; bis 1000 Material → Zahlenstrahl. Die Rechenhilfe sehen alle Kinder (eigener Eintrag bei Mathe).
 
 **Ausgangslage:** Im Schülermodus bietet Plus/Minus zu viele Wahlmöglichkeiten: Zufallsaufgabe, eigene Aufgabe eingeben, Darstellung wählen (Zahlenstrahl, Material, Hundertertafel). Das kann Schüler*innen mit Förderschwerpunkt geistige Entwicklung überfordern.
@@ -46,7 +46,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## B: Unterricht – Zahlen im Zwanzigerfeld darstellen
 
-**Status:** erledigt 19.11.2026 in `entwicklung` (Testversion), wartet auf Freigabe
+**Status:** erledigt 19.11.2026, freigegeben in 0.29.0 (20.11.2026)
 
 **Ausgangslage:** Das Zwanzigerfeld (Unterricht, Tafelwerkzeug) wird vor allem mit Rechnungen genutzt.
 
@@ -64,7 +64,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## C: Basis – bessere Progression der Schwierigkeitsstufen
 
-**Status:** erledigt 19.11.2026 in `entwicklung` (Testversion), wartet auf Freigabe.
+**Status:** erledigt 19.11.2026, freigegeben in 0.29.0 (20.11.2026).
 **Entscheidungen Stefan (19.11.):** Ähnlichkeit als Schritte innerhalb der Aufgabenart (nicht als eigene Arten); zuerst V1, V2, V3.
 **Umsetzung:** Aufgabenarten mit `{sim:true}` haben st 0…5 = deutlich/ähnlich/fein × wenige/mehr Bilder (`bzSim`), „Nächste Aufgabe“ nach 12. Neue Bilder: Messer, Nagel, Schraubenschlüssel und Varianten (großer Hammer, Klauenhammer, Kreuz- und kurzer Schraubenzieher, Ringschlüssel, Teelöffel, Kochlöffel, Kuchengabel, Becher); Untergruppen `B_SUB`, Familien `B_FAM`; Varianten nur bei „fein“. Arbeitsblätter V1–V3 mit Auswahl „Ähnlichkeit“. Basis-Test unverändert (leichte Form = deutlich).
 

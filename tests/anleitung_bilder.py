@@ -33,8 +33,14 @@ async def main():
         await pg.fill('#pname', 'Testkind A')
         await shot('03_kind', hl='#padd')
         await pg.click('#padd button[type=submit]'); await pg.wait_for_timeout(300)
-        await shot('04_tests', hl='[data-ptest="M1"]')
-        await pg.click('[data-ptest="M1"]'); await pg.wait_for_timeout(300)
+        await pg.click('#dlg-profile [data-close]'); await pg.wait_for_timeout(200)
+        # Testen: Startseite → Testen → Kind → Test (seit 0.29.0 ein eigener Eingang)
+        await pg.click('#btn-home'); await pg.wait_for_timeout(300)
+        if await pg.locator('[data-ctx-reset]').count(): await pg.click('[data-ctx-reset]'); await pg.wait_for_timeout(300)
+        await pg.click('[data-ctx-test]'); await pg.wait_for_timeout(300)
+        await pg.click('[data-home-pick]'); await pg.wait_for_timeout(300)
+        await shot('04_tests', hl='[data-tstart="M1"]')
+        await pg.click('[data-tstart="M1"]'); await pg.wait_for_timeout(300)
         await shot('05_intro', hl='#d-start')
         await pg.click('#d-start')
         skill = math_skill({10:5,20:3,100:0,1000:0},0,2,2)
@@ -49,11 +55,15 @@ async def main():
         await pg.click('#d-close'); await pg.wait_for_timeout(300)
         # Teil 2
         await pg.evaluate("diagStart('M2', false)"); await pg.wait_for_timeout(200); await pg.click('#d-start')
-        for step in range(80):
+        for step in range(200):
             if await pg.evaluate("app.diag.done"): break
-            info = await pg.evaluate("(()=>{const d=app.diag;return {key:d.key}})()")
-            await answer(pg, skill(info['key'])); await pg.wait_for_timeout(60)
+            info = await pg.evaluate("(()=>{const d=app.diag;return {key:d.key,type:d.items[d.idx].type}})()")
+            if info['type'] in ('input','flash','scatter','seq','clockset','write','sent','choice','pairs','line','money','build'): await answer(pg, skill(info['key']))
+            else: await pg.click('#d-skip')  # Aufgabenarten, die simlib nicht kennt (z. B. Hundertertafel): „Weiß ich nicht“
+            await pg.wait_for_timeout(60)
+        print('Teil 2 fertig:', await pg.evaluate("app.diag?.done"))
         await pg.click('#d-close'); await pg.wait_for_timeout(300)
+        print('Modus:', await pg.evaluate("app.mode"))
         # Lernstand
         await pg.click('#btn-more'); await pg.click('#btn-stats'); await pg.wait_for_timeout(500)
         await shot('08_lernstand')
