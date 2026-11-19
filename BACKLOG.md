@@ -13,7 +13,7 @@ Stand: 19.11.2026
 | 0 | Basis-Test abschließen (`IN_PROGRESS.md`) | klein | fertig gebaut, braucht nur Ausprobieren und Freigabe |
 | 1 | ~~**C** Basis: bessere Progression~~ | mittel | erledigt 19.11.2026 (Testversion), siehe `CHANGELOG.md` |
 | 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | erledigt 19.11.2026 (Testversion), siehe `CHANGELOG.md` |
-| 3 | **A** Plus und Minus aufteilen | groß | größter Nutzen beim Üben, aber Umbau eines zentralen Mathe-Moduls; zuerst Konzept mit Stefan |
+| 3 | ~~**A** Plus und Minus aufteilen~~ | groß | erledigt 19.11.2026 (Testversion), siehe `CHANGELOG.md` | 
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -21,7 +21,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## A: Modul Plus und Minus aufteilen
 
-**Status:** aufgenommen 19.11.2026 · in Arbeit
+**Status:** erledigt 19.11.2026 in `entwicklung` (Testversion), wartet auf Freigabe. Umsetzung: `app.calc` (Rechenhilfe) statt neuem Modus; `pmPractice`, `pmViews`, `pmMem`, `pmTrack` (Leiter je Kind, Rechenart und Zahlenraum); Rail-Eintrag und Startseiten-Kachel „Rechenhilfe“; Test `tests/plusminus_ueben.py`.
 **Entscheidungen Stefan (19.11.):** Darstellung wechselt automatisch wie bei Basis (nach 8 auf Anhieb richtigen die nächste, nach 3 Fehlern in Folge zurück; Lehrkraft kann oben jede wählen). Reihenfolge: bis 20 Material → Zwanzigerfeld → Zahlenstrahl; bis 100 Material → Hundertertafel → Zahlenstrahl; bis 1000 Material → Zahlenstrahl. Die Rechenhilfe sehen alle Kinder (eigener Eintrag bei Mathe).
 
 **Ausgangslage:** Im Schülermodus bietet Plus/Minus zu viele Wahlmöglichkeiten: Zufallsaufgabe, eigene Aufgabe eingeben, Darstellung wählen (Zahlenstrahl, Material, Hundertertafel). Das kann Schüler*innen mit Förderschwerpunkt geistige Entwicklung überfordern.

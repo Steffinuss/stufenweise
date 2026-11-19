@@ -29,8 +29,13 @@ Rückmeldungen beim Ausprobieren (19.11.2026, eingearbeitet, Testversion cb56bb1
 - Tests haben einen eigenen Eingang: Startseite → **Testen** (Lehrkraft-PIN) → Kind → Test, nach Fach geordnet mit Stand („noch nicht gemacht“ / „gemacht · zuletzt …“) und Wiederholung. Die Test-Knöpfe in „Wer übt?“ sind wieder entfernt; dort bleibt nur das Häkchen Basis. Lernstand behält seine Knöpfe.
 - Testversion zeigte 0.28.5 → zeigt jetzt „0.29.0 · Testversion <Stand> · <Datum>“.
 
-Noch offen, bevor der Basis-Test freigegeben wird:
-1. Stefan probiert den Test in der Testversion aus (am besten am Schul-iPad) und sieht sich die geänderten Texte V3/V6 an.
+Ebenfalls fertig in der Testversion (19.11.2026), Freigabe zusammen mit dem Basis-Test als 0.29.0:
+- Backlog A: Plus und Minus aufgeteilt in Üben (Darstellungen nacheinander) und Rechenhilfe.
+- Backlog B: Zwanzigerfeld im Unterricht – Zahl vorgeben und verdecken.
+- Backlog C: Basis V1–V3 schwerer durch Ähnlichkeit, 12 neue Bilder, Arbeitsblätter mit Auswahl „Ähnlichkeit“.
+
+Noch offen, bevor 0.29.0 freigegeben wird:
+1. Stefan probiert alles in der Testversion aus (am besten am Schul-iPad): Basis-Test, Testen-Eingang, Plus/Minus und Rechenhilfe, Zwanzigerfeld, Ähnlichkeit in Basis; dazu die geänderten Texte V3/V6.
 2. Rückmeldung einarbeiten, `sh tests/run_all.sh lang`, Testversion aktualisieren.
 3. Nach Stefans OK: `entwicklung` in `main` zusammenführen, Version 0.29.0, `CHANGELOG.md` ergänzen, Release anlegen (Stefan, GitHub-Oberfläche).
 4. Bildschirmfotos der Anleitung erneuern (das Bild `04_tests.png` ist entfernt, weil es die alten Test-Knöpfe zeigte) (dafür zuerst `tests/anleitung_bilder.py` reparieren, bricht seit 0.24.0 ab).

@@ -9,7 +9,7 @@ if ! curl -s -o /dev/null "http://localhost:$PORT/version.json"; then
   python3 -m http.server "$PORT" --directory . >/dev/null 2>&1 &
   SERVER=$!; sleep 1.5
 fi
-FAST="fehler smoke einstellungen runden gefuehrt hinweis_neu springen antwortfeld feld_ueben ueberspringen update_hinweis wochenuebersicht lernort_material legeblaetter tausenderbuch_nachspuren arbeitsheft doppelte_zeilen grosse_aufgaben arbeitsblatt_optionen zehnerpartner_ueben durchsicht_0_21 oberflaeche_details test_fortschritt test_nie_haengen test_passt handy drittes_fach basis_grundlagen basis_blaetter basis_ueben basis_test zwanzigerfeld_zahl blatt_auswahl"
+FAST="fehler smoke einstellungen runden gefuehrt hinweis_neu springen antwortfeld feld_ueben ueberspringen update_hinweis wochenuebersicht lernort_material legeblaetter tausenderbuch_nachspuren arbeitsheft doppelte_zeilen grosse_aufgaben arbeitsblatt_optionen zehnerpartner_ueben durchsicht_0_21 oberflaeche_details test_fortschritt test_nie_haengen test_passt handy drittes_fach basis_grundlagen basis_blaetter basis_ueben basis_test zwanzigerfeld_zahl plusminus_ueben blatt_auswahl"
 SLOW="sweep zufallsklicks kinder_sim arbeitsblaetter"
 LIST=$FAST; [ "$1" = "lang" ] && LIST="$FAST $SLOW"
 FAIL=0

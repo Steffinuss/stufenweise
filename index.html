@@ -602,6 +602,9 @@ body.class-mode #controls button{min-height:58px}
 .tw-word.bows .syl{display:inline-block;padding:0 .04em .14em;border-bottom:.07em solid currentColor;border-radius:0 0 50% 50%/0 0 .45em .45em;margin:0 .03em}
 .tw-text{font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1.45;max-width:1100px;text-align:center;font-family:Stufenfibel,"Atkinson Hyperlegible",Verdana,sans-serif}
 .tw-in input{width:min(360px,40vw);font-size:20px}
+.pm-views{display:flex;align-items:center;gap:4px;flex-wrap:wrap}.pm-views .pm-l{font-size:13px;color:var(--muted);margin-right:4px}.pm-views button{padding:6px 10px;border-radius:999px;font-size:15px}.pm-views button[aria-pressed="true"]{background:var(--dark);color:#fff}.pm-views button:disabled{opacity:1;cursor:default}.pm-views button:disabled:not([aria-pressed="true"]){color:var(--muted);background:transparent}.pm-arr{color:var(--muted)}
+.calc-op button{font-size:24px;font-weight:800;min-width:46px}
+@media (max-width:560px){.pm-views .pm-l{display:none}.pm-views button{padding:4px 8px;font-size:13px}}
 .tf-in{display:flex;align-items:center;gap:6px;font-weight:700}.tf-in input{width:3.2em;font-size:20px;text-align:center}.tf-reveal.open{border-style:solid;border-color:#e6e0d4;background:#fff}
 .adapt-tip.up{border:2px solid #1f7a45}
 .round-bar{position:absolute;left:18px;top:12px;z-index:5;display:flex;align-items:flex-end;gap:3px;height:34px;pointer-events:none}
@@ -1672,7 +1675,8 @@ function railMathHtml(g, lvOk){
   const tafelBtn = !g || g.axVisible('H') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1'}" data-board="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'H'}"><b aria-hidden="true">${TAFEL_SYM}</b>Tafel</button>` : '';
   const zVis = (!g || (g.axHas('Z') ? g.axVisible('Z') : g.mode !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20))));
   const zBtn = zVis ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.zlvl || 'Z1') ? g.first('Z') : app.read.zlvl || 'Z1'}" data-tenpair="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'Z'}"><b aria-hidden="true">${ZP_SYM}</b>Zehner&shy;partner</button>` : '';
-  return MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '') + (k === 'sub' ? zBtn : '')).join('') + (g && !g.modes.has('sub') ? zBtn : '') + (g && !g.modes.has('number') ? tafelBtn : '')
+  const calcBtn = `<button data-calc aria-pressed="${!!app.calc && ['add', 'sub'].includes(app.mode)}" title="Eigene Plus- und Minusaufgaben mit Hilfe rechnen"><b aria-hidden="true">±</b>Rechen&shy;hilfe</button>`;
+  return MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k && !(app.calc && ['add', 'sub'].includes(k))}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '') + (k === 'sub' ? zBtn + calcBtn : '')).join('') + (g && !g.modes.has('sub') ? zBtn + calcBtn : '') + (g && !g.modes.has('number') ? tafelBtn : '')
     + (!g || g.axVisible('U') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1'}" data-clock="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'U'}"><b aria-hidden="true">◷</b>Uhr</button>` : '')
     + (!g || g.axVisible('G') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1'}" data-size="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'G'}"><b aria-hidden="true">⚖</b>Größen</button>` : '');
 }
@@ -1742,12 +1746,13 @@ function renderTop(){
   $('#range-label').textContent = 'Zahlenraum bis';
   const free = app.mode === 'free', t = free ? null : task();
   const names = {number:['Zahl'], add:['Zahl','dazu'], sub:['Zahl','weg']}[app.mode];
-  $('#inputs').innerHTML = free ? '' :
+  if(pmPractice()){ $('#inputs').innerHTML = pmChips(); const rb = $('#btn-random'); rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; rb.setAttribute('aria-label', 'Neue Aufgabe'); return; }
+  $('#inputs').innerHTML = free ? '' : (app.calc ? `<div class="seg calc-op" role="group" aria-label="Rechenart"><button data-calcop="add" aria-pressed="${app.mode === 'add'}" aria-label="Plus">+</button><button data-calcop="sub" aria-pressed="${app.mode === 'sub'}" aria-label="Minus">−</button></div>` : '') +
     `<label><span>${names[0]}</span><input id="in-a" type="number" min="0" max="${app.range}" inputmode="numeric" value="${t.draft[0]}"></label>` +
     (app.mode === 'number' ? '' : `<span class="sign" aria-hidden="true">${MODES[app.mode].sym}</span><label><span>${names[1]}</span><input id="in-b" type="number" min="0" max="${app.range}" inputmode="numeric" value="${t.draft[1]}"></label>`) +
     `<button id="btn-commit" class="primary">Legen</button>`;
   const rb = $('#btn-random');
-  rb.hidden = free;
+  rb.hidden = free || !!app.calc; /* Rechenhilfe: „Ich habe eine Aufgabe“ – keine Zufallsaufgabe */
   rb.innerHTML = icon('random') + `<span>${app.mode === 'number' ? 'Zufallszahl' : 'Zufallsaufgabe'}</span>`;
   rb.setAttribute('aria-label', app.mode === 'number' ? 'Zufallszahl' : 'Zufallsaufgabe');
   if(carryFilter() !== settings) $('#inputs').insertAdjacentHTML('beforeend', `<span class="auto-chip" title="Die App übt den Zehnerübergang als eigene Stufe. Ein Tipp auf den Zahlenraum hebt das auf.">${app.carry === 'with' ? 'mit' : 'ohne'} Zehnerübergang</span>`);
@@ -1758,7 +1763,7 @@ function guideFix(){
   if(!['read', ...MATH_RAIL].includes(app.mode)) return;
   const g = guideOf(app.mode === 'read' ? subjOfLvl(app.read.lvl) || 'M' : settings.subject); if(!g) return;
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
-  if(g.modes && !g.modes.has(app.mode)){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
+  if(g.modes && !g.modes.has(app.mode) && !app.calc){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
 }
 /* Während eines Tests sind Leiste und Menü gesperrt, damit niemand versehentlich hinaustippt (Durchsicht 16.11.).
    Beenden geht über „Abbrechen“ (zweimal tippen). */
@@ -1790,7 +1795,7 @@ function renderWork(before){
   if(TOOL_MODES.includes(app.mode)) return renderTool();
   if(app.mode === 'map') return renderMap();
   const t = task();
-  if(!t.ready) return renderWelcome();
+  if(!t.ready){ if(pmPractice() && !app.pmAuto){ app.pmAuto = true; try { startRandom(); } finally { app.pmAuto = false; } if(task().ready) return; } return renderWelcome(); }
   renderTask(before);
 }
 
@@ -1799,10 +1804,10 @@ function renderWelcome(){
   $('#equation').textContent = ''; $('#words').hidden = true; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = '';
   $('#btn-say').hidden = true;
   $('#stage').innerHTML = `<div class="welcome"><div><div class="mark" aria-hidden="true"><svg viewBox="0 0 54 40"><rect x="4" y="5" width="30" height="30" rx="1.5" fill="${fillOf('h','a')}"/><path d="M7 5v30M4 8h30M10 5v30M4 11h30M13 5v30M4 14h30M16 5v30M4 17h30M19 5v30M4 20h30M22 5v30M4 23h30M25 5v30M4 26h30M28 5v30M4 29h30M31 5v30M4 32h30" stroke="#0004" stroke-width=".5"/><rect x="40" y="5" width="3.4" height="30" rx="1" fill="${fillOf('z','a')}"/><path d="M40 8h3.4M40 11h3.4M40 14h3.4M40 17h3.4M40 20h3.4M40 23h3.4M40 26h3.4M40 29h3.4M40 32h3.4" stroke="#0004" stroke-width=".5"/><rect x="48" y="31.6" width="3.4" height="3.4" rx=".8" fill="${fillOf('e','a')}"/></svg></div>
-    <h2>${{number:'Welche Zahl legst du?', add:'Welche Plus-Aufgabe legst du?', sub:'Welche Minus-Aufgabe legst du?', written:'Welche Aufgabe rechnest du schriftlich?', times:'Welche Mal-Aufgabe übst du?', money:'Rechnen mit Geld'}[app.mode]}</h2>
-    <p>${app.mode === 'times' ? 'Wähle oben die Reihen – oder trage eine Aufgabe ein.' : app.mode === 'money' ? 'Oben wählst du: Betrag legen oder Wechselgeld.' : 'Trage oben ein – oder lass dir eine Aufgabe geben.'}</p>
+    <h2>${app.calc ? 'Rechenhilfe: Welche Aufgabe hast du?' : {number:'Welche Zahl legst du?', add:'Welche Plus-Aufgabe legst du?', sub:'Welche Minus-Aufgabe legst du?', written:'Welche Aufgabe rechnest du schriftlich?', times:'Welche Mal-Aufgabe übst du?', money:'Rechnen mit Geld'}[app.mode]}</h2>
+    <p>${app.calc ? 'Wähle oben Plus oder Minus und trage deine Zahlen ein. Dann rechnest du mit Material, Feld, Tafel oder Zahlenstrahl – wie es dir hilft.' : app.mode === 'times' ? 'Wähle oben die Reihen – oder trage eine Aufgabe ein.' : app.mode === 'money' ? 'Oben wählst du: Betrag legen oder Wechselgeld.' : 'Trage oben ein – oder lass dir eine Aufgabe geben.'}</p>
     <div class="acts"><button id="w-edit" ${app.mode === 'money' ? 'hidden' : ''}>${icon('edit')}<span>${app.mode === 'number' ? 'Zahl eintragen' : 'Aufgabe eintragen'}</span></button>
-    <button id="w-random" class="primary">${icon('random')}<span>${app.mode === 'number' ? 'Zufallszahl' : app.mode === 'money' ? 'Los geht’s' : 'Zufallsaufgabe'}</span></button></div></div></div>`;
+    <button id="w-random" class="primary" ${app.calc ? 'hidden' : ''}>${icon('random')}<span>${app.mode === 'number' ? 'Zufallszahl' : app.mode === 'money' ? 'Los geht’s' : 'Zufallsaufgabe'}</span></button></div></div></div>`;
   $('#w-edit').onclick = () => $('#in-a')?.focus();
   $('#w-random').onclick = randomAny;
 }
@@ -1896,6 +1901,28 @@ function dice(n){
    Die erste Zahl liegt schon (blau). Plus: die zweite Zahl in Orange dazulegen. Minus: von hinten wegstreichen.
    Gefüllt wird wie üblich zeilenweise: erst die obere Reihe, dann die untere. */
 const fieldViewOk = () => ['add', 'sub'].includes(app.mode) && app.range <= 20;
+/* ---------- Plus und Minus: Üben und Rechenhilfe (Backlog A, Stefan 19.11.) ----------
+   Üben (Plus, Minus): nur Zufallsaufgaben, keine eigene Eingabe; die Darstellung kommt von selbst nacheinander:
+   bis 20 Material → Zwanzigerfeld → Zahlenstrahl, bis 100 Material → Hundertertafel → Zahlenstrahl, bis 1000 Material → Zahlenstrahl.
+   Nach 8 Aufgaben, die beim ersten Versuch richtig sind, die nächste Darstellung; nach 3 Fehlern in Folge zurück.
+   Rechenhilfe (app.calc): eigene Aufgabe eingeben, Plus oder Minus und die Darstellung frei wählen – für alle Kinder. */
+const pmPractice = () => ['add', 'sub'].includes(app.mode) && !app.calc;
+const pmViews = () => app.range <= 20 ? ['material', 'field', 'line'] : app.range === 100 ? ['material', 'board', 'line'] : ['material', 'line'];
+const pmName = v => ({material:'Material', field: app.range <= 10 ? 'Zehnerfeld' : 'Zwanzigerfeld', board:'Hundertertafel', line:'Zahlenstrahl'})[v];
+const pmWith = v => ({material:'mit Material', field: app.range <= 10 ? 'mit dem Zehnerfeld' : 'mit dem Zwanzigerfeld', board:'mit der Hundertertafel', line:'mit dem Zahlenstrahl'})[v];
+const PM_NEXT = 8;
+function pmMem(){ const k = `${data.current || 'guest'}|${app.mode}|${app.range}`, M = (app.pmMem ||= {})[k] ||= {v:0, ok:0, miss:0}; if(M.v >= pmViews().length) M.v = 0; return M; }
+const pmView = () => pmViews()[pmMem().v];
+/* gibt true zurück, wenn die Darstellungs-Leiter das Ergebnis übernimmt (dann kein Vorschlag „Schwerer/Leichter“) */
+function pmTrack(e){
+  const M = pmMem(), vs = pmViews(), last = M.v === vs.length - 1, first = M.v === 0;
+  if(e.ok){ M.ok++; M.miss = 0; if(!last && M.ok >= PM_NEXT){ M.v++; M.ok = 0; toast(`Gut gemacht! Ab jetzt ${pmWith(vs[M.v])}.`); } return !last; }
+  M.miss++; M.ok = 0; if(!first && M.miss >= 3){ M.v--; M.miss = 0; toast(`Jetzt wieder ${pmWith(vs[M.v])}.`); }
+  return !first;
+}
+function pmSetCalc(on){ if(!!app.calc === !!on) return; app.calc = !!on; app.tasks.add = blankTask(); app.tasks.sub = blankTask(); }
+const pmChips = () => { const M = pmMem(), vs = pmViews(), t = teacherOn();
+  return `<div class="pm-views" role="group" aria-label="Darstellung"><span class="pm-l">Darstellung</span>${vs.map((v, i) => `<button data-pmv="${i}" aria-pressed="${i === M.v}" ${t ? '' : 'disabled'} title="${t ? 'Lehrkraft: Darstellung wählen' : 'Kommt von selbst nach 8 richtigen Aufgaben'}">${pmName(v)}</button>`).join('<span class="pm-arr" aria-hidden="true">›</span>')}</div>`; };
 function fieldState(t){
   const cap = app.range <= 10 ? 10 : 20;
   if(!t.fd || t.fd.key !== `${t.a}|${t.b}|${cap}`) t.fd = {key:`${t.a}|${t.b}|${cap}`, cap, dots: Array(t.a).fill('b'), cross:0, hist:[]};
@@ -1958,6 +1985,7 @@ function renderTask(before){
 function selectedPieces(t){ return t.rows.flat().filter(p => app.sel.has(p.id)); }
 
 function viewButtons(t){
+  if(pmPractice()) return ''; /* Üben: Darstellung kommt von selbst (oben angezeigt) */
   const views = [['material','blocks','Material'], ['line','line','Zahlenstrahl']];
   if(app.mode === 'number' && app.range <= 6) views.push(['dice','dice','Würfelbild']);
   if(boardViewOk()) views.push(['board','grid', app.range === 1000 ? 'Tausenderbuch' : 'Tafel']);
@@ -2110,6 +2138,7 @@ function startRandom(){
   if(!pair){ $('#error').textContent = 'Mit diesen Übergangs-Filtern gibt es hier keine Aufgabe. Ändere sie in den Einstellungen.'; $('#error').hidden = false; return; }
   $('#error').hidden = true;
   Object.assign(t, {a:pair[0], b:pair[1], ready:true, draft:[String(pair[0]), app.mode === 'number' ? '' : String(pair[1])]});
+  if(pmPractice()){ t.view = pmView(); t.reveal = false; }
   setupRows(t); render(); sayTask();
 }
 function sayTask(){
@@ -3500,6 +3529,7 @@ function adaptStep(mode, dir){
 }
 function adaptTrack(e){
   const k = adaptKey(e); if(!k) return;
+  if(['add', 'sub'].includes(e.mode) && !app.calc && e.mode === app.mode && pmTrack(e)) return;
   const A = app.adapt; if(A.key !== k){ Object.assign(A, {key:k, ok:0, miss:0}); }
   if(e.ok){ A.ok++; A.miss = 0; } else { A.miss++; A.ok = 0; }
   const st = A.ok >= 5 ? (guideOn() || roundOn() ? null : adaptStep(k, 1)) : A.miss >= 3 ? adaptStep(k, -1) : null;
@@ -6845,9 +6875,10 @@ function applyOffer(set){
   if(set.rows){ settings.timesRows = [...set.rows]; saveSettings(); }
   if(set.blitz){ app.blitz.range = set.blitz; app.blitz.phase = 'idle'; }
   if(set.mode === 'money'){ Object.assign(app.money, {sub: set.msub || 'pay', range: set.mrange || 20, cents: !!set.cents, exact: !!set.exact}); app.mode = 'money'; saveSettings(); $('#stage').innerHTML = ''; moneyNew(); return; }
-  app.mode = set.mode;
+  pmSetCalc(false); app.mode = set.mode;
   if(['number','add','sub'].includes(set.mode)){
     const t = task(); t.view = set.view || 'material'; t.find = !!set.find;
+    if(pmPractice()){ const M = pmMem(), i = pmViews().indexOf(t.view); if(i >= 0){ M.v = i; M.ok = 0; M.miss = 0; } else t.view = pmView(); }
     if(!t.ready || !validTask(set.mode, t.a, t.b, app.range)){ const pair = randomTask(set.mode, app.range, settings); if(pair){ Object.assign(t, {a:pair[0], b:pair[1], ready:true, draft:[String(pair[0]), set.mode === 'number' ? '' : String(pair[1])]}); setupRows(t); } }
   }
   saveSettings(); $('#stage').innerHTML = ''; render();
@@ -7025,7 +7056,8 @@ function homeAreas(subj){
 }
 function homeAreasMath(g, lvOk){
   const out = [];
-    for(const k of MATH_RAIL){ if(g && !g.modes.has(k)) continue; out.push({mode:k, sym:MODES[k].sym, label:MODES[k].label});
+    for(const k of MATH_RAIL){ if(k === 'written') out.push({mode:'add', calc:1, sym:'±', label:'Rechenhilfe'}); /* Rechenhilfe für alle Kinder (Stefan, 19.11.) */
+      if(g && !g.modes.has(k)) continue; out.push({mode:k, sym:MODES[k].sym, label:MODES[k].label});
       if(k === 'number' && (!g || g.axVisible('H'))) out.push({mode:'read', lvl: g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1', last:'board', sym:TAFEL_SYM, label:'Hundertertafel'}); }
     if(!g || g.axVisible('U')) out.push({mode:'read', lvl: g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1', last:'clock', sym:'◷', label:'Uhr'});
     if(!g || g.axVisible('G')) out.push({mode:'read', lvl: g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1', last:'size', sym:'⚖', label:'Größen'});
@@ -7072,7 +7104,7 @@ function renderHome(){
     const groups = homeAreas(W.subj), fy = p ? forYouFor(W.subj) : null;
     body = `<h2>${subjName(W.subj)}: Was möchtest du üben?</h2>
       ${fy ? `<button class="home-card wz-fy" data-home-offer="${fy.sj}"><span class="hc-subj">★ Für dich</span><span class="hc-title">${escHtml(kidTitle(fy.z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>` : ''}
-      ${groups.map(([h, list]) => `${h ? `<p class="home-sub wz-gh">${h}</p>` : ''}<div class="wz-tiles">${list.map(t => `<button class="wz-tile" data-wz-mode="${t.mode}" ${t.lvl ? `data-wz-lvl="${t.lvl}"` : ''} ${t.last ? `data-wz-last="${t.last}"` : ''}><b aria-hidden="true">${t.sym}</b><span>${t.label}</span></button>`).join('')}</div>`).join('')}
+      ${groups.map(([h, list]) => `${h ? `<p class="home-sub wz-gh">${h}</p>` : ''}<div class="wz-tiles">${list.map(t => `<button class="wz-tile" data-wz-mode="${t.mode}" ${t.lvl ? `data-wz-lvl="${t.lvl}"` : ''} ${t.last ? `data-wz-last="${t.last}"` : ''} ${t.calc ? 'data-wz-calc="1"' : ''}><b aria-hidden="true">${t.sym}</b><span>${t.label}</span></button>`).join('')}</div>`).join('')}
       <button class="linkish wz-back" data-wz-step="subj">← anderes Fach</button>`;
   }
   const switchBtn = step !== 'who' && needWho ? `<button class="linkish home-switch" data-home-pick-again>${p ? `Nicht ${escHtml(p.name)}? Namen wechseln` : 'Namen wählen'}</button>` : '';
@@ -7094,7 +7126,7 @@ function wzGo(ds){
   if(ds.wzLvl){
     if(ds.wzLast){ settings.lastMath = ds.wzLast; ({clock:() => app.read.ulvl = ds.wzLvl, size:() => app.read.glvl = ds.wzLvl, board:() => app.read.hlvl = ds.wzLvl, tenpair:() => app.read.zlvl = ds.wzLvl})[ds.wzLast]?.(); }
     Object.assign(app.read, {lvl: ds.wzLvl, item:null, streak:0, miss:0}); app.mode = 'read';
-  } else { app.mode = ds.wzMode; settings.lastMath = app.mode; autoConf(app.mode); }
+  } else { pmSetCalc(!!ds.wzCalc); app.mode = ds.wzMode; settings.lastMath = app.mode; autoConf(app.mode); }
   saveSettings(); app.wz = null; render();
 }
 /* =====================================================================
@@ -9343,10 +9375,11 @@ $('#modes').addEventListener('click', e => {
   if(e.target.closest('[data-guide-all]')){ requireTeacher(() => { app.showAll = true; if(!settings.pin) app.teacherUntil = Date.now() + 20*60e3; toast('Alle Bereiche sichtbar (Lehrkraft, 20 Minuten).'); render(); }); return; }
   if(e.target.closest('[data-guide-off]')){ app.showAll = false; render(); return; }
   const rg = e.target.closest('[data-railgrp]'); if(rg){ app.railGrp = rg.dataset.railgrp; app.railGrpLvl = app.read.lvl; $('#modes').innerHTML = railHtml(); $('#modes').querySelector('.rail-h')?.scrollIntoView({block:'nearest'}); return; }
+  if(e.target.closest('[data-calc]') && !app.busy){ if(app.calc && ['add', 'sub'].includes(app.mode)) return; leaveMode(); app.activeZone = null; settings.subject = 'M'; pmSetCalc(true); app.mode = ['add', 'sub'].includes(settings.lastMath) ? settings.lastMath : 'add'; saveSettings(); render(); return; }
   const el = e.target.closest('[data-mode]'); if(!el || app.busy) return;
   if(el.dataset.lvl){ if(app.mode === 'read' && app.read.lvl === el.dataset.lvl) return; leaveMode(); if(el.dataset.clock){ settings.lastMath = 'clock'; saveSettings(); } if(el.dataset.size){ settings.lastMath = 'size'; saveSettings(); } if(el.dataset.board){ settings.lastMath = 'board'; saveSettings(); } if(el.dataset.tenpair){ settings.lastMath = 'tenpair'; saveSettings(); } Object.assign(app.read, {lvl: el.dataset.lvl, item:null, streak:0, miss:0}); app.mode = 'read'; render(); return; }
-  if(el.dataset.mode === app.mode) return;
-  leaveMode(); app.activeZone = null;
+  if(el.dataset.mode === app.mode && !app.calc) return;
+  leaveMode(); app.activeZone = null; pmSetCalc(false);
   app.mode = el.dataset.mode; settings.lastMath = app.mode; saveSettings(); autoConf(app.mode); render();
 });
 $('#ranges').addEventListener('click', e => {
@@ -9387,6 +9420,13 @@ $('#inputs').addEventListener('click', e => {
   if(op){ const w = app.written; w.op = op.dataset.op; if(w.ready && wrValid(w.a, w.b, w.op, w.range)) wrStart(w.a, w.b); else { w.ready = false; render(); } }
 });
 $('#btn-random').addEventListener('click', () => { skipMark(); randomAny(); });
+/* Plus/Minus: Darstellung wählen (Lehrkraft) und Rechenart in der Rechenhilfe */
+document.addEventListener('click', e => {
+  const pv = e.target.closest('[data-pmv]');
+  if(pv){ if(!pmPractice() || !teacherOn()) return; const M = pmMem(); M.v = +pv.dataset.pmv; M.ok = 0; M.miss = 0; const t = task(); t.view = pmView(); app.sel.clear(); t.check = t.check === 'ok' ? 'ok' : null; return render(); }
+  const op = e.target.closest('[data-calcop]');
+  if(op && app.calc && op.dataset.calcop !== app.mode){ const d = [$('#in-a')?.value || '', $('#in-b')?.value || '']; app.mode = op.dataset.calcop; settings.lastMath = app.mode; saveSettings(); const t = task(); if(!t.ready) t.draft = d; render(); }
+});
 $('#btn-say').addEventListener('click', () => {
   if(app.mode === 'written'){ const w = app.written; if(w.ready) speak(`${w.a} ${w.op === 'add' ? 'plus' : 'minus'} ${w.b}. ${w.done ? '' : wrPrompt()}`); return; }
   if(app.mode === 'money'){ const m = app.money; if(m.ready) speak(m.sub === 'pay' ? `Lege ${fmtMoney(m.target)}.` : `Der Preis ist ${fmtMoney(m.price)}. Bezahlt wird mit ${fmtMoney(m.paid)}. Wie viel Wechselgeld gibt es?`); return; }

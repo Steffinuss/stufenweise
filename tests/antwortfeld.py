@@ -10,7 +10,7 @@ async def main():
             await pg.goto(URL); await pg.wait_for_timeout(400)
             await pg.evaluate("settings.numpad='on'; saveSettings()")
             if await pg.locator("[data-ctx='practice']").count(): await pg.click("[data-ctx='practice']")
-            await pg.click('[data-mode="add"]'); await pg.wait_for_timeout(200)
+            await pg.click('[data-calc]'); await pg.wait_for_timeout(200)  # Rechenhilfe: Darstellung frei wählbar
             await pg.click('[data-range="100"]'); await pg.wait_for_timeout(200); await pg.evaluate('startRandom()'); await pg.wait_for_timeout(200)
             print(W, 'before join input?', await pg.locator('#guess').count())
             await pg.click('#c-join'); await pg.wait_for_timeout(1500)
