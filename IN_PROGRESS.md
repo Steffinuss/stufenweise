@@ -3,7 +3,7 @@
 Was gerade begonnen ist. Erledigtes wandert nach `CHANGELOG.md`, Geplantes steht in `BACKLOG.md`.
 Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
-Stand: 19.11.2026
+Stand: 19.11.2026 abends
 
 ## Basis-Test (Basis, Schritt 4)
 
@@ -21,6 +21,11 @@ Umgesetzt:
 - Kompetenzmatrix mit zwei Bereichszeilen (keine Treppe, nichts abgeleitet), Förderzone in der empfohlenen Reihenfolge, ILEB-Sätze, Elterninfo, Lernlandkarte, Kurztest, Re-Diagnose.
 - Hinweis im Lernstand, wenn Mathe „Zahlen bis 10, Stufe I“ oder Lesen L1 nicht erreicht ist; Basis wird bei offener Förderzone automatisch sichtbar.
 - Texte V3 und V6 an das angepasst, was der Test prüft (V3: Farbe bei gleichen bzw. verschiedenen Dingen; V6 b: vier Dinge ordnen).
+
+Rückmeldungen beim Ausprobieren (19.11.2026, eingearbeitet, Testversion cb56bb1):
+- Basis-Test war schwer zu finden → jetzt auch im Fenster „Wer übt?“ (eine Zeile je Fach: Basis, Mathe, Deutsch).
+- Bei „Zuordnen“ konnte man nichts falsch machen → „Jedem eins“ frei hinlegen: mehr im Vorrat, unter ein Bild passen auch mehrere, richtig nur mit genau einem je Bild (Üben und Test).
+- Testversion zeigte 0.28.5 → zeigt jetzt „0.29.0 · Testversion <Stand> · <Datum>“.
 
 Noch offen, bevor der Basis-Test freigegeben wird:
 1. Stefan probiert den Test in der Testversion aus (am besten am Schul-iPad) und sieht sich die geänderten Texte V3/V6 an.
