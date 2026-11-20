@@ -135,6 +135,8 @@ Die vierte Kachel auf der Startseite heißt **Materialkiste**. Sie ist für den 
 - **Taschenrechner:** plus, minus, mal (·) und geteilt (:) mit Zahlen bis 10 000, große Tasten, auch mit der Tastatur. Geteilt rechnet ohne Komma, mit Rest („17 : 5 = 3 Rest 2“). Mit **Ergebnis als Material** (oben) zeigt er das Ergebnis zusätzlich als Tausender, Hunderter, Zehner und Einer. Ein weiteres Rechenzeichen rechnet mit dem Ergebnis weiter, **C** löscht alles.
 - **Frei legen, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr:** dieselben Werkzeuge wie im Unterricht an der Tafel.
 
+![Materialkiste: Taschenrechner mit dem Ergebnis als Material, links die Werkzeuge](bilder/16_materialkiste.png)
+
 Links wechselt das Kind das Werkzeug, **Fertig** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren und in der Elterninfo) und im ILEB-Vorschlag für Mathe als Satz unter „Lernstand“.
 
 Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.

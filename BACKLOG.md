@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 20.11.2026
+Stand: 20.11.2026 (0.30.0)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -14,7 +14,7 @@ Stand: 20.11.2026
 | 1 | ~~**C** Basis: bessere Progression~~ | mittel | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
-| 4 | **D** Materialkiste (Hilfen für Schüler*innen) | mittel | gebaut 20.11. in `entwicklung`, in der Testversion; wartet auf Stefans Freigabe (`IN_PROGRESS.md`) |
+| 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -22,7 +22,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## D: Materialkiste – Hilfen für Schüler*innen als eigenes Modul
 
-**Status:** gebaut 20.11.2026 in `entwicklung`, in der Testversion; wartet auf Stefans Rückmeldung und Freigabe (`IN_PROGRESS.md`).
+**Status:** erledigt 20.11.2026, freigegeben in 0.30.0 (Stefan: „Sieht gut aus“).
 **Wunsch Stefan (20.11.):** Die Rechenhilfe soll kein Teil von Mathe/Plus-Minus sein, sondern ein ganz unabhängiges Modul, „quasi wie ein Taschenrechner, Materialvorrat usw.“ für Schüler*innen.
 
 **Ausgangslage:**
