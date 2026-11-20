@@ -4000,6 +4000,7 @@ function screenControl(btn){
 const MODE_NAMES = {basis:'Basis', diag:'Test', warm:'Startrunde', number:'Zahlen', clock:'Uhr und Kalender', size:'Größen und Einkaufen', read:'Lesen', write:'Schreiben', add:'Plus', sub:'Minus', written:'Schriftlich', times:'Einmaleins', blitz:'Blitzblick', money:'Geld', find:'Zahlenstrahl: Zahl suchen', screen:'Starter-Screening', board:'Hundertertafel', tenpair:'Zehnerpartner'};
 const pct = (a, b) => b ? Math.round(a/b*100) + ' %' : '–';
 const frac = list => `${list.filter(e => e.ok).length} von ${list.length}`;
+const KISTE_TITLE = 'Materialkiste (selbst genutzt)';
 /* Materialkiste: wie oft welches Werkzeug geöffnet wurde, z. B. „Rechenhilfe 5×, Taschenrechner 2×“ */
 function kisteLine(pid){ try { const ks = data.kiste?.[pid]; return ks ? KISTE_TOOLS.filter(t => ks[t.k]).map(t => `${t.label} ${ks[t.k]}×`).join(', ') : ''; } catch { return ''; } }
 function statsSections(id){
@@ -4067,7 +4068,7 @@ function statsSections(id){
     const tot = {}; for(const o of Object.values(errs)) for(const [k, n] of Object.entries(o)) tot[k] = (tot[k] || 0) + n;
     const tips = Object.entries(tot).filter(([k, n]) => ERR_MAT[k] && n >= 3).sort((a, b) => b[1] - a[1]).map(([k]) => `${ERR_NAME[k]}: ${ERR_MAT[k]}`);
     if(tips.length) out.push({title:'Nächster Schritt am Material', lines: tips}); }
-  const kl = kisteLine(id); if(kl) out.push({title:'Materialkiste (selbst genutzt)', lines:[kl]});
+  const kl = kisteLine(id); if(kl) out.push({title:KISTE_TITLE, lines:[kl]});   /* nur Lernstand (und Kopieren), nicht in der Elterninfo (Stefan 20.11.) */
   /* Übersprungen: ohne Lösung weitergeklickt (für die Lehrkraft – zeigt, wo ein Kind ausweicht) */
   const sk = data.skips?.[id] || [];
   if(sk.length){
@@ -9566,7 +9567,7 @@ function buildReport(pid, kind){
     body = `<div class="page rp">${head('Lernstandsbericht')}<p class="note">Letzte Tests: ${tests || '–'}. Kriteriumsorientierte Einstufung nach Kompetenzstufen (keine Normwerte). ✓ erreicht · (✓) abgeleitet · ½ teilweise · ✗ nicht erreicht · – nicht geprüft.</p>
       ${subjects.map(([sj, S]) => { const rep = zoneReport(pid, sj); return `<h2>${S}</h2>${mxTable(pid, sj)}${rep.zones.map(z => `<div class="z"><b>Förderzone: ${escHtml(cellLabel(z.key))}</b><br>${escHtml(z.why)}<br><small>${escHtml(z.info.bp)}</small>${(w => w ? `<br><b>Am Material:</b> ${escHtml(w.hand)} <b>Im Bild:</b> ${escHtml(w.bild)}` : '')(matWay(z.key))}<br><b>Im Alltag:</b> ${escHtml(z.info.analog)}</div>`).join('')}${rep.ileb ? `<h3>Formulierungsvorschlag ILEB</h3><p><b>Lernstand:</b> ${escHtml(rep.ileb.lernstand)}</p><p><b>Nächstes Ziel:</b> ${escHtml(rep.ileb.ziel)}</p><p><b>Maßnahmen:</b> ${escHtml(rep.ileb.massnahmen)}</p>` : ''}`; }).join('') || '<p>Noch keine Tests.</p>'}
       ${(() => { const pr = progressOf(pid); return pr?.gained.length ? `<h2>Lernfortschritt seit dem ersten Test (${new Date(pr.start).toLocaleDateString('de-DE')})</h2><ul>${pr.gained.map(k => `<li>${dShort(pr.sinceOf(k))}: ${escHtml(cellLabel(k))}</li>`).join('')}</ul>` : ''; })()}
-      ${(() => { const secs = statsSections(pid).filter(x => x.title !== 'Zuletzt geübt'); return secs.length ? `<h2>Übungen</h2>${secs.map(x => `<h3>${escHtml(x.title)}</h3><ul>${x.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul>`).join('')}` : ''; })()}
+      ${(() => { const secs = statsSections(pid).filter(x => !['Zuletzt geübt', KISTE_TITLE].includes(x.title)); return secs.length ? `<h2>Übungen</h2>${secs.map(x => `<h3>${escHtml(x.title)}</h3><ul>${x.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul>`).join('')}` : ''; })()}
       <p class="note" style="margin-top:6mm">Erstellt mit Stufenweise. Die Einstufungen sind Vorschläge und werden von der Lehrkraft geprüft. Sie ersetzen keine sonderpädagogische Diagnostik.</p></div>`;
   }
   const title = {map:'Lernlandkarte', parents:'Elterninfo', teacher:'Lernstandsbericht', week:'Wochenübersicht'}[kind] + ' ' + name;
@@ -9848,7 +9849,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.30.0 · 20.11.2026';
+const APP_VERSION = '0.30.1 · 20.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

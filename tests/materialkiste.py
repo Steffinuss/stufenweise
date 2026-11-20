@@ -97,6 +97,7 @@ async def main():
         # Lernstand und ILEB
         secs = await pg.evaluate(f"JSON.stringify(statsSections('{ali}'))")
         check('Lernstand', 'Materialkiste (selbst genutzt)' in secs and 'Rechenhilfe 4×' in secs, secs[-160:])
+        check('nicht in der Elterninfo', 'Materialkiste' not in await pg.evaluate(f"buildReport('{ali}', 'parents').html") and 'Materialkiste' in await pg.evaluate(f"statsText('{ali}')"))
         il = await pg.evaluate(f"zoneReport('{ali}', 'M').ileb?.lernstand || ''")
         check('ILEB Mathe', 'nutzt Hilfen aus der Materialkiste (Rechenhilfe 4×' in il, il)
 

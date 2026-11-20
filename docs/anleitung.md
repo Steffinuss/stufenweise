@@ -137,7 +137,7 @@ Die vierte Kachel auf der Startseite heißt **Materialkiste**. Sie ist für den 
 
 ![Materialkiste: Taschenrechner mit dem Ergebnis als Material, links die Werkzeuge](bilder/16_materialkiste.png)
 
-Links wechselt das Kind das Werkzeug, **Fertig** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren und in der Elterninfo) und im ILEB-Vorschlag für Mathe als Satz unter „Lernstand“.
+Links wechselt das Kind das Werkzeug, **Fertig** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren des Lernstands, nicht in der Elterninfo) und im ILEB-Vorschlag für Mathe als Satz unter „Lernstand“.
 
 Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.
 

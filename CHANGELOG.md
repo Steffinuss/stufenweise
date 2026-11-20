@@ -7,12 +7,17 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 - noch nichts
 
+## 0.30.1 – 20.11.2026
+
+Geändert:
+- Die Zählung der Materialkiste steht nur noch im Lernstand (auch beim Kopieren) und im ILEB-Vorschlag Mathe, nicht mehr in der Elterninfo (Stefan).
+
 ## 0.30.0 – 20.11.2026
 
 Neu:
 - **Materialkiste** (Backlog D): vierte Kachel auf der Startseite neben Üben, Unterricht und Testen. Hilfen für Kinder, die eine Aufgabe haben (z. B. vom Arbeitsblatt): Rechenhilfe, Taschenrechner, Frei legen, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr. Für alle Kinder, auch in der geführten Oberfläche; keine Bewertung, keine Runden, kein „Schwerer/Leichter“, freier Zahlenraum.
 - **Taschenrechner** in der Materialkiste: plus, minus, mal (·), geteilt (:) mit Zahlen bis 10 000, große Tasten, auch mit der Tastatur; geteilt mit Rest; Ergebnis wahlweise als Material (Tausender, Hunderter, Zehner, Einer).
-- Gezählt wird nur, wie oft ein Kind welches Werkzeug öffnet (Gast: nichts): im Lernstand „Materialkiste (selbst genutzt)“ (auch beim Kopieren und in der Elterninfo) und im ILEB-Vorschlag Mathe als Satz unter „Lernstand“.
+- Gezählt wird nur, wie oft ein Kind welches Werkzeug öffnet (Gast: nichts): im Lernstand „Materialkiste (selbst genutzt)“ (auch beim Kopieren und in der Elterninfo; ab 0.30.1 nicht mehr in der Elterninfo) und im ILEB-Vorschlag Mathe als Satz unter „Lernstand“.
 
 Geändert:
 - Die Rechenhilfe ist aus der Mathe-Leiste und den Mathe-Kacheln in die Materialkiste umgezogen. Aufgaben in der Rechenhilfe werden nicht mehr protokolliert.
