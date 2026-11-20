@@ -14,8 +14,31 @@ Stand: 20.11.2026
 | 1 | ~~**C** Basis: bessere Progression~~ | mittel | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
+| 4 | **D** Hilfen für Schüler*innen als eigenes Modul | mittel | Wunsch Stefan 20.11.; erst Entscheidungen (siehe D), dann in `entwicklung` |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
+
+---
+
+## D: Hilfen für Schüler*innen als eigenes Modul (Arbeitsname „Werkzeugkiste“)
+
+**Status:** Wunsch dokumentiert 20.11.2026, Entscheidungen offen, nicht begonnen.
+**Wunsch Stefan (20.11.):** Die Rechenhilfe soll kein Teil von Mathe/Plus-Minus sein, sondern ein ganz unabhängiges Modul, „quasi wie ein Taschenrechner, Materialvorrat usw.“ für Schüler*innen.
+
+**Ausgangslage:**
+- Rechenhilfe seit 0.29.0: `app.calc` innerhalb von Plus/Minus, eigener Eintrag in der Mathe-Leiste vor „Schriftlich“ (`homeAreasMath`), für alle Kinder sichtbar. Eigene Aufgabe eingeben, Plus/Minus und Darstellung frei wählen. Übungen werden protokolliert (`logAttempt`), aber ohne „Schwerer/Leichter“.
+- „Frei legen“ (`free`) ist schon ein Materialvorrat und bleibt nach dem Test immer sichtbar.
+- Für die Tafel gibt es acht Werkzeuge ohne Namen und ohne Speichern (`CLASS_TOOLS`: Zahlen, Zwanzigerfeld, Zahlenstrahl, Hundertertafel, Frei legen, Blitzblick, Uhr, Wörter mit Silben). Diese könnten für Schüler*innen wiederverwendet werden, ohne neue Architektur.
+
+**Idee:** eigener Bereich mit Werkzeugen, die ein Kind nutzt, wenn es eine Aufgabe (z. B. vom Arbeitsblatt oder aus dem Alltag) hat: kein Lernstand, keine Tests, keine Förderzone.
+
+**Offene Entscheidungen (Stefan):**
+1. Ort: eigener Eingang auf der Startseite (neben Üben und Testen) oder eigene Gruppe in der Leiste, die in jedem Fach zu sehen ist.
+2. Inhalt: Rechenhilfe (Plus/Minus), Materialvorrat, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr, Geld, Wörter/Silben; ein echter Taschenrechner (große Tasten, Ergebnis wahlweise auch als Material)?
+3. Speichern: ohne Ergebnisse wie an der Tafel, oder Nutzung mitschreiben (z. B. „hat die Rechenhilfe 5× genutzt“) für Lernstand/ILEB.
+4. Sichtbarkeit: immer für alle Kinder, oder je Kind von der Lehrkraft ein- und ausschaltbar (wie das Basis-Häkchen).
+5. Name für Kinder: „Hilfen“, „Werkzeugkiste“ o. Ä.
+6. Rechenhilfe danach aus der Mathe-Leiste nehmen oder an beiden Stellen lassen.
 
 ---
 
