@@ -31,7 +31,7 @@ async def main():
             if o['wide'] > 2: errs.append(f'{m}: Seite breiter als Handy ({o["wide"]} px)')
             if not (o['hintBelow'] and o['ctlBelow']): errs.append(f'{m}: Hinweis/Knöpfe liegen über der Aufgabe {o}')
         # Zifferntastatur unten über die ganze Breite
-        await pg.goto(URL); await pg.wait_for_timeout(200); await pg.click('[data-ctx="practice"]'); await pg.click('[data-home-subj="M"]'); await pg.click('.wz-tile[data-wz-calc]'); await pg.wait_for_timeout(200)  # Rechenhilfe: eigene Aufgabe eingeben
+        await pg.goto(URL); await pg.wait_for_timeout(200); await pg.click('[data-ctx-kiste]'); await pg.click('.ct-tile[data-kiste="calc"]'); await pg.wait_for_timeout(200)  # Rechenhilfe (Materialkiste): eigene Aufgabe eingeben
         await pg.click('#inputs input'); await pg.wait_for_timeout(200)
         np = await pg.evaluate("(()=>{const e=document.getElementById('numpad'); if(!e||e.hidden) return null; const r=e.getBoundingClientRect(); return [r.left, r.right, r.bottom]})()")
         if not np or np[0] > 1 or np[1] < 389 or np[2] < 663: errs.append(f'Zifferntastatur nicht unten über die ganze Breite: {np}')

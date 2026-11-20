@@ -540,13 +540,30 @@ body.rail-off .shell{grid-template-columns:minmax(0,1fr)}
 body.rail-off .rail-show{display:block}
 @media(max-width:760px){ .rail-toggle,.rail-show{display:none!important} body.rail-off .rail{display:flex} }
 /* Start: Üben oder Unterricht */
-.ctx-tiles{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
-.ctx-tile{width:min(260px,29vw);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:26px;border:3px solid transparent;padding:18px}
-.ctx-tile svg{width:190px;height:auto}
+.ctx-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,240px));gap:22px;justify-content:center;width:100%}
+@media (max-width:1060px){.ctx-tiles{grid-template-columns:repeat(2,minmax(0,260px))}}
+.ctx-tile{width:auto;hyphens:manual;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:26px;border:3px solid transparent;padding:18px}
+.ctx-tile svg{width:min(190px,100%);height:auto}
 .ctx-tile b{font-size:34px;line-height:1.1}.ctx-tile span{font-size:18px;color:var(--muted);font-weight:700}
-.ctx-tile.practice{background:#eaf5ee;border-color:#9fd3ae}.ctx-tile.class{background:#e8effa;border-color:#8fb3ea}.ctx-tile.test{background:#fdf1e1;border-color:#f0c48a}
+.ctx-tile.practice{background:#eaf5ee;border-color:#9fd3ae}.ctx-tile.kiste{background:#f4ecfa;border-color:#c9aee3}.ctx-tile.class{background:#e8effa;border-color:#8fb3ea}.ctx-tile.test{background:#fdf1e1;border-color:#f0c48a}
 .ctx-tile:hover{transform:translateY(-3px)}
 .ct-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;width:min(980px,100%)}
+/* Materialkiste: Taschenrechner */
+.trc{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-start;width:100%;padding:8px 0}
+.trc-box{width:min(380px,100%);background:#2b2930;border-radius:26px;padding:16px}
+.trc-disp{background:#eef4e6;border-radius:14px;padding:10px 16px;text-align:right;font-variant-numeric:tabular-nums;color:#2b2930}
+.trc-expr{font-size:30px;font-weight:700;min-height:40px;overflow-wrap:anywhere}
+.trc-res{font-size:46px;font-weight:800;min-height:56px;line-height:1.15;overflow-wrap:anywhere}.trc-res small{font-size:28px}
+.trc-err{font-size:22px;color:#b23a2e}.trc-ph{color:#a39e97}
+.trc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.trc-keys button{min-height:64px;font-size:32px;font-weight:800;border-radius:14px;background:#fff;color:#2b2930;border:0;padding:0}
+.trc-keys .op{background:#ffe2b8}.trc-keys .clr{background:#f6d3cf;font-size:26px}.trc-keys .bk{background:#e6e1d8;font-size:26px}
+.trc-keys .eq{grid-column:1/-1;background:#27834b;color:#fff}.trc-keys .eq:hover{background:#1f6b3d}
+.kiste-tiles{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.kiste-tiles .ct-tile{min-height:0;padding:10px 6px}
+.trc-side{flex:1 1 320px;min-width:260px;max-width:680px;display:flex;flex-direction:column;gap:10px}
+.trc-note{margin:0;font-size:20px;font-weight:700;color:var(--muted)}
+.trc-mat{background:#fff;border-radius:16px;padding:12px}.trc-mat svg{width:100%;height:auto;max-height:460px}
+.trc-zero{font-size:20px;font-weight:700;color:var(--muted)}
 .ct-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;min-height:150px;border-radius:20px}
 .ct-tile svg{width:96px;height:68px}.ct-tile b{font-size:21px}.ct-tile span{font-size:14px;color:var(--muted);font-weight:600}
 .ct-tile:hover{transform:translateY(-2px)}
@@ -957,7 +974,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
   .wz-logo svg{width:36px;height:36px}
   .wz-brand b{font-size:22px}
   .wz-brand span{font-size:13px}
-  .ctx-tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%}
+  .ctx-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
   .ctx-tile{width:auto;min-height:0;padding:12px 6px;border-radius:18px;gap:2px}
   .ctx-tile svg{width:100%;max-width:130px}
   .ctx-tile b{font-size:24px}
@@ -1675,8 +1692,7 @@ function railMathHtml(g, lvOk){
   const tafelBtn = !g || g.axVisible('H') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1'}" data-board="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'H'}"><b aria-hidden="true">${TAFEL_SYM}</b>Tafel</button>` : '';
   const zVis = (!g || (g.axHas('Z') ? g.axVisible('Z') : g.mode !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20))));
   const zBtn = zVis ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.zlvl || 'Z1') ? g.first('Z') : app.read.zlvl || 'Z1'}" data-tenpair="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'Z'}"><b aria-hidden="true">${ZP_SYM}</b>Zehner&shy;partner</button>` : '';
-  const calcBtn = `<button data-calc aria-pressed="${!!app.calc && ['add', 'sub'].includes(app.mode)}" title="Eigene Plus- und Minusaufgaben mit Hilfe rechnen"><b aria-hidden="true">±</b>Rechen&shy;hilfe</button>`;
-  return MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k && !(app.calc && ['add', 'sub'].includes(k))}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '') + (k === 'sub' ? zBtn + calcBtn : '')).join('') + (g && !g.modes.has('sub') ? zBtn + calcBtn : '') + (g && !g.modes.has('number') ? tafelBtn : '')
+  return MATH_RAIL.filter(k => !g || g.modes.has(k)).map(k => `<button data-mode="${k}" aria-pressed="${app.mode === k && !(app.calc && ['add', 'sub'].includes(k))}"><b aria-hidden="true">${MODES[k].sym}</b>${MODES[k].label}</button>` + (k === 'number' ? tafelBtn : '') + (k === 'sub' ? zBtn : '')).join('') + (g && !g.modes.has('sub') ? zBtn : '') + (g && !g.modes.has('number') ? tafelBtn : '')
     + (!g || g.axVisible('U') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1'}" data-clock="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'U'}"><b aria-hidden="true">◷</b>Uhr</button>` : '')
     + (!g || g.axVisible('G') ? `<button data-mode="read" data-lvl="${g && !lvOk(app.read.glvl || 'G1') ? g.first('G') : app.read.glvl || 'G1'}" data-size="1" aria-pressed="${app.mode === 'read' && String(app.read.lvl)[0] === 'G'}"><b aria-hidden="true">⚖</b>Größen</button>` : '');
 }
@@ -1695,6 +1711,7 @@ function railDeutschHtml(g, lvOk){
   return h;
 }
 function railHtml(){
+  if(app.kiste || (app.mode === 'home' && app.wz?.kiste && app.wz.step === 'tools')) return kisteRailHtml();
   if(classMode()) return classRailHtml();
   if(!app.ctx && app.mode === 'home') return '';
   if(!visSubjects().includes(settings.subject)) settings.subject = visSubjects()[0] || 'M';
@@ -1713,6 +1730,7 @@ function railHtml(){
   return h + guideRailBtn();
 }
 function leaveMode(){
+  if(app.kiste){ app.kiste = false; pmSetCalc(false); }
   document.querySelector('.adapt-tip')?.remove(); document.querySelector('.round-end')?.remove(); clearTimeout(app.round?.timer);
   clearTimeout(app.blitz.timer); if(app.blitz.phase === 'show') app.blitz.phase = 'idle';
   if(app.mode === 'screen') app.screen = null;
@@ -1733,7 +1751,7 @@ function setSubject(subj){
 function renderTop(){
   $('#modes').innerHTML = railHtml();
   document.querySelector('.rail').classList.toggle('compact', !!SUBJECTS[settings.subject]?.compact);
-  const gM = settings.subject === 'M' ? guideOf('M') : null;
+  const gM = settings.subject === 'M' && !app.kiste ? guideOf('M') : null;
   const okR = gM ? (['add', 'sub'].includes(app.mode) ? gM.addZrs : gM.zrs) : null;
   if(okR && !okR.has(app.range) && ['number', 'add', 'sub'].includes(app.mode)){ app.range = Math.max(...[...okR].filter(r => RANGES.includes(r)), 10); for(const k of Object.keys(app.tasks)) app.tasks[k] = blankTask(); }
   $('#ranges').innerHTML = RANGES.filter(n => !okR || okR.has(n)).map(n => `<button data-range="${n}" aria-pressed="${app.range===n}" aria-label="Zahlenraum bis ${n}">${n}</button>`).join('');
@@ -1760,7 +1778,7 @@ function renderTop(){
 
 /* ---------- Haupt-Rendern ---------- */
 function guideFix(){
-  if(!['read', ...MATH_RAIL].includes(app.mode)) return;
+  if(app.kiste || !['read', ...MATH_RAIL].includes(app.mode)) return;
   const g = guideOf(app.mode === 'read' ? subjOfLvl(app.read.lvl) || 'M' : settings.subject); if(!g) return;
   if(app.mode === 'read'){ const l = String(app.read.lvl); if(!g.lvlOk(l)){ app.read.lvl = g.first(l[0]); app.read.item = null; } return; }
   if(g.modes && !g.modes.has(app.mode) && !app.calc){ const set = zoneReport(curProfile().id, 'M').zones[0]?.info.offer?.set; if(set && set.mode !== 'read'){ applyOffer(set); return true; } app.mode = 'number'; }
@@ -2241,7 +2259,7 @@ function errHint(et, ctx){
   return ERR_HINT[et] || ERR_HINT.anders;
 }
 const ERR_NAME = {dreher:'Zahlendreher', eins:'um 1 daneben (Zählfehler)', zehn:'um 10 daneben', hundert:'um 100 daneben', anders:'anderer Fehler', rechenart:'falsche Rechenart', uebertrag:'Zehnerübergang nicht beachtet', kleingross:'Einer „klein von groß“ gerechnet'};
-function noteError(mode, type){ if(!type) return; const pid = data.current || 'guest'; (data.errs ??= {})[pid] ??= {}; const e = data.errs[pid][mode] ??= {}; e[type] = (e[type] || 0) + 1; saveData(); }
+function noteError(mode, type){ if(!type || app.kiste) return; const pid = data.current || 'guest'; (data.errs ??= {})[pid] ??= {}; const e = data.errs[pid][mode] ??= {}; e[type] = (e[type] || 0) + 1; saveData(); }
 /* ---------- Ansicht „Tafel“: Hundertertafel (bis 100) bzw. Tausenderbuch-Seite (bis 1000) ---------- */
 const boardViewOk = () => (app.range === 100 || app.range === 1000) && ['number', 'add', 'sub'].includes(app.mode);
 const tbPos = t => (t.bpath ||= [t.a]).at(-1);
@@ -3367,6 +3385,7 @@ touchProfiles();
 let dataBase = (() => { try { return localStorage.getItem(DATA_KEY); } catch { return null; } })();
 const jEq = (a, b) => a === b || JSON.stringify(a) === JSON.stringify(b);
 const isObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+const CNT_PATH = path => path[0] === 'errs' || path[0] === 'kiste';   /* Zähler: Zuwachs aus beiden Fenstern addieren */
 const isEmptyVal = x => Array.isArray(x) ? !x.length : isObj(x) && !Object.keys(x).length;
 /* Listen (Übungen, Verlauf, Auslassungen …): Einträge über ihren Inhalt erkennen */
 function mergeArr(b, m, t){
@@ -3382,7 +3401,7 @@ function mergeArr(b, m, t){
 function mergeKept(b, v, path){
   if(Array.isArray(v) && Array.isArray(b)) return mergeArr(b, v, []);
   if(isObj(v) && isObj(b)) return mergeObj(b, v, {}, path);
-  if(path[0] === 'errs' && typeof v === 'number' && typeof b === 'number') return v > b ? v - b : undefined;
+  if(CNT_PATH(path) && typeof v === 'number' && typeof b === 'number') return v > b ? v - b : undefined;
   return v;
 }
 function mergeObj(b, m, t, path){
@@ -3398,14 +3417,14 @@ function mergeObj(b, m, t, path){
   return out;
 }
 function merge3(b, m, t, path){
-  if(path[0] !== 'errs' && jEq(m, t)) return m;   /* Zähler: gleicher Stand in beiden Fenstern kann doppelter Zuwachs sein */
+  if(!CNT_PATH(path) && jEq(m, t)) return m;   /* Zähler: gleicher Stand in beiden Fenstern kann doppelter Zuwachs sein */
   if(b !== undefined && jEq(m, b)) return t;
   if(b !== undefined && jEq(t, b)) return m;
   if(isObj(m) && isObj(t)) return mergeObj(isObj(b) ? b : {}, m, t, path);
   if(Array.isArray(m) && Array.isArray(t)) return mergeArr(Array.isArray(b) ? b : [], m, t);
   if(typeof m === 'number' && typeof t === 'number'){
     const key = path.at(-1), bb = typeof b === 'number' ? b : 0;
-    if(path[0] === 'errs') return m + t - bb;                 /* Fehlerzähler: Zuwachs aus beiden Fenstern */
+    if(CNT_PATH(path)) return m + t - bb;                 /* Fehlerzähler: Zuwachs aus beiden Fenstern */
     if(key === 'firstUse' || key === 'created') return Math.min(m, t);
     if(['lastBackup', 'updated', 'date', 'ts'].includes(key)) return Math.max(m, t);
   }
@@ -3423,7 +3442,7 @@ function mergeStores(b, m, t){
   const out = mergeObj(rest(b), rest(m), rest(t), []);
   out.profiles = mergeProfiles(b?.profiles || [], m.profiles || [], t.profiles || []);
   const gone = (b?.profiles || []).map(p => p.id).filter(id => !out.profiles.some(p => p.id === id));
-  for(const id of gone) for(const k of ['log', 'skips', 'errs']) if(isObj(out[k])) delete out[k][id];   /* wie beim Löschen eines Kindes */
+  for(const id of gone) for(const k of ['log', 'skips', 'errs', 'kiste']) if(isObj(out[k])) delete out[k][id];   /* wie beim Löschen eines Kindes */
   out.log ??= {};
   out.current = out.profiles.some(p => p.id === m.current) ? m.current : null;   /* Wer übt, entscheidet jedes Fenster selbst */
   return out;
@@ -3489,7 +3508,7 @@ const escHtml = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;',
 const ROUND_MODES = ['add', 'sub', 'written', 'times', 'money', 'blitz', 'read'];
 app.round = {key:null, res:[]};
 const roundLen = () => Number(settings.roundLen ?? 10) || 0;
-const roundOn = () => roundLen() > 0 && ROUND_MODES.includes(app.mode) && app.ctx !== 'class';
+const roundOn = () => roundLen() > 0 && ROUND_MODES.includes(app.mode) && app.ctx !== 'class' && !app.kiste;
 /* Stufenwechsel innerhalb eines Bereichs beendet die Runde nicht (sonst ließe sich eine Runde durch Hin- und Herschalten „neu starten“) */
 const roundKey = () => `${data.current || 'guest'}|${app.mode}|${app.mode === 'read' ? (app.read.lvl || '')[0] : ''}`;
 function roundSync(){ const k = roundKey(); if(app.round.key !== k){ app.round = {key:k, res:[]}; app.solved = false; document.querySelector('.round-end')?.remove(); } }
@@ -3508,7 +3527,7 @@ function currentTaskLabel(){
   return '';
 }
 function logSkip(){
-  if(app.ctx === 'class') return;
+  if(app.ctx === 'class' || app.kiste) return;
   const label = currentTaskLabel(); if(!label) return;
   const id = data.current || 'guest', list = (data.skips ??= {})[id] ??= [];
   list.push({ts: Date.now(), mode: app.mode === 'read' ? rdMode(app.read.lvl) : app.mode, lvl: app.mode === 'read' ? app.read.lvl : undefined, task: label});
@@ -3589,7 +3608,7 @@ function roundEnd(){
   d.querySelector('button')?.focus();
 }
 function logAttempt(e){
-  if(app.ctx === 'class') return;
+  if(app.ctx === 'class' || app.kiste) return;   /* Materialkiste: nur die Nutzung wird gezählt (kisteCount) */
   const id = data.current || 'guest';
   const list = data.log[id] ??= [];
   list.push({ts: Date.now(), ...e}); app.solved = true;
@@ -3981,6 +4000,8 @@ function screenControl(btn){
 const MODE_NAMES = {basis:'Basis', diag:'Test', warm:'Startrunde', number:'Zahlen', clock:'Uhr und Kalender', size:'Größen und Einkaufen', read:'Lesen', write:'Schreiben', add:'Plus', sub:'Minus', written:'Schriftlich', times:'Einmaleins', blitz:'Blitzblick', money:'Geld', find:'Zahlenstrahl: Zahl suchen', screen:'Starter-Screening', board:'Hundertertafel', tenpair:'Zehnerpartner'};
 const pct = (a, b) => b ? Math.round(a/b*100) + ' %' : '–';
 const frac = list => `${list.filter(e => e.ok).length} von ${list.length}`;
+/* Materialkiste: wie oft welches Werkzeug geöffnet wurde, z. B. „Rechenhilfe 5×, Taschenrechner 2×“ */
+function kisteLine(pid){ try { const ks = data.kiste?.[pid]; return ks ? KISTE_TOOLS.filter(t => ks[t.k]).map(t => `${t.label} ${ks[t.k]}×`).join(', ') : ''; } catch { return ''; } }
 function statsSections(id){
   const L = data.log[id] || [], out = [];
   const prof = data.profiles.find(p => p.id === id);
@@ -4046,6 +4067,7 @@ function statsSections(id){
     const tot = {}; for(const o of Object.values(errs)) for(const [k, n] of Object.entries(o)) tot[k] = (tot[k] || 0) + n;
     const tips = Object.entries(tot).filter(([k, n]) => ERR_MAT[k] && n >= 3).sort((a, b) => b[1] - a[1]).map(([k]) => `${ERR_NAME[k]}: ${ERR_MAT[k]}`);
     if(tips.length) out.push({title:'Nächster Schritt am Material', lines: tips}); }
+  const kl = kisteLine(id); if(kl) out.push({title:'Materialkiste (selbst genutzt)', lines:[kl]});
   /* Übersprungen: ohne Lösung weitergeklickt (für die Lehrkraft – zeigt, wo ein Kind ausweicht) */
   const sk = data.skips?.[id] || [];
   if(sk.length){
@@ -6960,6 +6982,7 @@ function zoneReport(pid, subj){
     massnahmen: out.zones.map(z => { const w = matWay(z.key); return w ? `Am Material: ${w.hand.replace(/\.$/, '')}. Im Bild: ${w.bild.replace(/\.$/, '')}. In der App: ${z.info.offer.text}` : `${z.info.offer.text}; analog: ${z.info.analog}`; }).join('. ') + `. Re-Diagnose nach etwa 5 Übungseinheiten.`,
     bp: [...new Set(out.zones.map(z => z.info.bp))].join('; ')
   };
+  if(subj === 'M'){ const kl = kisteLine(pid); if(kl) out.ileb.lernstand += ` ${name} nutzt Hilfen aus der Materialkiste (${kl}).`; }
   if(!out.zones.length){ out.ileb.ziel = `${name} festigt und überträgt das Gelernte auf neue Situationen.`; out.ileb.massnahmen = 'Anwendung im Alltag und in Projekten; nächster Zahlenraum oder anspruchsvollere Texte.'; }
   return out;
 }
@@ -7158,7 +7181,7 @@ function homeAreas(subj){
 }
 function homeAreasMath(g, lvOk){
   const out = [];
-    for(const k of MATH_RAIL){ if(k === 'written') out.push({mode:'add', calc:1, sym:'±', label:'Rechenhilfe'}); /* Rechenhilfe für alle Kinder (Stefan, 19.11.) */
+    for(const k of MATH_RAIL){ /* Rechenhilfe: seit Backlog D in der Materialkiste */
       if(g && !g.modes.has(k)) continue; out.push({mode:k, sym:MODES[k].sym, label:MODES[k].label});
       if(k === 'number' && (!g || g.axVisible('H'))) out.push({mode:'read', lvl: g && !lvOk(app.read.hlvl || 'H1') ? g.first('H') : app.read.hlvl || 'H1', last:'board', sym:TAFEL_SYM, label:'Hundertertafel'}); }
     if(!g || g.axVisible('U')) out.push({mode:'read', lvl: g && !lvOk(app.read.ulvl || 'U1') ? g.first('U') : app.read.ulvl || 'U1', last:'clock', sym:'◷', label:'Uhr'});
@@ -7176,6 +7199,7 @@ function renderHome(){
   if(classMode()) return renderClassHome();
   const p = curProfile(), W = app.wz ||= {};
   if(W.test) return renderTestHome(p, W);
+  if(W.kiste) return renderKisteHome(p, W);
   const needWho = data.profiles.length > 0;
   let step = W.step || (needWho && !p && !W.guest ? 'who' : 'subj');
   if(step === 'area' && !W.subj) step = 'subj';
@@ -7244,7 +7268,7 @@ const CLASS_TOOLS = [
   {k:'tclock', label:'Uhr', sub:'Zeiger stellen'},
   {k:'tword', label:'Wörter', sub:'groß zeigen, Silben'}
 ];
-const TOOL_MODES = ['tfield', 'nline', 'hboard', 'tclock', 'tword'];
+const TOOL_MODES = ['tfield', 'nline', 'hboard', 'tclock', 'tword', 'tcalc'];
 const CT_ILL = {
   tfield:`<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="3" y="12" width="74" height="32" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><path d="M3 28h74M40 12v32" stroke="#2b2930" stroke-width="1.8"/>${Array.from({length:12}, (_, i) => `<circle cx="${6.7 + (i % 10)*7.4}" cy="${20 + Math.floor(i/10)*16}" r="3.1" fill="${i < 7 ? '#2f5ea8' : '#e8890c'}"/>`).join('')}</svg>`,
   number:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="19" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="36" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="50" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="64" y="40" width="10" height="10" rx="2" fill="#27834b"/><text x="56" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#2b2930" font-family="Stufenfibel,sans-serif">23</text></svg>',
@@ -7296,7 +7320,7 @@ function renderTestHome(p, W){
 function renderCtx(){
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
   $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}</div><section class="wz-body"><h2>Was machen wir?</h2>
-    <div class="ctx-tiles"><button class="ctx-tile practice" data-ctx="practice">${CTX_ILL.practice}<b>Üben</b><span>mit deinem Namen</span></button><button class="ctx-tile class" data-ctx="class">${CTX_ILL.class}<b>Unterricht</b><span>an der Tafel zeigen</span></button><button class="ctx-tile test" data-ctx-test>${CTX_ILL.test}<b>Testen</b><span>mit der Lehrkraft</span></button></div></section>
+    <div class="ctx-tiles"><button class="ctx-tile practice" data-ctx="practice">${CTX_ILL.practice}<b>Üben</b><span>mit deinem Namen</span></button><button class="ctx-tile class" data-ctx="class">${CTX_ILL.class}<b>Unterricht</b><span>an der Tafel zeigen</span></button><button class="ctx-tile test" data-ctx-test>${CTX_ILL.test}<b>Testen</b><span>mit der Lehrkraft</span></button><button class="ctx-tile kiste" data-ctx-kiste>${CTX_ILL.kiste}<b>Material&shy;kiste</b><span>rechnen und legen</span></button></div></section>
     <button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
 }
 function renderClassHome(){
@@ -7322,6 +7346,136 @@ function setTool(k){
 function classRailHtml(){
   return `<span class="rail-h">Unterricht</span>` + CLASS_TOOLS.map(t => `<button data-ctool="${t.k}" aria-pressed="${app.mode === t.k}"><b aria-hidden="true" class="ct-sym">${CT_ILL[t.k]}</b>${t.rail || t.label}</button>`).join('') + `<button data-ctx-reset class="rail-guide">${icon('user')}<span>Üben</span></button>`;
 }
+
+/* =====================================================================
+   Materialkiste (Backlog D, Stefan 20.11.): Hilfen für Schüler*innen, unabhängig vom Fach.
+   Eigener Eingang auf der Startseite. Für alle Kinder. Kein Lernstand, keine Tests, keine Förderzone, keine Runden:
+   Gezählt wird nur, wie oft ein Kind welches Werkzeug öffnet (data.kiste[pid][werkzeug]), für Lernstand und ILEB.
+   Die Werkzeuge sind die der Tafel (Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr, Frei legen), dazu
+   die Rechenhilfe (bisher in der Mathe-Leiste) und der Taschenrechner.
+   ===================================================================== */
+const KISTE_TOOLS = [
+  {k:'calc', label:'Rechenhilfe', rail:'Rechen&shy;hilfe', sub:'Plus und Minus mit Hilfe'},
+  {k:'tcalc', label:'Taschenrechner', rail:'Taschen&shy;rechner', sub:'+ − · : ausrechnen'},
+  {k:'free', label:'Frei legen', sub:'Material, Würfel und Geld'},
+  {k:'tfield', label:'Zwanzigerfeld', rail:'20er-Feld', sub:'legen und wegstreichen'},
+  {k:'hboard', label:'Hundertertafel', rail:'Hunderter&shy;tafel', sub:'färben und abdecken'},
+  {k:'nline', label:'Zahlenstrahl', rail:'Zahlen&shy;strahl', sub:'Sprünge machen'},
+  {k:'tclock', label:'Uhr', sub:'Zeiger stellen'}
+];
+CTX_ILL.kiste = '<svg viewBox="0 0 160 110" aria-hidden="true"><rect x="44" y="10" width="11" height="58" rx="2" fill="#346bc3" transform="rotate(-12 50 40)"/><rect x="60" y="14" width="11" height="54" rx="2" fill="#346bc3" transform="rotate(-4 66 40)"/><rect x="80" y="30" width="34" height="34" rx="3" fill="#c9414a" transform="rotate(8 97 47)"/><path d="M80 37h34M80 44h34M80 51h34M87 30v34M94 30v34M101 30v34M108 30v34" stroke="#fff" stroke-opacity=".5" stroke-width="1" transform="rotate(8 97 47)"/><circle cx="122" cy="38" r="11" fill="#d5b75a" stroke="#9c8433" stroke-width="3"/><rect x="30" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="34" y="28" width="10" height="10" rx="2" fill="#27834b"/><rect x="16" y="52" width="128" height="50" rx="7" fill="#d79a5a" stroke="#2b2930" stroke-width="4"/><path d="M16 66h128" stroke="#2b2930" stroke-width="3"/><rect x="66" y="74" width="28" height="12" rx="4" fill="#2b2930"/></svg>';
+const KISTE_ILL = k => ({
+  calc:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="10" width="8" height="40" rx="2" fill="#346bc3"/><rect x="17" y="10" width="8" height="40" rx="2" fill="#346bc3"/><rect x="29" y="42" width="8" height="8" rx="2" fill="#27834b"/><rect x="29" y="31" width="8" height="8" rx="2" fill="#27834b"/><text x="60" y="40" text-anchor="middle" font-size="32" font-weight="800" fill="currentColor" font-family="system-ui,sans-serif">±</text></svg>',
+  tcalc:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="22" y="2" width="36" height="52" rx="6" fill="#2b2930"/><rect x="27" y="7" width="26" height="11" rx="2" fill="#e4eedc"/>' + [0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${27 + c*9.5}" y="${22 + r*10}" width="7" height="7" rx="1.5" fill="${c === 2 ? '#ffe2b8' : '#fff'}"/>`).join('')).join('') + '</svg>'
+})[k] || CT_ILL[k] || '';
+const kisteOn = k => app.kiste && (k === 'calc' ? !!app.calc && ['add', 'sub'].includes(app.mode) : app.mode === k);
+function renderKisteHome(p, W){
+  const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Materialkiste</span></div></header>`, Q = '<b class="wz-q">?</b>';
+  const needWho = data.profiles.length > 0, step = needWho && (W.step === 'who' || (!p && !W.guest)) ? 'who' : 'tools';
+  const kidPic = p ? (p.sym && ICON[p.sym] ? iconSvg(p.sym, 40) : `<b class="wz-ini">${escHtml(p.name.slice(0, 1).toUpperCase())}</b>`) : '<b class="wz-ini">?</b>';
+  const steps = [['ctx', 'Materialkiste', CTX_ILL.kiste], ...(needWho ? [['who', step === 'tools' ? (p ? escHtml(p.name) : 'Gast') : 'Wer?', step === 'tools' ? kidPic : Q]] : []), ['tools', 'Was brauchst du?', Q]];
+  const si = Math.max(0, steps.findIndex(x => x[0] === step));
+  const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l, pic], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : 'next'}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben, Unterricht, Testen oder Materialkiste wählen"' : `data-wz-step="${k}" title="Zurück zu diesem Schritt"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk">${pic}</span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
+  const body = step === 'who'
+    ? `<h2>Wer bist du?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}" class="${q.sym && ICON[q.sym] ? 'has-sym' : ''}">${q.sym && ICON[q.sym] ? `<i class="kid-sym">${iconSvg(q.sym, 64)}</i>` : `<b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>`}${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div>`
+    : `<h2>${p ? `Hallo ${escHtml(p.name)}! ` : ''}Was brauchst du?</h2><p class="home-sub">Hier rechnest und legst du mit Hilfe. Nichts wird bewertet.</p>
+      <div class="ct-tiles kiste-tiles">${KISTE_TOOLS.map(t => `<button class="ct-tile" data-kiste="${t.k}">${KISTE_ILL(t.k)}<b>${t.label}</b><span>${t.sub}</span></button>`).join('')}</div>`;
+  const switchBtn = step === 'tools' && needWho ? `<button class="linkish home-switch" data-home-pick-again>${p ? `Nicht ${escHtml(p.name)}? Namen wechseln` : 'Namen wählen'}</button>` : '';
+  $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}${stair}</div><section class="wz-body">${body}</section>${switchBtn}<button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
+}
+function kisteRailHtml(){
+  return `<span class="rail-h">Material&shy;kiste</span>` + KISTE_TOOLS.map(t => `<button data-kiste="${t.k}" aria-pressed="${kisteOn(t.k)}"><b aria-hidden="true" class="ct-sym">${KISTE_ILL(t.k)}</b>${t.rail || t.label}</button>`).join('')
+    + `<button data-kiste-end class="rail-guide">${icon('check')}<span>Fertig</span></button>`;
+}
+/* Nur zählen, wie oft ein Werkzeug geöffnet wird – keine Aufgaben, keine Ergebnisse. Gast: nichts. */
+function kisteCount(k){ const p = curProfile(); if(!p) return; const m = (data.kiste ??= {})[p.id] ??= {}; m[k] = (m[k] || 0) + 1; saveData(); }
+function kisteGo(k){
+  if(app.busy || !KISTE_TOOLS.some(t => t.k === k) || kisteOn(k)) return;
+  leaveMode(); app.activeZone = null; app.wz = null; app.railGrp = null; settings.subject = 'M';
+  if(k === 'calc'){ pmSetCalc(true); app.mode = ['add', 'sub'].includes(settings.lastMath) ? settings.lastMath : 'add'; }
+  else app.mode = k;
+  app.kiste = true; kisteCount(k); render();
+}
+function kisteHome(){ if(app.busy) return; leaveMode(); app.mode = 'home'; app.wz = {kiste:true, step:'tools', guest: !data.current}; render(); }
+document.addEventListener('click', e => {
+  const k = e.target.closest('[data-kiste]'); if(k){ kisteGo(k.dataset.kiste); return; }
+  if(e.target.closest('[data-kiste-end]')){ kisteHome(); return; }
+  if(e.target.closest('[data-trm]')){ app.tr.mat = !app.tr.mat; render(); return; }
+  const tk = e.target.closest('[data-trk]'); if(tk && app.mode === 'tcalc') trPress(tk.dataset.trk);
+});
+
+/* ---------- Taschenrechner (Materialkiste): + − · :, Zahlen bis 10 000, Ergebnis wahlweise als Material ----------
+   Eine Rechnung nach der anderen: Zahl, Rechenzeichen, Zahl, „=“. Ein weiteres Rechenzeichen rechnet mit dem Ergebnis weiter.
+   Geteilt ohne Komma: „17 : 5 = 3 Rest 2“ (wie in der Schule). */
+app.tr = {a:'', op:'', b:'', res:null, mat:true, note:''};
+const TR_MAX = 10000, TR_OPS = {'+':'+', '-':'−', '*':'·', ':':':'}, TR_NAME = {'+':'plus', '-':'minus', '*':'mal', ':':'geteilt durch'};
+const trFmt = x => x === '' || x == null ? '' : Number(x).toLocaleString('de-DE');
+function trCompute(a, op, b){
+  a = +a; b = +b;
+  if(op === '+') return {v: a + b};
+  if(op === '-') return {v: a - b};
+  if(op === '*') return {v: a*b};
+  if(b === 0) return {err:'Durch 0 kann man nicht teilen.'};
+  return {v: Math.floor(a/b), rest: a % b};
+}
+const trUsable = r => r && !r.err && !r.rest && r.v >= 0 && r.v <= TR_MAX;
+function trPress(k){
+  const T = app.tr; T.note = '';
+  if(k === 'C') Object.assign(T, {a:'', op:'', b:'', res:null});
+  else if(k === 'back'){ if(T.res) T.res = null; else if(T.b) T.b = T.b.slice(0, -1); else if(T.op) T.op = ''; else T.a = T.a.slice(0, -1); }
+  else if(/^\d$/.test(k)){
+    if(T.res) Object.assign(T, {a:'', op:'', b:'', res:null});
+    const f = T.op ? 'b' : 'a', nv = T[f] === '0' ? k : T[f] + k;
+    if(+nv > TR_MAX) T.note = `Zahlen bis ${trFmt(TR_MAX)}.`; else T[f] = nv;
+  }
+  else if(TR_OPS[k]){
+    if(T.res){ if(trUsable(T.res)){ T.a = String(T.res.v); T.b = ''; T.res = null; T.op = k; } else T.note = 'Mit diesem Ergebnis geht es hier nicht weiter. Tippe C.'; }
+    else if(T.a && T.op && T.b){ const r = trCompute(T.a, T.op, T.b); if(trUsable(r)){ T.a = String(r.v); T.b = ''; T.op = k; } else T.res = r; }
+    else if(T.a) T.op = k;
+  }
+  else if(k === '=' && T.a && T.op && T.b) T.res = trCompute(T.a, T.op, T.b);
+  renderTcalc();
+}
+/* Ergebnis als Material: Tausender (Würfel), Hunderter (Platten), Zehner (Stangen), Einer (Würfelchen), je Stelle eine Gruppe */
+function trMatSvg(n){
+  const U = 6, S = 10*U, D = 13, cnt = {t: Math.floor(n/1000), h: Math.floor(n/100) % 10, z: Math.floor(n/10) % 10, e: n % 10};
+  const grid = (x, y, w, h, nx, ny) => { let g = ''; for(let i = 1; i < nx; i++) g += `M${x + i*w/nx} ${y}v${h}`; for(let i = 1; i < ny; i++) g += `M${x} ${y + i*h/ny}h${w}`; return g ? `<path d="${g}" stroke="#fff" stroke-opacity=".45" stroke-width=".8"/>` : ''; };
+  const draw = {
+    t: (x, y) => `<path d="M${x} ${y + D}l${D} ${-D}h${S}l${-D} ${D}z" fill="#3c9b62" stroke="#0006"/><path d="M${x + S} ${y + D}l${D} ${-D}v${S}l${-D} ${D}z" fill="#1d6a3b" stroke="#0006"/><rect x="${x}" y="${y + D}" width="${S}" height="${S}" fill="${PLACE.t}" stroke="#0006"/>${grid(x, y + D, S, S, 10, 10)}`,
+    h: (x, y) => `<rect x="${x}" y="${y}" width="${S}" height="${S}" rx="2" fill="${PLACE.h}" stroke="#0006"/>${grid(x, y, S, S, 10, 10)}`,
+    z: (x, y) => `<rect x="${x}" y="${y}" width="${U}" height="${S}" rx="1.5" fill="${PLACE.z}" stroke="#0006"/>${grid(x, y, U, S, 1, 10)}`,
+    e: (x, y) => `<rect x="${x}" y="${y}" width="${U}" height="${U}" rx="1.5" fill="${PLACE.e}" stroke="#0006"/>`
+  };
+  const cell = {t: [S + D + 8, S + D + 8, 3], h: [S + 8, S + 8, 3], z: [U + 5, S + 8, 10], e: [U + 4, U + 4, 5]};
+  let x = 6, s = '', H = 0; const labels = [];
+  for(const k of ['t', 'h', 'z', 'e']){
+    const c = cnt[k]; if(!c) continue;
+    const [cw, ch, per] = cell[k], cols = Math.min(c, per), rows = Math.ceil(c/per);
+    for(let i = 0; i < c; i++) s += draw[k](x + (i % per)*cw, 6 + Math.floor(i/per)*ch);
+    const w = cols*cw; H = Math.max(H, rows*ch); labels.push([x + w/2, `${c} ${NAME[k]}`, PLACE[k]]); x += Math.max(w, 96) + 26;
+  }
+  if(!labels.length) return '<p class="trc-zero">0 – kein Material</p>';
+  s += labels.map(([lx, t, col]) => `<text x="${lx}" y="${H + 30}" text-anchor="middle" font-size="17" font-weight="700" fill="${col}" font-family="system-ui,sans-serif">${t}</text>`).join('');
+  return `<svg viewBox="0 0 ${x - 20} ${H + 42}" role="img" aria-label="${trFmt(n)} als Material: ${labels.map(l => l[1]).join(', ')}">${s}</svg>`;
+}
+function renderTcalc(){
+  const T = app.tr, R = T.res;
+  $('#equation').innerHTML = ''; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = '';
+  const expr = `${T.a ? trFmt(T.a) : '<span class="trc-ph">0</span>'}${T.op ? ` ${TR_OPS[T.op]} ` : ''}${trFmt(T.b)}`;
+  const res = !R ? '' : R.err ? `<span class="trc-err">${R.err}</span>` : `${R.v < 0 ? '−' + trFmt(-R.v) : trFmt(R.v)}${R.rest ? ` <small>Rest ${trFmt(R.rest)}</small>` : ''}`;
+  const note = T.note || (R && !R.err ? (R.v < 0 ? 'Das Ergebnis ist kleiner als 0.' : !T.mat ? '' : R.v > TR_MAX ? `Material gibt es bis ${trFmt(TR_MAX)}.` : R.rest ? 'Material gibt es nur ohne Rest.' : '') : '');
+  const keys = [['7'], ['8'], ['9'], [':'], ['4'], ['5'], ['6'], ['*'], ['1'], ['2'], ['3'], ['-'], ['C', 'alles löschen'], ['0'], ['back', 'letzte Eingabe löschen'], ['+']];
+  const lab = k => ({'*':'·', '-':'−', back:'⌫'})[k] || k;
+  $('#stage').innerHTML = `<div class="trc"><div class="trc-box"><div class="trc-disp" role="status" aria-live="polite"><div class="trc-expr">${expr}</div><div class="trc-res">${res ? '= ' + res : ''}</div></div>
+    <div class="trc-keys">${keys.map(([k, l]) => `<button type="button" data-trk="${k}" class="${/\d/.test(k) ? 'num' : k === 'C' ? 'clr' : k === 'back' ? 'bk' : 'op'}" aria-label="${l || TR_NAME[k] || k}">${lab(k)}</button>`).join('')}<button type="button" data-trk="=" class="eq" aria-label="ist gleich">=</button></div></div>
+    <div class="trc-side">${note ? `<p class="trc-note">${note}</p>` : ''}${T.mat && trUsable(R) ? `<div class="trc-mat">${trMatSvg(R.v)}</div>` : ''}</div></div>`;
+}
+document.addEventListener('keydown', e => {
+  if(app.mode !== 'tcalc' || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
+  if(e.target.closest?.('input, textarea, select') || (e.target.closest?.('button') && ['Enter', ' '].includes(e.key))) return;
+  const k = /^\d$/.test(e.key) ? e.key : {'+':'+', '-':'-', '*':'*', 'x':'*', 'X':'*', '/':':', ':':':', 'Enter':'=', '=':'=', 'Backspace':'back', 'Escape':'C', 'Delete':'C'}[e.key];
+  if(k){ e.preventDefault(); trPress(k); }
+});
 
 /* ---------- Zahlenstrahl-Werkzeug (Unterricht) ---------- */
 /* Zoomen: Knöpfe + − ↔, zwei Finger auseinanderziehen, Mausrad mit Strg; Verschieben: mit einem Finger ziehen */
@@ -7663,6 +7817,7 @@ function renderTopTool(){
     return true;
   }
   $('#range-label').textContent = ''; $('#ranges').innerHTML = '';
+  if(m === 'tcalc'){ $('#inputs').innerHTML = `<button class="chip-toggle" data-trm aria-pressed="${app.tr.mat}" title="Das Ergebnis zusätzlich mit Tausendern, Hundertern, Zehnern und Einern zeigen">Ergebnis als Material</button>`; return true; }
   if(m === 'tword'){ $('#inputs').innerHTML = `<label class="tw-in"><span>Wort oder Satz</span><input id="tw-text" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" value="${escHtml(app.tw.text)}"></label><button id="tw-go" class="primary">Zeigen</button>`; return true; }
   $('#inputs').innerHTML = '';
   return true;
@@ -7720,6 +7875,7 @@ function renderTool(){
   if(app.mode === 'hboard') return renderHboard();
   if(app.mode === 'tclock') return renderTclock();
   if(app.mode === 'tword') return renderTword();
+  if(app.mode === 'tcalc') return renderTcalc();
 }
 document.addEventListener('click', e => {
   if(!TOOL_MODES.includes(app.mode)) return;
@@ -7749,13 +7905,14 @@ document.addEventListener('click', e => {
 
 function homeClick(e){
   const cx = e.target.closest('[data-ctx]'); if(cx){ setCtx(cx.dataset.ctx); return; }
+  if(e.target.closest('[data-ctx-kiste]')){ setCtx('practice'); app.wz = {kiste:true, step: data.profiles.length ? 'who' : 'tools'}; render(); return; }
   if(e.target.closest('[data-ctx-test]')){ requireTeacher(() => { setCtx('practice'); app.wz = {test:true, step:'who'}; render(); }); return; }
   const ts = e.target.closest('[data-tstart],[data-tre]'); if(ts){ requireTeacher(() => ts.dataset.tre ? diagStart(ts.dataset.tre, true) : diagStart(ts.dataset.tstart, false)); return; }
   if(e.target.closest('[data-ctx-reset]')){ setCtx(null); return; }
   const ct = e.target.closest('[data-ctool]'); if(ct){ setTool(ct.dataset.ctool); return; }
   const cw = e.target.closest('[data-ctworld]'); if(cw){ settings.world = cw.dataset.ctworld; saveSettings(); renderHome(); return; }
-  const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; app.wz = app.wz?.test ? {test:true, step:'tst'} : {step:'subj', guest: !data.current}; saveData(); renderProfiles(); render(); return; }
-  if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {...(app.wz?.test ? {test:true} : {}), step:'who'}; saveData(); renderProfiles(); render(); return; }
+  const pk = e.target.closest('[data-home-pick]'); if(pk){ data.current = pk.dataset.homePick || null; app.wz = app.wz?.test ? {test:true, step:'tst'} : app.wz?.kiste ? {kiste:true, step:'tools', guest: !data.current} : {step:'subj', guest: !data.current}; saveData(); renderProfiles(); render(); return; }
+  if(e.target.closest('[data-home-pick-again]')){ data.current = null; app.wz = {...(app.wz?.test ? {test:true} : app.wz?.kiste ? {kiste:true} : {}), step:'who'}; saveData(); renderProfiles(); render(); return; }
   const ws = e.target.closest('[data-wz-step]'); if(ws){ app.wz = {...app.wz, step: ws.dataset.wzStep}; renderHome(); return; }
   const wt = e.target.closest('[data-wz-mode]'); if(wt){ wzGo(wt.dataset); return; }
   const of = e.target.closest('[data-home-offer]'); if(of){ const sj = of.dataset.homeOffer; let z = zoneReport(data.current, sj).zones[0]; if(!z){ const f = frontierKeys(data.current, subjOfTest(sj)).find(k => TESTS[sj]?.homeKey ? TESTS[sj].homeKey(k) : keyInTest(k, sj)); if(f) z = {key:f, info:cellInfo(f)}; } if(z){ leaveMode(); applyOffer(z.info.offer.set); } return; }
@@ -9480,7 +9637,6 @@ $('#modes').addEventListener('click', e => {
   if(e.target.closest('[data-guide-all]')){ requireTeacher(() => { app.showAll = true; if(!settings.pin) app.teacherUntil = Date.now() + 20*60e3; toast('Alle Bereiche sichtbar (Lehrkraft, 20 Minuten).'); render(); }); return; }
   if(e.target.closest('[data-guide-off]')){ app.showAll = false; render(); return; }
   const rg = e.target.closest('[data-railgrp]'); if(rg){ app.railGrp = rg.dataset.railgrp; app.railGrpLvl = app.read.lvl; $('#modes').innerHTML = railHtml(); $('#modes').querySelector('.rail-h')?.scrollIntoView({block:'nearest'}); return; }
-  if(e.target.closest('[data-calc]') && !app.busy){ if(app.calc && ['add', 'sub'].includes(app.mode)) return; leaveMode(); app.activeZone = null; settings.subject = 'M'; pmSetCalc(true); app.mode = ['add', 'sub'].includes(settings.lastMath) ? settings.lastMath : 'add'; saveSettings(); render(); return; }
   const el = e.target.closest('[data-mode]'); if(!el || app.busy) return;
   if(el.dataset.lvl){ if(app.mode === 'read' && app.read.lvl === el.dataset.lvl) return; leaveMode(); if(el.dataset.clock){ settings.lastMath = 'clock'; saveSettings(); } if(el.dataset.size){ settings.lastMath = 'size'; saveSettings(); } if(el.dataset.board){ settings.lastMath = 'board'; saveSettings(); } if(el.dataset.tenpair){ settings.lastMath = 'tenpair'; saveSettings(); } Object.assign(app.read, {lvl: el.dataset.lvl, item:null, streak:0, miss:0}); app.mode = 'read'; render(); return; }
   if(el.dataset.mode === app.mode && !app.calc) return;
@@ -9830,7 +9986,7 @@ $('#dlg-profile').addEventListener('click', e => {
   const pick = e.target.closest('[data-pid]'); if(pick){ selectProfile(pick.dataset.pid); return; }
   const del = e.target.closest('[data-del]');
   if(del && !teacherOn()) return requireTeacher(() => renderProfiles());
-  if(del){ const id = del.dataset.del, p = data.profiles.find(x => x.id === id); if(p && del.dataset.sure){ data.profiles = data.profiles.filter(x => x.id !== id); delete data.log[id]; if(data.skips) delete data.skips[id]; if(data.errs) delete data.errs[id]; if(data.current === id) data.current = null; saveData({empty: true}); renderProfiles(); render(); } else { del.dataset.sure = '1'; del.innerHTML = '<span style="display:inline;font-weight:700;color:var(--bad)">Sicher?</span>'; } return; }
+  if(del){ const id = del.dataset.del, p = data.profiles.find(x => x.id === id); if(p && del.dataset.sure){ data.profiles = data.profiles.filter(x => x.id !== id); delete data.log[id]; if(data.skips) delete data.skips[id]; if(data.errs) delete data.errs[id]; if(data.kiste) delete data.kiste[id]; if(data.current === id) data.current = null; saveData({empty: true}); renderProfiles(); render(); } else { del.dataset.sure = '1'; del.innerHTML = '<span style="display:inline;font-weight:700;color:var(--bad)">Sicher?</span>'; } return; }
   if(e.target.closest('#p-screen')){ $('#dlg-profile').close(); screenStart(); }
   if(e.target.closest('#p-unlock')){ requireTeacher(() => renderProfiles()); return; }
 });
@@ -9863,7 +10019,7 @@ $('#dlg-stats').addEventListener('click', async e => {
     return;
   }
   const del = e.target.closest('#stats-del');
-  if(del){ if(del.dataset.sure){ delete data.log[statsId]; if(data.skips) delete data.skips[statsId]; if(data.errs) delete data.errs[statsId]; const p = data.profiles.find(x => x.id === statsId); if(p) p.screening = null; saveData(); renderStats(); toast('Daten gelöscht.'); } else { del.dataset.sure = '1'; del.querySelector('span').textContent = 'Wirklich löschen?'; } }
+  if(del){ if(del.dataset.sure){ delete data.log[statsId]; if(data.skips) delete data.skips[statsId]; if(data.errs) delete data.errs[statsId]; if(data.kiste) delete data.kiste[statsId]; const p = data.profiles.find(x => x.id === statsId); if(p) p.screening = null; saveData(); renderStats(); toast('Daten gelöscht.'); } else { del.dataset.sure = '1'; del.querySelector('span').textContent = 'Wirklich löschen?'; } }
 });
 for(const d of [$('#dlg-profile'), $('#dlg-stats')]) d.addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target === d) d.close(); });
 if('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { if(dlgSet.open) fillVoices(); });
@@ -9883,7 +10039,8 @@ $('#help-content').innerHTML = [
   ['chart','Die Stufen','Mathe: Zahlenräume 10, 20, 100, 1000 mit den Niveaus I–V (Fritz & Ricken, Krajewski), Stellenwert S1–S4 (Herzog, Ehlert & Fritz) Rechnen R1–R7 (Plus und Minus bis 10, 20, 100, 1000, Einmaleins), Zehnerpartner Z1–Z3 (Zahlen, die zusammen 10 ergeben, und Rechnen über die 10), Zeit U1–U6 (Uhr und Kalender) und Hundertertafel H1–H7 (bis zum Tausenderbuch). Der Mathe-Test hat zwei Teile: Teil 1 Zahlen und Rechnen, Teil 2 Uhr, Größen und Hundertertafel – so bleibt jede Sitzung kurz. Deutsch: Lesen L1–L9 und Schreiben W1–W6 nach dem Bildungsplan GENT. Dazu Größen G1–G4 (Messen, cm/m/km, g/kg, Einkaufen). Jede Stufe hat einen „Ich kann“-Satz in einfacher Sprache.'],
   ['h','Für Schüler*innen'],
   ['home','Startseite','Das Stufen-Zeichen links oben führt zur Startseite. Dort tippst du deinen Namen an. Unter „Heute für dich“ stehen deine Übungen. Die „Startrunde“ sind 3 kurze Aufgaben zum Aufwärmen. „Meine Lernlandkarte“ zeigt, was du schon kannst (✓) und woran du gerade arbeitest (★).'],
-  ['edit','Mathe','Links wählst du: Zahlen legen, Hundertertafel, Plus, Minus, Zehnerpartner, Rechenhilfe, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Bei Plus und Minus gibt es Zufallsaufgaben; die Darstellung kommt von selbst nacheinander (Material → Zwanzigerfeld oder Hundertertafel → Zahlenstrahl, nach 8 richtigen Aufgaben die nächste). In der Rechenhilfe gibt das Kind eine eigene Aufgabe ein und wählt die Darstellung frei. Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
+  ['edit','Mathe','Links wählst du: Zahlen legen, Hundertertafel, Plus, Minus, Zehnerpartner, Schriftlich, Einmaleins, Geld, Blitzblick, Frei legen, Uhr und Größen. Nach deinem Test stellt sich jede Übung selbst passend ein (Zahlenraum, Zehnerübergang). Bei Plus und Minus gibt es Zufallsaufgaben; die Darstellung kommt von selbst nacheinander (Material → Zwanzigerfeld oder Hundertertafel → Zahlenstrahl, nach 8 richtigen Aufgaben die nächste). Eigene Aufgaben rechnest du mit der Rechenhilfe in der Materialkiste. Beim Blitzblick wird die Zeit kürzer, wenn es gut klappt, und länger, wenn es schwer ist. Material kannst du antippen oder ziehen. Bei einem Fehler bekommst du einen Tipp, zum Beispiel: „Zehner und Einer sind vertauscht.“'],
+  ['blocks','Materialkiste','Startseite → „Materialkiste“ → Name → Werkzeug. Hier rechnest und legst du mit Hilfe, wenn du eine Aufgabe hast, zum Beispiel vom Arbeitsblatt: Rechenhilfe (eigene Plus- und Minusaufgaben mit Material, Feld, Tafel oder Zahlenstrahl), Taschenrechner (plus, minus, mal, geteilt mit Zahlen bis 10 000; das Ergebnis auf Wunsch als Material; geteilt mit Rest), Frei legen, Zwanzigerfeld, Hundertertafel, Zahlenstrahl und Uhr. Links wechselst du das Werkzeug, „Fertig“ führt zur Auswahl zurück. Nichts wird bewertet. Die Lehrkraft sieht im Lernstand nur, wie oft du welches Werkzeug geöffnet hast.'],
   ['target','Zahlenstrahl vergrößern','Tippe auf einen Sprung (zum Beispiel +7), dann wird er groß. Noch einmal tippen: zurück. Mit + und − vergrößerst und verkleinerst du. Mit zwei Fingern kannst du auch zoomen und mit einem Finger verschieben. Unten zeigt der kleine Zahlenstrahl, wo du gerade bist – tippe dort, um hinzuspringen.'],
   ['line','Deutsch','Lesen in 9 Stufen (Bilder, Signalwörter, Buchstaben, Wörter, genau lesen, Sätze, kurze Texte, Pläne und Tabellen, lange Texte) und Schreiben in 6 Stufen (abschreiben, Anlaute, kurze und lange Wörter, Merkstellen, Sätze). Unter „Meine Wörter“ übst du Wörter, die deine Lehrkraft eingetragen hat: anschauen, merken, abdecken, auswendig schreiben, vergleichen. „Silben färben“ hilft bei langen Wörtern. Beim Schreiben gibt es Buchstaben auf dem Bildschirm.'],
   ['blocks','Basis','Grundlagen vor dem Zählen und Lesen: Gleiches finden, Was passt nicht?, Sortieren, Eins zu eins zuordnen, Mengen vergleichen, Der Größe nach, Muster, Auf einen Blick, Formen, Richtung und Spiegelung, Von links nach rechts. Oben hellblau steht die Vorgabe oder das Ziel, unten beige der Vorrat: Die Kinder schieben Dinge an ihren Platz (oder tippen das Ding und dann den Platz an). Jede Aufgabenart wird zuerst vorgemacht (orange Rahmen, „Schau zu“, eine Hand zeigt es); das Kind bleibt bei ihr, bis es sie sicher kann (erst wenige, dann mehr Bilder). Die Lehrkraft erklärt den Auftrag. Kinder sehen „Basis“ nur, wenn es für sie eingeschaltet ist (unter „Wer übt?“ oder in den Einstellungen unter „Kinder &amp; Daten“) oder der Basis-Test eine Förderzone ergeben hat. Manche Aufgabenarten werden zusätzlich feiner: erst deutlich verschiedene Dinge, dann ähnliche, dann sehr ähnliche. Dazu gibt es Arbeitsblätter und Legeblätter.'],
@@ -9891,7 +10048,7 @@ $('#help-content').innerHTML = [
   ['h','Für die Lehrkraft'],
   ['lock','Lehrkraft-PIN','In den Einstellungen eine 4-stellige PIN festlegen. Dann sind Lernstand, Tests, Arbeitsblätter, Berichte, Einstellungen und das Anlegen von Kindern geschützt. Nach der Eingabe bleibt der Bereich 20 Minuten offen.'],
   ['target','Tests','Startseite → „Testen“ → Kind → Test (mit Lehrkraft-PIN). Dort steht je Fach, welche Teile schon gemacht sind; der Basis-Test erscheint, wenn Basis beim Kind eingeschaltet ist oder Mathe „Zahlen bis 10, Stufe I“ bzw. Lesen L1 noch nicht erreicht ist. Mathe-, Lese- und Schreib-Test sind adaptiv: gelöst → schwerer, nicht gelöst → leichter; in Mathe auch mit Sprüngen zwischen den Zahlenräumen. Meist 6–25 Aufgaben. Der Basis-Test hat drei kurze Teile; jede Aufgabenart wird zuerst vorgemacht, dann löst das Kind zwei bis drei Aufgaben, bei Erfolg noch die schwerere Form. Die Kinder sehen eine ermutigende Einleitung, während des Tests oben die Abschnitte und einen Balken, der nur vorwärts läuft (ohne richtig/falsch), und am Ende keine Ergebnisse. Während des Tests sind Leiste und Menü gesperrt; Beenden mit zweimal „Abbrechen“. Die Arbeitsaufträge sind kurz; Kinder, die sie noch nicht lesen können, brauchen beim ersten Mal eine kurze Erklärung.'],
-  ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, der Weg am Material (Handeln, Bild, Zahl) mit Legeblatt, Ideen für den Alltag, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
+  ['chart','Lernstand','Kompetenzmatrix je Fach (antippen ändert eine Einstufung), Förderzone mit Begründung und Beobachtungen, Lernangebot direkt starten, der Weg am Material (Handeln, Bild, Zahl) mit Legeblatt, Ideen für den Alltag, ILEB-Formulierungen, Verlauf, typische Fehler beim Üben und wie oft das Kind welches Werkzeug der Materialkiste geöffnet hat. „Ganze Klasse“ zeigt alle Förderzonen und die letzte Startrunde, schlägt Fördergruppen vor und speichert alles als Tabelle für Excel oder Numbers.'],
   ['print','Arbeitsblätter und Berichte','Das Drucker-Symbol oben öffnet den Arbeitsblatt-Generator (Mathe mit Material, Uhr, Lesen, Schreiben – passend zur Förderzone oder frei, mit Lösungsblatt). Wählbar sind unter anderem „Große Aufgaben“ und bei Mathe „Materialbilder: 1. Aufgabe vorgegeben, dann selbst zeichnen“; die Einstellungen bleiben auf diesem Gerät gespeichert. Mit „Ins Arbeitsheft“ sammelst du mehrere Blätter zu einem Heft: Titelblatt mit Namen und Inhaltsverzeichnis, Seitenzahlen, ohne Namenszeilen und ohne Lösungen. Unter „Basis“ stehen Blätter für Kinder, die noch nicht sicher zählen: Gleiches finden, Sortieren, eins zu eins zuordnen, mehr und weniger, Größen, Muster, Formen, Richtungen; die erste Aufgabe jeder Art ist vorgemacht, auf Wunsch mit Mustern statt Farben für den Schwarz-Weiß-Drucker. Gewählt wird in drei Schritten: Fach, Bereich, Blatt; „Zuletzt benutzt“ hilft beim Wiederfinden. Beim Bereich „Legeblätter“ jedes Fachs gibt es Blätter in Originalgröße zum Drauflegen: Zehner- und Zwanzigerfeld, Zahlenstrahl, Hunderterfeld, Stellentafel, Zifferblatt, Preise, Sortierunterlage, Zuordnungsleiste, Musterstreifen, Anlaute, Wörter, Silben und Buchstabenkarten. Im Lernstand druckt „Bericht drucken“ einen Lernstandsbericht für die ILEB, eine Elterninfo in einfacher Sprache oder die Lernlandkarte zum Ankreuzen im Schülergespräch.'],
   ['target','Geführte Oberfläche','Nach dem Test sieht jedes Kind nur seine Bereiche und Stufen (★ = Förderzone). In den Einstellungen wählst du für alle oder für einzelne Kinder: nur die Förderzone, Förderzone und Geschafftes oder alles. Übt ein Kind 10 Aufgaben mit mindestens 9 richtig, bietet die App einen Kurztest an; klappt er, öffnet sich die nächste Stufe. „Alles zeigen“ unten in der Leiste blendet mit PIN alle Bereiche ein.'],
   ['settings','Einstellungen','Eigene Wörter (Namen der Klasse, Praktikumswörter) für „Schreiben → Meine Wörter“ und Arbeitsblätter zum Nachspuren. Ergebnisse anzeigen erlauben, Montessori-Farben, Wortwahl Umtauschen oder Bündeln, Zifferntastatur auf dem Bildschirm (auf dem iPad automatisch), Zehner- und Hunderterübergang bei Zufallsaufgaben. „Daten sichern“ speichert alles als Datei – wichtig, weil die Daten nur in diesem Browser liegen.'],

@@ -14,15 +14,15 @@ Stand: 20.11.2026
 | 1 | ~~**C** Basis: bessere Progression~~ | mittel | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
-| 4 | **D** Hilfen für Schüler*innen als eigenes Modul | mittel | Wunsch Stefan 20.11.; erst Entscheidungen (siehe D), dann in `entwicklung` |
+| 4 | **D** Materialkiste (Hilfen für Schüler*innen) | mittel | gebaut 20.11. in `entwicklung`, in der Testversion; wartet auf Stefans Freigabe (`IN_PROGRESS.md`) |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
 ---
 
-## D: Hilfen für Schüler*innen als eigenes Modul (Arbeitsname „Werkzeugkiste“)
+## D: Materialkiste – Hilfen für Schüler*innen als eigenes Modul
 
-**Status:** Wunsch dokumentiert 20.11.2026, Grundentscheidungen getroffen (20.11.), Name und Rechenhilfe in der Mathe-Leiste noch offen; nicht begonnen.
+**Status:** gebaut 20.11.2026 in `entwicklung`, in der Testversion; wartet auf Stefans Rückmeldung und Freigabe (`IN_PROGRESS.md`).
 **Wunsch Stefan (20.11.):** Die Rechenhilfe soll kein Teil von Mathe/Plus-Minus sein, sondern ein ganz unabhängiges Modul, „quasi wie ein Taschenrechner, Materialvorrat usw.“ für Schüler*innen.
 
 **Ausgangslage:**
@@ -38,7 +38,9 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 - Speichern: nur die Nutzung zählen (z. B. „Rechenhilfe 5× genutzt“) für Lernstand und ILEB; keine einzelnen Aufgaben, keine Ergebnisse, keine Förderzone.
 - Sichtbarkeit: für alle Kinder immer.
 
-**Noch offen:** Name für Kinder; Rechenhilfe aus der Mathe-Leiste nehmen oder an beiden Stellen lassen; Taschenrechner: welche Rechenarten (nur + und − oder auch × und :), Zahlenraum.
+**Weitere Entscheidungen Stefan (20.11.):** Name „Materialkiste“; Rechenhilfe fällt in der Mathe-Leiste weg; Taschenrechner mit + − · : und Zahlen bis 10 000.
+
+**Umsetzung:** vierte Kachel auf der Startseite → „Wer bist du?“ (mit Gast) → Werkzeugauswahl; in der Kiste eigene Leiste mit „Fertig“. Die Tafel-Werkzeuge laufen unverändert (`TOOL_MODES`), die Rechenhilfe wie bisher (`app.calc`). In der Kiste (`app.kiste`) keine Lenkung (`guideFix`), kein gesperrter Zahlenraum, keine Runden, kein `logAttempt`/`noteError`/`logSkip`. `kisteCount` zählt das Öffnen je Werkzeug in `data.kiste`. Taschenrechner `tcalc`: eine Rechnung nach der anderen, Weiterrechnen mit dem Ergebnis, geteilt mit Rest, Material nur für ganze Ergebnisse 0–10 000. Lernstand (`statsSections`, `kisteLine`) und ILEB Mathe (`zoneReport`). Test `tests/materialkiste.py`.
 
 **Ursprüngliche Fragen:**
 1. Ort: eigener Eingang auf der Startseite (neben Üben und Testen) oder eigene Gruppe in der Leiste, die in jedem Fach zu sehen ist.

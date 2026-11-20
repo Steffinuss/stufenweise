@@ -56,6 +56,7 @@ Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. D
 | `springen.py` | nichts springt: Zwanzigerfeld bleibt beim ersten Tippen an seiner Stelle |
 | `hinweis_neu.py` | „Richtig“ verschwindet bei der nächsten Aufgabe |
 | `lernort_material.py` | Weg am Material für jede Stufe, Legeblatt-Knopf, ILEB-Maßnahmen |
+| `materialkiste.py` | Materialkiste: Ablauf, alle Werkzeuge, Zählen, Taschenrechner, Lernstand/ILEB |
 | `mehrere_fenster.py` | Zwei Fenster derselben App: nichts geht verloren, Löschen gilt weiter |
 | `wochenuebersicht.py`, `update_hinweis.py` | Wochenübersicht; Update-Hinweis nur auf der Startseite |
 | `shot.py BILD.png "js" "CLICK selektor" …` | Hilfsprogramm: Schritte ausführen und Bildschirmfoto speichern |

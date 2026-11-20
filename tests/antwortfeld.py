@@ -10,7 +10,7 @@ async def main():
             await pg.goto(URL); await pg.wait_for_timeout(400)
             await pg.evaluate("settings.numpad='on'; saveSettings()")
             if await pg.locator("[data-ctx='practice']").count(): await pg.click("[data-ctx='practice']")
-            await pg.click('[data-calc]'); await pg.wait_for_timeout(200)  # Rechenhilfe: Darstellung frei wählbar
+            await pg.evaluate("kisteGo('calc')"); await pg.wait_for_timeout(200)  # Rechenhilfe (Materialkiste): Darstellung frei wählbar
             await pg.click('[data-range="100"]'); await pg.wait_for_timeout(200); await pg.evaluate('startRandom()'); await pg.wait_for_timeout(200)
             print(W, 'before join input?', await pg.locator('#guess').count())
             await pg.click('#c-join'); await pg.wait_for_timeout(1500)
@@ -28,6 +28,7 @@ async def main():
             await pg.evaluate('startRandom()'); await pg.wait_for_timeout(200); await pg.click('[data-view="board"]'); await pg.wait_for_timeout(200)
             await pg.click('#numpad [data-np="min"]'); await pg.type('#guess', '12'); await pg.click('[data-tbj="1"]'); await pg.wait_for_timeout(200)
             print(W, 'kept value after jump:', await pg.evaluate("document.querySelector('#guess').value"))
+            await pg.evaluate('goHome()')  # Materialkiste verlassen: dort gibt es keine Mathe-Leiste
             await pg.click('[data-mode="times"]'); await pg.wait_for_timeout(300); await pg.evaluate('timesStart(6, 4)'); await pg.wait_for_timeout(300)
             await pg.screenshot(path=f'eq_times_{W}.png')
             print(W, 'times input:', await pg.locator('#equation #guess').count(), await pg.evaluate("document.querySelector('#equation').innerText"))

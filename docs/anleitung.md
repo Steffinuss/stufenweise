@@ -39,7 +39,7 @@ Jedes Kind bekommt ein eigenes Profil. Nimm Vornamen oder Kürzel.
 
 Das neue Kind ist jetzt ausgewählt (dunkel hinterlegt).
 
-**Test starten:** Auf der Startseite gibt es neben „Üben“ und „Unterricht“ die Kachel **Testen** (mit Lehrkraft-PIN, falls eine eingestellt ist). Dann wählst du das Kind und danach den Test. Die Tests stehen nach Fach geordnet, jeweils mit dem Stand („noch nicht gemacht“ oder „gemacht · zuletzt am …“):
+**Test starten:** Auf der Startseite gibt es neben „Üben“, „Unterricht“ und „Materialkiste“ die Kachel **Testen** (mit Lehrkraft-PIN, falls eine eingestellt ist). Dann wählst du das Kind und danach den Test. Die Tests stehen nach Fach geordnet, jeweils mit dem Stand („noch nicht gemacht“ oder „gemacht · zuletzt am …“):
 
 - **Basis** Teil 1 bis 3, nur wenn bei dem Kind „Basis“ angehakt ist, es schon Basis-Ergebnisse hat oder Mathe „Zahlen bis 10, Stufe I“ bzw. Lesen L1 nicht erreicht ist (dann mit Hinweis „Vorgeschlagen“)
 - **Mathe** Teil 1: Zahlen und Rechnen, Teil 2: Uhr, Größen, Hundertertafel
@@ -115,7 +115,7 @@ Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigt eine Treppe, 
 
 Bei Plus, Minus und dem Einmaleins schreibt das Kind das Ergebnis direkt oben in die Rechnung, dort, wo vorher das Fragezeichen stand, und prüft mit dem Haken daneben (oder mit ✓ auf der Zifferntastatur). Beim Legen mit Material erscheint das Feld, sobald die Mengen zusammengelegt sind. Auch im Test steht das Antwortfeld direkt in der Aufgabe (zum Beispiel „8 = 6 + ☐“) oder gleich darunter.
 
-### Plus und Minus: Üben und Rechenhilfe
+### Plus und Minus üben
 
 **Plus** und **Minus** sind zum Üben da: Das Kind bekommt sofort eine Aufgabe und muss nichts eintragen oder auswählen. Mit **Neue Aufgabe** oben geht es weiter. Die Darstellung wechselt von selbst, in dieser Reihenfolge:
 
@@ -125,7 +125,17 @@ Bei Plus, Minus und dem Einmaleins schreibt das Kind das Ergebnis direkt oben in
 
 Nach 8 Aufgaben, die beim ersten Versuch richtig sind, kommt die nächste Darstellung; nach drei Aufgaben in Folge, die nicht auf Anhieb geklappt haben, geht es eine zurück. Oben steht, welche Darstellung gerade dran ist. Als Lehrkraft (mit PIN freigeschaltet oder ohne PIN) kannst du dort direkt eine andere wählen. Den Vorschlag „Schwerer“ (größerer Zahlenraum) gibt es erst bei der letzten Darstellung.
 
-Die **Rechenhilfe** (links unter Minus, auf der Startseite als eigene Kachel) ist für den Fall „Ich habe eine Aufgabe und brauche Hilfe“: Das Kind wählt oben Plus oder Minus, trägt seine Zahlen ein und tippt **Legen**. Unten wählt es frei, womit es rechnet: Material, Zehner-/Zwanzigerfeld, Tafel oder Zahlenstrahl. Alle Kinder sehen die Rechenhilfe, auch in der geführten Oberfläche.
+Eigene Aufgaben rechnet das Kind mit der **Rechenhilfe** in der Materialkiste (siehe unten).
+
+### Materialkiste: Hilfen für die Kinder
+
+Die vierte Kachel auf der Startseite heißt **Materialkiste**. Sie ist für den Fall „Ich habe eine Aufgabe und brauche Hilfe“, zum Beispiel beim Arbeitsblatt oder im Alltag. Das Kind tippt seinen Namen (oder „Gast“) und wählt ein Werkzeug:
+
+- **Rechenhilfe:** oben Plus oder Minus wählen, die eigenen Zahlen eintragen und **Legen** tippen. Unten wählt das Kind frei, womit es rechnet: Material, Zehner-/Zwanzigerfeld, Tafel oder Zahlenstrahl. Der Zahlenraum ist frei wählbar, auch wenn das Kind beim Üben noch auf einen kleineren beschränkt ist.
+- **Taschenrechner:** plus, minus, mal (·) und geteilt (:) mit Zahlen bis 10 000, große Tasten, auch mit der Tastatur. Geteilt rechnet ohne Komma, mit Rest („17 : 5 = 3 Rest 2“). Mit **Ergebnis als Material** (oben) zeigt er das Ergebnis zusätzlich als Tausender, Hunderter, Zehner und Einer. Ein weiteres Rechenzeichen rechnet mit dem Ergebnis weiter, **C** löscht alles.
+- **Frei legen, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr:** dieselben Werkzeuge wie im Unterricht an der Tafel.
+
+Links wechselt das Kind das Werkzeug, **Fertig** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren und in der Elterninfo) und im ILEB-Vorschlag für Mathe als Satz unter „Lernstand“.
 
 Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.
 
@@ -151,7 +161,7 @@ Die Zehnerpartner haben im Lernstand eine eigene Zeile (Z1–Z3). Im Mathe-Test 
 
 ### Zwanzigerfeld beim Üben
 
-Bei Plus und Minus bis 20 (und bis 10) kommt nach dem Material das **Zwanzigerfeld** (bis 10: Zehnerfeld); in der Rechenhilfe wählt man es unten aus. Die erste Zahl liegt schon als blaue Punkte im Feld. **Plus:** Das Kind legt die zweite Zahl in Orange dazu, indem es ins Feld tippt oder +1 und +5 nimmt. Wie üblich wird erst die obere Reihe voll gemacht. **Minus:** Das Kind streicht von hinten weg, mit Tippen oder −1 und −5. Dann schreibt es das Ergebnis oben in die Rechnung.
+Bei Plus und Minus bis 20 (und bis 10) kommt nach dem Material das **Zwanzigerfeld** (bis 10: Zehnerfeld); in der Rechenhilfe (Materialkiste) wählt man es unten aus. Die erste Zahl liegt schon als blaue Punkte im Feld. **Plus:** Das Kind legt die zweite Zahl in Orange dazu, indem es ins Feld tippt oder +1 und +5 nimmt. Wie üblich wird erst die obere Reihe voll gemacht. **Minus:** Das Kind streicht von hinten weg, mit Tippen oder −1 und −5. Dann schreibt es das Ergebnis oben in die Rechnung.
 
 ### Übungsrunden
 
@@ -179,7 +189,7 @@ Schreibt das Kind ein Wort fast richtig, markiert die App die einzelnen Buchstab
 
 Links unter **Tafel** übt das Kind mit der Hundertertafel (1 bis 100) in sieben Stufen: Zahlen finden, Tafel und Material verbinden (Zehnerstangen, Punktefeld, Zahlwort), Nachbarn und Lücken, Ausschnitte ergänzen, Wege gehen (unten +10, rechts +1), Muster erkennen und zuletzt das Tausenderbuch. Die Stufen H1–H7 sind Teil des Mathe-Tests (Teil 2) und erscheinen in der Kompetenzmatrix.
 
-Bei **Zahlen** und in der **Rechenhilfe** gibt es im Zahlenraum bis 100 außerdem die Ansicht **Tafel** (bis 1000: **Tausenderbuch**); beim Üben von Plus und Minus bis 100 kommt die Hundertertafel von selbst nach dem Material. Der Start ist orange markiert. Das Kind springt mit den Knöpfen +10 und +1 (bei Minus −10 und −1, bis 1000 auch ±100) oder tippt ein Feld in seiner Spalte (Zehner) oder ein paar Felder weiter (Einer) an. Schräge Sprünge lässt die App nicht zu. Der Weg bleibt sichtbar, darunter steht er als Rechnung, zum Beispiel „Start 52 · +10 +10 +10 +10 · 3-mal +1 = 95“. Bei jeder neuen Aufgabe beginnt der Weg neu.
+Bei **Zahlen** und in der **Rechenhilfe** (Materialkiste) gibt es im Zahlenraum bis 100 außerdem die Ansicht **Tafel** (bis 1000: **Tausenderbuch**); beim Üben von Plus und Minus bis 100 kommt die Hundertertafel von selbst nach dem Material. Der Start ist orange markiert. Das Kind springt mit den Knöpfen +10 und +1 (bei Minus −10 und −1, bis 1000 auch ±100) oder tippt ein Feld in seiner Spalte (Zehner) oder ein paar Felder weiter (Einer) an. Schräge Sprünge lässt die App nicht zu. Der Weg bleibt sichtbar, darunter steht er als Rechnung, zum Beispiel „Start 52 · +10 +10 +10 +10 · 3-mal +1 = 95“. Bei jeder neuen Aufgabe beginnt der Weg neu.
 
 Im Tausenderbuch zeigt links eine Seitenleiste alle zehn Seiten (1–100 bis 901–1000). Ein orangefarbener Punkt markiert die Startseite, ein blauer die Seite, auf der das Kind gerade ist. Mit einem Tipp auf eine Seite kann es blättern. Bei „Zahl suchen“ sind nur die erste Zeile und die Zehnerzahlen beschriftet; im Tausenderbuch muss das Kind zuerst die richtige Seite aufschlagen.
 

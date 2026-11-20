@@ -2,7 +2,8 @@
 Üben: sofort eine Zufallsaufgabe, keine eigene Eingabe, keine Darstellungs-Knöpfe unten; Darstellung kommt nacheinander
 (bis 20 Material → Zwanzigerfeld → Zahlenstrahl, bis 100 Material → Hundertertafel → Zahlenstrahl, bis 1000 Material → Zahlenstrahl),
 nach 8 auf Anhieb richtigen die nächste, nach 3 Fehlern in Folge zurück; Lehrkraft kann oben wählen (mit PIN gesperrt).
-Rechenhilfe: eigener Eintrag (auch geführt), Plus/Minus wählbar, eigene Zahlen, Darstellung frei, keine Zufallsaufgabe."""
+Rechenhilfe (seit Backlog D in der Materialkiste): Plus/Minus wählbar, eigene Zahlen, Darstellung frei, keine Zufallsaufgabe;
+nicht mehr in der Mathe-Leiste und nicht mehr als Kachel bei Mathe."""
 import asyncio
 from playwright.async_api import async_playwright
 from common import URL, launch  # noqa: E402
@@ -44,10 +45,11 @@ async def main():
         await pg.evaluate("settings.pin='1234'; app.teacherUntil=0; render()")
         if not await pg.evaluate("document.querySelector('[data-pmv=\"0\"]').disabled"): errs.append('Darstellung mit PIN nicht gesperrt')
         await pg.evaluate("settings.pin=''; render()")
-        # Rechenhilfe
-        await pg.click('[data-calc]'); await pg.wait_for_timeout(200)
-        st = await pg.evaluate("[app.mode, !!app.calc, task().ready, !!document.querySelector('#in-a'), !!document.querySelector('[data-calcop]'), document.querySelector('#btn-random').hidden, document.querySelector('[data-calc]').getAttribute('aria-pressed'), document.querySelector('[data-mode=\"add\"]').getAttribute('aria-pressed')]")
-        if st != ['add', True, False, True, True, True, 'true', 'false']: errs.append(f'Rechenhilfe Start: {st}')
+        # Rechenhilfe: nicht mehr in der Mathe-Leiste, sondern in der Materialkiste
+        if await pg.locator('[data-calc]').count(): errs.append('Rechenhilfe noch in der Mathe-Leiste')
+        await pg.evaluate("kisteGo('calc')"); await pg.wait_for_timeout(200)
+        st = await pg.evaluate("[app.mode, !!app.calc, task().ready, !!document.querySelector('#in-a'), !!document.querySelector('[data-calcop]'), document.querySelector('#btn-random').hidden, document.querySelector('.rail [data-kiste=\"calc\"]').getAttribute('aria-pressed'), !!document.querySelector('.rail [data-mode=\"add\"]')]")
+        if st != ['add', True, False, True, True, True, 'true', False]: errs.append(f'Rechenhilfe Start: {st}')
         await pg.fill('#in-a', '13'); await pg.fill('#in-b', '6'); await pg.click('[data-calcop="sub"]'); await pg.wait_for_timeout(150)
         await pg.click('#btn-commit'); await pg.wait_for_timeout(150)
         st = await pg.evaluate("[app.mode, task().a, task().b, document.querySelectorAll('[data-view]').length]")
@@ -55,13 +57,13 @@ async def main():
         await pg.click('[data-view="line"]'); await pg.wait_for_timeout(100)
         if await pg.evaluate("task().view") != 'line': errs.append('Rechenhilfe: Darstellung frei')
         # zurück zum Üben: neue Zufallsaufgabe, nicht die eigene
-        await pg.click('[data-mode="sub"]'); await pg.wait_for_timeout(200)
+        await pg.click('[data-kiste-end]'); await pg.wait_for_timeout(150)
+        await pg.evaluate("goHome()"); await pg.click('[data-mode="sub"]'); await pg.wait_for_timeout(200)
         st = await pg.evaluate("[app.mode, !!app.calc, task().ready, task().a === 13 && task().b === 6]")
         if st != ['sub', False, True, False]: errs.append(f'zurück zum Üben: {st}')
-        # Startseite: Kachel Rechenhilfe; geführte Oberfläche zeigt Rechenhilfe
+        # Mathe-Kacheln: keine Rechenhilfe mehr
         await pg.evaluate("app.mode='home'; app.wz={step:'area', subj:'M'}; render()")
-        await pg.click('.wz-tile[data-wz-calc]'); await pg.wait_for_timeout(150)
-        if await pg.evaluate("[app.mode, !!app.calc].join()") != 'add,true': errs.append('Kachel Rechenhilfe')
+        if await pg.locator('.wz-tile[data-wz-calc]').count(): errs.append('Kachel Rechenhilfe noch bei Mathe')
         await pg.close()
         # Handy
         pg = await b.new_page(viewport={'width': 390, 'height': 844}); pg.on('pageerror', lambda e: errs.append(str(e)))

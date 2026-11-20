@@ -5,7 +5,16 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+Neu:
+- **Materialkiste** (Backlog D): vierte Kachel auf der Startseite neben Üben, Unterricht und Testen. Hilfen für Kinder, die eine Aufgabe haben (z. B. vom Arbeitsblatt): Rechenhilfe, Taschenrechner, Frei legen, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr. Für alle Kinder, auch in der geführten Oberfläche; keine Bewertung, keine Runden, kein „Schwerer/Leichter“, freier Zahlenraum.
+- **Taschenrechner** in der Materialkiste: plus, minus, mal (·), geteilt (:) mit Zahlen bis 10 000, große Tasten, auch mit der Tastatur; geteilt mit Rest; Ergebnis wahlweise als Material (Tausender, Hunderter, Zehner, Einer).
+- Gezählt wird nur, wie oft ein Kind welches Werkzeug öffnet (Gast: nichts): im Lernstand „Materialkiste (selbst genutzt)“ (auch beim Kopieren und in der Elterninfo) und im ILEB-Vorschlag Mathe als Satz unter „Lernstand“.
+
+Geändert:
+- Die Rechenhilfe ist aus der Mathe-Leiste und den Mathe-Kacheln in die Materialkiste umgezogen. Aufgaben in der Rechenhilfe werden nicht mehr protokolliert.
+- Hilfe in der App und Anleitung beschreiben die Materialkiste.
+
+Für Entwickler*innen: `app.kiste`, `KISTE_TOOLS`, `kisteGo`, `kisteCount`, `data.kiste[pid][werkzeug]` (beim Zusammenführen mehrerer Fenster addiert wie `errs`), Taschenrechner `app.tr`/`renderTcalc` als Werkzeug in `TOOL_MODES` (`tcalc`); neuer Test `tests/materialkiste.py`.
 
 ## 0.29.1 – 20.11.2026
 
