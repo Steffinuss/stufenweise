@@ -7,6 +7,17 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 - noch nichts
 
+## 0.29.1 – 20.11.2026
+
+Fehlerbehebung:
+- **Kinder gingen verloren, wenn die App in mehreren Fenstern offen war** (z. B. installierte App und Browser-Tab, gemeldet von Stefan nach dem Update auf 0.29.0). Jedes Fenster schrieb beim Speichern seinen ganzen eigenen Stand zurück; ein länger offenes Fenster überschrieb so neuere Kinder und Ergebnisse, besonders über „Jetzt aktualisieren“. Jetzt führt jedes Fenster beim Speichern zusammen statt zu überschreiben: Neues aus allen Fenstern bleibt, entfernt wird nur, was ein Fenster wirklich gelöscht hat (Kind löschen, „Daten löschen“, Einstufung entfernen). Fehlerzähler aus beiden Fenstern werden addiert.
+- Offene Fenster übernehmen Änderungen anderer Fenster sofort (auf der Startseite gleich sichtbar), auch die Einstellungen.
+- Sicherheitsnetz: Ein Stand ohne Kinder wird nie über einen Stand mit Kindern gespeichert, außer beim Löschen des letzten Kindes oder beim Ersetzen durch eine Sicherung.
+- „Jetzt aktualisieren“ speichert vor dem Neuladen nicht mehr extra.
+- Ein nicht lesbarer gespeicherter Stand wird vor dem Überschreiben unter `stufenweise.data.defekt` im Browser aufgehoben.
+
+Für Entwickler*innen: `saveData()` mit Dreiwege-Abgleich (`dataBase`, `merge3`, `mergeStores`, `adoptStore`), `storage`-Listener; neuer Test `tests/mehrere_fenster.py` (16 Prüfungen, auch im schnellen Testlauf).
+
 ## 0.29.0 – 20.11.2026
 
 Neu:

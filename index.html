@@ -3343,7 +3343,9 @@ function randomAny(){ app.mode === 'written' ? wrRandom() : app.mode === 'times'
    Profile, Lernstand-Protokoll
    ===================================================================== */
 const DATA_KEY = 'stufenweise.data';
-const data = (() => { try { return {profiles:[], current:null, log:{}, ...JSON.parse(localStorage.getItem(DATA_KEY) || '{}')}; } catch { return {profiles:[], current:null, log:{}}; } })();
+/* Nicht lesbarer Stand (sollte nie vorkommen): vor dem ersten Überschreiben unter „….defekt“ aufheben */
+const dataKeepBroken = raw => { try { if(raw && localStorage.getItem(DATA_KEY + '.defekt') !== raw) localStorage.setItem(DATA_KEY + '.defekt', raw); } catch {} };
+const data = (() => { try { return {profiles:[], current:null, log:{}, ...JSON.parse(localStorage.getItem(DATA_KEY) || '{}')}; } catch { try { dataKeepBroken(localStorage.getItem(DATA_KEY)); } catch {} return {profiles:[], current:null, log:{}}; } })();
 /* Vorbereitung für spätere Synchronisation zwischen Geräten:
    weltweit eindeutige Kennungen, Zeitstempel bei jeder Änderung eines Kindes, Versionsnummer des Datenformats. */
 const DATA_SCHEMA = 2;
@@ -3356,7 +3358,106 @@ const newId = pre => pre + (globalThis.crypto?.randomUUID ? crypto.randomUUID() 
 const profSig = new Map();
 function touchProfiles(){ for(const p of data.profiles){ const {updated, ...rest} = p, sig = JSON.stringify(rest); if(profSig.has(p.id) && profSig.get(p.id) !== sig) p.updated = Date.now(); profSig.set(p.id, sig); } }
 touchProfiles();
-const saveData = () => { try { touchProfiles(); localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch {} };
+/* ---------- Mehrere Fenster (z. B. installierte App und Browser-Tab) teilen sich denselben Speicher ----------
+   Jedes Fenster merkt sich den Stand, den es zuletzt gelesen oder geschrieben hat (dataBase). Hat inzwischen ein anderes
+   Fenster gespeichert, wird nicht überschrieben, sondern dreiseitig zusammengeführt (gemeinsamer Ausgangsstand, dieses
+   Fenster, das andere Fenster): Neues aus beiden Fenstern bleibt. Entfernt wird nur, was ein Fenster gegenüber dem
+   Ausgangsstand wirklich entfernt hat (Kind gelöscht, „Daten löschen“, Einstufung entfernt, alte Einträge gekürzt).
+   Ein Fenster, das etwas nur nicht kennt, löscht es damit nie. */
+let dataBase = (() => { try { return localStorage.getItem(DATA_KEY); } catch { return null; } })();
+const jEq = (a, b) => a === b || JSON.stringify(a) === JSON.stringify(b);
+const isObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+const isEmptyVal = x => Array.isArray(x) ? !x.length : isObj(x) && !Object.keys(x).length;
+/* Listen (Übungen, Verlauf, Auslassungen …): Einträge über ihren Inhalt erkennen */
+function mergeArr(b, m, t){
+  const K = x => JSON.stringify(x), inB = new Set(b.map(K)), inM = new Set(m.map(K)), inT = new Set(t.map(K));
+  const gone = k => inB.has(k) && (!inM.has(k) || !inT.has(k));
+  const out = m.filter(x => !gone(K(x)));
+  for(const x of t){ const k = K(x); if(!inM.has(k) && !gone(k)){ out.push(x); inM.add(k); } }
+  const tk = x => isObj(x) ? (x.ts ?? x.date) : undefined;
+  if(out.every(x => typeof tk(x) === 'number')) out.sort((x, y) => tk(x) - tk(y));
+  return out;
+}
+/* Ein Fenster hat einen Eintrag entfernt, das andere ihn verändert: nur das Neue des anderen bleibt */
+function mergeKept(b, v, path){
+  if(Array.isArray(v) && Array.isArray(b)) return mergeArr(b, v, []);
+  if(isObj(v) && isObj(b)) return mergeObj(b, v, {}, path);
+  if(path[0] === 'errs' && typeof v === 'number' && typeof b === 'number') return v > b ? v - b : undefined;
+  return v;
+}
+function mergeObj(b, m, t, path){
+  const out = {}, has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  for(const k of new Set([...Object.keys(m), ...Object.keys(t)])){
+    const inM = has(m, k), inT = has(t, k), inB = has(b, k);
+    if(inM && inT){ out[k] = merge3(inB ? b[k] : undefined, m[k], t[k], [...path, k]); continue; }
+    const v = inM ? m[k] : t[k];
+    if(!inB){ out[k] = v; continue; }
+    if(jEq(b[k], v)) continue;
+    const r = mergeKept(b[k], v, [...path, k]); if(r !== undefined && !isEmptyVal(r)) out[k] = r;
+  }
+  return out;
+}
+function merge3(b, m, t, path){
+  if(path[0] !== 'errs' && jEq(m, t)) return m;   /* Zähler: gleicher Stand in beiden Fenstern kann doppelter Zuwachs sein */
+  if(b !== undefined && jEq(m, b)) return t;
+  if(b !== undefined && jEq(t, b)) return m;
+  if(isObj(m) && isObj(t)) return mergeObj(isObj(b) ? b : {}, m, t, path);
+  if(Array.isArray(m) && Array.isArray(t)) return mergeArr(Array.isArray(b) ? b : [], m, t);
+  if(typeof m === 'number' && typeof t === 'number'){
+    const key = path.at(-1), bb = typeof b === 'number' ? b : 0;
+    if(path[0] === 'errs') return m + t - bb;                 /* Fehlerzähler: Zuwachs aus beiden Fenstern */
+    if(key === 'firstUse' || key === 'created') return Math.min(m, t);
+    if(['lastBackup', 'updated', 'date', 'ts'].includes(key)) return Math.max(m, t);
+  }
+  return m;
+}
+/* Kinder über ihre Kennung: Löschen in einem Fenster gilt (ausdrückliche Handlung), neue Kinder aus beiden Fenstern bleiben */
+function mergeProfiles(b, m, t){
+  const ids = a => new Map(a.map(p => [p.id, p])), B = ids(b), M = ids(m), T = ids(t), out = [];
+  for(const p of m){ if(T.has(p.id)) out.push(merge3(B.get(p.id), p, T.get(p.id), ['profiles'])); else if(!B.has(p.id)) out.push(p); }
+  for(const p of t) if(!M.has(p.id) && !B.has(p.id)) out.push(p);
+  return out;
+}
+function mergeStores(b, m, t){
+  const rest = o => { const {profiles, current, ...r} = isObj(o) ? o : {}; return r; };
+  const out = mergeObj(rest(b), rest(m), rest(t), []);
+  out.profiles = mergeProfiles(b?.profiles || [], m.profiles || [], t.profiles || []);
+  const gone = (b?.profiles || []).map(p => p.id).filter(id => !out.profiles.some(p => p.id === id));
+  for(const id of gone) for(const k of ['log', 'skips', 'errs']) if(isObj(out[k])) delete out[k][id];   /* wie beim Löschen eines Kindes */
+  out.log ??= {};
+  out.current = out.profiles.some(p => p.id === m.current) ? m.current : null;   /* Wer übt, entscheidet jedes Fenster selbst */
+  return out;
+}
+/* Stand eines anderen Fensters in dieses Fenster übernehmen (zusammenführen). false: Stand nicht lesbar */
+function adoptStore(raw){
+  let t; try { t = JSON.parse(raw); } catch { t = null; }
+  if(!isObj(t)){ dataKeepBroken(raw); return false; }
+  let b = null; try { b = dataBase ? JSON.parse(dataBase) : null; } catch {}
+  const merged = mergeStores(b, data, t);
+  for(const k of Object.keys(data)) delete data[k];
+  Object.assign(data, merged);
+  profSig.clear(); touchProfiles();   /* übernommene Stände nicht als „gerade geändert“ markieren */
+  return true;
+}
+/* opt.empty: Das Fenster darf alle Kinder entfernen (letztes Kind gelöscht, Sicherung ersetzt). Sonst wird ein Stand ohne
+   Kinder nie über einen Stand mit Kindern geschrieben; das Fenster übernimmt dann den gespeicherten Stand. */
+const saveData = opt => { try {
+  touchProfiles();
+  const cur = localStorage.getItem(DATA_KEY);
+  if(cur != null && cur !== dataBase) adoptStore(cur);
+  if(!data.profiles.length && !opt?.empty && cur){ let t = null; try { t = JSON.parse(cur); } catch {}
+    if(t?.profiles?.length){ dataBase = null; adoptStore(cur); dataBase = cur; console.warn('Stufenweise: Stand ohne Kinder nicht gespeichert, gespeicherter Stand übernommen.'); return; } }
+  const s = JSON.stringify(data); localStorage.setItem(DATA_KEY, s); dataBase = s;
+} catch {} };
+/* Ein anderes Fenster hat gespeichert: Stand übernehmen. Auf der Startseite gleich neu zeichnen, beim Üben ruhig weiter
+   (die Anzeige folgt beim nächsten Wechsel). Die Testversion speichert mit Vorsatz „test:“ und reagiert nur darauf. */
+addEventListener('storage', e => { try {
+  if(e.storageArea !== localStorage || e.newValue == null) return;
+  const P = TEST_BUILD ? 'test:' : '';
+  if(e.key === P + DATA_KEY){ if(e.newValue === dataBase || !adoptStore(e.newValue)) return; dataBase = e.newValue;
+    backupStateUpdate(); if($('#dlg-profile')?.open) renderProfiles(); if(atStart() && !document.querySelector('dialog[open]')) render(); }
+  else if(e.key === P + STORE){ const st = JSON.parse(e.newValue); if(isObj(st)) Object.assign(settings, st); }
+} catch {} });
 /* Im Unterricht an der Tafel erscheinen keine Kindernamen (auch nicht bei den Arbeitsblättern) */
 const kids = () => app.ctx === 'class' ? [] : data.profiles;
 /* Themenwelten: Stufen und Tests bleiben gleich, nur Wörter, Texte und Sachaufgaben passen sich der Schulstufe an */
@@ -7722,7 +7823,7 @@ function applyImport(mode){
   if(mode === 'replace'){ const dev = data.device; for(const k of Object.keys(data)) delete data[k]; Object.assign(data, {profiles:[], current:null, log:{}}, structuredClone(src)); data.device = dev; data.schema = Math.max(data.schema || 1, DATA_SCHEMA); for(const p of data.profiles) p.updated ??= p.created || Date.now(); profSig.clear(); touchProfiles(); }
   else mergeData(src);
   if(pendingImport.settings){ const keep = settings.pin; Object.assign(settings, pendingImport.settings); settings.pin = keep; saveSettings(); }
-  pendingImport = null; $('#import-ask').hidden = true; saveData(); renderProfiles(); render();
+  pendingImport = null; $('#import-ask').hidden = true; saveData({empty: mode === 'replace'}); renderProfiles(); render();
   toast(mode === 'replace' ? 'Sicherung geladen.' : 'Sicherung zusammengeführt.');
 }
 /* Daten eines anderen Geräts dazunehmen: neue Kinder kommen dazu, bei gleichen Kindern gilt der neuere Stand,
@@ -9591,7 +9692,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.29.0 · 20.11.2026';
+const APP_VERSION = '0.29.1 · 20.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
@@ -9685,7 +9786,8 @@ function showUpdateBar(force){
 }
 async function doUpdate(){
   toast('Neue Version wird geladen …');
-  try{ saveSettings(); saveData(); }catch{}
+  /* nicht noch einmal speichern: Gespeichert wird nach jeder Änderung. Ein länger offenes Fenster hätte hier früher
+     seinen alten Stand über den neueren eines anderen Fensters geschrieben (0.29.1). */
   const here = location.pathname;
   await Promise.all([here, 'manifest.webmanifest', 'version.json'].map(u => fetch(u, {cache:'reload'}).catch(() => null)));
   const u = new URL(location.href); u.searchParams.set('v', (UPD.found?.version || String(Date.now())).split(' ')[0]);
@@ -9728,7 +9830,7 @@ $('#dlg-profile').addEventListener('click', e => {
   const pick = e.target.closest('[data-pid]'); if(pick){ selectProfile(pick.dataset.pid); return; }
   const del = e.target.closest('[data-del]');
   if(del && !teacherOn()) return requireTeacher(() => renderProfiles());
-  if(del){ const id = del.dataset.del, p = data.profiles.find(x => x.id === id); if(p && del.dataset.sure){ data.profiles = data.profiles.filter(x => x.id !== id); delete data.log[id]; if(data.skips) delete data.skips[id]; if(data.errs) delete data.errs[id]; if(data.current === id) data.current = null; saveData(); renderProfiles(); render(); } else { del.dataset.sure = '1'; del.innerHTML = '<span style="display:inline;font-weight:700;color:var(--bad)">Sicher?</span>'; } return; }
+  if(del){ const id = del.dataset.del, p = data.profiles.find(x => x.id === id); if(p && del.dataset.sure){ data.profiles = data.profiles.filter(x => x.id !== id); delete data.log[id]; if(data.skips) delete data.skips[id]; if(data.errs) delete data.errs[id]; if(data.current === id) data.current = null; saveData({empty: true}); renderProfiles(); render(); } else { del.dataset.sure = '1'; del.innerHTML = '<span style="display:inline;font-weight:700;color:var(--bad)">Sicher?</span>'; } return; }
   if(e.target.closest('#p-screen')){ $('#dlg-profile').close(); screenStart(); }
   if(e.target.closest('#p-unlock')){ requireTeacher(() => renderProfiles()); return; }
 });
