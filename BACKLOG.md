@@ -22,7 +22,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## D: Hilfen für Schüler*innen als eigenes Modul (Arbeitsname „Werkzeugkiste“)
 
-**Status:** Wunsch dokumentiert 20.11.2026, Entscheidungen offen, nicht begonnen.
+**Status:** Wunsch dokumentiert 20.11.2026, Grundentscheidungen getroffen (20.11.), Name und Rechenhilfe in der Mathe-Leiste noch offen; nicht begonnen.
 **Wunsch Stefan (20.11.):** Die Rechenhilfe soll kein Teil von Mathe/Plus-Minus sein, sondern ein ganz unabhängiges Modul, „quasi wie ein Taschenrechner, Materialvorrat usw.“ für Schüler*innen.
 
 **Ausgangslage:**
@@ -32,7 +32,15 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 **Idee:** eigener Bereich mit Werkzeugen, die ein Kind nutzt, wenn es eine Aufgabe (z. B. vom Arbeitsblatt oder aus dem Alltag) hat: kein Lernstand, keine Tests, keine Förderzone.
 
-**Offene Entscheidungen (Stefan):**
+**Entscheidungen Stefan (20.11.):**
+- Ort: eigener Eingang auf der Startseite neben Üben und Testen, unabhängig vom Fach.
+- Inhalt: Rechenhilfe Plus/Minus, Materialvorrat (Frei legen mit Material, Würfeln, Geld), Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr (wie an der Tafel) und neu ein einfacher Taschenrechner (große Tasten, Ergebnis wahlweise auch als Material).
+- Speichern: nur die Nutzung zählen (z. B. „Rechenhilfe 5× genutzt“) für Lernstand und ILEB; keine einzelnen Aufgaben, keine Ergebnisse, keine Förderzone.
+- Sichtbarkeit: für alle Kinder immer.
+
+**Noch offen:** Name für Kinder; Rechenhilfe aus der Mathe-Leiste nehmen oder an beiden Stellen lassen; Taschenrechner: welche Rechenarten (nur + und − oder auch × und :), Zahlenraum.
+
+**Ursprüngliche Fragen:**
 1. Ort: eigener Eingang auf der Startseite (neben Üben und Testen) oder eigene Gruppe in der Leiste, die in jedem Fach zu sehen ist.
 2. Inhalt: Rechenhilfe (Plus/Minus), Materialvorrat, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr, Geld, Wörter/Silben; ein echter Taschenrechner (große Tasten, Ergebnis wahlweise auch als Material)?
 3. Speichern: ohne Ergebnisse wie an der Tafel, oder Nutzung mitschreiben (z. B. „hat die Rechenhilfe 5× genutzt“) für Lernstand/ILEB.
