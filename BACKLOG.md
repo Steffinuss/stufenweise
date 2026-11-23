@@ -15,6 +15,7 @@ Stand: 20.11.2026 (0.30.0)
 | 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
+| 5 | **E** QR-Umzug schneller (+ Fehler F2) | mittel | Vorschlag 23.11.; wartet auf Stefans OK |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -49,6 +50,27 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 4. Sichtbarkeit: immer für alle Kinder, oder je Kind von der Lehrkraft ein- und ausschaltbar (wie das Basis-Häkchen).
 5. Name für Kinder: „Hilfen“, „Werkzeugkiste“ o. Ä.
 6. Rechenhilfe danach aus der Mathe-Leiste nehmen oder an beiden Stellen lassen.
+
+---
+
+## E: QR-Umzug schneller (mit Fehler F2)
+
+**Status:** Vorschlag 23.11.2026, wartet auf Stefans OK. Nicht begonnen.
+**Anlass (Stefan, 23.11.):** Umzug von 6 Kindern Mac → iPad braucht 109 QR-Codes; klappt gut, dauert aber. Frage: mehr Information pro Code oder schnelleres Wechseln?
+
+**F2 – Fehler:** `qrPayload(…, keep)` kürzt die Übungen mit `l.slice(-keep)`. Bei `keep = 0` liefert `slice(-0)` die ganze Liste. Die App zeigt „von jedem Kind die letzten 0 Übungen“, überträgt aber alle Übungen; `maxParts: 60` greift dadurch nicht (bei Stefan 109 Teile). Nicht allein beheben: Dann gingen beim Umzug wirklich alle Übungen verloren. Gemeinsam mit E lösen.
+
+**Messungen (23.11.):**
+- Heute: 230 Bytes je Code, Fehlerkorrektur M (61 × 61 Module), Wechsel alle 650 ms. 109 Teile ≈ 25 KB ≈ 71 s je Durchlauf.
+- Eigener QR-Leser (`QR.scan`) liest im Test (720 px, leichte Unschärfe, Rauschen) Codes bis 1.000 Bytes mit Fehlerkorrektur L (105 × 105 Module) sicher, auch bei nur 3 px je Modul, in 10–30 ms.
+- Übungen spaltenweise statt als einzelne Objekte verpackt (Zeitabstände statt Zeitstempel, Rechenart als Nummer): nach Deflate 3,4 statt 6,4 Bytes je Eintrag (Faktor 1,9).
+
+**Vorschlag:**
+1. Mehr pro Code: etwa 700 Bytes mit Fehlerkorrektur L (≈ 3× heute). Schalter „Kleine Codes“ als Rückfall, falls eine Kamera nicht mitkommt.
+2. Kompakter packen: Übungen spaltenweise (Format `v:2`; der Empfänger liest weiter auch `v:1`).
+3. Schneller wechseln: etwa 400 ms statt 650 ms; Empfänger wertet Bilder mit 960 statt 720 px aus.
+4. F2 beheben: Kürzen der Übungen erst, wenn es auch dann noch über der Grenze liegt, und dann ehrlich anzeigen.
+Erwartung für Stefans Fall: etwa 20 statt 109 Codes, ein Durchlauf etwa 8 s statt 71 s. Muss auf echten Geräten (Mac-Bildschirm → iPad-Kamera) geprüft werden.
 
 ---
 
