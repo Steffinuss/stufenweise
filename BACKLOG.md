@@ -15,7 +15,7 @@ Stand: 20.11.2026 (0.30.0)
 | 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
-| 5 | **E** QR-Umzug schneller (+ Fehler F2) | mittel | von Stefan getestet („funktionieren hervorragend“), mit F3 (Druck) Freigabe als 0.31.0 |
+| 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -55,7 +55,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## E: QR-Umzug schneller (mit Fehler F2)
 
-**Status:** gebaut 23.11.2026 in `entwicklung` (Stefan: „Ja, bau es“), in der Testversion; wartet auf Test Mac → iPad und Freigabe. Umgesetzt wie unten vorgeschlagen; gemessen: 6 Kinder × 800 Übungen 25 statt 148 Codes, ≈ 10 statt 96 s je Durchlauf.
+**Status:** erledigt, freigegeben in 0.31.0 (23.11.2026). Stefan hat Mac → iPad getestet: „funktionieren hervorragend“. Umgesetzt wie unten vorgeschlagen; gemessen: 6 Kinder × 800 Übungen 25 statt 148 Codes, ≈ 10 statt 96 s je Durchlauf.
 **Anlass (Stefan, 23.11.):** Umzug von 6 Kindern Mac → iPad braucht 109 QR-Codes; klappt gut, dauert aber. Frage: mehr Information pro Code oder schnelleres Wechseln?
 
 **F2 – Fehler:** `qrPayload(…, keep)` kürzt die Übungen mit `l.slice(-keep)`. Bei `keep = 0` liefert `slice(-0)` die ganze Liste. Die App zeigt „von jedem Kind die letzten 0 Übungen“, überträgt aber alle Übungen; `maxParts: 60` greift dadurch nicht (bei Stefan 109 Teile). Nicht allein beheben: Dann gingen beim Umzug wirklich alle Übungen verloren. Gemeinsam mit E lösen.

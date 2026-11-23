@@ -5,6 +5,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+- noch nichts
+
+## 0.31.0 – 23.11.2026
+
 Geändert:
 - **QR-Umzug viel schneller** (Backlog E, Stefan): größere Codes (700 statt 230 Bytes je Code), Übungen kompakter verpackt (etwa halb so viele Daten) und schnellerer Wechsel (0,4 statt 0,65 s). Beispiel 6 Kinder mit je 800 Übungen: 25 statt 148 Codes, ein Durchlauf etwa 10 statt 96 Sekunden. Das empfangende Gerät wertet das Kamerabild genauer aus. Schalter **Kleine Codes** unter den Codes als Rückfall, falls eine Kamera nicht mitkommt (wird gemerkt).
 - Beide Geräte brauchen dieselbe Version: Ältere Versionen übergehen die neuen Codes; eine neuere Version meldet am empfangenden Gerät „bitte aktualisieren“. Codes älterer Versionen werden weiter gelesen.
