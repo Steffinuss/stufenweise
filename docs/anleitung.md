@@ -328,7 +328,7 @@ Mehrere Blätter lassen sich zu einem Heft zusammenstellen:
 
 Das Heft bleibt auf dem Gerät gespeichert, bis du es leerst.
 
-**Heft zur Förderzone:** Wenn ein Kind schon getestet wurde, kann Stufenweise das Heft selbst zusammenstellen. Im Lernstand des Kindes auf **Arbeitsheft zur Förderzone** tippen (oder im Arbeitsheft oben das Kind wählen). Die App zeigt die Förderzonen in Mathe, Lesen und Schreiben. Wähle 1 oder 2 Blätter je Stufe und tippe auf **Heft erstellen**. Jedes Blatt wird mit neuen Aufgaben gefüllt. Ein vorhandenes Heft wird dabei ersetzt; danach kannst du wie gewohnt Seiten verschieben, entfernen oder weitere hinzufügen.
+**Heft zur Förderzone:** Wenn ein Kind schon getestet wurde, kann Stufenweise das Heft selbst zusammenstellen. Im Lernstand des Kindes auf **Arbeitsheft zur Förderzone** tippen (oder im Arbeitsheft oben das Kind wählen). Die App zeigt die Förderzonen in Mathe, Lesen und Schreiben. Wähle 1 oder 2 Blätter je Stufe und tippe auf **Heft erstellen**. Sind Basis-Blätter dabei, kannst du **Schwarz-Weiß-Drucker** ankreuzen (Muster statt Farben). Sind Blätter zur Hundertertafel dabei, kannst du **Ausgefüllte Hundertertafel als Extraseite zum Nachschauen** ankreuzen; die Tafel kommt dann einmal hinten ins Heft. Jedes Blatt wird mit neuen Aufgaben gefüllt. Ein vorhandenes Heft wird dabei ersetzt; danach kannst du wie gewohnt Seiten verschieben, entfernen oder weitere hinzufügen.
 
 ## Schritt 7: Rückmeldung geben
 

@@ -16,7 +16,7 @@ Stand: 23.11.2026 (0.31.0)
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
-| 6 | **G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar | klein | gebaut in `entwicklung` (23.11.2026), wartet auf Stefans OK in der Testversion |
+| 6 | **G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar (+ Heft zur Förderzone) | klein | gebaut in `entwicklung` (23.11.2026), wartet auf Stefans OK in der Testversion |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -33,6 +33,9 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 - Über den Aufgaben steht vor den Zeichen-Erklärungen ein kleines Tafel-Bild mit „Hundertertafel“.
 - Häkchen „Ausgefüllte Hundertertafel als Extraseite zum Nachschauen“ (aus, wird gemerkt): Seite „Hundertertafel zum Nachschauen“ nach dem Blatt, vor den Lösungen; „Ins Arbeitsheft“ übernimmt sie als eigene Heftseite.
 - Test `tests/hundertertafel_blaetter.py`.
+
+**Nachtrag (Stefan, 23.11.):** Auch beim automatisch erstellten **Heft zur Förderzone** sollen „Schwarz-Weiß-Druck“ und die Hundertertafel als Extraseite wählbar sein, die Tafel nur, wenn Hundertertafel-Aufgaben im Heft sind.
+- Umsetzung: Häkchen im Kasten „Heft zur Förderzone“ (`app.heft.bw`, `app.heft.taf`, gemerkt). Schwarz-Weiß nur sichtbar, wenn Basis-Zonen dabei sind (wirkt nur auf Basis-Blätter). Tafel nur sichtbar und nur angehängt, wenn eine Zone zu H1–H6 dabei ist; einmal als letzte Heftseite (auch bei 2 Blättern je Stufe). Die Einstellungen des Einzelblatts bleiben unberührt. Test `tests/heft_zone_optionen.py`.
 
 ---
 
