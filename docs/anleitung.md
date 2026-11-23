@@ -248,6 +248,8 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 
 **Kopf- und Fußzeilen:** Am Computer werden Arbeitsblätter, Legeblätter und das Arbeitsheft ohne Datum und Internetadresse am Rand gedruckt. Stehen sie trotzdem auf dem Blatt, im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad und iPhone hängt Safari immer eine Fußzeile an; das lässt sich dort nicht abschalten. Für saubere Blätter am Computer drucken.
 
+**Ein Blatt = eine Seite:** Was die Vorschau als ein Blatt zeigt, wird auch auf genau ein Blatt gedruckt. Ist ein Blatt etwas zu hoch (zum Beispiel ein langer Lesetext), verkleinert Stufenweise es leicht, höchstens auf 80 %. Passt es auch so nicht, steht in der Vorschau ein oranger Hinweis „wird auf 2 Blätter gedruckt“; dann weniger Aufgaben wählen.
+
 ![Arbeitsblatt-Generator mit Vorschau](bilder/13_arbeitsblatt.png)
 
 Unter „Hundertertafel und Tausenderbuch“ gibt es Blätter zu allen sieben Stufen und drei Material-Blätter: eine ausgefüllte Hundertertafel, eine leere Tafel zum Eintragen und das Tausenderbuch: Unter „Seite“ wählst du eine bestimmte Seite (zum Beispiel 701–800) oder „ganzes Tausenderbuch“. Dann kommen alle 10 Seiten von 1–100 bis 901–1000 zum Ausdrucken und Binden; mit „Ins Arbeitsheft“ werden es 10 Heftseiten.
@@ -322,7 +324,7 @@ Mehrere Blätter lassen sich zu einem Heft zusammenstellen:
 
 1. Ein Blatt einstellen und auf **Ins Arbeitsheft** tippen. Das Blatt wird genau so übernommen, wie es in der Vorschau steht. Für jede weitere Seite wiederholen.
 2. Oben auf **Arbeitsheft** wechseln. Dort Titel und Namen für das Titelblatt wählen (oder leer lassen zum Selbstschreiben), die Reihenfolge mit ↑ ↓ ändern oder Seiten entfernen.
-3. **Heft drucken.** Das Heft hat ein Titelblatt mit Namen und Inhaltsverzeichnis. Die Seiten haben Seitenzahlen, aber keine Namenszeilen und keine Lösungen.
+3. **Heft drucken.** Das Heft hat ein Titelblatt mit Namen und Inhaltsverzeichnis (bei mehr als 8 Seiten steht das Inhaltsverzeichnis auf einer eigenen Seite). Die Seiten haben Seitenzahlen, aber keine Namenszeilen und keine Lösungen.
 
 Das Heft bleibt auf dem Gerät gespeichert, bis du es leerst.
 

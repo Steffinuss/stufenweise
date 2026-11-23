@@ -15,7 +15,7 @@ Stand: 20.11.2026 (0.30.0)
 | 2 | ~~**B** Unterricht: Zahl im Zwanzigerfeld~~ | klein | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
-| 5 | **E** QR-Umzug schneller (+ Fehler F2) | mittel | gebaut 23.11. in `entwicklung`, in der Testversion; wartet auf Test mit echten Geräten |
+| 5 | **E** QR-Umzug schneller (+ Fehler F2) | mittel | von Stefan getestet („funktionieren hervorragend“), mit F3 (Druck) Freigabe als 0.31.0 |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 

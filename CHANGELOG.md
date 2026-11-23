@@ -10,9 +10,10 @@ Geändert:
 - Beide Geräte brauchen dieselbe Version: Ältere Versionen übergehen die neuen Codes; eine neuere Version meldet am empfangenden Gerät „bitte aktualisieren“. Codes älterer Versionen werden weiter gelesen.
 
 Fehlerbehebung:
+- **F3: Druck wie Vorschau** (Stefan, 23.11.): Im Arbeitsheft rutschten das Inhaltsverzeichnis und lange Deutsch-Aufgaben (z. B. „Längere Texte verstehen“) im Druck auf ein weiteres Blatt, oft nur mit der Fußzeile; in der Vorschau sah alles passend aus, weil ein Blatt dort länger als A4 sein durfte. Jetzt wird jedes Blatt, das etwas zu hoch ist, im Druckdokument selbst auf eine Seite verkleinert (höchstens auf 80 %, in allen Browsern, auch in einer gespeicherten Datei). Passt es so nicht, zeigt die Vorschau „wird auf 2 Blätter gedruckt“. Das Deckblatt hatte im Druck andere Maße als in der Vorschau (das ist entfernt); bei mehr als 8 Seiten steht das Inhaltsverzeichnis auf einer eigenen Seite. Legeblätter und Berichte sind unverändert.
 - **F2:** Bei sehr vielen Daten zeigte die App „von jedem Kind die letzten 0 Übungen“, übertrug aber alle Übungen (daher z. B. 109 Codes bei 6 Kindern). Jetzt wird nur gekürzt, wenn es auch mit großen Codes nicht passt, und die Anzeige stimmt („mit allen Übungen“, „die letzten …“ oder „ohne Übungen“).
 
-Für Entwickler*innen: Format 2 (`v:2`, Kopfbyte 2), `colPack`/`colUnpack` (verlustfrei, Zeitstempel als Abstände, Schlüsselreihenfolge über Formen), `QR_MODES`, `settings.qrSmall`; neuer Test `tests/qr_umzug.py` (echter Umzug zwischen zwei Browsern über Bilder und den eingebauten Leser).
+Für Entwickler*innen: Format 2 (`v:2`, Kopfbyte 2), `colPack`/`colUnpack` (verlustfrei, Zeitstempel als Abstände, Schlüsselreihenfolge über Formen), `QR_MODES`, `settings.qrSmall`; neuer Test `tests/qr_umzug.py` (echter Umzug zwischen zwei Browsern über Bilder und den eingebauten Leser). Druck: `PAGE_FIT_JS` (im Kopf von Arbeitsblatt, Legeblatt und Heft; `window.__fitPages`, `.fitz` nur beim Verkleinern, `data-fit`, `data-over`), `sheetFit` misst ohne Verkleinerung; neuer Test `tests/druck_seiten.py` (Chrome-Druck als PDF, Seiten gezählt).
 
 ## 0.30.1 – 20.11.2026
 
