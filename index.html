@@ -1212,7 +1212,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', askWho:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fbMail:'', qrSmall:false, allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', askWho:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -8281,28 +8281,59 @@ const QR = (() => {
    Sender: Daten → JSON → komprimiert → in Teile zerlegt → nacheinander als QR-Codes gezeigt.
    Empfänger: liest die Teile mit der Kamera (Reihenfolge egal), setzt sie zusammen und führt die Daten zusammen.
    Jeder Teil: „SW“, Formatversion, Sitzungsnummer (2 Byte), Teil-Nr., Anzahl Teile, Kompression, Daten. */
-const QRX = {chunk:230, maxParts:60, timer:null, stream:null, raf:0, rx:null, idx:0, parts:null, paused:false};
+/* QR-Umzug. Große Codes (Standard): 700 Bytes, Fehlerkorrektur L, Wechsel alle 0,4 s. „Kleine Codes“ als Rückfall
+   für Kameras, die nicht mitkommen: 230 Bytes, Fehlerkorrektur M, 0,65 s (so war es bis 0.30). Kopf je Code:
+   S W <Format> <Sitzung 2 Byte> <Teil> <Anzahl> <deflate?>; Format 2 = Übungen spaltenweise gepackt (colPack).
+   Ältere App-Versionen kennen nur Format 1 und übergehen Format-2-Codes, statt sie falsch zu lesen. */
+const QRX = {timer:null, stream:null, raf:0, rx:null, idx:0, parts:null, paused:false, sel:null, oldSeen:0};
+const QR_MODES = {big:{chunk:700, ecc:'L', ms:400, maxParts:60}, small:{chunk:230, ecc:'M', ms:650, maxParts:120}};
+const qrMode = () => QR_MODES[settings.qrSmall ? 'small' : 'big'];
+/* Listen spaltenweise packen: je Schlüssel eine Spalte, Zeitstempel als Abstand zum vorigen Eintrag, Reihenfolge der
+   Schlüssel je Eintrag über „Formen“ (s, i). Verlustfrei: Doppelte werden beim Übernehmen über ts + Aufgabe erkannt. */
+function colPack(list, tk){
+  const shapes = [], sMap = new Map(), si = [], c = {}; let prev = 0;
+  for(const e of list){
+    const keys = Object.keys(e), sig = keys.join('\u0001'); let k = sMap.get(sig);
+    if(k === undefined){ k = shapes.push(keys) - 1; sMap.set(sig, k); }
+    si.push(k);
+    for(const key of keys){ let v = e[key]; if(key === tk && typeof v === 'number'){ const d = v - prev; prev = v; v = d; } (c[key] ??= []).push(v); }
+  }
+  const out = {n: list.length, s: shapes, c, t: tk}; if(shapes.length > 1) out.i = si; return out;
+}
+function colUnpack(p){
+  if(Array.isArray(p)) return p;   /* schon eine Liste (Format 1) */
+  const pos = {}, out = []; let prev = 0;
+  for(let j = 0; j < (p?.n || 0); j++){
+    const keys = p.s[p.i ? p.i[j] : 0], e = {};
+    for(const key of keys){ pos[key] = (pos[key] ?? -1) + 1; let v = p.c[key][pos[key]]; if(key === p.t && typeof v === 'number'){ v = prev + v; prev = v; } e[key] = v; }
+    out.push(e);
+  }
+  return out;
+}
 async function qrZip(bytes){ try{ const cs = new CompressionStream('deflate-raw'); return {flag:1, bytes:new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(cs)).arrayBuffer())}; }catch{ return {flag:0, bytes}; } }
 async function qrUnzip(bytes, flag){ if(!flag) return bytes; const ds = new DecompressionStream('deflate-raw'); return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(ds)).arrayBuffer()); }
 function qrPayload(ids, withSettings, keep){
   const pick = (o, f) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => ids.includes(k)).map(([k, v]) => [k, f ? f(v) : v]));
-  return {app:'stufenweise', kind:'move', v:1, from:data.device, at:Date.now(),
-    data:{schema:data.schema, profiles:data.profiles.filter(p => ids.includes(p.id)), log:pick(data.log, l => keep == null ? l : l.slice(-keep)), matrix:pick(data.matrix), mhist:pick(data.mhist), skips:pick(data.skips, l => l.slice(-50))},
+  /* keep: null = alle Übungen, sonst die letzten keep (0 = keine). Achtung: slice(-0) wäre die ganze Liste (Fehler F2 bis 0.30). */
+  const cut = l => keep == null ? l : keep > 0 ? l.slice(-keep) : [];
+  return {app:'stufenweise', kind:'move', v:2, from:data.device, at:Date.now(),
+    data:{schema:data.schema, profiles:data.profiles.filter(p => ids.includes(p.id)), log:pick(data.log, l => colPack(cut(l), 'ts')), matrix:pick(data.matrix), mhist:pick(data.mhist, h => colPack(h, 'date')), skips:pick(data.skips, l => colPack(l.slice(-50), 'ts'))},
     settings: withSettings ? {...settings, pin:undefined, startCtx:undefined} : undefined};
 }
 async function qrBuild(ids, withSettings){
-  let keep = null, z;
+  const M = qrMode(); let keep = null, z;
   for(;;){
     z = await qrZip(new TextEncoder().encode(JSON.stringify(qrPayload(ids, withSettings, keep))));
-    if(Math.ceil(z.bytes.length/QRX.chunk) <= QRX.maxParts) break;
+    if(Math.ceil(z.bytes.length/M.chunk) <= M.maxParts) break;
     const longest = Math.max(1, ...ids.map(id => (data.log[id] || []).length));
     keep = Math.floor((keep ?? longest)*0.6); if(keep < 5){ keep = 0; z = await qrZip(new TextEncoder().encode(JSON.stringify(qrPayload(ids, withSettings, 0)))); break; }
   }
-  const n = Math.max(1, Math.ceil(z.bytes.length/QRX.chunk)), sid = Math.floor(Math.random()*65536), parts = [];
+  const n = Math.max(1, Math.ceil(z.bytes.length/M.chunk)), sid = Math.floor(Math.random()*65536), parts = [];
+  if(n > 255) throw new Error('zu viele Teile');   /* Anzahl steht in einem Byte; dann bleibt die Sicherungsdatei */
   for(let i = 0; i < n; i++){
-    const body = z.bytes.subarray(i*QRX.chunk, (i + 1)*QRX.chunk), b = new Uint8Array(8 + body.length);
-    b.set([83, 87, 1, sid >> 8, sid & 255, i, n, z.flag]); b.set(body, 8);
-    parts.push(QR.svg(QR.encode(b, 'M'), {quiet:4}));
+    const body = z.bytes.subarray(i*M.chunk, (i + 1)*M.chunk), b = new Uint8Array(8 + body.length);
+    b.set([83, 87, 2, sid >> 8, sid & 255, i, n, z.flag]); b.set(body, 8);
+    parts.push(QR.svg(QR.encode(b, M.ecc), {quiet:4}));
   }
   return {parts, keep, bytes:z.bytes.length};
 }
@@ -8317,19 +8348,21 @@ function openQrSend(){
     : `<p class="note">Auf diesem Gerät sind noch keine Kinder angelegt.</p>`;
   $('#dlg-qr').showModal();
 }
-async function qrShow(){
-  const ids = [...document.querySelectorAll('[data-qr-kid]:checked')].map(i => i.dataset.qrKid), ws = $('#qr-set')?.checked;
+async function qrShow(again){
+  if(!again) QRX.sel = {ids: [...document.querySelectorAll('[data-qr-kid]:checked')].map(i => i.dataset.qrKid), ws: !!$('#qr-set')?.checked};
+  qrStop(); const {ids, ws} = QRX.sel;
   if(!ids.length && !ws) return toast('Bitte mindestens ein Kind auswählen.');
   $('#qr-body').innerHTML = '<p class="note">QR-Codes werden vorbereitet …</p>';
   let res; try{ res = await qrBuild(ids, ws); }catch(err){ $('#qr-body').innerHTML = '<p class="note">Das hat leider nicht geklappt. Bitte stattdessen eine Sicherungsdatei verwenden.</p>'; return; }
   QRX.parts = res.parts; QRX.idx = 0; QRX.paused = false;
   const names = data.profiles.filter(p => ids.includes(p.id)).map(p => escHtml(p.name)).join(', ') || 'nur Einstellungen';
   $('#qr-body').innerHTML = `<div class="qr-show"><div class="qr-box" id="qr-box"></div><div class="qr-dots" id="qr-dots" ${res.parts.length > 1 ? '' : 'hidden'}>${res.parts.map(() => '<i></i>').join('')}</div>
-    <p class="note" style="text-align:center;margin:0"><b id="qr-count"></b> · ${names}${res.keep != null ? ` · von jedem Kind die letzten ${res.keep} Übungen (alle Übungen: Sicherungsdatei)` : ''}</p>
+    <p class="note" style="text-align:center;margin:0"><b id="qr-count"></b> · ${names}${res.keep == null ? ' · mit allen Übungen' : res.keep > 0 ? ` · von jedem Kind die letzten ${res.keep} Übungen (alle Übungen: Sicherungsdatei)` : ' · ohne Übungen (Übungen: Sicherungsdatei)'}</p>
     <p class="note" style="text-align:center;margin:0">Auf dem anderen Gerät: Einstellungen → Daten sichern → <b>Per QR-Code empfangen</b>. Dann die Kamera auf diesen Bildschirm halten.${res.parts.length > 1 ? ' Die Codes wechseln von selbst, bis alle Teile angekommen sind.' : ''}</p>
-    ${res.parts.length > 1 ? '<div class="row" style="justify-content:center;gap:8px"><button type="button" class="icon-btn" id="qr-prev">◀</button><button type="button" class="icon-btn" id="qr-pause">Anhalten</button><button type="button" class="icon-btn" id="qr-next">▶</button></div>' : ''}</div>`;
+    ${res.parts.length > 1 ? '<div class="row" style="justify-content:center;gap:8px"><button type="button" class="icon-btn" id="qr-prev">◀</button><button type="button" class="icon-btn" id="qr-pause">Anhalten</button><button type="button" class="icon-btn" id="qr-next">▶</button></div>' : ''}
+    <div class="row" style="justify-content:center"><button type="button" class="linkish" id="qr-size">${settings.qrSmall ? 'Große Codes (schneller)' : 'Kleine Codes (wenn die Kamera nicht mitkommt)'}</button></div></div>`;
   qrFrame();
-  if(res.parts.length > 1) QRX.timer = setInterval(() => { if(!QRX.paused){ QRX.idx = (QRX.idx + 1) % QRX.parts.length; qrFrame(); } }, 650);
+  if(res.parts.length > 1) QRX.timer = setInterval(() => { if(!QRX.paused){ QRX.idx = (QRX.idx + 1) % QRX.parts.length; qrFrame(); } }, qrMode().ms);
 }
 function qrFrame(){
   const box = $('#qr-box'); if(!box) return;
@@ -8338,7 +8371,7 @@ function qrFrame(){
   [...$('#qr-dots').children].forEach((d, i) => d.classList.toggle('now', i === QRX.idx));
 }
 async function openQrRecv(){
-  qrStop(); QRX.rx = null;
+  qrStop(); QRX.rx = null; QRX.oldSeen = 0;
   $('#qr-title').textContent = 'Per QR-Code empfangen';
   $('#qr-body').innerHTML = `<div class="qr-cam"><video id="qr-video" playsinline muted></video><div class="qr-frame"></div></div>
     <div class="qr-dots" id="qr-rdots" style="margin:10px auto"></div><p class="note" id="qr-state" style="text-align:center">Kamera wird gestartet …</p>`;
@@ -8353,7 +8386,7 @@ async function openQrRecv(){
   const tick = t => {
     QRX.raf = requestAnimationFrame(tick);
     if(t - last < 90 || v.readyState < 2) return; last = t;
-    const sc = Math.min(1, 720/Math.max(v.videoWidth, v.videoHeight)), w = Math.round(v.videoWidth*sc), h = Math.round(v.videoHeight*sc); if(!w || !h) return;
+    const sc = Math.min(1, 960/Math.max(v.videoWidth, v.videoHeight)), w = Math.round(v.videoWidth*sc), h = Math.round(v.videoHeight*sc); if(!w || !h) return;
     cv.width = w; cv.height = h; cx.drawImage(v, 0, 0, w, h);
     const px = cx.getImageData(0, 0, w, h).data, g = new Uint8Array(w*h);
     for(let i = 0; i < w*h; i++) g[i] = (px[4*i]*77 + px[4*i + 1]*150 + px[4*i + 2]*29) >> 8;
@@ -8363,7 +8396,9 @@ async function openQrRecv(){
   QRX.raf = requestAnimationFrame(tick);
 }
 function qrGot(b){
-  if(b.length < 9 || b[0] !== 83 || b[1] !== 87 || b[2] !== 1) return;
+  if(b.length < 9 || b[0] !== 83 || b[1] !== 87) return;
+  if(b[2] > 2){ if(!QRX.oldSeen++) $('#qr-state').textContent = 'Das andere Gerät hat eine neuere Version von Stufenweise. Bitte dieses Gerät aktualisieren (neu laden).'; return; }
+  if(b[2] < 1) return;
   const sid = b[3] << 8 | b[4], i = b[5], n = b[6], flag = b[7];
   if(!QRX.rx || QRX.rx.sid !== sid) QRX.rx = {sid, n, flag, parts:new Array(n).fill(null)};
   if(i >= n || QRX.rx.parts[i]) return;
@@ -8378,7 +8413,8 @@ async function qrDone(){
   qrStop();
   const rx = QRX.rx, all = new Uint8Array(rx.parts.reduce((a, p) => a + p.length, 0)); let o = 0; for(const p of rx.parts){ all.set(p, o); o += p.length; }
   let obj;
-  try{ obj = JSON.parse(new TextDecoder().decode(await qrUnzip(all, rx.flag))); if(obj.app !== 'stufenweise' || obj.kind !== 'move' || !obj.data) throw 0; }
+  try{ obj = JSON.parse(new TextDecoder().decode(await qrUnzip(all, rx.flag))); if(obj.app !== 'stufenweise' || obj.kind !== 'move' || !obj.data) throw 0;
+    for(const k of ['log', 'mhist', 'skips']) if(obj.data[k]) for(const pid of Object.keys(obj.data[k])) obj.data[k][pid] = colUnpack(obj.data[k][pid]); }
   catch{ $('#qr-state').textContent = 'Die Daten konnten nicht gelesen werden. Bitte noch einmal versuchen.'; return; }
   QRX.rxObj = obj;
   const ps = obj.data.profiles || [], n = Object.values(obj.data.log || {}).reduce((a, l) => a + l.length, 0);
@@ -8401,6 +8437,7 @@ $('#dlg-qr').addEventListener('click', e => {
   if(e.target.closest('[data-close]') || e.target === $('#dlg-qr')) return $('#dlg-qr').close();
   const b = e.target.closest('button'); if(!b) return;
   if(b.id === 'qr-go') qrShow();
+  else if(b.id === 'qr-size'){ settings.qrSmall = !settings.qrSmall; saveSettings(); qrShow(true); }
   else if(b.id === 'qr-take') qrTake();
   else if(b.id === 'qr-pause'){ QRX.paused = !QRX.paused; b.textContent = QRX.paused ? 'Weiter' : 'Anhalten'; }
   else if(b.id === 'qr-next' || b.id === 'qr-prev'){ QRX.paused = true; const p = $('#qr-pause'); if(p) p.textContent = 'Weiter'; QRX.idx = (QRX.idx + (b.id === 'qr-next' ? 1 : QRX.parts.length - 1)) % QRX.parts.length; qrFrame(); }

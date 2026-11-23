@@ -5,7 +5,14 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+Geändert:
+- **QR-Umzug viel schneller** (Backlog E, Stefan): größere Codes (700 statt 230 Bytes je Code), Übungen kompakter verpackt (etwa halb so viele Daten) und schnellerer Wechsel (0,4 statt 0,65 s). Beispiel 6 Kinder mit je 800 Übungen: 25 statt 148 Codes, ein Durchlauf etwa 10 statt 96 Sekunden. Das empfangende Gerät wertet das Kamerabild genauer aus. Schalter **Kleine Codes** unter den Codes als Rückfall, falls eine Kamera nicht mitkommt (wird gemerkt).
+- Beide Geräte brauchen dieselbe Version: Ältere Versionen übergehen die neuen Codes; eine neuere Version meldet am empfangenden Gerät „bitte aktualisieren“. Codes älterer Versionen werden weiter gelesen.
+
+Fehlerbehebung:
+- **F2:** Bei sehr vielen Daten zeigte die App „von jedem Kind die letzten 0 Übungen“, übertrug aber alle Übungen (daher z. B. 109 Codes bei 6 Kindern). Jetzt wird nur gekürzt, wenn es auch mit großen Codes nicht passt, und die Anzeige stimmt („mit allen Übungen“, „die letzten …“ oder „ohne Übungen“).
+
+Für Entwickler*innen: Format 2 (`v:2`, Kopfbyte 2), `colPack`/`colUnpack` (verlustfrei, Zeitstempel als Abstände, Schlüsselreihenfolge über Formen), `QR_MODES`, `settings.qrSmall`; neuer Test `tests/qr_umzug.py` (echter Umzug zwischen zwei Browsern über Bilder und den eingebauten Leser).
 
 ## 0.30.1 – 20.11.2026
 

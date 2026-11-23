@@ -361,7 +361,7 @@ So kommen Kinder ohne Datei und ohne Internet auf ein anderes Gerät, zum Beispi
 
 1. Auf dem **alten Gerät**: Einstellungen → Kinder & Daten → **Per QR-Code senden**. Kinder ankreuzen (auf Wunsch auch die Einstellungen, die PIN wird nie übertragen) und **QR-Codes zeigen** tippen.
 2. Auf dem **neuen Gerät**: Einstellungen → Kinder & Daten → **Per QR-Code empfangen**. Beim ersten Mal fragt das iPad, ob Stufenweise die Kamera benutzen darf: erlauben.
-3. Die Kamera des neuen Geräts auf den Bildschirm des alten halten. Bei vielen Daten wechseln die QR-Codes von selbst; die Reihenfolge ist egal, kleine Kästchen zeigen, welche Teile schon angekommen sind. Meist dauert das zehn bis zwanzig Sekunden.
+3. Die Kamera des neuen Geräts auf den Bildschirm des alten halten. Bei vielen Daten wechseln die QR-Codes von selbst; die Reihenfolge ist egal, kleine Kästchen zeigen, welche Teile schon angekommen sind. Meist dauert das zehn bis zwanzig Sekunden. Kommt die Kamera nicht mit (es kommen kaum neue Teile an), unter den Codes **Kleine Codes** wählen: Dann sind es mehr, aber leichter lesbare Codes, die langsamer wechseln. Beide Geräte brauchen dieselbe Version von Stufenweise; sonst meldet das empfangende Gerät, dass es aktualisiert werden muss.
 4. Zum Schluss zeigt das neue Gerät, welche Kinder angekommen sind. **Übernehmen** tippen.
 
 Ist ein Kind auf beiden Geräten schon da, wird zusammengeführt: Die Übungen beider Geräte bleiben erhalten, bei Name, Bild und Lernstand gilt der neuere Stand. Bei sehr vielen Übungen werden per QR-Code nur die neuesten übertragen (die App sagt dann, wie viele); den ganzen Verlauf bringt die Sicherungsdatei mit.
