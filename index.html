@@ -8692,20 +8692,22 @@ const W_SHEETS = {
        () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1], s = `${cap(art(n))} ${n} ist ${t}.`; return T_(['lies', 'schreibe'], 'Schreibe richtig ab. Denk an Großbuchstaben und den Punkt.', `<p class="ab-sent">${s.toLowerCase().replace('.', '')}</p>${lineW()}`, s); }]}
 };
 /* Arbeitsblätter zur Hundertertafel und zum Tausenderbuch */
+/* kleines Tafel-Bild für den Hinweis „Hundertertafel“ auf den Blättern H1–H6 */
+const TAF_ICON = `<svg class="ab-op" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="1" fill="#fff" stroke="#222" stroke-width="1.6"/><path d="M6 2v20M10 2v20M14 2v20M18 2v20M2 6h20M2 10h20M2 14h20M2 18h20" stroke="#222" stroke-width=".7"/><rect x="2.8" y="2.8" width="3.2" height="3.2" fill="#346bc3"/></svg>`;
 const hbP = (bd, mm = 6.5) => `<div class="hbp" style="--hs:${mm}mm">${boardHtml(bd, {print:true})}</div>`;
 const hDistinct = (k, f) => { const out = new Set(); let t = 0; while(out.size < k && t++ < 60) out.add(f()); return [...out]; };
 const H_SHEETS = {
-  H1: {name:'Zahlen in der Hundertertafel finden', cols:2, gens:[
+  H1: {name:'Zahlen in der Hundertertafel finden', taf:true, cols:2, gens:[
     () => { const ns = hDistinct(3, () => Math.random() < .25 ? rnd(1, 9)*10 : hDecade()); return T_(['lies', 'kreise'], `Kreise ein: <b>${ns.join(', ')}</b>`, hbP({}, 6.4), ns.join(', ')); },
     () => { const show = {}, marks = {}, gaps = hDistinct(3, () => hAt(0, rnd(1, 9), rnd(1, 9))).sort((a, b) => a - b); for(let i = 0; i < 10; i++){ show[i + 1] = 'num'; show[i*10 + 1] = 'num'; } gaps.forEach((n, i) => { show[n] = 'L:' + 'ABC'[i]; marks[n] = 'mk'; });
       return T_(['lies', 'schreibe'], 'Welche Zahlen stehen bei A, B und C?', `${hbP({def:'blank', show, marks}, 6.2)}<p class="ab-row">${'ABC'.split('').map(x => `${x} = ${box(13)}`).join('&nbsp;&nbsp;')}</p>`, gaps.map((n, i) => `${'ABC'[i]} = ${n}`).join(', ')); }
   ]},
-  H2: {name:'Tafel und Material verbinden', cols:2, gens:[
+  H2: {name:'Hundertertafel und Material verbinden', taf:true, cols:2, gens:[
     () => { const z = rnd(1, 9), e = rnd(1, 9); return T_(['zaehle', 'schreibe'], 'Welche Zahl ist das?', `<span class="ab-ic" style="width:46mm">${materialSvg(z, e)}</span>${ans()}`, z*10 + e); },
     () => { const n = hDecade(); return T_(['zaehle', 'schreibe'], 'Wie viele Punkte sind dunkel?', `<span class="ab-ic" style="width:40mm">${hdotsSvg(n)}</span>${ans()}`, n); },
     () => { const n = hDecade(); return T_(['lies', 'schreibe'], 'Schreibe die Zahl mit Ziffern.', `<p class="ab-row">${numberWord(n)}</p>${ans()}`, n); }
   ]},
-  H3: {name:'Nachbarn und Lücken', cols:2, gens:[
+  H3: {name:'Nachbarn und Lücken in der Hundertertafel', taf:true, cols:2, gens:[
     () => { const r = rnd(1, 9), c0 = pick([0, 5]), gaps = shuffle([0, 1, 2, 3, 4]).slice(0, 2), show = {}; for(let c = 0; c < 5; c++) show[hAt(0, r, c0 + c)] = gaps.includes(c) ? 'in' : 'num';
       return T_('schreibe', 'Fülle die Lücken in der Zeile.', hbP({show, cut:[r, r, c0, c0 + 4]}, 12), hFields({show}).join(', ')); },
     () => { const n = hAt(0, rnd(1, 8), rnd(1, 8)), A = {[n - 1]:'in', [n]:'num', [n + 1]:'in'}, B = {[n - 10]:'in', [n]:'num', [n + 10]:'in'}, [r, c] = hRC(n);
@@ -8713,17 +8715,17 @@ const H_SHEETS = {
     () => { const c = rnd(0, 8), r0 = pick([0, 5]), gaps = shuffle([0, 1, 2, 3, 4]).slice(0, 2), show = {}; for(let r = 0; r < 5; r++) show[hAt(0, r0 + r, c)] = gaps.includes(r) ? 'in' : 'num';
       return T_('schreibe', 'Fülle die Lücken in der Spalte.', hbP({show, cut:[r0, r0 + 4, c, c]}, 11), hFields({show}).join(', ')); }
   ]},
-  H4: {name:'Ausschnitte ergänzen', cols:3, gens:[
+  H4: {name:'Ausschnitte aus der Hundertertafel ergänzen', taf:true, cols:3, gens:[
     () => { const x = hCut(0, {cells:[[-1, 0], [0, -1], [0, 0], [0, 1], [1, 0]], given:2}); return T_('schreibe', 'Fülle die leeren Felder.', hbP(x.bd, 9.5), hFields(x.bd).join(', ')); },
     () => { const sh = hShape(), x = hCut(0, sh, rnd(0, sh.cells.length - 1)); return T_('schreibe', 'Fülle die leeren Felder.', hbP(x.bd, 9.5), hFields(x.bd).join(', ')); },
     () => { const sh = hShape(), x = hCut(0, sh); return T_('schreibe', 'Fülle die leeren Felder.', hbP(x.bd, 9.5), hFields(x.bd).join(', ')); }
   ]},
-  H5: {name:'Wege gehen: Plus und Minus an der Tafel', cols:2, gens:[
+  H5: {name:'Wege gehen: Plus und Minus an der Hundertertafel', taf:true, cols:2, gens:[
     () => { const d = rnd(1, 3), k = rnd(1, 4), s = hAt(0, rnd(0, 9 - d), rnd(0, 9 - k)); return T_(['lies', 'schreibe'], `Start bei <b>${s}</b>: <b class="ab-arrows">${'↓'.repeat(d)}${'→'.repeat(k)}</b> Wo kommst du an?`, `${hbP({marks:{[s]:'mk'}}, 5.6)}${ans()}`, s + 10*d + k); },
     () => { const z = rnd(1, 4), e = rnd(0, 5), s = hAt(0, rnd(0, 9 - z), rnd(0, 9 - e)), b = z*10 + e; return T_(['rechne', 'schreibe'], `Rechne mit der Tafel: <b>${s} + ${b}</b>`, `${hbP({marks:{[s]:'mk'}}, 5.6)}<p class="ab-row">${s} + ${b} = ${box(14)}</p>`, s + b); },
     () => { const z = rnd(1, 4), e = rnd(0, 5), s = hAt(0, rnd(z, 9), rnd(e, 9)), b = z*10 + e; return T_(['rechne', 'schreibe'], `Rechne mit der Tafel: <b>${s} − ${b}</b>`, `${hbP({marks:{[s]:'mk'}}, 5.6)}<p class="ab-row">${s} − ${b} = ${box(14)}</p>`, s - b); }
   ]},
-  H6: {name:'Muster erkennen', cols:2, gens:[
+  H6: {name:'Muster in der Hundertertafel erkennen', taf:true, cols:2, gens:[
     () => { const e = rnd(1, 9); return T_('male', `Male alle Zahlen an, die mit <b>${e}</b> enden.`, hbP({}, 6.2), Array.from({length:10}, (_, i) => i*10 + e).join(', ')); },
     () => { const k = pick([2, 3, 4, 5]); return T_('male', `Male die <b>${k}er-Reihe</b> an: ${k}, ${2*k}, ${3*k} … bis ${10*k}.`, hbP({}, 6.2), Array.from({length:10}, (_, i) => (i + 1)*k).join(', ')); },
     () => { const z = rnd(2, 8); return T_('male', `Male alle Zahlen mit <b>${z} Zehnern</b> an.`, hbP({}, 6.2), `${z*10} bis ${z*10 + 9}`); },
@@ -8994,7 +8996,7 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .page{width:210mm;padding:12mm;margin:0 auto;page-break-after:always;-webkit-box-decoration-break:clone;box-decoration-break:clone}.page:last-child{page-break-after:auto}
 .ab-top{border-bottom:2.5px solid #222;padding-bottom:2.5mm;margin-bottom:3mm}.ab-top h1{font-size:20pt;margin:0 0 3mm;line-height:1.15}
 .ab-meta{display:grid;grid-template-columns:2fr 1fr;gap:8mm;font-size:11pt}.ab-meta div{display:flex;gap:2mm;align-items:flex-end}.ab-meta span{flex:1;border-bottom:1.2px solid #444;min-height:6mm;font-weight:700;padding-left:1mm}
-.ab-legend{display:flex;flex-wrap:wrap;gap:2mm 6mm;font-size:9.5pt;color:#444;margin:0 0 4mm}.ab-legend span{display:flex;align-items:center;gap:1.5mm}.ab-legend .ab-op{width:5mm;height:5mm}
+.ab-legend{display:flex;flex-wrap:wrap;gap:2mm 6mm;font-size:9.5pt;color:#444;margin:0 0 4mm}.ab-legend span{display:flex;align-items:center;gap:1.5mm}.ab-legend .ab-op{width:5mm;height:5mm}.ab-legend .ab-taf{font-weight:700;color:#222}
 .ab-grid{display:grid;gap:4mm}.ab-grid.gross>.ab-task{zoom:1.35}.ab-tausch{font-size:10pt;color:#444;text-align:center;margin:0;white-space:nowrap}.ab-tausch .tz{display:inline-block;width:5mm;height:3mm;border:1.2px dashed #222;border-radius:1mm;vertical-align:middle;margin-right:1mm}
 .ab-task{border:1.2px solid #c8c8c8;border-radius:3mm;padding:3mm 4mm 3.5mm 4mm;display:flex;flex-direction:column;gap:2mm;break-inside:avoid;min-height:30mm}
 .ab-ins{display:flex;align-items:center;gap:2mm;font-size:11.5pt;line-height:1.3;color:#222}.ab-ins .nr{width:6.5mm;height:6.5mm;border-radius:50%;background:#222;color:#fff;font-size:9.5pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
@@ -9080,8 +9082,8 @@ function zoneToSheet(key){
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
-app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[]};
-const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'recent'];
+app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, taf:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[]};
+const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'taf', 'recent'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
 function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch {} }
@@ -9286,12 +9288,14 @@ function buildSheet0(limit){
   const ord = [...Array(n).keys()].sort((x, y) => G.gi[x] - G.gi[y] || G.d[x] - G.d[y] || x - y);
   const exSeen = new Set(), tasks = ord.map((j, i) => { let h = G.tasks[j].replace('§NR§', i + 1); const ek = G.gi[j] + '|' + (h.match(/§EK:(\w+)§/)?.[1] || ''); h = h.replace(/§EK:\w+§/g, ''); if(!h.includes('§V§')) return h; const ex = !exSeen.has(ek); exSeen.add(ek); return abPick(h, ex); }), sols = ord.map(j => G.sols[j]), used = new Set(G.ops.slice(0, n).flat());
   const body = abScale(`<div class="ab-grid${S.gross ? ' gross' : ''}" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols, S.gross ? AB_GROSS : 1);
-  const legend = `<div class="ab-legend">${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
+  const legend = `<div class="ab-legend">${def.taf ? `<span class="ab-taf">${TAF_ICON} Hundertertafel</span>` : ''}${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
   const info = ({L:L_INFO, W:W_INFO, U:U_INFO, G:G_INFO, H:H_INFO, ...SHEET_INFO})[sj]?.[key] || null;
   const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
   const sol = S.sol && !def.mat ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
-  return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}${sj === 'B' ? BB_CSS : ''}</style>${PAGE_FIT_JS}</head><body>${B_BW ? B_BW_DEFS : ''}<div class="page">${head}${legend}${body}${foot}</div>${sol}</body></html>`, _bw: B_BW = false, _sim: B_SIM = 0};
+  /* Hundertertafel zum Nachschauen als eigene Seite (Stefan, 23.11.; nur auf Wunsch) */
+  const help = def.taf && S.taf ? `<div class="page hilfe"><div class="ab-top"><h1>Hundertertafel zum Nachschauen</h1></div>${hbP({}, 16.2)}<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>` : '';
+  return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}${sj === 'B' ? BB_CSS : ''}</style>${PAGE_FIT_JS}</head><body>${B_BW ? B_BW_DEFS : ''}<div class="page">${head}${legend}${body}${foot}</div>${help}${sol}</body></html>`, _bw: B_BW = false, _sim: B_SIM = 0};
 }
 /* Blatt füllen: in der Vorschau messen, wie viele volle Reihen auf die erste Seite passen */
 function sheetFit(fr, show = sheetShow){
@@ -9419,6 +9423,7 @@ function renderSheets(keep){
     : /^H:H[ML]$/.test(S.topic) ? ''
     : `<label class="row">Aufgaben ${sel('sh-n', [['fill', 'Blatt füllen'], ...[4, 6, 8, 10, 12].map(n => [n, n])], S.n)}</label>
     <label class="row cb"><input type="checkbox" id="sh-gross" ${S.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label>
+    ${H_SHEETS[key]?.taf && S.topic.startsWith('H:') ? `<label class="row cb"><input type="checkbox" id="sh-taf" ${S.taf ? 'checked' : ''}> Ausgefüllte Hundertertafel als Extraseite zum Nachschauen</label>` : ''}
     ${S.topic.startsWith('B:') ? `<label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${['B:V1', 'B:V2', 'B:V3'].includes(S.topic) ? `<label class="row">Ähnlichkeit <select id="sh-bsim">${BZ_SIM.map((t, i) => `<option value="${i}" ${(S.bsim || 0) === i ? 'selected' : ''}>${['deutlich (andere Gruppe)', 'ähnlich (gleiche Gruppe)', 'fein (Varianten)'][i]}</option>`).join('')}</select></label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Erkläre den Auftrag daran.</p>` : ''}
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
@@ -9469,6 +9474,7 @@ function sheetChange(e){
   if(t.id === 'sh-mstrich') S.mstrich = t.value;
   if(t.dataset.shrow){ const n = +t.dataset.shrow, r = new Set(sheetRows()); t.checked ? r.add(n) : r.delete(n); if(!r.size){ t.checked = true; return; } S.rows = [...r]; }
   if(t.id === 'sh-gross') S.gross = t.checked;
+  if(t.id === 'sh-taf') S.taf = t.checked;
   if(t.id === 'sh-bw') S.bw = t.checked;
   if(t.id === 'sh-bsim') S.bsim = +t.value || 0;
   if(t.id === 'sh-tausch') S.tausch = t.checked;

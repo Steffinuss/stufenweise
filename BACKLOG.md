@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 20.11.2026 (0.30.0)
+Stand: 23.11.2026 (0.31.0)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -16,8 +16,23 @@ Stand: 20.11.2026 (0.30.0)
 | 3 | ~~**A** Plus und Minus aufteilen~~ | groß | freigegeben in 0.29.0 (20.11.2026), siehe `CHANGELOG.md` | 
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
+| 6 | **G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar | klein | gebaut in `entwicklung` (23.11.2026), wartet auf Stefans OK in der Testversion |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
+
+---
+
+## G: Hundertertafel-Blätter – Bezug zur Tafel sichtbar
+
+**Status:** gebaut in `entwicklung` (23.11.2026), Testversion; wartet auf Stefans OK.
+**Anlass (Stefan, 23.11.):** Bei Blättern wie „Nachbarn und Lücken“ sieht man nicht, dass es um die Hundertertafel geht.
+**Stefans Wahl:** Titel ergänzen, Hinweis mit Tafel-Bild, ausgefüllte Hundertertafel als Extraseite – nur auf Wunsch (Häkchen).
+
+**Umsetzung:** Blätter H1–H6 (nicht Tausenderbuch, nicht Material-Blätter):
+- Titel: „Hundertertafel und Material verbinden“, „Nachbarn und Lücken in der Hundertertafel“, „Ausschnitte aus der Hundertertafel ergänzen“, „Wege gehen: Plus und Minus an der Hundertertafel“, „Muster in der Hundertertafel erkennen“ (H1 hatte die Tafel schon im Titel). Die Namen der Stufen in der App und im Lernstand bleiben gleich.
+- Über den Aufgaben steht vor den Zeichen-Erklärungen ein kleines Tafel-Bild mit „Hundertertafel“.
+- Häkchen „Ausgefüllte Hundertertafel als Extraseite zum Nachschauen“ (aus, wird gemerkt): Seite „Hundertertafel zum Nachschauen“ nach dem Blatt, vor den Lösungen; „Ins Arbeitsheft“ übernimmt sie als eigene Heftseite.
+- Test `tests/hundertertafel_blaetter.py`.
 
 ---
 

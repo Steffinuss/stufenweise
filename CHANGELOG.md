@@ -5,7 +5,8 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+Geändert:
+- **Hundertertafel-Arbeitsblätter** (Backlog G, Stefan): Die Blätter H1–H6 nennen die Hundertertafel im Titel (zum Beispiel „Nachbarn und Lücken in der Hundertertafel“), und über den Aufgaben steht ein kleines Tafel-Bild mit „Hundertertafel“. Neues Häkchen „Ausgefüllte Hundertertafel als Extraseite zum Nachschauen“ (aus, wird gemerkt): eine Seite mit der Tafel 1 bis 100 nach dem Blatt; kommt auch ins Arbeitsheft.
 
 ## 0.31.0 – 23.11.2026
 
