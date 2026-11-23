@@ -5,6 +5,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+- noch nichts
+
+## 0.32.0 – 23.11.2026
+
 Geändert:
 - **Hundertertafel-Arbeitsblätter** (Backlog G, Stefan): Die Blätter H1–H6 nennen die Hundertertafel im Titel (zum Beispiel „Nachbarn und Lücken in der Hundertertafel“), und über den Aufgaben steht ein kleines Tafel-Bild mit „Hundertertafel“. Neues Häkchen „Ausgefüllte Hundertertafel als Extraseite zum Nachschauen“ (aus, wird gemerkt): eine Seite mit der Tafel 1 bis 100 nach dem Blatt; kommt auch ins Arbeitsheft.
 - **Heft zur Förderzone mit Optionen** (Backlog G, Stefan): Häkchen „Schwarz-Weiß-Drucker“ (nur wenn Basis-Blätter dabei sind) und „Ausgefüllte Hundertertafel als Extraseite zum Nachschauen“ (nur wenn Hundertertafel-Blätter dabei sind; die Tafel kommt einmal hinten ins Heft). Beide werden gemerkt. Bisher übernahm das Heft zur Förderzone die Schwarz-Weiß-Einstellung unsichtbar vom zuletzt gedruckten Basis-Blatt.

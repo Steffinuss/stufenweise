@@ -5,4 +5,4 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 23.11.2026
 
-Gerade nichts in Arbeit. QR-Umzug (Backlog E) und Druck wie Vorschau (F3) sind mit 0.31.0 freigegeben (siehe `CHANGELOG.md`).
+Gerade nichts in Arbeit. Hundertertafel-Blätter und Heft zur Förderzone mit Optionen (Backlog G) sind mit 0.32.0 freigegeben (siehe `CHANGELOG.md`).
