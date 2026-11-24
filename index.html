@@ -31,7 +31,7 @@
 body{margin:0}
 button,input,select{font:inherit;color:inherit}
 button{border:0;border-radius:14px;background:#fff;padding:8px 14px;min-height:48px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);transition:transform .08s,background .15s}
-button:hover:not(:disabled){background:#faf6ee}
+@media(hover:hover){button:hover:not(:disabled){background:#faf6ee}} /* iPad: kein „hängender“ Hover nach dem Antippen */
 button:active:not(:disabled){transform:translateY(1px)}
 button:disabled{opacity:.35;cursor:default;box-shadow:none}
 .primary,button.primary:hover:not(:disabled){background:var(--dark);color:#fff}
@@ -314,6 +314,7 @@ body.screening .toolbar{visibility:hidden}
 @media(max-width:1400px){
   .icon-btn span{display:none}
 }
+@media(min-width:761px){ #btn-random span{display:inline} }   /* „Neue Aufgabe“ statt eines unbeschrifteten Pfeils (Usability-Review) */
 @media(max-height:620px) and (min-width:761px){
   #modes button{min-height:48px;flex-direction:row;gap:6px;justify-content:flex-start;padding:4px 8px;font-size:12px}
   #modes b{font-size:17px;width:20px}
@@ -469,7 +470,7 @@ input.seq-box:focus{outline:none;border-style:solid;background:#fff8ee}
 
 /* Fachwahl in der Leiste */
 .subj{display:grid;grid-template-columns:1fr;gap:3px;background:#fff;border-radius:14px;padding:3px;margin-bottom:4px}
-.subj button{min-height:34px!important;font-size:13px!important;padding:4px!important;border-radius:11px;box-shadow:none;background:transparent;font-weight:700}
+.subj button{min-height:44px!important;font-size:13px!important;padding:4px!important;border-radius:11px;box-shadow:none;background:transparent;font-weight:700}
 #modes .subj button[aria-pressed=true],#modes .subj button[aria-pressed=true]:hover{background:var(--dark);color:#fff}
 #modes .foryou{background:#fbe8cf;color:#7a4508}
 #modes .foryou[aria-pressed=true],#modes .foryou:hover{background:#f6d6a8}
@@ -536,6 +537,22 @@ body.pic-mode .hint{min-height:48px;line-height:1.3;display:flex;align-items:cen
 .rail-guide~.rail-toggle,#modes:has(.rail-guide)+.rail-toggle{margin-top:4px}
 .rail-show{display:none;position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:55;width:30px;height:74px;padding:0;border-radius:0 14px 14px 0;font-size:24px;font-weight:800;background:#fff;box-shadow:0 4px 14px #0002}
 body.rail-off .rail{display:none}
+/* Konzentrationsmodus (Backlog H): beim Üben nur die Aufgabe */
+body.fokus .rail,body.fokus .rail-show,body.fokus .topbar,body.fokus .workspace > .round-bar,body.fokus-home .rail,body.fokus-home .rail-show{display:none!important}
+body.fokus .shell,body.fokus-home .shell{grid-template-columns:minmax(0,1fr)}
+body.fokus main{padding-left:18px}
+body.fokus #controls .views,body.fokus #controls .views + .sep{display:none}   /* Darstellung wählt die Lehrkraft */
+.fokus-bar{display:flex;align-items:center;gap:12px;min-height:56px}
+.fokus-bar[hidden]{display:none}
+.fk-prog{display:flex;align-items:center;gap:14px;font-size:19px;font-weight:700;color:var(--ink)}
+.fk-dots{display:flex;gap:7px}.fk-dots i{width:20px;height:20px;border-radius:50%;border:2.5px solid #cfc5b2;background:#fff;box-sizing:border-box}
+.fk-dots i.ok{background:#1f7a45;border-color:#1f7a45}.fk-dots i.late{background:#e8b45c;border-color:#e8b45c}.fk-dots i.skip{background:#e7dfd0;border-color:#cfc5b2}
+.fk-dots i.now{border-color:var(--ink);border-width:3.5px;transform:scale(1.15)}
+.fk-sp{flex:1}
+.fokus-bar button{font:inherit;font-size:18px;font-weight:700;min-height:52px;padding:6px 18px;border-radius:14px;border:1.5px solid #ddd4c3;background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+.fokus-bar button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fokus-bar button svg{width:24px;height:24px}
+.fokus-bar .fk-t{min-width:52px;padding:6px 12px;border-color:transparent;background:transparent;opacity:.55}
 body.rail-off .shell{grid-template-columns:minmax(0,1fr)}
 body.rail-off .rail-show{display:block}
 @media(max-width:760px){ .rail-toggle,.rail-show{display:none!important} body.rail-off .rail{display:flex} }
@@ -636,6 +653,8 @@ body.class-mode #controls button{min-height:58px}
 .round-card .acts button{font:inherit;font-size:19px;font-weight:700;min-height:56px;border-radius:14px;border:1.5px solid #ddd4c3;background:#fff;padding:8px 16px}
 .round-card .acts button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
 .round-card .acts small{display:block;font-size:14px;font-weight:600;opacity:.8}.adapt-tip.down{border:2px solid #e8890c}
+.st-jump{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}.st-jump button{min-height:44px;padding:6px 14px;border-radius:12px;font-weight:700}
+.sh-help summary{cursor:pointer;font-weight:700;min-height:32px}
 .adapt-tip button{min-height:40px;padding:4px 12px;font-size:14px}
 @keyframes tipIn{from{opacity:0;transform:translateY(-8px)}}
 .workspace{position:relative}
@@ -880,7 +899,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 .wz-body{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;margin:auto 0}
 .wz-body h2{font-size:clamp(26px,3.2vw,38px)}
 .home.wz .home-subj button{width:210px;min-height:150px;gap:8px;font-size:24px}.home.wz .home-subj svg{width:140px;height:auto}.home.wz .home-cards+.home-sub+.home-subj button{min-height:110px;width:180px;font-size:20px}.home.wz .home-cards+.home-sub+.home-subj svg{width:96px}
-.home.wz .home-subj button:hover{transform:translateY(-2px)}
+@media(hover:hover){.home.wz .home-subj button:hover{transform:translateY(-2px)}}
 .wz-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;width:min(900px,100%)}
 .wz-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:92px;font-size:17px;font-weight:700;padding:10px 6px}
 .wz-tile b{font-size:30px;line-height:1;min-height:32px;display:flex;align-items:center}.wz-tile b small{font-size:15px;font-weight:800}.wz-tile .rail-tafel{width:32px;height:32px}
@@ -1050,6 +1069,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
       </div></div>
     </div>
   </div>
+  <div id="fokus-bar" class="fokus-bar" hidden></div>
   <p id="error" class="error" role="alert" hidden></p>
 
   <section class="workspace" aria-label="Arbeitsfläche">
@@ -1121,6 +1141,10 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
   </fieldset>
   </div>
   <div class="set-panel" data-stab-panel="kids" role="tabpanel" hidden>
+  <fieldset><legend>Konzentrationsmodus</legend>
+    <p class="note">Beim Üben sehen die Kinder nur die Aufgabe, wie viele Aufgaben noch kommen, „Weiter“ und „Pause“. Leiste, Zahlenraum und Darstellung sind ausgeblendet. „Weiter“ erscheint, wenn die Aufgabe gelöst ist oder nach zwei Fehlversuchen. Das Zahnrad oben rechts zeigt mit der PIN alles, bis das Kind auf „Pause“ tippt. Den Bereich wählen die Kinder auf der Startseite.</p>
+    <label class="row">Konzentrationsmodus <select data-key="fokus"><option value="on">an (alle Kinder)</option><option value="off">aus</option></select></label>
+  </fieldset>
   <fieldset><legend>Geführte Oberfläche</legend>
     <p class="note">Nach dem Test sieht jedes Kind nur die Bereiche und Stufen, die für es dran sind. Werkzeuge (Zahlen zeigen, Frei legen) bleiben immer sichtbar. Mit der PIN zeigt „Alles zeigen“ in der Leiste vorübergehend alle Bereiche.</p>
     <label class="row">Standard für alle Kinder <select data-key="guide"><option value="zone">Nur die Förderzone</option><option value="plus">Förderzone und Geschafftes</option><option value="all">Alles sichtbar (Förderzone markiert)</option></select></label>
@@ -1212,7 +1236,7 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fbMail:'', qrSmall:false, allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', askWho:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fokus:'on', fbMail:'', qrSmall:false, allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', askWho:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
@@ -1474,6 +1498,7 @@ async function flip(root, before){
 
 /* ---------- Kleine Helfer für die Oberfläche ---------- */
 function setHint(text, tone=''){
+  if(typeof fokusSync === 'function') queueMicrotask(fokusSync);
   const h = $('#hint'); h.className = 'hint' + (tone ? ' ' + tone : '');
   if(typeof picMode === 'function' && picMode() && !['diag', 'home', 'map'].includes(app.mode)){
     /* Bildmodus: ein großes Zeichen; der Satz steht klein darunter für Erwachsene */
@@ -1790,7 +1815,7 @@ function testLock(){
   document.body.classList.toggle('testing', on);
   for(const el of document.querySelectorAll('aside.rail, #btn-rail-show, .top-tools')) el.inert = on;
 }
-function render(){ testLock(); if(guideFix()) return; if(typeof UPD !== 'undefined') queueMicrotask(updSync); document.body.classList.toggle('rail-off', !!settings.railOff); queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); }
+function render(){ testLock(); if(guideFix()) return; fokusClass(); if(typeof UPD !== 'undefined') queueMicrotask(updSync); document.body.classList.toggle('rail-off', !!settings.railOff); queueMicrotask(picDecor); $('#btn-fb').hidden = settings.fbOn === false; document.body.classList.toggle('class-mode', classMode()); $('#btn-profile').hidden = $('#btn-stats').hidden = classMode(); renderTop(); renderWork(); fitTop(); roundBar(); fokusSync(); }
 /* Passt die Einstellungsleiste nicht neben die Knöpfe oben rechts, rückt sie in eine eigene Zeile (sonst verschwinden z. B. die 10er-Reihe oder „Kalender“) */
 function fitTop(){
   const tb = document.querySelector('.topbar'), t = tb?.querySelector('.toolbar'); if(!t) return;
@@ -1818,7 +1843,14 @@ function renderWork(before){
 }
 
 function renderWelcome(){
-  
+  if(fokusTask()){
+    if(app.mode === 'money'){
+      $('#equation').textContent = ''; $('#words').hidden = true; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = '';
+      $('#stage').innerHTML = `<div class="welcome"><div><h2>Rechnen mit Geld</h2><p>Was möchtest du üben?</p><div class="acts fk-money"><button data-fk-money="pay" class="primary">${icon('next')}<span>Betrag legen</span></button><button data-fk-money="change" class="primary">${icon('next')}<span>Wechselgeld</span></button></div></div></div>`;
+      return;
+    }
+    if(app.mode !== 'blitz' && !app.fkAuto){ app.fkAuto = true; try { randomAny(); } finally { app.fkAuto = false; } if(task().ready || app.mode !== 'number' && app.mode !== 'add' && app.mode !== 'sub') return; }
+  }
   $('#equation').textContent = ''; $('#words').hidden = true; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = '';
   $('#btn-say').hidden = true;
   $('#stage').innerHTML = `<div class="welcome"><div><div class="mark" aria-hidden="true"><svg viewBox="0 0 54 40"><rect x="4" y="5" width="30" height="30" rx="1.5" fill="${fillOf('h','a')}"/><path d="M7 5v30M4 8h30M10 5v30M4 11h30M13 5v30M4 14h30M16 5v30M4 17h30M19 5v30M4 20h30M22 5v30M4 23h30M25 5v30M4 26h30M28 5v30M4 29h30M31 5v30M4 32h30" stroke="#0004" stroke-width=".5"/><rect x="40" y="5" width="3.4" height="30" rx="1" fill="${fillOf('z','a')}"/><path d="M40 8h3.4M40 11h3.4M40 14h3.4M40 17h3.4M40 20h3.4M40 23h3.4M40 26h3.4M40 29h3.4M40 32h3.4" stroke="#0004" stroke-width=".5"/><rect x="48" y="31.6" width="3.4" height="3.4" rx=".8" fill="${fillOf('e','a')}"/></svg></div>
@@ -1853,7 +1885,20 @@ function canPick(t){
   if(app.range < 10) return app.mode === 'sub' && !t.done && settings.subMode === 'self';
   return app.mode === 'number' || (app.mode === 'add' && t.done) || (app.mode === 'sub' && !t.done);
 }
-function showDigits(){ return settings.digits && (app.mode === 'number' || resultsOn()); }
+function showDigits(){ return settings.digits && (app.mode === 'number' ? !(countOn(task()) && task().check !== 'ok') : resultsOn()); }
+/* Konzentrationsmodus: „Zahlen“ mit Material wird zur Zählaufgabe – die Zahl steht erst nach dem Zählen da (Usability-Review, Karte „Mengen legen und abzählen“) */
+const countOn = t => app.mode === 'number' && typeof fokusTask === 'function' && fokusTask() && t.view === 'material' && !t.find && t.ready;
+function countCheck(){
+  const t = task(), g = $('#guess'); if(!g || g.value.trim() === ''){ g?.focus(); return; }
+  t.tries = (t.tries || 0) + 1; const v = Number(g.value);
+  if(v === t.a){
+    logAttempt({mode:'count', range:app.range, task:String(t.a), ok: t.tries === 1, tries:t.tries});
+    t.check = 'ok'; renderWork(); setHint(`Richtig! Es sind ${t.a}.`, 'good'); celebrate($('#equation')); speak(`Richtig, ${t.a}.`);
+  } else {
+    const et = errorType(v, t.a); noteError('count', et); t.check = 'no';
+    setHint(et === 'eins' ? 'Ganz knapp! Zähle noch einmal genau.' : 'Noch nicht. Zähle noch einmal nach.', 'warn'); g.select();
+  }
+}
 
 function pieceSvg(p, x, y, pickable, restorable){
   const w = p.kind === 'h' ? 100 : 10, h = p.kind === 'e' ? 10 : 100;
@@ -1969,7 +2014,8 @@ function taskPrompt(t){
   if(t.view === 'field'){ const fi = fieldInfo(t); if(app.mode === 'add') return fi.done ? 'Wie viele sind es zusammen?' : fi.over ? 'Das sind zu viele. Tippe einen orangen Punkt an, dann geht er weg.' : `Lege ${t.b} orange Punkte dazu. Erst die obere Reihe voll machen.`; return fi.done ? 'Wie viele bleiben übrig?' : fi.over ? 'Das sind zu viele. Tippe einen durchgestrichenen Punkt an, dann ist er wieder da.' : `Streiche ${t.b} Punkte weg. Fang hinten an.`; }
   if(t.view === 'board'){ const w = app.range === 1000 ? 'im Tausenderbuch' : 'in der Hundertertafel'; return app.mode === 'number' ? (t.find ? `Wo steht die Zahl ${w}? Tippe das Feld an.` : `Hier steht die Zahl ${w}.`) : app.mode === 'add' ? `Starte bei ${t.a} und gehe ${t.b} weiter. Wo landest du?` : `Starte bei ${t.a} und gehe ${t.b} zurück. Wo landest du?`; }
   if(t.view === 'line') return app.mode === 'number' ? (t.find ? 'Schätze: Wo liegt die Zahl? Tippe auf den Zahlenstrahl.' : 'Hier liegt die Zahl auf dem Zahlenstrahl.') : app.mode === 'add' ? `Springe von ${t.a} aus ${t.b} weiter. Wo landest du?` : `Springe von ${t.a} aus ${t.b} zurück. Wo landest du?`;
-  if(app.mode === 'number') return app.range < 10 || t.a < 10 ? 'Wie viele sind es? Zähle nach.' : `Die Zahl ist gelegt. ${ex ? 'Bündle oder entbündle' : 'Tausche um'}: Die Menge bleibt gleich.`;
+  if(countOn(t) && t.check !== 'ok') return t.a < 10 ? 'Wie viele sind es? Zähle nach.' : t.a < 100 ? 'Wie viele sind es? Zähle die Zehner und die Einer.' : 'Wie viele sind es? Zähle die Hunderter, Zehner und Einer.';
+  if(app.mode === 'number') return (app.range < 10 || t.a < 10) && !countOn(t) ? 'Wie viele sind es? Zähle nach.' : `Die Zahl ist gelegt. ${ex ? 'Bündle oder entbündle' : 'Tausche um'}: Die Menge bleibt gleich.`;
   if(app.mode === 'add') return t.done ? (countKind(t.rows[0],'e') >= 10 ? `10 Einer = 1 Zehner. ${ex ? 'Bündle' : 'Tausche'} die Einer.` : countKind(t.rows[0],'z') >= 10 && app.range >= 100 ? `10 Zehner = 1 Hunderter. ${ex ? 'Bündle' : 'Tausche'} die Zehner.` : 'Wie viele sind es zusammen?') : 'Zwei Mengen. Lege sie zusammen.';
   if(t.done) return 'Die durchgestrichenen Teile sind weg. Wie viele bleiben übrig?';
   return settings.subMode === 'self' ? `Nimm ${t.b} weg. Tippe die Teile an und drücke „Wegnehmen“.` : `Nimm ${t.b} weg.`;
@@ -1984,9 +2030,9 @@ function numHtml(n, cls){
 function renderTask(before){
   const t = task(), {a, b} = t, res = resultOf(app.mode, a, b);
   const showRes = (resultsOn() && t.reveal) || t.check === 'ok';
-  $('#equation').innerHTML = app.mode === 'number' ? numHtml(a,'ca') :
+  $('#equation').innerHTML = app.mode === 'number' ? (countOn(t) && t.check !== 'ok' ? eqGuess(t, String(app.range).length) : numHtml(a,'ca')) :
     `${numHtml(a,'ca')}<span class="op">${MODES[app.mode].sym}</span>${numHtml(b, app.mode==='add' ? 'cb' : '')}<span class="op">=</span>${!showRes && guessHere(t) ? eqGuess(t, String(app.range).length) : `<span class="res ${t.check==='ok' ? 'ok' : ''}">${showRes ? res : '?'}${t.check==='ok' ? okCheck : ''}</span>`}`;
-  $('#words').hidden = !(app.mode === 'number' && settings.numberWords);
+  $('#words').hidden = !(app.mode === 'number' && settings.numberWords) || (countOn(t) && t.check !== 'ok');
   $('#words').innerHTML = wordHtml(a);
   $('#prompt').textContent = taskPrompt(t);
   const stage = $('#stage');
@@ -2078,6 +2124,7 @@ function renderTaskControls(t){
 }
 
 function taskHint(t){
+  if(countOn(t) && t.check !== 'ok') return setHint('');   /* beim Zählen keine Tausch-Hinweise */
   if(t.view === 'field'){ if(t.check === 'ok' || t.check === 'no') return; const fi = fieldInfo(t); return setHint(settings.help && fi.left > 0 ? `Noch ${fi.left}.` : ''); }
   if(t.view === 'board'){
     if(app.mode === 'number') return t.find && t.findGuess != null ? undefined : setHint(t.find && app.range === 1000 ? 'Suche zuerst die richtige Seite. Dann tippe das Feld an.' : '');
@@ -2298,6 +2345,7 @@ function boardTap(n){
 }
 function tbJump(t, d){ const p = tbPos(t), q = p + d; if(q < (app.mode === 'sub' ? 0 : 1) || q > app.range){ setHint(q > app.range ? `Weiter als ${app.range} geht es nicht.` : 'Kleiner als 0 geht es nicht.', 'warn'); return; } t.bpath.push(q); t.bview = null; renderWork(); }
 function checkGuess(){
+  if(app.mode === 'number') return countCheck();
   const t = task(), g = $('#guess'); if(!g || g.value.trim() === '') { g?.focus(); return; }
   const res = resultOf(app.mode, t.a, t.b);
   t.tries = (t.tries || 0) + 1;
@@ -3594,7 +3642,9 @@ function roundEnd(){
   acts.push(btn('again', 'Noch eine Runde', '', !acts.some(a => a.includes('class="primary"'))));
   acts.push(btn('pause', 'Pause', 'zurück zum Start'));
   const d = document.createElement('div'); d.className = 'round-end'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', 'Runde geschafft');
-  d.innerHTML = `<div class="round-card"><h2>Geschafft!</h2>${roundBarHtml(R.res, n, false)}<p><b>${n} Aufgaben</b> – ${good} davon gleich richtig${skipped ? `, ${skipped} übersprungen` : ''}.</p><p>${msg}</p><div class="acts">${acts.join('')}</div></div>`;
+  const head = good === 0 || skipped >= n/2 ? 'Runde vorbei' : 'Geschafft!';   /* „Geschafft!“ nur, wenn auch etwas gelöst wurde */
+  d.setAttribute('aria-label', head);
+  d.innerHTML = `<div class="round-card"><h2>${head}</h2>${roundBarHtml(R.res, n, false)}<p><b>${n} Aufgaben</b> – ${good} davon gleich richtig${skipped ? `, ${skipped} übersprungen` : ''}.</p><p>${msg}</p><div class="acts">${acts.join('')}</div></div>`;
   d.addEventListener('click', ev => {
     const b = ev.target.closest('[data-round]'); if(!b) return;
     d.remove(); app.round = {key:null, res:[]};
@@ -3604,9 +3654,56 @@ function roundEnd(){
     if(k === 'up' || k === 'down'){ const st = k === 'up' ? up : down; st.apply(); toast(st.text); roundSync(); roundBar(); return; }
     roundSync(); randomAny(); roundBar();
   });
-  ws.append(d); speak('Geschafft!');
+  ws.append(d); speak(head);
   d.querySelector('button')?.focus();
 }
+/* ---------- Konzentrationsmodus (Backlog H, Stefan 24.11.2026) ----------
+   Beim Üben sehen Kinder nur die Aufgabe, wie viele Aufgaben noch kommen, „Weiter“ und „Pause“.
+   Leiste, Einstellleiste, Name und Menü sind ausgeblendet. „Weiter“ gibt es nach der Lösung oder nach zwei Fehlversuchen.
+   Für alle Kinder, Standard an (Einstellungen → Kinder). Mit der PIN zeigt das Zahnrad vorübergehend alles (bis „Pause“/Startseite). */
+const FOKUS_MODES = ['number', 'add', 'sub', 'written', 'times', 'money', 'blitz', 'read'];
+const fokusBase = () => settings.fokus !== 'off' && app.ctx === 'practice' && !app.kiste && !app.calc && !app.fokusAus && !(app.wz && (app.wz.test || app.wz.kiste));
+const fokusTask = () => fokusBase() && FOKUS_MODES.includes(app.mode);
+function fokusClass(){
+  const on = fokusTask(), home = !on && fokusBase() && app.mode === 'home';
+  document.body.classList.toggle('fokus', on); document.body.classList.toggle('fokus-home', home);
+}
+/* gelöst? wie viele Fehlversuche bei der aktuellen Aufgabe? */
+function fkState(){
+  const m = app.mode, of = (ok, tries) => ({solved: ok, miss: ok ? 0 : tries || 0});
+  if(m === 'add' || m === 'sub' || m === 'number'){ const t = task(); return of(t.check === 'ok', t.tries); }
+  if(m === 'times') return of(app.times.check === 'ok', app.times.tries);
+  if(m === 'money') return of(app.money.check === 'ok', app.money.tries);
+  if(m === 'blitz') return of(app.blitz.phase === 'done', app.blitz.tries);
+  if(m === 'written'){ const w = app.written; return of(!!w.done, (w.errDigit || 0) + (w.errCarry || 0)); }
+  if(m === 'read'){ const R = app.read; return of(!!R.fb?.ok, R.tries); }
+  return {solved:false, miss:0};
+}
+const FK_PAUSE = '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15L16 5l11 10"/><path d="M8 13v14h16V13"/></svg>';
+function fokusSync(){
+  fokusClass();
+  const bar = $('#fokus-bar'); if(!bar) return;
+  const on = fokusTask(); bar.hidden = !on;
+  if(!on){ if(bar.innerHTML){ bar.innerHTML = ''; bar.dataset.h = ''; } return; }
+  const st = fkState(), ctl = $('#controls');
+  const free = app.mode === 'number' && !countOn(task()), allow = free || st.solved || st.miss >= 2;
+  for(const b of ctl.querySelectorAll('#m-next, #w-next, #t-next')){ b.hidden = !allow; const sep = b.previousElementSibling; if(sep?.classList.contains('sep')) sep.style.display = allow ? '' : 'none'; const sp = b.querySelector('span'); if(sp && sp.textContent !== 'Weiter') sp.textContent = 'Weiter'; }
+  const inCtl = [...ctl.querySelectorAll('#m-next, #w-next, #t-next, #r-next, #b-next, #r-up, #r-art-up, #r-try, #b-go')].some(b => !b.hidden);
+  const blitzShow = app.mode === 'blitz' && (!app.blitz.ready || app.blitz.phase === 'show');
+  const ready = app.mode === 'read' ? !!app.read.item && !app.read.demo : app.mode === 'blitz' ? true : app.mode === 'written' ? app.written.ready : app.mode === 'times' ? app.times.ready : app.mode === 'money' ? app.money.ready : task().ready;
+  const showNext = ready && allow && !inCtl && !blitzShow;
+  let prog = '';
+  if(roundOn()){ roundSync(); const n = roundLen(), R = app.round, i = Math.min(R.res.length + 1, n);
+    prog = `<div class="fk-dots" aria-hidden="true">${Array.from({length:n}, (_, k) => `<i class="${R.res[k] === true ? 'ok' : R.res[k] === false ? 'late' : R.res[k] === 'skip' ? 'skip' : k === R.res.length ? 'now' : ''}"></i>`).join('')}</div><span>Aufgabe ${i} von ${n}</span>`; }
+  const html = `<div class="fk-prog">${prog}</div><span class="fk-sp"></span>${showNext ? `<button id="fk-next" class="${st.solved || free ? 'primary' : ''}">${icon('next')}<span>Weiter</span></button>` : ''}<button id="fk-pause">${FK_PAUSE}<span>Pause</span></button><button id="fk-teacher" class="fk-t" aria-label="Lehrkraft: alles zeigen" title="Lehrkraft: alles zeigen (PIN)">${icon('settings')}</button>`;
+  if(bar.dataset.h !== html){ bar.innerHTML = html; bar.dataset.h = html; }
+}
+document.addEventListener('click', e => {
+  if(e.target.closest('#fk-pause')) return goHome();
+  if(e.target.closest('#fk-next')) return $('#btn-random').click();
+  if(e.target.closest('#fk-teacher')) return requireTeacher(() => { app.fokusAus = true; if(!settings.pin) app.teacherUntil = Date.now() + 20*60e3; toast('Alles sichtbar, bis zur Pause.'); render(); });
+  const fm = e.target.closest('[data-fk-money]'); if(fm){ app.money.sub = fm.dataset.fkMoney; app.money.ready = false; moneyNew(); return; }
+});
 function logAttempt(e){
   if(app.ctx === 'class' || app.kiste) return;   /* Materialkiste: nur die Nutzung wird gezählt (kisteCount) */
   const id = data.current || 'guest';
@@ -3735,7 +3832,7 @@ function drawMoneyTable(){
   if(m.sub === 'change'){
     s += `<g><rect x="20" y="14" width="190" height="70" rx="12" fill="#fff" stroke="#e4dccb" stroke-width="2"/><text x="36" y="40" font-size="15" font-weight="700" fill="#6b6672">Preis</text><text x="36" y="70" font-size="28" font-weight="700" fill="#2b2930">${fmtMoney(m.price)}</text></g>`;
     s += `<text x="232" y="40" font-size="15" font-weight="700" fill="#6b6672">Bezahlt mit</text>` + `<g transform="translate(232 48) scale(.8)">${moneySvg(m.paid, 0, 0)}</g>`;
-    s += `<text x="400" y="40" font-size="15" font-weight="700" fill="#6b6672">Wechselgeld: Lege hier hin, was zurückkommt.</text>`;
+    s += `<text x="400" y="40" font-size="15" font-weight="700" fill="#6b6672">Wechselgeld</text>`;
     s += `<line x1="20" y1="94" x2="${W - 20}" y2="94" stroke="#e4dccb" stroke-width="2" stroke-dasharray="4 5"/>`;
   }
   if(!m.items.length) s += `<text x="${W/2}" y="${startY + 110}" text-anchor="middle" font-size="20" fill="#a39e97">Tippe oder ziehe Münzen und Scheine hierher.</text>`;
@@ -3751,8 +3848,8 @@ function renderMoney(){
   const m = app.money;
   $('#words').hidden = true;
   if(!m.ready) return renderWelcome();
-  $('#equation').innerHTML = m.sub === 'pay' ? `Lege <span class="money-amt">${fmtMoney(m.target)}</span>` : `${fmtMoney(m.paid)}<span class="op">−</span>${fmtMoney(m.price)}<span class="op">=</span><span class="res ${m.check === 'ok' ? 'ok' : ''}">${m.check === 'ok' || (resultsOn() && m.reveal) ? fmtMoney(m.target) : '?'}${m.check === 'ok' ? okCheck : ''}</span>`;
-  $('#prompt').textContent = m.sub === 'pay' ? 'Tippe oder ziehe Münzen und Scheine auf den Tisch. Zum Zurücklegen antippen oder vom Tisch ziehen.' : 'Ergänze vom Preis bis zum bezahlten Schein: Lege das Wechselgeld.';
+  $('#equation').innerHTML = m.sub === 'pay' ? `Lege <span class="money-amt">${fmtMoney(m.target)}</span>` : m.check !== 'ok' && !(resultsOn() && m.reveal) ? 'Lege das Wechselgeld.' : `${fmtMoney(m.paid)}<span class="op">−</span>${fmtMoney(m.price)}<span class="op">=</span><span class="res ${m.check === 'ok' ? 'ok' : ''}">${m.check === 'ok' || (resultsOn() && m.reveal) ? fmtMoney(m.target) : '?'}${m.check === 'ok' ? okCheck : ''}</span>`;
+  $('#prompt').textContent = m.sub === 'pay' ? 'Tippe oder ziehe Münzen und Scheine auf den Tisch. Zum Zurücklegen antippen oder vom Tisch ziehen.' : '';
   const denoms = moneyDenoms();
   $('#stage').innerHTML = `<div class="money"><div class="mtable">${drawMoneyTable()}</div><div class="mtray" role="group" aria-label="Geldbörse">${denoms.map(c => { const [w, h] = itemSize(c); return `<button class="mden" data-den="${c}" aria-label="${denomLabel(c)} hinlegen" ${m.check === 'ok' ? 'disabled' : ''}><svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${isNote(c) ? 74 : Math.max(30, w*.95)}" aria-hidden="true">${moneySvg(c, 0, 0)}</svg></button>`; }).join('')}</div></div>`;
   const c = [];
@@ -3765,7 +3862,7 @@ function renderMoney(){
   $('#controls').innerHTML = c.join('');
   if(m.check === 'ok') return;
   if(resultsOn() && m.reveal) setHint(`Auf dem Tisch: ${fmtMoney(moneySum())}`);
-  else if(settings.help) setHint(m.sub === 'pay' ? 'Tipp: Nimm zuerst große Scheine und Münzen.' : 'Tipp: Fange mit kleinen Münzen an, bis du einen runden Betrag hast.');
+  else if(settings.help && m.tries > 0 && m.check !== 'no') setHint(m.sub === 'pay' ? 'Tipp: Nimm zuerst große Scheine und Münzen.' : 'Tipp: Fange mit kleinen Münzen an, bis du einen runden Betrag hast.');   /* Tipp erst nach einem Fehlversuch (Usability-Review) */
   else setHint('');
 }
 function moneyCheck(){
@@ -3997,7 +4094,7 @@ function screenControl(btn){
 /* =====================================================================
    Lernstand-Übersicht
    ===================================================================== */
-const MODE_NAMES = {basis:'Basis', diag:'Test', warm:'Startrunde', number:'Zahlen', clock:'Uhr und Kalender', size:'Größen und Einkaufen', read:'Lesen', write:'Schreiben', add:'Plus', sub:'Minus', written:'Schriftlich', times:'Einmaleins', blitz:'Blitzblick', money:'Geld', find:'Zahlenstrahl: Zahl suchen', screen:'Starter-Screening', board:'Hundertertafel', tenpair:'Zehnerpartner'};
+const MODE_NAMES = {basis:'Basis', diag:'Test', warm:'Startrunde', number:'Zahlen', clock:'Uhr und Kalender', size:'Größen und Einkaufen', read:'Lesen', write:'Schreiben', add:'Plus', sub:'Minus', written:'Schriftlich', times:'Einmaleins', blitz:'Blitzblick', money:'Geld', find:'Zahlenstrahl: Zahl suchen', count:'Zahlen: Mengen abzählen', screen:'Starter-Screening', board:'Hundertertafel', tenpair:'Zehnerpartner'};
 const pct = (a, b) => b ? Math.round(a/b*100) + ' %' : '–';
 const frac = list => `${list.filter(e => e.ok).length} von ${list.length}`;
 const KISTE_TITLE = 'Materialkiste (selbst genutzt)';
@@ -4057,6 +4154,10 @@ function statsSections(id){
     }
     for(const a of Object.values(AXES).filter(a => a.mode === mode)) for(const l of a.levels){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${a.info[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
     if(mode === 'read' && E.some(e => e.lvl === 'LX')) lines.push(`Meine Wörter lesen: ${frac(E.filter(e => e.lvl === 'LX'))} beim ersten Versuch richtig`);
+    if(mode === 'count'){
+      const ranges = [...new Set(E.map(e => e.range))].sort((a, b) => a - b);
+      for(const r of ranges){ const es = E.filter(e => e.range === r); lines.push(`bis ${r}: ${frac(es)} beim ersten Zählen richtig`); }
+    }
     if(mode === 'find'){
       const ranges = [...new Set(E.map(e => e.range))].sort((a, b) => a - b);
       for(const r of ranges){ const es = E.filter(e => e.range === r); lines.push(`bis ${r}: im Schnitt ${Math.round(es.reduce((s, e) => s + e.dist, 0)/es.length)} daneben (${frac(es)} nah dran)`); }
@@ -4129,6 +4230,15 @@ function renderStats(){
   $('#stats-body').innerHTML = backupBox() + `<label class="row">Kind <select id="stats-who">${ids.map(([id, n]) => `<option value="${id}" ${id === statsId ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` + teacher.html + (secs.length ? '<h3 class="stats-h">Übungsprotokoll</h3>' : '') +
     (secs.length ? secs.map(s => `<fieldset><legend>${s.title}</legend><ul class="stat-lines">${s.lines.map(l => `<li>${escHtml(l)}</li>`).join('')}</ul></fieldset>`).join('') : '<p class="note" style="margin:14px 0">Noch keine Aufgaben geprüft. Gezählt wird jede Aufgabe mit „Prüfen“ oder „Fertig“.</p>') +
     `<div class="row" style="margin-top:10px"><button id="stats-report" class="icon-btn primary">${icon('print')}<span style="display:inline">Bericht drucken</span></button><button id="stats-heft" class="icon-btn">${icon('print')}<span style="display:inline">Arbeitsheft zur Förderzone</span></button><button id="stats-copy" class="icon-btn">${icon('check')}<span style="display:inline">Als Text kopieren</span></button><button id="stats-del" class="icon-btn">${icon('trash')}<span style="display:inline">Daten löschen</span></button></div><textarea id="stats-text" readonly hidden></textarea>`;
+  statsJump();
+}
+/* Sprungmarken oben im Lernstand (Usability-Review): je Fach und zum Übungsprotokoll */
+function statsJump(){
+  const body = $('#stats-body'), hs = [...body.querySelectorAll('h3.stats-h')]; if(hs.length < 2) return;
+  const nav = document.createElement('nav'); nav.className = 'st-jump'; nav.setAttribute('aria-label', 'Springen zu');
+  nav.innerHTML = hs.map((h, i) => `<button type="button" data-stj="${i}">${escHtml(h.textContent.replace(/:.*/, ''))}</button>`).join('');
+  (body.querySelector('#stats-who')?.closest('label') || body.firstElementChild)?.after(nav);
+  nav.addEventListener('click', e => { const b = e.target.closest('[data-stj]'); if(b) hs[+b.dataset.stj].scrollIntoView({behavior:'smooth', block:'start'}); });
 }
 
 /* =====================================================================
@@ -5666,8 +5776,8 @@ const H_INFO = {
 for(const [k, v] of Object.entries(H_INFO)){ v.offer = {text:`Hundertertafel: ${v.name}`, set:{mode:'read', lvl:k}}; v.bp = 'BP GENT 2022, M 2.1.1.2 Zahldarstellungen (Hundertertafel, Tausenderbuch)'; }
 
 const U_INFO = {
-  U1:{name:'Volle Stunden', short:'Volle Std.', kann:'liest volle Stunden an der Uhr ab und stellt sie ein', ziel:'liest volle Stunden an der Zeigeruhr ab und unterscheidet kurzen und langen Zeiger', analog:'Lernuhr mit farbigen Zeigern; Tagesplan mit Uhrzeiten (8 Uhr Schulbeginn, 12 Uhr Mittagessen)'},
-  U2:{name:'Halbe Stunden', short:'Halbe Std.', kann:'liest halbe Stunden ab und sagt „halb …“ richtig', ziel:'liest halbe Stunden ab und versteht „halb 8“ als 7:30', analog:'„Halb“ heißt: halber Weg zur nächsten Stunde – mit der Lernuhr zeigen; Busplan mit halben Stunden'},
+  U1:{name:'Volle Stunden', short:'Volle Stunden', kann:'liest volle Stunden an der Uhr ab und stellt sie ein', ziel:'liest volle Stunden an der Zeigeruhr ab und unterscheidet kurzen und langen Zeiger', analog:'Lernuhr mit farbigen Zeigern; Tagesplan mit Uhrzeiten (8 Uhr Schulbeginn, 12 Uhr Mittagessen)'},
+  U2:{name:'Halbe Stunden', short:'Halbe Stunden', kann:'liest halbe Stunden ab und sagt „halb …“ richtig', ziel:'liest halbe Stunden ab und versteht „halb 8“ als 7:30', analog:'„Halb“ heißt: halber Weg zur nächsten Stunde – mit der Lernuhr zeigen; Busplan mit halben Stunden'},
   U3:{name:'Viertelstunden', short:'Viertel', kann:'liest Viertelstunden ab (Viertel nach, Viertel vor)', ziel:'liest Viertelstunden ab und unterscheidet „Viertel nach“ und „Viertel vor“', analog:'Uhr in vier Viertel teilen (wie eine Pizza); Pausenzeiten im Stundenplan ablesen'},
   U4:{name:'Minuten genau', short:'Minuten', kann:'liest die Uhr auf 5 Minuten genau ab, auch digital', ziel:'liest Uhrzeiten auf 5 Minuten genau ab und übersetzt zwischen Zeigeruhr und Digitaluhr', analog:'Minutenkranz in 5er-Schritten an der Lernuhr; Handy-Uhr und Wanduhr vergleichen'},
   U5:{name:'Zeitspannen im Alltag', short:'Zeitspannen', kann:'berechnet Zeitspannen im Alltag (Busfahrt, Pause, Film)', ziel:'bestimmt Anfang, Ende und Dauer von Alltagszeitspannen', analog:'Fahrplan lesen und Abfahrts- und Ankunftszeiten bestimmen; Timer beim Kochen oder in der Werkstatt stellen'},
@@ -7224,7 +7334,7 @@ function renderHome(){
       if(z) cards.push(`<button class="home-card" data-home-offer="${subj}"><span class="hc-subj">${TESTS[subj].name}</span><span class="hc-title">${escHtml(kidTitle(z.info.offer.text))}</span><span class="hc-go">${icon('next')} Los geht's</span></button>`);
     }
     body = `<h2>${p ? `${p.sym && ICON[p.sym] ? `<span class="hello-sym">${iconSvg(p.sym, 56)}</span> ` : ''}Hallo ${escHtml(p.name)}!` : 'Willkommen!'}</h2>
-      ${cards.length ? `<p class="home-sub">★ Heute für dich:</p><div class="home-cards">${cards.join('')}</div><p class="home-sub">Oder such dir ein Fach aus:</p>` : `<p class="home-sub">${p ? 'Was möchtest du üben? Deine Lehrkraft kann mit dir einen Test machen – dann stehen hier deine Aufgaben.' : 'Was möchtest du üben?'}</p>`}
+      ${cards.length ? `<p class="home-sub">★ Heute für dich:</p><div class="home-cards">${cards.join('')}</div><p class="home-sub">Oder such dir ein Fach aus:</p>` : `<p class="home-sub">Was möchtest du üben?</p>`}
       <div class="home-subj">${visSubjects().map(sj => `<button data-home-subj="${sj}">${SUBJECTS[sj].ill()}<span>${subjName(sj)}</span></button>`).join('')}</div>
       ${p ? `<div class="home-row">${cards.length ? `<button class="home-map" data-home-warm>${icon('next')} Startrunde (3 Aufgaben)</button>` : ''}<button class="home-map" data-home-map>${icon('target')} Meine Lernlandkarte</button></div>` : ''}`;
   } else {
@@ -7386,7 +7496,7 @@ function renderKisteHome(p, W){
 }
 function kisteRailHtml(){
   return `<span class="rail-h">Material&shy;kiste</span>` + KISTE_TOOLS.map(t => `<button data-kiste="${t.k}" aria-pressed="${kisteOn(t.k)}"><b aria-hidden="true" class="ct-sym">${KISTE_ILL(t.k)}</b>${t.rail || t.label}</button>`).join('')
-    + `<button data-kiste-end class="rail-guide">${icon('check')}<span>Fertig</span></button>`;
+    + `<button data-kiste-end class="rail-guide">${icon('close')}<span>Kiste zu</span></button>`;
 }
 /* Nur zählen, wie oft ein Werkzeug geöffnet wird – keine Aufgaben, keine Ergebnisse. Gast: nichts. */
 function kisteCount(k){ const p = curProfile(); if(!p) return; const m = (data.kiste ??= {})[p.id] ??= {}; m[k] = (m[k] || 0) + 1; saveData(); }
@@ -7469,7 +7579,7 @@ function renderTcalc(){
   const lab = k => ({'*':'·', '-':'−', back:'⌫'})[k] || k;
   $('#stage').innerHTML = `<div class="trc"><div class="trc-box"><div class="trc-disp" role="status" aria-live="polite"><div class="trc-expr">${expr}</div><div class="trc-res">${res ? '= ' + res : ''}</div></div>
     <div class="trc-keys">${keys.map(([k, l]) => `<button type="button" data-trk="${k}" class="${/\d/.test(k) ? 'num' : k === 'C' ? 'clr' : k === 'back' ? 'bk' : 'op'}" aria-label="${l || TR_NAME[k] || k}">${lab(k)}</button>`).join('')}<button type="button" data-trk="=" class="eq" aria-label="ist gleich">=</button></div></div>
-    <div class="trc-side">${note ? `<p class="trc-note">${note}</p>` : ''}${T.mat && trUsable(R) ? `<div class="trc-mat">${trMatSvg(R.v)}</div>` : ''}</div></div>`;
+    ${note || (T.mat && trUsable(R)) ? `<div class="trc-side">${note ? `<p class="trc-note">${note}</p>` : ''}${T.mat && trUsable(R) ? `<div class="trc-mat">${trMatSvg(R.v)}</div>` : ''}</div>` : ''}</div>`;   /* ohne Material steht der Rechner in der Mitte */
 }
 document.addEventListener('keydown', e => {
   if(app.mode !== 'tcalc' || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
@@ -7921,7 +8031,7 @@ function homeClick(e){
   if(e.target.closest('[data-home-warm]')){ warmStart(); return; }
   const sj = e.target.closest('[data-home-subj]'); if(sj){ app.wz = {...app.wz, step:'area', subj: sj.dataset.homeSubj}; if(settings.subject !== sj.dataset.homeSubj){ settings.subject = sj.dataset.homeSubj; app.railGrp = null; saveSettings(); } render(); }
 }
-function goHome(){ if(app.busy) return; leaveMode(); app.mode = 'home'; app.wz = null; app.round = {key:null, res:[]}; render(); }
+function goHome(){ if(app.busy) return; app.fokusAus = false; leaveMode(); app.mode = 'home'; app.wz = null; app.round = {key:null, res:[]}; render(); }
 
 /* ---------- Lehrkraft-PIN ---------- */
 app.teacherUntil = 0;
@@ -9433,7 +9543,7 @@ function renderSheets(keep){
     ${S.topic.startsWith('B:') ? `<label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${['B:V1', 'B:V2', 'B:V3'].includes(S.topic) ? `<label class="row">Ähnlichkeit <select id="sh-bsim">${BZ_SIM.map((t, i) => `<option value="${i}" ${(S.bsim || 0) === i ? 'selected' : ''}>${['deutlich (andere Gruppe)', 'ähnlich (gleiche Gruppe)', 'fein (Varianten)'][i]}</option>`).join('')}</select></label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Erkläre den Auftrag daran.</p>` : ''}
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
-    ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge. Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
+    ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge.</p><details class="note sh-help"><summary>Probleme beim Drucken?</summary>Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</details></div>
     <iframe id="sh-frame" title="Vorschau Arbeitsblatt"></iframe>`;
   if(!keep || !app.sheetDoc) app.sheetDoc = buildSheet();
   sheetShow();

@@ -5,7 +5,18 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+Neu (Backlog H, Usability-Review vom 24.11.2026, Stefans Antworten im Dokument):
+- **Konzentrationsmodus** für alle Kinder, Standard an (Einstellungen → Kinder): Beim Üben sind Leiste, Einstellleiste, Name und Menü ausgeblendet. Oben stehen „Aufgabe 3 von 10“ mit Punkten, „Weiter“ (erst nach der Lösung oder nach zwei Fehlversuchen) und „Pause“ (zurück zur Startseite). Das Zahnrad zeigt mit der PIN alles bis zur Pause. Auch auf der Startseite keine Leiste. Nicht im Unterricht, im Test und in der Materialkiste.
+- **Zahlen mit Material im Konzentrationsmodus = Zählaufgabe:** Die Zahl und die Ziffern erscheinen erst, wenn das Kind richtig gezählt hat (vorher stand bei „Wie viele sind es? Zähle nach.“ die Zahl schon da). Im Lernstand als „Zahlen: Mengen abzählen“.
+- **Geld im Konzentrationsmodus:** Auswahl „Betrag legen“ oder „Wechselgeld“ als große Kacheln.
+
+Geändert:
+- **Wechselgeld:** oben nur „Lege das Wechselgeld.“, das Feld heißt „Wechselgeld“; die Rechnung (10 € − 7 € = 3 €) erscheint erst nach dem Lösen. Der Tipp (auch bei „Betrag legen“) kommt erst nach einem Fehlversuch.
+- **Rundenende:** „Runde vorbei“ statt „Geschafft!“, wenn nichts gelöst oder mindestens die Hälfte übersprungen wurde.
+- Startseite: kürzerer Satz („Was möchtest du üben?“); auf dem iPad bleibt nach dem Antippen keine Kachel hell hinterlegt.
+- Uhr: „Volle Stunden“ und „Halbe Stunden“ ausgeschrieben; der Pfeil oben heißt „Neue Aufgabe“.
+- Umschalter Mathe/Deutsch 44 px hoch; Materialkiste: „Kiste zu“ statt „Fertig“, Taschenrechner ohne Material in der Mitte.
+- Lernstand: Sprungmarken je Fach oben; Arbeitsblätter: Druckhilfe aufklappbar („Probleme beim Drucken?“).
 
 ## 0.32.0 – 23.11.2026
 

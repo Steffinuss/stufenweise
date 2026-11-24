@@ -34,3 +34,9 @@ async def launch(p, **kw):
         except Exception:
             pass
     return await p.chromium.launch(**kw)
+
+
+# Konzentrationsmodus (seit Backlog H Standard „an“) für Tests ausschalten, die die volle Oberfläche
+# mit Leiste und Einstellleiste bedienen. Vor pg.goto(URL) mit pg.add_init_script(FOKUS_AUS) setzen.
+FOKUS_AUS = ("try{const k='stufenweise.settings',s=JSON.parse(localStorage.getItem(k)||'{}');"
+             "if(!s.fokus){s.fokus='off';localStorage.setItem(k,JSON.stringify(s))}}catch(e){}")

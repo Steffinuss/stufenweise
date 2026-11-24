@@ -17,7 +17,7 @@ Stand: 23.11.2026 (0.32.0)
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
 | 6 | ~~**G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar (+ Heft zur Förderzone)~~ | klein | freigegeben in 0.32.0 (23.11.2026), siehe `CHANGELOG.md` |
-| 7 | **H** Konzentrationsmodus für Kinder (+ Usability-Review) | klein bis mittel | Wunsch Stefan 24.11.2026; Vorschlag im Usability-Review, wartet auf Stefans Entscheidung |
+| 7 | **H** Konzentrationsmodus für Kinder (+ Usability-Review) | klein bis mittel | gebaut in `entwicklung` (24.11.2026), wartet auf Stefans OK in der Testversion |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -25,11 +25,13 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## H: Konzentrationsmodus für Kinder
 
-**Status:** Wunsch, noch nicht gebaut (24.11.2026).
+**Status:** gebaut in `entwicklung` (24.11.2026), Testversion; wartet auf Stefans OK.
 **Anlass (Stefan, 24.11.):** Beim Wechselgeld ist der Bildschirm sehr voll. Idee: eine Art „Fullscreen-Modus“, damit sich Kinder nur auf die Aufgabe konzentrieren.
 **Befund (Usability-Review 24.11., Dokument „Stufenweise – Usability-Review“, claude.ai/artifact/AdqPQacwdjd3vDwH9zfaQx):** Wechselgeld auf dem iPad: 30 Knöpfe sichtbar, 7 gehören zur Aufgabe; vier Anweisungen gleichzeitig; Rechnung „10 € − 7 €“ zum Auftrag „Ergänze“.
 **Vorschlag:** Bereichsleiste, Einstellleiste, Name und Menü ausblenden; ein Satz Auftrag, Tipp erst nach Fehlversuch; Fortschritt groß („3 von 10“); Knopf „Pause“ zurück zu „Heute für dich“; Einstellung wie „Geführte Oberfläche“ (alle oder einzelne Kinder), Lehrkraft mit PIN. Bausteine vorhanden (Leiste ausblenden, abgedunkelte Leiste im Test, PIN, Runden).
-**Offen (Stefan):** alle oder einzeln, von selbst an nach dem Test? „Neue Aufgabe“ weg oder erst nach Fehlversuchen? Wechselgeld-Rechnung als Ergänzung? Weitere Empfehlungen 2–12 aus dem Review übernehmen?
+**Stefans Antworten (im Dokument, 24.11.):** für alle Kinder und automatisch an; „Weiter“ nach 2 Fehlversuchen; Wechselgeld-Rechnung erst nach dem Legen; keine Handys im Unterricht. „Bitte baue das alles ein“ (Empfehlungen 1–12).
+**Umsetzung:** `settings.fokus` ('on'/'off', Standard 'on'), `fokusBase`/`fokusTask`/`fokusClass`/`fokusSync`, `#fokus-bar` (Punkte, `#fk-next`, `#fk-pause`, `#fk-teacher` mit `requireTeacher` → `app.fokusAus` bis `goHome`), `fkState()` je Bereich (gelöst, Fehlversuche), `#m-next/#w-next/#t-next` erst nach Lösung oder 2 Fehlversuchen („Weiter“), `body.fokus`/`body.fokus-home` blenden Leiste, Einstellleiste und Darstellungswahl aus. Willkommen: Aufgabe startet von selbst, Geld mit Kacheln (`data-fk-money`). Zählaufgabe `countOn`/`countCheck` (Protokoll `count`). Wechselgeld, Rundenende, Startseite, Uhr, Mathe/Deutsch, Materialkiste, Lernstand-Sprungmarken (`statsJump`), Druckhilfe (`details.sh-help`). Tests `tests/konzentrationsmodus.py`; Tests mit voller Oberfläche schalten den Modus über `FOKUS_AUS` (tests/common.py) aus.
+**Nicht umgesetzt (Empfehlung 7):** Einerwürfel und Zehnerstangen lassen sich nicht sinnvoll größer antippen: Die Tippflächen füllen die Lücken schon aus (Würfel 25 px), mehr ginge nur mit größerem Material und damit weniger Platz.
 
 ---
 

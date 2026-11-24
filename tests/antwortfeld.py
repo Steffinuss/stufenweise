@@ -1,13 +1,13 @@
 import asyncio, sys
 from playwright.async_api import async_playwright
-from common import URL, launch  # noqa: E402 (Adresse, Browser, Ausgabeordner)
+from common import URL, launch, FOKUS_AUS  # noqa: E402 (Adresse, Browser, Ausgabeordner)
 async def main():
     async with async_playwright() as p:
         b=await launch(p)
         for (W,H,touch) in [(1180,820,True),(820,1180,True)]:
             ctx=await b.new_context(viewport={'width':W,'height':H}, has_touch=touch, is_mobile=False)
             pg=await ctx.new_page(); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-            await pg.goto(URL); await pg.wait_for_timeout(400)
+            await pg.add_init_script(FOKUS_AUS); await pg.goto(URL); await pg.wait_for_timeout(400)
             await pg.evaluate("settings.numpad='on'; saveSettings()")
             if await pg.locator("[data-ctx='practice']").count(): await pg.click("[data-ctx='practice']")
             await pg.evaluate("kisteGo('calc')"); await pg.wait_for_timeout(200)  # Rechenhilfe (Materialkiste): Darstellung frei wählbar

@@ -6,7 +6,7 @@ Rechenhilfe (seit Backlog D in der Materialkiste): Plus/Minus wählbar, eigene Z
 nicht mehr in der Mathe-Leiste und nicht mehr als Kachel bei Mathe."""
 import asyncio
 from playwright.async_api import async_playwright
-from common import URL, launch  # noqa: E402
+from common import URL, launch, FOKUS_AUS  # noqa: E402
 
 SOLVE = "(()=>{const t=task(); if(!document.querySelector('#guess')){ t.done=true; renderWork(); } const g=document.querySelector('#guess'); g.value=String(resultOf(app.mode,t.a,t.b)); t.tries=TRIES; checkGuess(); })()"
 
@@ -24,7 +24,7 @@ async def main():
     async with async_playwright() as p:
         b = await launch(p); errs = []
         pg = await b.new_page(viewport={'width': 1180, 'height': 820}); pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.wait_for_timeout(400)
+        await pg.add_init_script(FOKUS_AUS); await pg.goto(URL); await pg.wait_for_timeout(400)
         await pg.evaluate("app.ctx='practice'; settings.subject='M'; app.range=20; app.mode='home'; render()")
         await pg.click('[data-mode="add"]'); await pg.wait_for_timeout(200)
         st = await pg.evaluate("[app.mode, !!app.calc, task().ready, task().view, !!document.querySelector('#in-a'), document.querySelectorAll('[data-view]').length, document.querySelectorAll('[data-pmv]').length, document.querySelector('#btn-random').textContent]")
@@ -67,7 +67,7 @@ async def main():
         await pg.close()
         # Handy
         pg = await b.new_page(viewport={'width': 390, 'height': 844}); pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.wait_for_timeout(300)
+        await pg.add_init_script(FOKUS_AUS); await pg.goto(URL); await pg.wait_for_timeout(300)
         await pg.evaluate("app.ctx='practice'; settings.subject='M'; app.range=20; app.mode='add'; render()"); await pg.wait_for_timeout(200)
         if await pg.evaluate("document.documentElement.scrollWidth") > 392: errs.append('Handy: zu breit')
         print('ERR', errs); await b.close()

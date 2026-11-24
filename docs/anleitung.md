@@ -83,7 +83,7 @@ Am Ende sieht das Kind keine Ergebnisse, nur ein Dankeschön. Für dich führt d
 
 ## Schritt 4: Lernstand ansehen
 
-Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das Kind oder „Ganze Klasse“.
+Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das Kind oder „Ganze Klasse“. Darunter springst du mit den Knöpfen (Mathematik, Lesen, Schreiben, …) direkt zum Fach.
 
 **Die Kompetenzmatrix:** Dunkelgrünes ✓ heißt erreicht, hellgrünes ✓ abgeleitet (aus einer höheren Stufe geschlossen), ½ teilweise, rotes ✗ nicht erreicht, Strich nicht getestet. Antippen ändert eine Einstufung, wenn du das Kind anders erlebst.
 
@@ -113,11 +113,24 @@ Die Startseite führt in drei Stufen zur Übung. Oben rechts zeigt eine Treppe, 
 2. **Fach:** Unter **Heute für dich** steht die passende Übung aus der Förderzone. Ein Tipp darauf startet sie sofort. Sonst wählt das Kind Mathe oder Deutsch.
 3. **Übung:** Das Kind wählt einen Bereich, zum Beispiel Plus oder Hundertertafel. Oben steht wieder „Für dich“ mit der passenden Übung.
 
+### Konzentrationsmodus
+
+Beim Üben sehen die Kinder nur die Aufgabe. Die Leiste links, die Einstellungen oben (Zahlenraum, Darstellung, Geld bis …), der Name und das Menü **⋯** sind ausgeblendet. Oben stehen nur:
+
+- **Aufgabe 3 von 10** mit Punkten: grün heißt gleich richtig, gelb nach einem zweiten Versuch, grau übersprungen.
+- **Weiter**: erst wenn die Aufgabe gelöst ist oder nach zwei Fehlversuchen. Vorher kann das Kind schwere Aufgaben nicht einfach wegtippen.
+- **Pause**: zurück zur Startseite. Dort wählt das Kind über die Kacheln ein anderes Fach oder einen anderen Bereich.
+- Das **Zahnrad** ist für dich: Mit der PIN siehst du alles (Leiste und Einstellungen), bis das Kind auf „Pause“ tippt.
+
+Auch auf der Startseite fehlt die Leiste; Fach und Bereich wählt das Kind über die großen Kacheln. Beim Geld wählt das Kind zuerst „Betrag legen“ oder „Wechselgeld“. Unter **Zahlen** mit Material zählt das Kind die Menge und schreibt die Zahl oben in das Feld; die Zahl und die Ziffern unter den Spalten erscheinen erst danach.
+
+Der Konzentrationsmodus ist für alle Kinder eingeschaltet. Ausschalten kannst du ihn unter **Einstellungen → Kinder → Konzentrationsmodus**. Im Unterricht an der Tafel, im Test und in der Materialkiste gilt er nicht.
+
 Bei Plus, Minus und dem Einmaleins schreibt das Kind das Ergebnis direkt oben in die Rechnung, dort, wo vorher das Fragezeichen stand, und prüft mit dem Haken daneben (oder mit ✓ auf der Zifferntastatur). Beim Legen mit Material erscheint das Feld, sobald die Mengen zusammengelegt sind. Auch im Test steht das Antwortfeld direkt in der Aufgabe (zum Beispiel „8 = 6 + ☐“) oder gleich darunter.
 
 ### Plus und Minus üben
 
-**Plus** und **Minus** sind zum Üben da: Das Kind bekommt sofort eine Aufgabe und muss nichts eintragen oder auswählen. Mit **Neue Aufgabe** oben geht es weiter. Die Darstellung wechselt von selbst, in dieser Reihenfolge:
+**Plus** und **Minus** sind zum Üben da: Das Kind bekommt sofort eine Aufgabe und muss nichts eintragen oder auswählen. Mit **Weiter** oben geht es weiter (ohne Konzentrationsmodus: **Neue Aufgabe**). Die Darstellung wechselt von selbst, in dieser Reihenfolge:
 
 - bis 10 und bis 20: Material → Zehner- bzw. Zwanzigerfeld → Zahlenstrahl
 - bis 100: Material → Hundertertafel → Zahlenstrahl
@@ -137,13 +150,13 @@ Die vierte Kachel auf der Startseite heißt **Materialkiste**. Sie ist für den 
 
 ![Materialkiste: Taschenrechner mit dem Ergebnis als Material, links die Werkzeuge](bilder/16_materialkiste.png)
 
-Links wechselt das Kind das Werkzeug, **Fertig** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren des Lernstands, nicht in der Elterninfo) und im ILEB-Vorschlag für Mathe als Satz unter „Lernstand“.
+Links wechselt das Kind das Werkzeug, **Kiste zu** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren des Lernstands, nicht in der Elterninfo) und im ILEB-Vorschlag für Mathe als Satz unter „Lernstand“.
 
 Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.
 
 ![Startseite mit „Heute für dich“](bilder/11_heute.png)
 
-Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Links sieht das Kind nur die Bereiche, die für es dran sind, mit ★ für die Förderzone. Bei Fehlern gibt es einen konkreten Tipp. Wie viel ein Kind sehen darf, stellst du in den Einstellungen unter „Geführte Oberfläche“ ein.
+Die Übung stellt sich selbst ein, hier zum Beispiel Wechselgeld bis 20 €. Ohne Konzentrationsmodus sieht das Kind links nur die Bereiche, die für es dran sind, mit ★ für die Förderzone. Beim Wechselgeld steht oben nur „Lege das Wechselgeld.“; die Rechnung (zum Beispiel 10 € − 7 € = 3 €) erscheint, wenn das Wechselgeld richtig liegt. Der Tipp „Fange mit kleinen Münzen an …“ kommt erst nach einem Fehlversuch. Bei Fehlern gibt es einen konkreten Tipp. Wie viel ein Kind sehen darf, stellst du in den Einstellungen unter „Geführte Oberfläche“ ein.
 
 ![Übung Wechselgeld mit Material](bilder/12_ueben.png)
 
@@ -167,7 +180,7 @@ Bei Plus und Minus bis 20 (und bis 10) kommt nach dem Material das **Zwanzigerfe
 
 ### Übungsrunden
 
-Geübt wird in Runden zu 10 Aufgaben. Oben links zeigt eine kleine Treppe, wie weit das Kind in der Runde ist: grün heißt gleich richtig, gelb heißt nach einem zweiten Versuch richtig. Wer mit dem Pfeil zur nächsten Aufgabe springt, ohne die Aufgabe gelöst zu haben, verbraucht trotzdem eine Stufe: Sie wird gestreift (übersprungen) und zählt nicht als richtig. Auch ein Wechsel zwischen den Stufen oben (etwa von „Tausender“ zu „Finden“) beginnt keine neue Runde. So lassen sich schwere Aufgaben nicht wegklicken, und der Rückblick zeigt ehrlich, was gelöst wurde („… 1 übersprungen“). Nach der letzten Aufgabe kommt ein kurzer Rückblick („Geschafft! 10 Aufgaben – 8 davon gleich richtig“) mit großen Knöpfen:
+Geübt wird in Runden zu 10 Aufgaben. Oben links zeigen Punkte (im Konzentrationsmodus) oder eine kleine Treppe, wie weit das Kind in der Runde ist: grün heißt gleich richtig, gelb heißt nach einem zweiten Versuch richtig. Wer mit dem Pfeil zur nächsten Aufgabe springt, ohne die Aufgabe gelöst zu haben, verbraucht trotzdem eine Stufe: Sie wird gestreift (übersprungen) und zählt nicht als richtig. Auch ein Wechsel zwischen den Stufen oben (etwa von „Tausender“ zu „Finden“) beginnt keine neue Runde. So lassen sich schwere Aufgaben nicht wegklicken, und der Rückblick zeigt ehrlich, was gelöst wurde („… 1 übersprungen“). Nach der letzten Aufgabe kommt ein kurzer Rückblick („Geschafft! 10 Aufgaben – 8 davon gleich richtig“; wurde nichts gelöst oder mindestens die Hälfte übersprungen, heißt er „Runde vorbei“) mit großen Knöpfen:
 
 - **Schwerer** (mit Angabe, was als Nächstes kommt), wenn mindestens 7 Aufgaben gleich richtig waren. Bei 9 oder 10 ist der Knopf hervorgehoben.
 - **Leichter**, wenn weniger als die Hälfte gleich richtig war.
@@ -205,7 +218,7 @@ Die Zeiger lassen sich auch mit dem Finger ziehen, beim Uhr-Stellen und im Unter
 
 Oben rechts stehen nur noch der Name und das Menü **⋯**. Im Menü findest du Lernstand, Arbeitsblätter, Rückmeldung, Anleitung, Vollbild und Einstellungen. Die Überschrift über der Aufgabe (z. B. „Hundertertafel · Tafel und Material verbinden“) fällt beim Üben weg, weil die Stufe schon oben in der Leiste markiert ist; so bekommt die Aufgabe mehr Höhe.
 
-Ganz unten in der linken Leiste blendet **‹** die Leiste aus. Die Aufgabe bekommt dann die ganze Breite. Am linken Rand erscheint ein kleiner Knopf **›**, der die Leiste wieder einblendet. Die Einstellung bleibt auf dem Gerät gespeichert.
+Ganz unten in der linken Leiste blendet **‹** die Leiste aus (für Kinder übernimmt das der Konzentrationsmodus). Die Aufgabe bekommt dann die ganze Breite. Am linken Rand erscheint ein kleiner Knopf **›**, der die Leiste wieder einblendet. Die Einstellung bleibt auf dem Gerät gespeichert.
 
 Beim Zahlenstrahl mit **Zahl suchen** bleibt die Übung an, wenn du den Zahlenraum wechselst; es kommt gleich eine neue Zahl im neuen Zahlenraum. **Mehr Zahlen** beschriftet jede Hauptmarke (bis 100 alle Zehnerzahlen, bis 1000 alle Hunderterzahlen) – eine Hilfe für Kinder, die sich am Strahl noch schwer orientieren.
 

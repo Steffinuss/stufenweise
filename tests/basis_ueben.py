@@ -11,7 +11,7 @@ vorgemacht („Schau zu“, Klicks gesperrt, dann „Jetzt du“); nach 8 richti
 nach drei Fehlern in Folge wird es wieder leichter."""
 import asyncio
 from playwright.async_api import async_playwright
-from common import URL, launch  # noqa: E402
+from common import URL, launch, FOKUS_AUS  # noqa: E402
 
 CHECK = r"""(()=>{ const bad = [], n = {};
   for(const ax of ['V', 'O']) for(const l of axLevels(ax)){
@@ -68,7 +68,7 @@ async def main():
     async with async_playwright() as p:
         b = await launch(p); errs = []
         pg = await b.new_page(viewport={'width': 1180, 'height': 820}); pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.wait_for_timeout(400)
+        await pg.add_init_script(FOKUS_AUS); await pg.goto(URL); await pg.wait_for_timeout(400)
         r = await pg.evaluate(CHECK); errs += r['bad']
         print('Aufgaben geprüft je Stufe:', r['n'])
         # Gast: Fach Basis in der Fachwahl

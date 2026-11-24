@@ -4,7 +4,7 @@ es ohne weiteren Umbau aufnehmen: Fachwahl, Startseite, Üben, Test, Lernstand, 
 Berichte, Tabelle; optional nur für eingeschaltete Kinder sichtbar."""
 import asyncio
 from playwright.async_api import async_playwright
-from common import URL, launch  # noqa: E402
+from common import URL, launch, FOKUS_AUS  # noqa: E402
 
 PROBE = r"""(()=>{
   const mk = (q, ok, alt) => () => ({type:'choice', prompt:q, label:q, options:[{a:ok}, {a:alt}], correct:0});
@@ -31,7 +31,7 @@ async def main():
     async with async_playwright() as p:
         b = await launch(p); errs = []
         pg = await b.new_page(viewport={'width': 1180, 'height': 820}); pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.wait_for_timeout(400)
+        await pg.add_init_script(FOKUS_AUS); await pg.goto(URL); await pg.wait_for_timeout(400)
         reg = await pg.evaluate(PROBE)
         if reg != ['B,M,D,X', 'M,L,W,B,X']: errs.append(f'Anmeldung: {reg}')
         # Gast: alle drei Fächer sichtbar
@@ -91,7 +91,7 @@ async def main():
         await pg.close()
         # Ohne Probe-Fach: (für Gäste) Basis, Mathe, Deutsch
         pg = await b.new_page(viewport={'width': 1180, 'height': 820}); pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.wait_for_timeout(300); await pg.evaluate("app.ctx='practice'; app.mode='number'; render()")
+        await pg.add_init_script(FOKUS_AUS); await pg.goto(URL); await pg.wait_for_timeout(300); await pg.evaluate("app.ctx='practice'; app.mode='number'; render()")
         subs = await pg.evaluate("[...document.querySelectorAll('.rail .subj button')].map(b=>b.textContent).join()")
         if subs != 'Basis,Mathe,Deutsch': errs.append(f'Standard: {subs}')
         await pg.close()
