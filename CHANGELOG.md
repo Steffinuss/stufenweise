@@ -5,7 +5,17 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+Neu (Backlog I „Optimierung Deutsch“, Stefans Antworten im Dokument vom 24.11.2026):
+- **Bilder beim Schreiben:** nur eindeutige Bilder (Üben, Test, Anfangsbuchstaben, Arbeitsblätter W2–W5); Tulpe, Rose und Kanne weggelassen. **Kenne ich nicht** beim Üben: Wort mit Bild zeigen, abdecken, aus dem Gedächtnis schreiben (zählt „mit Hilfe“); im Schreib-Test ein anderes Bild (höchstens zweimal je Stufe). Lernstand: „Bilder, die nicht erkannt wurden (Wortschatz)“. **Bilder vorher ansehen** (Knopf für die Lehrkraft): die Bilder der nächsten Runde mit Wort. **Bilder abwählen** für die Klasse (Einstellungen → Deutsch).
+- **Anhören (Sprachausgabe, zum Ausprobieren):** Lautsprecher-Knopf liest nur das Wort vor (Schreiben, Schreib-Test, Hören, Bildwörterbuch). Nur Stimmen auf dem Gerät, nichts übers Internet. Einstellungen → Deutsch: Standard für alle Kinder, je Kind abweichend, Stimme, Tempo, Probe.
+- **W4 Silben:** Kästchen unter Silbenbögen; beim Üben zusätzlich Silbenkarten legen.
+- **Hören P1–P4** mit Übungen (Silben zählen, Silben verbinden, Reime, Anlaute) und im Lese-Test, wenn L4 noch nicht erreicht ist; Arbeitsblätter „Hören“.
+- **Materialkiste Deutsch:** Anlauttabelle, Bildwörterbuch, Wörter. Die Nutzung steht im ILEB-Vorschlag Lesen/Schreiben.
+- **Unterricht Deutsch:** Anlauttabelle, Blitzlesen, Satz-Baukasten.
+- **W6 Schreiben im Alltag** (nur Üben): Einkaufszettel und eigener Satz zum Bild.
+- **Legeblatt „Bildkarten mit Wort“** (Wortschatz, Memory; für ein Kind zuerst seine unbekannten Bilder).
+- **Mathe, Hundertertafel „Finden“:** auch teilweise verdeckt (erste Zeile und Zehnerzahlen) und verdeckt; wechselt von selbst (8 richtig → weiter, 3 Fehler → zurück), Lehrkraft wählt oben. Nicht im Test.
+- Test `tests/deutsch_optimierung.py`.
 
 ## 0.33.0 – 24.11.2026
 

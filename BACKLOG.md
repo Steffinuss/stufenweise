@@ -18,7 +18,7 @@ Stand: 24.11.2026 (0.33.0)
 | 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
 | 6 | ~~**G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar (+ Heft zur Förderzone)~~ | klein | freigegeben in 0.32.0 (23.11.2026), siehe `CHANGELOG.md` |
 | 7 | ~~**H** Konzentrationsmodus für Kinder (+ Usability-Review)~~ | klein bis mittel | freigegeben in 0.33.0 (24.11.2026), siehe `CHANGELOG.md` |
-| 8 | **I** Optimierung Deutsch (Bilder beim Schreiben, evtl. Sprachausgabe, Ausbau) | mittel bis groß | wartet auf Stefans Antworten im Dokument |
+| 8 | **I** Optimierung Deutsch (Bilder beim Schreiben, Anhören, Ausbau) + Hundertertafel verdeckt | groß | gebaut in `entwicklung` (24.11.2026), Testversion, wartet auf Freigabe |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -26,7 +26,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## I: Optimierung Fach Deutsch
 
-**Status:** dokumentiert 24.11.2026, wartet auf Stefans Antworten (Dokument „Stufenweise – Optimierung Deutsch“, claude.ai/artifact/UWNJUi6e6cFP7h7W7ugtdx, Abschnitt „Fragen an dich“). Nichts gebaut.
+**Status:** gebaut in `entwicklung` (24.11.2026), Testversion; wartet auf Stefans Freigabe. Dokument „Stufenweise – Optimierung Deutsch“ (claude.ai/artifact/UWNJUi6e6cFP7h7W7ugtdx).
 **Anlass (Stefan, 24.11.):** In Deutsch ist deutlich weniger als in Mathe. Beim Schreiben müssen Kinder Wörter schreiben, ohne sie zu kennen; manchmal erkennen sie die Bilder nicht. „Vielleicht wäre an dieser Stelle doch eine Sprachausgabe als Hilfe gut.“
 
 **Befund (gezählt in 0.33.0):**
@@ -41,7 +41,9 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 - Mit Ton: Knopf „Anhören“ neben dem Bild, nur das Wort. A Gerätestimme nur mit `localService`-Stimmen (nichts ins Internet); B eigene Aufnahmen der ~110 Bildwörter als Teil der App (~1 MB, offline), evtl. zusätzlich in Silben; Mischung möglich (Gerätestimme nur für „Meine Wörter“). Lehrkraft schaltet ein (alle oder je Kind).
 - Ausbau: D1 Hören P1–P4 mit Übungen, D2 Silben beim Schreiben (W4 Kästchen unter Silbenbögen, Silbenkarten legen), D3 Deutsch in der Materialkiste (Anlauttabelle, Bildwörterbuch, Wörter legen), D4 Deutsch im Unterricht (Anlauttabelle, Blitzlesen, Satz-Baukasten), D5 Schreiben im Alltag (Einkaufszettel, eigener Satz), D6 Arbeitsblätter (Silben zählen, Reime, Anlaut-Bilder, Bildkarten).
 
-**Offene Fragen an Stefan:** 1 H1 im Üben und Test? 2 Tulpe/Rose/Kanne beim Schreiben herausnehmen? 3 H2 Variante a/b? 4 H3 ja? 5 H4 Klasse oder je Kind? 6 Sprachausgabe keine/A/B/Mischung? 7 Ton im Schreib-Test, alle oder je Kind? 8 Welche Bausteine D1–D6 in welcher Reihenfolge? 9 P1–P4 auch im Lese-Test?
+**Stefans Antworten (im Dokument, 24.11.):** 1 ja, Üben und Test · 2 wie vorgeschlagen „oder beides gelten lassen“ → herausgenommen · 3 b beim Üben, a im Test · 4 ja, Knopf für die Lehrkraft · 5 ganze Klasse · 6 „erstmal A testen, evtl. später eigene Aufnahmen“ · 7 im Test ja, je Kind · 8 D2, D1, D3, D6, D4, D5 · 9 „Ja, auch im Test prüfen“. Dazu (24.11.): Hundertertafel „Finde Zahl“ auch abgedeckt und teilabgedeckt.
+**Damit geändert:** feste Regel „Keine Sprachausgabe“ gilt nicht mehr für „Anhören“ (nur das Wort, nur Gerätestimmen); Rückmeldungen werden weiter nicht vorgelesen.
+**Umsetzung:** `W_AMBIG`, `wClear`, `wPool`, `wPick`, `W_POOLS`, `settings.wHide`, `wUnkOk` (`r-unk`, Test `d-unk` mit `unkFrom`, `d.unkK`), `unkWords` (Log-Feld `unk`), `wPreviewStart`/`app.read.wq`; Anhören `sayOn`/`sayWord`/`speechBtn`/`sayMini` (nur `localService`), `settings.anhoeren`, `p.say`; W4 `syl` (Kästchen `w-sylg`), `sylCardItem`, `WRITE_PRACTICE`; Hören `PHON` (P1–P4), `RHYME`, Lese-Test `readPlan` (Hören, wenn L4 nicht erreicht), `cap:40`; Kiste `abc`/`dict`/`tword` (`subj:'D'`, `kisteLine(pid, sj)`); Unterricht `abc`/`tblitz`/`tsatz`; Blätter `P_SHEETS`, Legeblatt `bildk`; W6 `shopItem`, `satzItem` (`check:'satz'`, `free`); Hundertertafel `hCover`, `hcovTrack`, `p.hcov`. Test `tests/deutsch_optimierung.py`.
 
 ---
 

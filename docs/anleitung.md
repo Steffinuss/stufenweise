@@ -147,10 +147,11 @@ Die vierte Kachel auf der Startseite heißt **Materialkiste**. Sie ist für den 
 - **Rechenhilfe:** oben Plus oder Minus wählen, die eigenen Zahlen eintragen und **Legen** tippen. Unten wählt das Kind frei, womit es rechnet: Material, Zehner-/Zwanzigerfeld, Tafel oder Zahlenstrahl. Der Zahlenraum ist frei wählbar, auch wenn das Kind beim Üben noch auf einen kleineren beschränkt ist.
 - **Taschenrechner:** plus, minus, mal (·) und geteilt (:) mit Zahlen bis 10 000, große Tasten, auch mit der Tastatur. Geteilt rechnet ohne Komma, mit Rest („17 : 5 = 3 Rest 2“). Mit **Ergebnis als Material** (oben) zeigt er das Ergebnis zusätzlich als Tausender, Hunderter, Zehner und Einer. Ein weiteres Rechenzeichen rechnet mit dem Ergebnis weiter, **C** löscht alles.
 - **Frei legen, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr:** dieselben Werkzeuge wie im Unterricht an der Tafel.
+- **Deutsch:** **Anlauttabelle** (Buchstabe antippen → alle Bilder, die so anfangen), **Bildwörterbuch** (alle Bilder mit Wort und Silbenfarben zum Nachschauen) und **Wörter** (ein Wort eintippen und mit Silbenfarben groß sehen).
 
 ![Materialkiste: Taschenrechner mit dem Ergebnis als Material, links die Werkzeuge](bilder/16_materialkiste.png)
 
-Links wechselt das Kind das Werkzeug, **Kiste zu** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren des Lernstands, nicht in der Elterninfo) und im ILEB-Vorschlag für Mathe als Satz unter „Lernstand“.
+Links wechselt das Kind das Werkzeug, **Kiste zu** führt zurück zur Auswahl. Alle Kinder sehen die Materialkiste, auch in der geführten Oberfläche. Es gibt keine Bewertung, keine Runden und keine Vorschläge „Schwerer/Leichter“. Gespeichert wird nur, wie oft ein Kind welches Werkzeug geöffnet hat (bei „Gast“ nichts). Das steht im Lernstand unter „Materialkiste (selbst genutzt)“ (auch beim Kopieren des Lernstands, nicht in der Elterninfo) und im ILEB-Vorschlag für Mathe (Mathe-Werkzeuge) und Lesen/Schreiben (Deutsch-Werkzeuge) als Satz unter „Lernstand“.
 
 Die **Startrunde** (3 Aufgaben) eignet sich zum Aufwärmen, die **Lernlandkarte** zeigt, was das Kind schon kann.
 
@@ -200,9 +201,29 @@ Die Buchstabentastatur ist wie am Handy angeordnet (QWERTZ). Wer lieber nach dem
 
 Schreibt das Kind ein Wort fast richtig, markiert die App die einzelnen Buchstaben: grün stimmt, rot ist falsch, ein gestricheltes Kästchen zeigt einen fehlenden Buchstaben, durchgestrichen heißt zu viel. Stimmt mindestens die Hälfte, bleiben die grünen Buchstaben beim Verbessern stehen und das Kind füllt nur die roten Kästchen neu (aus „Prot“ wird _rot, das Kind tippt das B). Ist das Wort weit weg, gibt es keine Markierung, damit das Kind nicht rät, sondern neu ansetzt. Auf den Stufen „lautgetreu“ zählt ein Wort wie „Hunt“ schon als richtig; ab der Stufe Merkstellen wird es markiert.
 
+### Bilder beim Schreiben und Anhören
+
+Beim Schreiben nach Bild muss das Kind das Bild erkennen. Damit das nicht zum Stolperstein wird:
+
+- **Nur eindeutige Bilder:** Beim Schreiben (Üben und Test) und bei den Anfangsbuchstaben kommen nur Bilder mit eindeutigem Namen vor. Tulpe und Rose (sonst „Blume“) und Kanne (sonst „Tasse“) sind beim Schreiben weggelassen.
+- **Kenne ich nicht:** Beim Üben zeigt der Knopf das Wort mit dem Bild. Das Kind merkt es sich, deckt es ab und schreibt es aus dem Gedächtnis. Das zählt als „mit Hilfe“, nicht als Schreibfehler. Im Schreib-Test kommt stattdessen ein anderes Bild (höchstens zweimal je Stufe). Der Lernstand sammelt die Bilder unter „Bilder, die nicht erkannt wurden (Wortschatz)“.
+- **Bilder vorher ansehen:** Ohne Konzentrationsmodus (oder nach dem Zahnrad mit PIN) zeigt der Knopf **Bilder vorher ansehen** die Bilder der nächsten Runde mit Wort und Silbenfarben. Schaut sie zusammen an und sprecht die Wörter; **Los geht's** startet die Runde mit genau diesen Bildern.
+- **Bilder abwählen:** Einstellungen → Deutsch → **Bilder beim Schreiben**. Abgewählte Bilder kommen beim Schreiben, bei den Anfangsbuchstaben und auf diesen Arbeitsblättern nicht mehr vor (für die ganze Klasse).
+- **Anhören (Sprachausgabe):** Einstellungen → Deutsch → **Anhören**. Standard für alle Kinder (aus/an) und je Kind abweichend. Dann steht neben dem Bild ein Lautsprecher-Knopf, der nur das Wort vorliest: beim Schreiben, im Schreib-Test, beim Hören und im Bildwörterbuch. Die App nutzt nur deutsche Stimmen, die auf dem Gerät liegen; nichts geht ins Internet. Auf dem iPad klingt die Stimme besser, wenn du unter Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Deutsch eine „erweiterte“ Stimme lädst. Mit **Probe** hörst du, wie es klingt.
+
+**Lange Wörter (W4):** Die Kästchen stehen in Silben unter Silbenbögen. Beim Üben kommt zusätzlich „Lege das Wort aus Silben“ mit Silbenkarten (nicht im Test).
+
+**Sätze (W6):** Beim Üben kommen zusätzlich ein **Einkaufszettel** (drei Bilder nacheinander aufschreiben) und **Schreibe einen Satz zum Bild**: Die App prüft großen Anfang, Punkt, mindestens drei Wörter und dass das Wort zum Bild (großgeschrieben) vorkommt.
+
+### Hören
+
+In Deutsch gibt es unter **Hören** vier Stufen zur phonologischen Bewusstheit: **Silben** (Wie viele Silben? Punkte antippen), **Verbinden** (Silben hören, Bild antippen), **Reime** (Was reimt sich?) und **Anlaute** (Was fängt genauso an?). Ohne Anhören spricht die Lehrkraft das Wort; bei „Verbinden“ steht klein, was sie sagen soll. Der Lese-Test prüft die Hör-Stufen, wenn „Wörter lesen“ (L4) noch nicht erreicht ist.
+
 ### Hundertertafel und Tausenderbuch
 
 Links unter **Tafel** übt das Kind mit der Hundertertafel (1 bis 100) in sieben Stufen: Zahlen finden, Tafel und Material verbinden (Zehnerstangen, Punktefeld, Zahlwort), Nachbarn und Lücken, Ausschnitte ergänzen, Wege gehen (unten +10, rechts +1), Muster erkennen und zuletzt das Tausenderbuch. Die Stufen H1–H7 sind Teil des Mathe-Tests (Teil 2) und erscheinen in der Kompetenzmatrix.
+
+Bei **Finden** (H1) wählst du oben **Alle Zahlen**, **Teilweise verdeckt** (nur erste Zeile und Zehnerzahlen) oder **Verdeckt** (keine Zahlen). Die Stufe wechselt wie bei Plus und Minus von selbst: nach 8 auf Anhieb richtigen eine weiter, nach 3 Fehlern in Folge zurück. Nach der richtigen Lösung erscheinen alle Zahlen. Im Test bleibt die Tafel ausgefüllt.
 
 Bei **Zahlen** und in der **Rechenhilfe** (Materialkiste) gibt es im Zahlenraum bis 100 außerdem die Ansicht **Tafel** (bis 1000: **Tausenderbuch**); beim Üben von Plus und Minus bis 100 kommt die Hundertertafel von selbst nach dem Material. Der Start ist orange markiert. Das Kind springt mit den Knöpfen +10 und +1 (bei Minus −10 und −1, bis 1000 auch ±100) oder tippt ein Feld in seiner Spalte (Zehner) oder ein paar Felder weiter (Einer) an. Schräge Sprünge lässt die App nicht zu. Der Weg bleibt sichtbar, darunter steht er als Rechnung, zum Beispiel „Start 52 · +10 +10 +10 +10 · 3-mal +1 = 95“. Bei jeder neuen Aufgabe beginnt der Weg neu.
 
@@ -235,6 +256,9 @@ Die Werkzeuge:
 - **Frei legen** und **Blitzblick** wie beim Üben.
 - **Uhr:** Zeiger mit + und − stellen (in Schritten von 1, 5 oder 15 Minuten), dazu auf Wunsch die Digitalzeit und die Uhrzeit in Worten.
 - **Wörter:** ein Wort oder einen Satz eintippen und groß zeigen, mit farbigen Silben und Silbenbögen. Kennt die App ein Bild zum Wort, erscheint es dazu.
+- **Anlauttabelle:** alle Buchstaben mit Bild; ein Buchstabe zeigt alle Bilder, die so anfangen.
+- **Blitzlesen:** **Nächstes Wort** zeigt ein Wort für 0,5, 1 oder 2 Sekunden, dann steht dort „?“. Oben eigene Wörter eintragen (mit Komma getrennt) oder leer lassen (Wörter aus der App). **Aufdecken** zeigt das Wort mit Bild.
+- **Satz-Baukasten:** oben einen Satz eintippen, **Wortkarten machen**. Die Kinder tippen die Karten der Reihe nach an; ein grüner Strich zeigt, dass der Satz stimmt.
 
 In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, dass ein Gerät immer direkt mit Üben oder immer mit Unterricht startet, zum Beispiel der Rechner an der Tafel.
 
@@ -244,6 +268,8 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 2. Das Kind wählen. Unter „Passend zur Förderzone“ stehen seine Stufen, zum Beispiel „Rechnen R3“.
 3. Das Blatt wählst du in drei Schritten: **Fach** (Basis, Mathe, Deutsch), dann **Bereich** (zum Beispiel bei Mathe: Zahlen, Rechnen, Hundertertafel, Uhr, Größen und Geld, Legeblätter), dann **Blatt** aus einer kurzen Liste. Wechselst du zurück in ein Fach, ist das dort zuletzt gewählte Blatt wieder da. Unter „Zuletzt benutzt“ stehen die Blätter, die du zuletzt gedruckt, gespeichert oder ins Heft übernommen hast. Wählst du ein Kind mit Förderzone, stellt sich das passende Fach ein. Dann bei Bedarf Zahlenraum und Material anpassen. Bei „Aufgaben“ füllt „Blatt füllen“ die Seite mit vollen Reihen; du kannst auch eine feste Zahl wählen. Rechts siehst du die Vorschau.
 4. **Drucken** tippen. „Lösungsblatt anhängen“ legt eine Seite mit den Lösungen dazu.
+
+**Deutsch → Hören:** Silben zählen, Silben verbinden (die Lehrkraft spricht; was sie sagt, steht auf dem Lösungsblatt), Reime finden und Anlaute hören – alles mit Bildern, ohne Lesen.
 
 **Materialbilder:** Bei Plus, Minus, Ergänzen, Einmaleins, Zehnerpartnern und „Rechnen über die 10“ wählst du „bei allen Aufgaben“, „1. Aufgabe vorgegeben, dann selbst zeichnen“ oder „ohne“. Beim Zeichnen zeigt die erste Aufgabe das Bild als Beispiel, bei Zahlen ab 20 in der Kurzschreibweise (| Zehner, • Einer). Die weiteren Aufgaben haben ein leeres Zwanzigerfeld (bei Plus und Minus immer mit 20 Feldern, auch bis 10) oder ein Zeichenfeld.
 
@@ -327,7 +353,7 @@ Die **Legeblätter für echtes Material** stehen bei jedem Fach als eigener Bere
 
 - **Mathe:** Zehnerfeld, Zwanzigerfeld (Querformat), Zahlenstrahl bis 20, Zahlenstrahl bis 100 oder 1000, Hunderterfeld in 1 cm für Einerwürfel, Stellentafel (bis 100 hochkant, bis 1000 quer, breit genug für Hunderterplatten und Zehnerstangen), Preise mit Spielgeld legen, Zifferblatt mit Zeigern zum Ausschneiden, Zifferblatt mit Minutenkranz.
 - **Basis:** Sortierunterlage mit zwei Feldern (Küche und Werkstatt, zwei Farben oder ohne Bild zum Selbstbeschriften), Zuordnungsleiste „eins zu eins“ (unter jedes Bild ein echtes Ding legen) und Musterstreifen für Plättchen (AB, AAB/ABB, ABC oder leer zum Vorlegen).
-- **Deutsch:** Anfangsbuchstaben legen, Wörter legen (ein Kästchen pro Buchstabe), Wörter nachlegen mit Vorlage, Merkwörter nachlegen (Merkstelle farbig), Silben legen (ein Stein pro Silbe), Buchstabenkarten zum Ausschneiden (groß und klein, häufige Buchstaben öfter; ein Strich zeigt, wo unten ist).
+- **Deutsch:** Anfangsbuchstaben legen, Wörter legen (ein Kästchen pro Buchstabe), Wörter nachlegen mit Vorlage, Merkwörter nachlegen (Merkstelle farbig), Silben legen (ein Stein pro Silbe), Buchstabenkarten zum Ausschneiden (groß und klein, häufige Buchstaben öfter; ein Strich zeigt, wo unten ist). Neu: **Bildkarten mit Wort** (12 Karten zum Ausschneiden für Wortschatzarbeit und Memory; mit einem gewählten Kind zuerst die Bilder, die es nicht erkannt hat).
 
 Bei den meisten Mathe-Blättern wählst du unter **Aufgaben**, was dazu auf dem Blatt steht, zum Beispiel „Plus“, „Ergänzen bis 20“ oder „ohne Aufgaben“ für das freie Legen. **Wichtig:** in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf jedem Legeblatt ist ein 5-cm-Strich: Ist er kürzer, wurde verkleinert. Im Lernstand öffnet **Legeblatt drucken** direkt das passende Blatt zur Förderzone. Legeblätter lassen sich auch ins Arbeitsheft übernehmen.
 
