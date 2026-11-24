@@ -703,6 +703,9 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 /* Schreiben */
 .w-wrap{gap:12px}
 .w-boxes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.w-boxes.syl{gap:18px}.w-sylg{display:flex;gap:6px;padding-bottom:16px;position:relative}
+.w-sylg::after{content:'';position:absolute;left:8%;right:8%;bottom:0;height:12px;border:3px solid #346bc3;border-top:none;border-radius:0 0 60px 60px/0 0 14px 14px}
+.w-sylg:nth-child(even)::after{border-color:#c9414a}
 .w-box{width:52px;height:64px;border-bottom:4px solid var(--dark);display:flex;align-items:flex-end;justify-content:center;font-size:44px;font-weight:700;font-family:Stufenfibel,Verdana,Arial,sans-serif;background:#fff;border-radius:8px 8px 0 0}
 .w-box.cur{border-bottom-color:#e8890c;background:#fff8ee}
 .w-keys{display:grid;grid-template-columns:repeat(10,minmax(30px,54px));gap:6px;justify-content:center}
@@ -4699,7 +4702,7 @@ function wPool(list){ const h = wHidden(), a = list.filter(w => wClear(w) && !h.
 function wPick(list){ const pool = wPool(list), q = app.mode === 'read' ? app.read?.wq : null; if(q?.length){ const i = q.findIndex(w => pool.includes(w)); if(i >= 0) return q.splice(i, 1)[0]; } return fresh(pool); }
 const W_POOLS = {W2: () => Object.values(INITIAL).flat(), W3: () => LAUT_SHORT, W4: () => LAUT_LONG, W5: () => MERK, W6: () => [...LAUT_SHORT, ...LAUT_LONG]};
 /* „Kenne ich nicht“: nur bei Schreibaufgaben nach Bild (Wort nicht zu sehen) */
-const wUnkOk = it => !!it && it.type === 'write' && !!it.icon && !it.word && !it.unkWord && !it.tiles;
+const wUnkOk = it => !!it && it.type === 'write' && !!it.icon && !it.word && !it.unkWord && (!it.tiles || it.sylT);
 /* Bilder, die ein Kind nicht kannte (aus Übungen, Überspringen und Test): Wortschatzliste für die Lehrkraft */
 function unkWords(pid){
   const n = {}; for(const e of [...(data.log[pid] || []), ...(data.skips?.[pid] || [])]) if(e.unk) for(const w of String(e.unk).split('|')) n[w] = (n[w] || 0) + 1;
@@ -5338,12 +5341,18 @@ const WRITE = {
        () => { const k = fresh(LAUT_LONG); return wItem(k, {word:k, tiles: shuffle(k.split('')), check:'exact', prompt:'Lege das Wort nach.', label:`abschreiben: ${k}`}); }],
   W2: [0, 1, 2].map(i => () => { const k = wPick(W_POOLS.W2()); return {kern: i === 0, type:'write', icon:k, target:k[0], check:'ci', max:1, prompt:'Schreibe den ersten Buchstaben.', label:`Anlaut schreiben: ${k} → ${k[0]}`}; }),
   W3: [() => wItem(wPick(LAUT_SHORT), {kern:true}), () => wItem(wPick(LAUT_SHORT)), () => wItem(wPick(LAUT_SHORT))],
-  W4: [() => wItem(wPick(LAUT_LONG), {kern:true}), () => wItem(wPick(LAUT_LONG)), () => wItem(wPick(LAUT_LONG))],
+  W4: [() => wItem(wPick(LAUT_LONG), {kern:true, syl:true, prompt:'Sprich in Silben. Schreibe Silbe für Silbe.'}), () => wItem(wPick(LAUT_LONG), {syl:true, prompt:'Sprich in Silben. Schreibe Silbe für Silbe.'}), () => wItem(wPick(LAUT_LONG), {syl:true, prompt:'Sprich in Silben. Schreibe Silbe für Silbe.'})],
   W5: [() => wItem(wPick(MERK), {kern:true, check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(wPick(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(wPick(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'})],
   W6: [() => wItem(wPick(W_POOLS.W6()), {kern:true, check:'exact', prompt:'Schreibe das Wort richtig – denk an den großen Anfangsbuchstaben.', label:'Nomen groß schreiben'}),
        () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1]; const s = [cap(art(n)), n, 'ist', ...(t + '.').split(' ')]; return {type:'sent', icon: n, words: s, tiles: shuffle(s.map((_, i) => i)), prompt:'Lege den Satz zum Bild.', label:`Satz legen: ${s.join(' ')}`}; },
        () => { const w2 = fresh(['Hose','Lampe','Gabel','Tasse','Jacke','Mütze','Blume','Kerze','Kiste','Leiter','Schere','Pizza','Banane','Tomate']); const right = `Die ${w2} ist neu.`; return mkChoice({layout:'col', icon: w2, prompt:'Welcher Satz ist richtig geschrieben?', label:`richtig geschriebener Satz (${w2})`}, [right, `die ${w2} ist neu.`, `Die ${w2.toLowerCase()} ist neu.`, `Die ${w2} Ist neu`].map(t => ({h:`<span class="rd-word" style="font-size:26px">${escHtml(t)}</span>`, a:t})), 0); }]
 };
+/* Nur beim Üben (nicht im Test): W4 Silbenkarten legen als Zwischenschritt (Backlog I, D2) */
+function sylCardItem(){
+  const k = wPick(LAUT_LONG), parts = sylOf(k), other = fresh(wPool(LAUT_LONG).filter(w => w !== k)), extra = sylOf(other).find(x => !parts.includes(x));
+  return {type:'write', icon:k, target:k, syl:true, sylT:true, tiles: shuffle([...parts, ...(extra ? [extra] : [])]), check:'exact', prompt:'Lege das Wort aus Silben.', label:`Silben legen: ${k}`, tip:'Noch nicht. Sprich das Wort langsam in Silben. Welche Silbe hörst du zuerst?'};
+}
+const WRITE_PRACTICE = {W4: [sylCardItem, sylCardItem]};
 /* Darstellung */
 function writeStage(it, r, opt = {}){
   r.text ??= ''; r.used ??= [];
@@ -5357,7 +5366,10 @@ function writeStage(it, r, opt = {}){
   let boxes;
   if(opt.feedback && !opt.feedback.ok && r.marks) boxes = `<div class="w-boxes" aria-label="Deine Antwort mit Markierung">${r.marks.ops.map(o => `<span class="w-box ${o.k}" aria-label="${o.k === 'ok' ? 'richtig' : o.k === 'miss' ? 'hier fehlt ein Buchstabe' : o.k === 'extra' ? 'zu viel' : 'falsch'}">${escHtml(o.c)}</span>`).join('')}</div>`;
   else if(r.slots){ const cur = r.slots.findIndex(x => !x.c); boxes = `<div class="w-boxes" aria-label="Verbessere das Wort">${r.slots.map((x, i) => `<span class="w-box ${x.fix ? 'fix' : ''} ${i === cur ? 'cur' : ''}">${escHtml(x.c)}</span>`).join('')}</div>`; }
-  else boxes = `<div class="w-boxes" aria-label="Deine Antwort">${Array.from({length: Math.max(n, r.text.length)}, (_, i) => `<span class="w-box ${i === r.text.length ? 'cur' : ''}">${escHtml(r.text[i] || '')}</span>`).join('')}</div>`;
+  else { const bx = Array.from({length: Math.max(n, r.text.length)}, (_, i) => `<span class="w-box ${i === r.text.length ? 'cur' : ''}">${escHtml(r.text[i] || '')}</span>`);
+    /* W4 (Backlog I, D2): Kästchen in Silben gruppiert, unter jeder Silbe ein Bogen */
+    if(it.syl && !it.max){ const parts = sylOf(it.target), g = []; let k = 0; parts.forEach((p, j) => { const end = j === parts.length - 1 ? bx.length : k + p.length; g.push(`<span class="w-sylg">${bx.slice(k, end).join('')}</span>`); k = end; }); boxes = `<div class="w-boxes syl" aria-label="Deine Antwort, Silbe für Silbe">${g.join('')}</div>`; }
+    else boxes = `<div class="w-boxes" aria-label="Deine Antwort">${bx.join('')}</div>`; }
   let kb;
   if(it.tiles) kb = `<div class="w-tiles">${it.tiles.map((ch, i) => `<button data-wtile="${i}" ${r.used.includes(i) ? 'disabled' : ''}>${escHtml(ch)}</button>`).join('')}<button data-wdel aria-label="Letzten Buchstaben löschen">⌫</button></div>`;
   else {
@@ -5381,6 +5393,7 @@ function writeClick(e, it, r){
   if(e.target.closest('[data-wmemo]')){ r.hidden = true; return true; }
   if(e.target.closest('[data-wpeek]')){ r.hidden = false; r.peek = (r.peek || 0) + 1; return true; }
   const t = e.target.closest('[data-wtile]'); if(t){ const i = +t.dataset.wtile; r.marks = null; r.used.push(i); r.text += it.tiles[i]; return true; }
+  if(it.sylT && e.target.closest('[data-wdel]')){ if(r.used?.length){ const i = r.used.pop(); r.text = r.text.slice(0, -it.tiles[i].length); } r.marks = null; return true; }
   const k = e.target.closest('[data-wkey]'); if(k){ wType(it, r, r.shift ? keyUp(k.dataset.wkey) : k.dataset.wkey); r.shift = false; return true; }
   if(e.target.closest('[data-wshift]')){ r.shift = !r.shift; return true; }
   if(e.target.closest('[data-wdel]')){ wDel(r); return true; }
@@ -7261,7 +7274,7 @@ function readNew(){
   const R = app.read; R.lvl ||= readDefaultLevel();
   const axBank = l => AXES[String(l)[0]]?.items[l];
   if(!READ[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl] && !Z_ITEMS[R.lvl] && !axBank(R.lvl)) R.lvl = 'L4';
-  const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl);
+  const bank = [...(READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl) || []), ...(WRITE_PRACTICE[R.lvl] || [])];
   const arts = bzArts(R.lvl), m = arts && bzMem(); if(m && !arts[m.art]) Object.assign(m, {art:0, ok:0});
   freshNew(); let it, tries = 0; do { it = arts ? arts[m.art][1](bzStep(m, arts[m.art])) : pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
   if(R.lvl === 'H1') it = hCover(it);
