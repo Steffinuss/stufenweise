@@ -5,6 +5,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+- noch nichts
+
+## 0.34.0 – 24.11.2026
+
 Neu (Backlog I „Optimierung Deutsch“, Stefans Antworten im Dokument vom 24.11.2026):
 - **Bilder beim Schreiben:** nur eindeutige Bilder (Üben, Test, Anfangsbuchstaben, Arbeitsblätter W2–W5); Tulpe, Rose und Kanne weggelassen. **Kenne ich nicht** beim Üben: Wort mit Bild zeigen, abdecken, aus dem Gedächtnis schreiben (zählt „mit Hilfe“); im Schreib-Test ein anderes Bild (höchstens zweimal je Stufe). Lernstand: „Bilder, die nicht erkannt wurden (Wortschatz)“. **Bilder vorher ansehen** (Knopf für die Lehrkraft): die Bilder der nächsten Runde mit Wort. **Bilder abwählen** für die Klasse (Einstellungen → Deutsch).
 - **Anhören (Sprachausgabe, zum Ausprobieren):** Lautsprecher-Knopf liest nur das Wort vor (Schreiben, Schreib-Test, Hören, Bildwörterbuch). Nur Stimmen auf dem Gerät, nichts übers Internet. Einstellungen → Deutsch: Standard für alle Kinder, je Kind abweichend, Stimme, Tempo, Probe.

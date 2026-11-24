@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 24.11.2026 (0.33.0)
+Stand: 24.11.2026 (0.34.0)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -18,7 +18,7 @@ Stand: 24.11.2026 (0.33.0)
 | 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
 | 6 | ~~**G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar (+ Heft zur Förderzone)~~ | klein | freigegeben in 0.32.0 (23.11.2026), siehe `CHANGELOG.md` |
 | 7 | ~~**H** Konzentrationsmodus für Kinder (+ Usability-Review)~~ | klein bis mittel | freigegeben in 0.33.0 (24.11.2026), siehe `CHANGELOG.md` |
-| 8 | **I** Optimierung Deutsch (Bilder beim Schreiben, Anhören, Ausbau) + Hundertertafel verdeckt | groß | gebaut in `entwicklung` (24.11.2026), Testversion, wartet auf Freigabe |
+| 8 | ~~**I** Optimierung Deutsch (Bilder beim Schreiben, Anhören, Ausbau) + Hundertertafel verdeckt, Mathe mit Material~~ | groß | freigegeben in 0.34.0 (24.11.2026), siehe `CHANGELOG.md` |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -26,7 +26,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## I: Optimierung Fach Deutsch
 
-**Status:** gebaut in `entwicklung` (24.11.2026), Testversion; wartet auf Stefans Freigabe. Dokument „Stufenweise – Optimierung Deutsch“ (claude.ai/artifact/UWNJUi6e6cFP7h7W7ugtdx).
+**Status:** erledigt, freigegeben in 0.34.0 (24.11.2026). Dokument „Stufenweise – Optimierung Deutsch“ (claude.ai/artifact/UWNJUi6e6cFP7h7W7ugtdx).
 **Anlass (Stefan, 24.11.):** In Deutsch ist deutlich weniger als in Mathe. Beim Schreiben müssen Kinder Wörter schreiben, ohne sie zu kennen; manchmal erkennen sie die Bilder nicht. „Vielleicht wäre an dieser Stelle doch eine Sprachausgabe als Hilfe gut.“
 
 **Befund (gezählt in 0.33.0):**
