@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 23.11.2026 (0.32.0)
+Stand: 24.11.2026 (0.33.0)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -17,7 +17,7 @@ Stand: 23.11.2026 (0.32.0)
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
 | 6 | ~~**G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar (+ Heft zur Förderzone)~~ | klein | freigegeben in 0.32.0 (23.11.2026), siehe `CHANGELOG.md` |
-| 7 | **H** Konzentrationsmodus für Kinder (+ Usability-Review) | klein bis mittel | gebaut in `entwicklung` (24.11.2026), wartet auf Stefans OK in der Testversion |
+| 7 | ~~**H** Konzentrationsmodus für Kinder (+ Usability-Review)~~ | klein bis mittel | freigegeben in 0.33.0 (24.11.2026), siehe `CHANGELOG.md` |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -25,7 +25,7 @@ Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test auspr
 
 ## H: Konzentrationsmodus für Kinder
 
-**Status:** gebaut in `entwicklung` (24.11.2026), Testversion; wartet auf Stefans OK.
+**Status:** erledigt, freigegeben in 0.33.0 (24.11.2026).
 **Anlass (Stefan, 24.11.):** Beim Wechselgeld ist der Bildschirm sehr voll. Idee: eine Art „Fullscreen-Modus“, damit sich Kinder nur auf die Aufgabe konzentrieren.
 **Befund (Usability-Review 24.11., Dokument „Stufenweise – Usability-Review“, claude.ai/artifact/AdqPQacwdjd3vDwH9zfaQx):** Wechselgeld auf dem iPad: 30 Knöpfe sichtbar, 7 gehören zur Aufgabe; vier Anweisungen gleichzeitig; Rechnung „10 € − 7 €“ zum Auftrag „Ergänze“.
 **Vorschlag:** Bereichsleiste, Einstellleiste, Name und Menü ausblenden; ein Satz Auftrag, Tipp erst nach Fehlversuch; Fortschritt groß („3 von 10“); Knopf „Pause“ zurück zu „Heute für dich“; Einstellung wie „Geführte Oberfläche“ (alle oder einzelne Kinder), Lehrkraft mit PIN. Bausteine vorhanden (Leiste ausblenden, abgedunkelte Leiste im Test, PIN, Runden).
