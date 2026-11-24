@@ -722,7 +722,13 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 /* Schreiben */
 .w-wrap{gap:12px}
 .w-boxes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.w-boxes.syl{gap:18px}.w-sylg{display:flex;gap:6px;padding-bottom:16px;position:relative}
+.w-boxes.syl{gap:18px}
+.w-free{min-width:min(640px,90%);min-height:64px;border-bottom:4px solid var(--dark);font-size:clamp(28px,4vw,40px);font-weight:700;font-family:Stufenfibel,Verdana,Arial,sans-serif;background:#fff;border-radius:8px 8px 0 0;padding:6px 14px;white-space:pre-wrap;text-align:left}
+.w-caret{display:inline-block;width:3px;height:1em;background:#e8962e;vertical-align:-.1em;margin-left:2px}
+.w-extra{display:flex;gap:6px;justify-content:center;margin-top:-8px}.w-extra button{min-height:48px;min-width:56px;padding:0 14px;font-size:24px;font-weight:700}.w-extra .space{min-width:280px;font-size:16px}
+.w-shop{position:absolute;left:12px;top:12px;background:#fffdf3;border:1.5px solid #ddd4c3;border-radius:10px;padding:8px 12px;min-width:170px;box-shadow:0 2px 6px #0001;font-size:18px}
+.w-shop b{display:block;margin-bottom:4px;font-size:15px;color:var(--muted)}.w-shop-r{display:flex;align-items:center;gap:8px;border-bottom:1px dashed #cfc6b4;padding:2px 0;font-weight:700;font-family:Stufenfibel,Verdana,sans-serif}.w-shop-r.now{background:#fff2db}
+.w-shopw{position:relative}.w-sylg{display:flex;gap:6px;padding-bottom:16px;position:relative}
 .w-sylg::after{content:'';position:absolute;left:8%;right:8%;bottom:0;height:12px;border:3px solid #346bc3;border-top:none;border-radius:0 0 60px 60px/0 0 14px 14px}
 .w-sylg:nth-child(even)::after{border-color:#c9414a}
 .w-box{width:52px;height:64px;border-bottom:4px solid var(--dark);display:flex;align-items:flex-end;justify-content:center;font-size:44px;font-weight:700;font-family:Stufenfibel,Verdana,Arial,sans-serif;background:#fff;border-radius:8px 8px 0 0}
@@ -5407,7 +5413,18 @@ function sylCardItem(){
   const k = wPick(LAUT_LONG), parts = sylOf(k), other = fresh(wPool(LAUT_LONG).filter(w => w !== k)), extra = sylOf(other).find(x => !parts.includes(x));
   return {type:'write', icon:k, target:k, syl:true, sylT:true, tiles: shuffle([...parts, ...(extra ? [extra] : [])]), check:'exact', prompt:'Lege das Wort aus Silben.', label:`Silben legen: ${k}`, tip:'Noch nicht. Sprich das Wort langsam in Silben. Welche Silbe hörst du zuerst?'};
 }
-const WRITE_PRACTICE = {W4: [sylCardItem, sylCardItem]};
+/* W6 nur beim Üben: Schreiben im Alltag (Backlog I, D5) – Einkaufszettel und ein eigener Satz zum Bild */
+const SHOP = ['Banane', 'Milch', 'Brot', 'Käse', 'Salat', 'Gurke', 'Tomate', 'Pizza', 'Apfel', 'Ananas', 'Seife'];
+function shopItem(){
+  const R = app.read, S = R.shop && R.shop.list.length > R.shop.done.length ? R.shop : (R.shop = {list: freshN(wPool(SHOP), 3), done: []});
+  const k = S.list[S.done.length];
+  return wItem(k, {shop:S, prompt:'Schreibe den Einkaufszettel.', label:`Einkaufszettel: ${k}`, tip:'Noch nicht. Sprich das Wort langsam mit.'});
+}
+function satzItem(){
+  const k = wPick(W_POOLS.W6());
+  return {type:'write', icon:k, target:k, check:'satz', free:true, prompt:'Schreibe einen Satz zum Bild. Denk an den großen Anfang und den Punkt.', label:`eigener Satz: ${k}`};
+}
+const WRITE_PRACTICE = {W4: [sylCardItem, sylCardItem], W6: [shopItem, shopItem, satzItem]};
 /* Darstellung */
 function writeStage(it, r, opt = {}){
   r.text ??= ''; r.used ??= [];
@@ -5419,7 +5436,10 @@ function writeStage(it, r, opt = {}){
      Wer weiterschreibt, sieht die zusätzlichen Buchstaben trotzdem. */
   const n = it.max || Math.max(it.target.length, r.text.length);
   let boxes;
-  if(opt.feedback && !opt.feedback.ok && r.marks) boxes = `<div class="w-boxes" aria-label="Deine Antwort mit Markierung">${r.marks.ops.map(o => `<span class="w-box ${o.k}" aria-label="${o.k === 'ok' ? 'richtig' : o.k === 'miss' ? 'hier fehlt ein Buchstabe' : o.k === 'extra' ? 'zu viel' : 'falsch'}">${escHtml(o.c)}</span>`).join('')}</div>`;
+  if(it.free){ boxes = `<div class="w-free" aria-label="Dein Satz">${escHtml(r.text)}<span class="w-caret"></span></div>`; }
+  const shopHtml = it.shop ? (S => { const i = S.list.indexOf(it.target); return `<div class="w-shop"><b>Einkaufszettel</b>${S.list.map((w, j) => `<div class="w-shop-r${j === i ? ' now' : ''}">${iconSvg(w, 40)}<span>${j < i || S.done.includes(w) ? escHtml(w) : j === i ? '✎' : '…'}</span></div>`).join('')}</div>`; })(it.shop) : '';
+  if(boxes);
+  else if(opt.feedback && !opt.feedback.ok && r.marks) boxes = `<div class="w-boxes" aria-label="Deine Antwort mit Markierung">${r.marks.ops.map(o => `<span class="w-box ${o.k}" aria-label="${o.k === 'ok' ? 'richtig' : o.k === 'miss' ? 'hier fehlt ein Buchstabe' : o.k === 'extra' ? 'zu viel' : 'falsch'}">${escHtml(o.c)}</span>`).join('')}</div>`;
   else if(r.slots){ const cur = r.slots.findIndex(x => !x.c); boxes = `<div class="w-boxes" aria-label="Verbessere das Wort">${r.slots.map((x, i) => `<span class="w-box ${x.fix ? 'fix' : ''} ${i === cur ? 'cur' : ''}">${escHtml(x.c)}</span>`).join('')}</div>`; }
   else { const bx = Array.from({length: Math.max(n, r.text.length)}, (_, i) => `<span class="w-box ${i === r.text.length ? 'cur' : ''}">${escHtml(r.text[i] || '')}</span>`);
     /* W4 (Backlog I, D2): Kästchen in Silben gruppiert, unter jeder Silbe ein Bogen */
@@ -5431,8 +5451,9 @@ function writeStage(it, r, opt = {}){
     const key = k => `<button data-wkey="${k}">${r.shift ? keyUp(k) : k}</button>`, shift = `<button data-wshift aria-pressed="${!!r.shift}" class="wide">⇧ groß</button>`, del = `<button data-wdel class="wide" aria-label="Löschen">⌫</button>`;
     kb = settings.kbd === 'abc' ? `<div class="w-keys">${KEYS.map(key).join('')}${shift}${del}</div>`
       : `<div class="w-keys qwertz">${[...QWERTZ[0]].map(key).join('')}<span class="off"></span><span class="off"></span>${[...QWERTZ[1]].map(key).join('')}${shift}${[...QWERTZ[2]].map(key).join('')}${del}</div>`;
+    if(it.free) kb += `<div class="w-extra"><button data-wkey=" " class="wide space" aria-label="Leertaste">Leertaste</button><button data-wkey="." aria-label="Punkt">.</button><button data-wkey="?" aria-label="Fragezeichen">?</button><button data-wkey="!" aria-label="Ausrufezeichen">!</button></div>`;
   }
-  return `<div class="it-wrap w-wrap">${head}${boxes}${kb}</div>`;
+  return `<div class="it-wrap w-wrap${it.shop ? ' w-shopw' : ''}">${shopHtml}${head}${boxes}${kb}</div>`;
 }
 function sentStage(it, r){
   r.order ??= [];
@@ -5457,7 +5478,7 @@ function writeClick(e, it, r){
 function writeKey(e, it, r){
   if(!it || (it.type !== 'write' && it.type !== 'sent')) return false;
   if(e.key === 'Backspace'){ if(it.type === 'sent') r.order?.pop(); else { r.text ??= ''; wDel(r); } return true; }
-  if(it.type === 'write' && e.key.length === 1 && /[a-zäöüß]/i.test(e.key)){
+  if(it.type === 'write' && e.key.length === 1 && (/[a-zäöüß]/i.test(e.key) || (it.free && /[ .?!]/.test(e.key)))){
     if(it.tiles){ const i = it.tiles.findIndex((ch, j) => ch === e.key && !(r.used ??= []).includes(j)) ; const i2 = i >= 0 ? i : it.tiles.findIndex((ch, j) => ch.toLowerCase() === e.key.toLowerCase() && !r.used.includes(j)); if(i2 < 0) return false; r.used.push(i2); r.text = (r.text || '') + it.tiles[i2]; return true; }
     if(it.max && (r.text || '').length >= it.max) return false; r.text ??= ''; wType(it, r, e.key); return true;
   }
@@ -5467,6 +5488,16 @@ function evalWrite(it, r){
   if(it.type === 'sent'){ if((r.order || []).length < it.words.length) return null; const ok = r.order.every((v, i) => it.words[v] === it.words[i]); return {ok, given: r.order.map(i => it.words[i]).join(' '), obs: ok ? [] : ['Satzbau unvollständig oder vertauscht']}; }
   if(r.slots && r.slots.some(x => !x.c)) return null;
   const a = (r.text || '').trim(); if(!a) return null;
+  if(it.check === 'satz'){ /* eigener Satz: großer Anfang, Punkt (oder ! ?), mindestens 3 Wörter, das Wort zum Bild (lautgetreu genügt) */
+    const ws = a.replace(/[.!?]+$/, '').split(/\s+/).filter(Boolean), obs = [];
+    if(!/^[A-ZÄÖÜ]/.test(a)) obs.push('Satzanfang klein');
+    if(!/[.!?]$/.test(a)) obs.push('Punkt fehlt');
+    if(ws.length < 3) obs.push('zu kurz');
+    const nw = ws.find(w => lautNorm(w) === lautNorm(it.target));
+    if(!nw) obs.push('Wort zum Bild fehlt'); else if(!/^[A-ZÄÖÜ]/.test(nw)) obs.push('Nomen klein');
+    it.tipNow = obs.includes('Wort zum Bild fehlt') ? `Noch nicht. Schreibe in deinem Satz, was auf dem Bild ist.` : obs.includes('zu kurz') ? 'Noch nicht. Schreibe einen ganzen Satz mit mindestens drei Wörtern.' : obs.includes('Satzanfang klein') ? 'Fast! Der Satz fängt mit einem großen Buchstaben an.' : obs.includes('Nomen klein') ? `Fast! „${nw}“ ist ein Ding. Dinge schreibt man groß.` : obs.includes('Punkt fehlt') ? 'Fast! Am Ende vom Satz steht ein Punkt.' : '';
+    return {ok: !obs.length, given: a, obs};
+  }
   const exact = a === it.target, ci = a.toLowerCase() === it.target.toLowerCase(), laut = lautNorm(a) === lautNorm(it.target);
   const ok = it.check === 'exact' ? exact : it.check === 'ci' ? ci : (ci || laut);
   const obs = [];
@@ -7384,7 +7415,7 @@ function renderRead(){
     bzAfter(); glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it && !R.demo, renderRead); return; }
   const up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn() && !roundOn(), down = R.miss >= 3 && li > 0;
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : (it.type === 'board' && it.mode === 'fill') || it.type === 'input' ? false : !evalItem(it, R.r, [])})) +
-    (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '') +
+    (R.fb && !R.fb.ok && R.tries >= 2 && it.check !== 'satz' ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '') +
     (wUnkOk(it) && !R.fb?.ok ? toolBtn({id:'r-unk', ic:'help', label:'Kenne ich nicht'}) : '') +
     (W_POOLS[R.lvl] && !document.body.classList.contains('fokus') ? '<span class="sep"></span>' + toolBtn({id:'r-pics', ic:'eye', label:'Bilder vorher ansehen'}) : '');
   itFit();
@@ -7401,6 +7432,7 @@ function readCheck(){
   if(BZ_TYPES.includes(it.type)) R.r.mark = res.ok ? null : res.mark;
   R.fb = {choice: R.r.choice, ok: res.ok};
   if(R.lvl === 'H1') hcovTrack(res.ok, R.tries === 0);
+  if(res.ok && it.shop && !it.shop.done.includes(it.target)) it.shop.done.push(it.target);
   const bzm = bzArts(R.lvl) && bzMem(), bzArt = bzm && bzArts(R.lvl)[bzm.art];
   if(bzm){ if(res.ok && R.tries === 0) bzm.ok++; else if(!res.ok && R.tries === 0 && (R.miss || 0) >= 2) bzm.ok = Math.max(0, Math.min(bzm.ok, bzTop(bzArt)) - 3); /* dreimal daneben: wieder leichter */ }
   if(res.ok){
@@ -7410,13 +7442,13 @@ function readCheck(){
     celebrate(document.querySelector('#stage .fb-ok'));
   } else {
     if(R.tries === 0){ R.miss = (R.miss || 0) + 1; R.streak = 0; }
-    if(it.type === 'write' && !it.max){ R.r.marks = wDiff(res.given, it.target, it.check !== 'exact'); if(it.tiles) R.r.marks.slots = null; if(R.r.marks.okN < Math.ceil([...it.target].length / 2)) R.r.marks = null; R.r.slots = null; }
+    if(it.type === 'write' && !it.max && it.check !== 'satz'){ R.r.marks = wDiff(res.given, it.target, it.check !== 'exact'); if(it.tiles) R.r.marks.slots = null; if(R.r.marks.okN < Math.ceil([...it.target].length / 2)) R.r.marks = null; R.r.slots = null; }
     R.tries++; renderRead();
     const lautOk = it.type === 'write' && res.obs.some(o => o.startsWith('lautgetreu'));
     if(it.type === 'clockset') return setHint(res.obs.includes('Stunde falsch') ? 'Die Minuten stimmen. Schau auf den kurzen roten Zeiger.' : 'Noch nicht. Langer blauer Zeiger = Minuten, kurzer roter Zeiger = Stunden.', 'bad');
     const mk = R.r.marks, caseOnly = it.type === 'write' && res.obs.includes('Groß-/Kleinschreibung'), wHint = !mk ? '' : mk.slots ? ' Die grünen Buchstaben stimmen. Verbessere die roten Kästchen.' : it.tiles ? ' Die grünen Buchstaben stehen schon richtig.' : mk.ops.some(o => o.k === 'extra') ? ' Die durchgestrichenen Buchstaben sind zu viel.' : ' Die grünen Buchstaben stimmen schon.';
     if(caseOnly) return setHint('Fast! Achte auf groß und klein.' + wHint, 'bad');
-    setHint(lautOk ? 'Gut gehört! So spricht man es. Geschrieben wird es aber anders – schau genau.' + wHint : it.type === 'write' ? (it.tip || 'Noch nicht. Sprich das Wort langsam mit.') + wHint : it.type === 'sent' ? 'Noch nicht. Der Satz fängt groß an und endet mit Punkt.' : (it.tip || 'Noch nicht. Schau noch einmal genau.'), 'bad');
+    setHint(lautOk ? 'Gut gehört! So spricht man es. Geschrieben wird es aber anders – schau genau.' + wHint : it.type === 'write' ? (it.tipNow || it.tip || 'Noch nicht. Sprich das Wort langsam mit.') + wHint : it.type === 'sent' ? 'Noch nicht. Der Satz fängt groß an und endet mit Punkt.' : (it.tip || 'Noch nicht. Schau noch einmal genau.'), 'bad');
   }
 }
 function readControl(btn){
