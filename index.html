@@ -377,6 +377,17 @@ body.screening .toolbar{visibility:hidden}
 .dg-stage:has(.it-more)::after{content:'↓ Weiter unten';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;font-weight:700;font-size:15px;padding:5px 14px;border-radius:999px;pointer-events:none;z-index:3}
 .it-svg{width:100%;display:flex;justify-content:center}.it-svg>svg{max-width:100%;max-height:300px}
 .it-icon svg{display:block;filter:drop-shadow(0 2px 3px #0002)}
+.it-icon:has(.say-btn){position:relative}.it-icon svg+.say-btn{position:absolute;left:100%;top:50%;transform:translate(16px,-50%)}
+.say-btn{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;border:2px solid #346bc3;background:#fff;color:#346bc3;cursor:pointer;flex:none;box-shadow:0 2px 6px #0001}
+.say-btn>svg{filter:none;width:30px!important;height:30px!important;max-width:none!important}.say-btn:active{background:#e6eefb}
+.say-btn.big{width:72px;height:72px}
+.wpre{max-width:900px;margin:0 auto;text-align:center}.wpre-h{font-size:19px;margin:4px 0 14px}
+.wpre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
+.wpre-grid figure{margin:0;background:#fff;border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 1px 4px #0001}
+.wpre-grid figcaption{font-size:24px;font-weight:700}.wpre-grid .say-btn{width:44px;height:44px}.wpre-grid .say-btn>svg{width:22px!important;height:22px!important}
+.whide{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:6px}
+.whide-it{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:10px;background:#fff;border:1.5px solid #ddd4c3;font-size:15px}
+.whide-it.off{opacity:.45;background:#f3efe6}.whide-it svg{flex:none}
 .it-word{font-size:clamp(44px,7vw,72px);font-weight:700;letter-spacing:.04em;background:#fff;border-radius:18px;padding:6px 34px;box-shadow:var(--shadow)}
 .it-text .it-in{width:2.6em;font:inherit;font-weight:700;text-align:center;padding:0 .1em;margin:0 .05em;height:1.35em;border:3px dashed #cfc6b4;border-radius:12px;background:#fdfbf6;color:var(--ink);vertical-align:middle;position:relative;top:-.15em}
 .it-text .it-in:focus{border-style:solid;border-color:var(--focus);outline:none;background:#fff}
@@ -1139,6 +1150,18 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
       <textarea data-key="ownWords" rows="4" placeholder="Ali, Selin, Praktikum, Schraube, Montag" style="width:100%;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:1.5px solid #ddd4c3;margin-top:6px"></textarea></label>
     <p class="note">Die Wörter erscheinen unter „Lesen → Meine Wörter“, „Schreiben → Meine Wörter“ und als Arbeitsblatt. Sie werden nicht für Tests verwendet.</p>
   </fieldset>
+  <fieldset><legend>Anhören (Sprachausgabe)</legend>
+    <p class="note">Neben dem Bild erscheint ein Knopf „Anhören“. Er liest nur das Wort vor: beim Schreiben, im Schreib-Test und beim Hören. Die App nutzt nur deutsche Stimmen, die auf diesem Gerät liegen; nichts geht ins Internet. Gibt es keine solche Stimme, erscheint kein Knopf.</p>
+    <label class="row">Standard für alle Kinder <select data-key="anhoeren"><option value="off">aus</option><option value="on">an</option></select></label>
+    <div id="say-list"></div>
+    <label class="row">Stimme <select data-key="voice" id="voice-select"></select></label>
+    <label class="row">Tempo <select data-key="rate"><option value="0.7">langsam</option><option value="0.85">etwas langsam</option><option value="1">normal</option></select></label>
+    <div class="row" style="justify-content:flex-start;gap:8px"><button type="button" class="icon-btn" id="say-test">Probe: „Tomate“</button><span class="note" id="say-state"></span></div>
+  </fieldset>
+  <fieldset><legend>Bilder beim Schreiben</legend>
+    <p class="note">Beim Schreiben nach Bild kommen nur eindeutige Bilder vor. Bilder, die deine Klasse nicht kennt, hier abwählen: Sie kommen dann beim Schreiben, bei den Anfangsbuchstaben und auf diesen Arbeitsblättern nicht mehr vor.</p>
+    <div id="whide-list" class="whide"></div>
+  </fieldset>
   </div>
   <div class="set-panel" data-stab-panel="kids" role="tabpanel" hidden>
   <fieldset><legend>Konzentrationsmodus</legend>
@@ -1236,12 +1259,13 @@ const FREE_COLORS = ['#c9414a','#346bc3','#27834b','#bd7618','#8054ad','#b0477c'
 const FREE_COLOR_NAMES = ['Rot','Blau','Grün','Orange','Lila','Pink'];
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate;
 
-const DEFAULTS = {fokus:'on', fbMail:'', qrSmall:false, allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.9', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', askWho:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
+const DEFAULTS = {fokus:'on', fbMail:'', qrSmall:false, allowResults:false, digits:true, numberWords:true, colors:'montessori', words:'exchange', exchangeMode:'select', subMode:'self', zones:true, help:true, speech:false, anhoeren:'off', wHide:[], labels:true, ten:'any', hundred:'any', lock:false, timesRows:[2,5,10], wrMaterial:true, voice:'', rate:'0.85', subject:'M', lastMath:'number', numpad:'auto', world:'HS', clockMin:'5', kbd:'qwertz', roundLen:'10', startCtx:'ask', askWho:'ask', ownWords:'', guide:'plus', fbOn:true, fbName:''};
 const STORE = 'stufenweise.settings';
 /* Übernahme aus dem alten Arbeitstitel: vorhandene Daten einmalig in die neuen Schlüssel kopieren */
 try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], ['stufenweise.data', 'zahlenraum-werkstatt.data']]){ if(localStorage.getItem(n) == null && localStorage.getItem(o) != null){ localStorage.setItem(n, localStorage.getItem(o)); localStorage.removeItem(o); } } } catch {}
 const settings = (() => { try { const st = JSON.parse(localStorage.getItem(STORE) || '{}'); if(!st.v3){ delete st.colors; st.v3 = true; } if(!st.v4){ delete st.speech; st.v4 = true; } if(!st.v5){ if(String(st.fbMail || '').includes('posteo.de')) st.fbMail = ''; st.v5 = true; } return {...DEFAULTS, ...st}; } catch { return {...DEFAULTS}; } })();
 settings.v3 = true; settings.v4 = true;
+if(!['0.7', '0.85', '1'].includes(String(settings.rate))) settings.rate = '0.85';
 const saveSettings = () => { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {} };
 
 /* ---------- Icons ---------- */
@@ -1342,9 +1366,9 @@ function toSpeech(text){
   s = s.replace(/\d+/g, m => spokenNumber(+m));
   return s.replace(/\s+([.,!?:])/g, '$1').replace(/([?!])\./g, '$1').replace(/\.{2,}/g, '.').replace(/\s+/g, ' ').trim();
 }
+/* Backlog I: nur Stimmen, die auf dem Gerät liegen (localService) – Online-Stimmen würden den Text ins Internet schicken */
 function germanVoices(){
-  if(!('speechSynthesis' in window)) return [];
-  return speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith('de'));
+  try { if(!('speechSynthesis' in window)) return []; return speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith('de') && v.localService); } catch { return []; }
 }
 function bestVoice(){
   const vs = germanVoices(); if(!vs.length) return null;
@@ -1352,7 +1376,18 @@ function bestVoice(){
   const score = v => (/natural|neural|online/i.test(v.name) ? 50 : 0) + (/google/i.test(v.name) ? 30 : 0) + (/premium|enhanced|erweitert/i.test(v.name) ? 40 : 0) + (/anna|petra|helena|katja|seraphina|vicki/i.test(v.name) ? 10 : 0) + (v.lang === 'de-DE' ? 5 : 0) - (/espeak|compact/i.test(v.name) ? 60 : 0);
   return [...vs].sort((a, b) => score(b) - score(a))[0];
 }
-function speak(){ /* Sprachausgabe bewusst entfernt (Qualität der Gerätestimmen reicht nicht) */ }
+function speak(){ /* Rückmeldungen werden nicht vorgelesen (Qualität der Gerätestimmen; keine Spielmechanik) */ }
+/* „Anhören“ (Backlog I, Stefan 24.11.: Gerätestimme ausprobieren): ein Knopf liest nur das Wort vor – beim Schreiben, im Test, beim Hören.
+   Einschalten: Einstellungen → Deutsch (Standard für alle Kinder, je Kind abweichend). Ohne deutsche Stimme auf dem Gerät kein Knopf. */
+const sayWanted = () => { const p = curProfile(); return p?.say ? p.say === 'on' : settings.anhoeren === 'on'; };
+const sayOn = () => sayWanted() && !!bestVoice();
+function sayWord(w){
+  try { const v = bestVoice(); if(!v || !w) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(String(w)); u.voice = v; u.lang = v.lang; u.rate = Math.min(1.2, Math.max(0.5, +settings.rate || 0.85)); speechSynthesis.speak(u); } catch {}
+}
+const SAY_ICON = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const speechBtn = (w, big) => w && sayOn() ? `<button type="button" class="say-btn${big ? ' big' : ''}" data-sayw="${escHtml(w)}" aria-label="Anhören" title="Anhören">${SAY_ICON}</button>` : '';
+document.addEventListener('click', e => { const b = e.target.closest('[data-sayw]'); if(!b) return; e.stopPropagation(); e.preventDefault(); sayWord(b.dataset.sayw); }, true);
+try { if('speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged', () => { if(sayWanted() && ['read', 'diag'].includes(app.mode) && !document.querySelector('[data-sayw]')) render(); }); } catch {}
 
 /* ---------- Material-Modell ---------- */
 let uid = 0;
@@ -3578,7 +3613,7 @@ function logSkip(){
   if(app.ctx === 'class' || app.kiste) return;
   const label = currentTaskLabel(); if(!label) return;
   const id = data.current || 'guest', list = (data.skips ??= {})[id] ??= [];
-  list.push({ts: Date.now(), mode: app.mode === 'read' ? rdMode(app.read.lvl) : app.mode, lvl: app.mode === 'read' ? app.read.lvl : undefined, task: label});
+  list.push({ts: Date.now(), mode: app.mode === 'read' ? rdMode(app.read.lvl) : app.mode, lvl: app.mode === 'read' ? app.read.lvl : undefined, task: label, ...(app.mode === 'read' && app.read.item?.unkWord ? {unk: app.read.item.unkWord} : {})});
   if(list.length > 500) list.splice(0, list.length - 500);
   saveData();
 }
@@ -4143,7 +4178,7 @@ function statsSections(id){
     }
     if(mode === 'write'){
       for(const l of W_LEVELS){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${W_INFO[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
-      const laut = E.filter(e => !e.ok && e.given).slice(-6).map(e => `${e.task.replace(/^.*: /, '')} → „${e.given}“`); if(laut.length) lines.push(`Schreibungen zum Ansehen: ${laut.join(', ')}`);
+      const laut = E.filter(e => !e.ok && e.given && !e.unk).slice(-6).map(e => `${e.task.replace(/^.*: /, '')} → „${e.given}“`); if(laut.length) lines.push(`Schreibungen zum Ansehen: ${laut.join(', ')}`);
     }
     if(mode === 'read'){
       for(const l of L_LEVELS){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${L_INFO[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
@@ -4169,7 +4204,8 @@ function statsSections(id){
     const tot = {}; for(const o of Object.values(errs)) for(const [k, n] of Object.entries(o)) tot[k] = (tot[k] || 0) + n;
     const tips = Object.entries(tot).filter(([k, n]) => ERR_MAT[k] && n >= 3).sort((a, b) => b[1] - a[1]).map(([k]) => `${ERR_NAME[k]}: ${ERR_MAT[k]}`);
     if(tips.length) out.push({title:'Nächster Schritt am Material', lines: tips}); }
-  const kl = kisteLine(id); if(kl) out.push({title:KISTE_TITLE, lines:[kl]});   /* nur Lernstand (und Kopieren), nicht in der Elterninfo (Stefan 20.11.) */
+  const kl = kisteLine(id); if(kl) out.push({title:KISTE_TITLE, lines:[kl]});
+  const uw = unkWords(id); if(uw.length) out.push({title:'Bilder, die nicht erkannt wurden (Wortschatz)', lines:[uw.slice(0, 30).join(', '), 'Diese Wörter mit echten Gegenständen und Bildkarten üben. Bilder, die die Klasse nicht kennt, lassen sich in den Einstellungen unter „Deutsch“ abwählen.']});   /* nur Lernstand (und Kopieren), nicht in der Elterninfo (Stefan 20.11.) */
   /* Übersprungen: ohne Lösung weitergeklickt (für die Lehrkraft – zeigt, wo ein Kind ausweicht) */
   const sk = data.skips?.[id] || [];
   if(sk.length){
@@ -4653,6 +4689,33 @@ const LAUT_SHORT_READ = ['Bus','Rad','Mond','Limo','Sofa','Hose','Lupe','Dose','
 const LAUT_LONG = ['Tomate','Banane','Kamera','Radio','Gabel','Pinsel','Lampe','Blume','Zange','Wolke','Nagel','Apfel','Rakete','Salat','Tulpe','Palme','Kamel','Nudel','Ananas','Lineal','Ampel','Paket','Besen','Melone'];
 const MERK = ['Tasse','Sonne','Kasse','Hammer','Messer','Tonne','Ball','Mütze','Jacke','Pizza','Kanne','Kissen','Decke','Socke','Glocke','Puppe','Katze','Brille','Löffel','Pfanne','Bett','Kamm','Rock','Schnecke']; /* echte Merkstellen: doppelte Mitlaute, ck, tz */
 const INITIAL = {};
+/* Schreiben nach Bild (Backlog I): nur eindeutige Bilder. Tulpe und Rose (→ „Blume“) und Kanne (→ „Tasse“) nicht.
+   Die Lehrkraft kann Bilder für die Klasse abwählen (settings.wHide). Bleiben weniger als 3, gelten die Abwahlen nicht. */
+const W_AMBIG = ['Tulpe', 'Rose', 'Kanne'];
+const wHidden = () => new Set(Array.isArray(settings.wHide) ? settings.wHide : []);
+const wClear = w => !!ICON[w] && CLEAR.includes(w) && !W_AMBIG.includes(w);
+function wPool(list){ const h = wHidden(), a = list.filter(w => wClear(w) && !h.has(w)); return a.length >= 3 ? a : list.filter(wClear); }
+/* „Bilder vorher ansehen“: die Wörter der Runde stehen in app.read.wq und kommen dann der Reihe nach dran (nur beim Üben) */
+function wPick(list){ const pool = wPool(list), q = app.mode === 'read' ? app.read?.wq : null; if(q?.length){ const i = q.findIndex(w => pool.includes(w)); if(i >= 0) return q.splice(i, 1)[0]; } return fresh(pool); }
+const W_POOLS = {W2: () => Object.values(INITIAL).flat(), W3: () => LAUT_SHORT, W4: () => LAUT_LONG, W5: () => MERK, W6: () => [...LAUT_SHORT, ...LAUT_LONG]};
+/* „Kenne ich nicht“: nur bei Schreibaufgaben nach Bild (Wort nicht zu sehen) */
+const wUnkOk = it => !!it && it.type === 'write' && !!it.icon && !it.word && !it.unkWord && !it.tiles;
+/* Bilder, die ein Kind nicht kannte (aus Übungen, Überspringen und Test): Wortschatzliste für die Lehrkraft */
+function unkWords(pid){
+  const n = {}; for(const e of [...(data.log[pid] || []), ...(data.skips?.[pid] || [])]) if(e.unk) for(const w of String(e.unk).split('|')) n[w] = (n[w] || 0) + 1;
+  return Object.entries(n).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de')).map(([w, k]) => k > 1 ? `${w} (${k}×)` : w);
+}
+/* Bilder vorher ansehen: die Wörter der nächsten Runde mit Bild und Silbenbögen zeigen (Knopf für die Lehrkraft) */
+function wPreviewStart(){
+  const R = app.read, f = W_POOLS[R.lvl]; if(!f) return;
+  const n = roundOn() ? roundLen() : 8, pool = wPool(f()), ws = [];
+  freshNew(); for(let i = 0; i < n && ws.length < pool.length; i++){ const w = fresh(pool.filter(x => !ws.includes(x))); ws.push(w); }
+  R.wq = [...ws]; R.wpre = ws; setHint(''); renderRead();
+}
+function wPreviewHtml(ws){
+  return `<div class="wpre"><p class="wpre-h">Diese Bilder kommen gleich. Schaut sie zusammen an und sprecht die Wörter.</p><div class="wpre-grid">${ws.map(w => `<figure>${iconSvg(w, 84)}<figcaption class="bows">${sylSpans(sylOf(w))}</figcaption>${speechBtn(w)}</figure>`).join('')}</div></div>`;
+}
+const wAllPics = () => [...new Set(Object.values(W_POOLS).flatMap(f => f()))].filter(wClear).sort((a, b) => a.localeCompare(b, 'de'));
 for(const w of CLEAR) if(ICON[w] && !/^(Sch|Ei|Au|Eu|St|Sp|Pf|Ch|Qu|V)/.test(w)) (INITIAL[w[0]] ??= []).push(w);   /* St/Sp klingen wie Scht/Schp, Pf ist ein Doppellaut */
 /* Abwechslung: Wörter wiederholen sich nicht, solange es andere gibt */
 const FRESH = {used:new Set(), recent:[]};
@@ -4738,7 +4801,7 @@ const signEasy = kern => { const t = fresh(['STOP','WC','BUS','ZUG','EIS','PIZZA
 const signHard = () => { const t = fresh(Object.keys(SIGN_SIMILAR)); return signItem(false, t, shuffle(SIGN_SIMILAR[t]).slice(0, 2)); };
 /* L3: Buchstaben */
 function anlautItem(kern){
-  const k = fresh(Object.values(INITIAL).flat()), L = k[0];
+  const k = fresh(wPool(W_POOLS.W2())), L = k[0];
   return choiceRow({kern, icon:k, prompt:'Mit welchem Buchstaben fängt das Wort an?', label:`Anlaut ${k} → ${L}`, L}, [L, ...others(['A','M','S','T','L','R','H','B','K','O','E','F','N','P','G','Z','D','W'], [L], 2)].map(x => ({h:`<span class="rd-letter">${x}</span>`, a: x})));
 }
 const CASE = {B:['b','d','p'], M:['m','n','w'], A:['a','o','e'], R:['r','n','h'], E:['e','a','c'], L:['l','i','t'], N:['n','m','u'], D:['d','b','q'], G:['g','q','p'], F:['f','t','l'], H:['h','n','k'], T:['t','f','l'], U:['u','n','v'], W:['w','m','v']};
@@ -5273,20 +5336,21 @@ const WRITE = {
   W1: [() => { const k = fresh(LAUT_SHORT); return wItem(k, {kern:true, word:k, tiles: shuffle(k.split('')), check:'exact', prompt:'Lege das Wort nach.', label:`abschreiben: ${k}`}); },
        () => { const k = fresh(['Lampe','Tasse','Hose','Gabel','Lupe','Sofa','Limo','Blume','Kiste','Wolke']); return wItem(k, {word:k, tiles: shuffle(k.split('')), check:'exact', prompt:'Lege das Wort nach.', label:`abschreiben: ${k}`}); },
        () => { const k = fresh(LAUT_LONG); return wItem(k, {word:k, tiles: shuffle(k.split('')), check:'exact', prompt:'Lege das Wort nach.', label:`abschreiben: ${k}`}); }],
-  W2: [0, 1, 2].map(i => () => { const k = fresh(Object.values(INITIAL).flat()); return {kern: i === 0, type:'write', icon:k, target:k[0], check:'ci', max:1, prompt:'Schreibe den ersten Buchstaben.', label:`Anlaut schreiben: ${k} → ${k[0]}`}; }),
-  W3: [() => wItem(fresh(LAUT_SHORT), {kern:true}), () => wItem(fresh(LAUT_SHORT)), () => wItem(fresh(LAUT_SHORT))],
-  W4: [() => wItem(fresh(LAUT_LONG), {kern:true}), () => wItem(fresh(LAUT_LONG)), () => wItem(fresh(LAUT_LONG))],
-  W5: [() => wItem(fresh(MERK), {kern:true, check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(fresh(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(fresh(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'})],
-  W6: [() => wItem(fresh([...LAUT_SHORT, ...LAUT_LONG].filter(w => CLEAR.includes(w))), {kern:true, check:'exact', prompt:'Schreibe das Wort richtig – denk an den großen Anfangsbuchstaben.', label:'Nomen groß schreiben'}),
+  W2: [0, 1, 2].map(i => () => { const k = wPick(W_POOLS.W2()); return {kern: i === 0, type:'write', icon:k, target:k[0], check:'ci', max:1, prompt:'Schreibe den ersten Buchstaben.', label:`Anlaut schreiben: ${k} → ${k[0]}`}; }),
+  W3: [() => wItem(wPick(LAUT_SHORT), {kern:true}), () => wItem(wPick(LAUT_SHORT)), () => wItem(wPick(LAUT_SHORT))],
+  W4: [() => wItem(wPick(LAUT_LONG), {kern:true}), () => wItem(wPick(LAUT_LONG)), () => wItem(wPick(LAUT_LONG))],
+  W5: [() => wItem(wPick(MERK), {kern:true, check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(wPick(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(wPick(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'})],
+  W6: [() => wItem(wPick(W_POOLS.W6()), {kern:true, check:'exact', prompt:'Schreibe das Wort richtig – denk an den großen Anfangsbuchstaben.', label:'Nomen groß schreiben'}),
        () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1]; const s = [cap(art(n)), n, 'ist', ...(t + '.').split(' ')]; return {type:'sent', icon: n, words: s, tiles: shuffle(s.map((_, i) => i)), prompt:'Lege den Satz zum Bild.', label:`Satz legen: ${s.join(' ')}`}; },
        () => { const w2 = fresh(['Hose','Lampe','Gabel','Tasse','Jacke','Mütze','Blume','Kerze','Kiste','Leiter','Schere','Pizza','Banane','Tomate']); const right = `Die ${w2} ist neu.`; return mkChoice({layout:'col', icon: w2, prompt:'Welcher Satz ist richtig geschrieben?', label:`richtig geschriebener Satz (${w2})`}, [right, `die ${w2} ist neu.`, `Die ${w2.toLowerCase()} ist neu.`, `Die ${w2} Ist neu`].map(t => ({h:`<span class="rd-word" style="font-size:26px">${escHtml(t)}</span>`, a:t})), 0); }]
 };
 /* Darstellung */
 function writeStage(it, r, opt = {}){
   r.text ??= ''; r.used ??= [];
-  if(it.memo && !r.hidden) return `<div class="it-wrap w-wrap"><div class="it-word memo-word">${escHtml(it.word)}</div><p class="memo-steps">Lies das Wort genau. Sprich es leise mit. Merke es dir.</p><button class="memo-btn" data-wmemo>Ich habe es mir gemerkt – abdecken</button></div>`;
+  if(it.memo && !r.hidden) return `<div class="it-wrap w-wrap">${it.unkWord ? `<div class="it-icon">${iconSvg(it.icon, 110)}</div>` : ''}<div class="it-word memo-word">${escHtml(it.word)}</div><p class="memo-steps">${it.unkWord ? 'So heißt das Bild. Lies das Wort genau. Merke es dir.' : 'Lies das Wort genau. Sprich es leise mit. Merke es dir.'}</p><button class="memo-btn" data-wmemo>Ich habe es mir gemerkt – abdecken</button></div>`;
   const showWord = it.word && (!it.memo || opt.feedback);
-  const head = (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 130)}</div>` : '') + (showWord ? `<div class="it-word">${escHtml(it.word)}</div>` : '') + (it.memo && !opt.feedback ? `<button class="memo-peek" data-wpeek>Nochmal ansehen</button>` : '');
+  const sayW = it.icon || it.word || (it.target?.length > 1 ? it.target : '');
+  const head = (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 130)}${speechBtn(sayW)}</div>` : speechBtn(sayW) ? `<div class="it-icon">${speechBtn(sayW)}</div>` : '') + (showWord ? `<div class="it-word">${escHtml(it.word)}</div>` : '') + (it.memo && !opt.feedback ? `<button class="memo-peek" data-wpeek>Nochmal ansehen</button>` : '');
   /* so viele Kästchen wie das Wort Buchstaben hat; sind alle voll, kommt kein leeres Kästchen dazu (sonst wirkt das Wort unfertig).
      Wer weiterschreibt, sieht die zusätzlichen Buchstaben trotzdem. */
   const n = it.max || Math.max(it.target.length, r.text.length);
@@ -6055,8 +6119,8 @@ function diagAnswer(skip){
   let res;
   if(skip) res = {ok:false, given:'–', obs:['„Weiß ich nicht“']};
   else { res = evalItem(it, d.resp || {}, readFields()); if(!res) return focusEmpty(); }
-  d.answers.push({label: it.label, ok: res.ok, kern: !!it.kern, given: res.given, obs: res.obs || [], ms: Math.round(performance.now() - d.t0), ...(it.blk ? {blk: it.blk} : {})});
-  logAttempt({mode:'diag', task: it.label, ok: res.ok, tries:1, cell: d.key});
+  d.answers.push({label: it.label, ok: res.ok, kern: !!it.kern, given: res.given, obs: res.obs || [], ms: Math.round(performance.now() - d.t0), ...(it.blk ? {blk: it.blk} : {}), ...(it.unkFrom ? {unk: it.unkFrom} : {})});
+  logAttempt({mode:'diag', task: it.label, ok: res.ok, tries:1, cell: d.key, ...(it.unkFrom ? {unk: it.unkFrom.join('|')} : {})});
   d.nItems++;
   let st = TESTS[d.subj]?.decide ? TESTS[d.subj].decide(d) : cellDecision(d.answers);
   if(!st && d.idx + 1 >= d.items.length) st = d.answers.some(a => a.ok) ? 'teilweise' : 'nicht'; /* keine Aufgabe mehr übrig: nie hängen bleiben */
@@ -6274,6 +6338,7 @@ function renderDiag(){
   let c = '';
   if(it.type === 'flash' && r.hidden) c += toolBtn({id:'d-again', ic:'eye', label:'Nochmal zeigen'});
   if(it.type !== 'flash' || r.hidden) c += toolBtn({id:'d-next', ic:'next', label:'Weiter', primary:true});
+  if(!d.warm && wUnkOk(it) && !TESTS[d.subj]?.cellItems && ((d.unkK ||= {})[d.key] || 0) < 2) c += toolBtn({id:'d-unk', ic:'eye', label:'Kenne ich nicht'});
   c += toolBtn({id:'d-skip', ic:'help', label: d.warm ? 'Überspringen' : 'Weiß ich nicht'}) + '<span class="sep"></span>' + toolBtn({id:'d-close', ic:'close', label:'Abbrechen'});
   $('#controls').innerHTML = c;
   setHint(it.hint || '');
@@ -6298,6 +6363,11 @@ function diagControl(btn){
     case 'd-go': if(!d.dm?.end) return; clearTimeout(d.timer); d.idx++; d.resp = null; d.dm = null; d.you = d.items[d.idx]; d.t0 = performance.now(); setHint(''); return renderDiag();
     case 'd-redemo': if(!d.dm?.end) return; d.dm = null; setHint(''); return renderDiag();
     case 'd-next': return d.warm ? warmAnswer(false) : diagAnswer(false);
+    case 'd-unk': { /* Backlog I: Bild nicht erkannt → anderes Bild derselben Stufe, zählt nicht (höchstens 2-mal je Stufe) */
+      const it = d.items[d.idx], gens = itemsFor(d.key); if(!wUnkOk(it) || !gens?.length) return;
+      let nw, n = 0; do { nw = gens[d.idx % gens.length](); n++; } while(nw.icon === it.icon && n < 8);
+      d.unkK[d.key] = (d.unkK[d.key] || 0) + 1; d.items[d.idx] = {...nw, kern: it.kern, unkFrom: [...(it.unkFrom || []), it.icon]};
+      d.resp = null; d.t0 = performance.now(); setHint(''); return renderDiag(); }
     case 'd-skip': return d.warm ? warmAnswer(true) : diagAnswer(true);
     case 'w-more': { const k = d.answers.find(a => !a.ok)?.key || d.answers[0]?.key; app.diag = null; $('#stage').innerHTML = ''; if(k){ leaveMode(); applyOffer(cellInfo(k).offer.set); } else { app.mode = 'home'; render(); } return; }
     case 'd-again': { d.resp ||= {}; d.resp.hidden = false; d.resp.again = true; return renderDiag(); }
@@ -7200,6 +7270,8 @@ function renderTopRead(){
 }
 function renderRead(){
   const R = app.read;
+  if(R.wpre && W_POOLS[R.lvl]){ $('#words').hidden = true; $('#btn-say').hidden = true; $('#equation').innerHTML = ''; $('#prompt').innerHTML = '<span class="dg-prompt">Bilder ansehen</span>'; $('#stage').innerHTML = wPreviewHtml(R.wpre); $('#controls').innerHTML = toolBtn({id:'r-pics-go', ic:'next', label:'Los geht\'s', primary:true}); return; }
+  if(R.wpre) R.wpre = null;
   if(!R.item) return readNew();
   const it = R.item;
   $('#words').hidden = true; $('#btn-say').hidden = true;
@@ -7224,7 +7296,9 @@ function renderRead(){
     bzAfter(); glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it && !R.demo, renderRead); return; }
   const up = R.streak >= 5 && li >= 0 && li < lv.length - 1 && !guideOn() && !roundOn(), down = R.miss >= 3 && li > 0;
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : (it.type === 'board' && it.mode === 'fill') || it.type === 'input' ? false : !evalItem(it, R.r, [])})) +
-    (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '');
+    (R.fb && !R.fb.ok && R.tries >= 2 ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '') +
+    (wUnkOk(it) && !R.fb?.ok ? toolBtn({id:'r-unk', ic:'help', label:'Kenne ich nicht'}) : '') +
+    (W_POOLS[R.lvl] && !document.body.classList.contains('fokus') ? '<span class="sep"></span>' + toolBtn({id:'r-pics', ic:'eye', label:'Bilder vorher ansehen'}) : '');
   itFit();
   glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it, renderRead);
 }
@@ -7241,7 +7315,7 @@ function readCheck(){
   const bzm = bzArts(R.lvl) && bzMem(), bzArt = bzm && bzArts(R.lvl)[bzm.art];
   if(bzm){ if(res.ok && R.tries === 0) bzm.ok++; else if(!res.ok && R.tries === 0 && (R.miss || 0) >= 2) bzm.ok = Math.max(0, Math.min(bzm.ok, bzTop(bzArt)) - 3); /* dreimal daneben: wieder leichter */ }
   if(res.ok){
-    logAttempt({mode: rdMode(R.lvl), task: it.label, ok: R.tries === 0, tries: R.tries + 1, lvl: R.lvl, given: res.given, ...(bzm ? {art: bzm.art} : {})});
+    logAttempt({mode: rdMode(R.lvl), task: it.label, ok: R.tries === 0 && !it.unkWord, tries: R.tries + 1, lvl: R.lvl, given: res.given, ...(bzm ? {art: bzm.art} : {}), ...(it.unkWord ? {unk: it.unkWord} : {})});
     if(R.tries === 0){ R.streak = (R.streak || 0) + 1; R.miss = 0; } else R.streak = 0;
     renderRead(); if(bzm) setHint(bzm.ok === bzNextAt(bzArt) && R.tries === 0 ? 'Richtig! Das kannst du schon gut.' : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); else setHint(R.streak >= 5 && !roundOn() && [L_LEVELS, W_LEVELS, U_LEVELS, G_LEVELS, H_LEVELS, Z_LEVELS].some(lv => lv.includes(R.lvl) && lv.at(-1) !== R.lvl) ? `${R.streak}-mal in Folge richtig. Du kannst die nächste Stufe probieren.` : R.tries ? 'Richtig – gut weitergemacht!' : 'Richtig!', 'ok'); speak('Richtig!');
     celebrate(document.querySelector('#stage .fb-ok'));
@@ -7264,6 +7338,9 @@ function readControl(btn){
     case 'r-demo': clearTimeout(app.demoT); setHint(''); R.fb = null; R.tries = 0; bzDemoStart(); return renderRead();
     case 'r-art-up': { const arts = bzArts(R.lvl), m = bzMem(); if(m.art < arts.length - 1) Object.assign(m, {art: m.art + 1, ok:0}); else { const lv = rdLevels(R.lvl); R.lvl = lv[lv.indexOf(R.lvl) + 1]; } Object.assign(R, {item:null, streak:0, miss:0}); setHint(''); return render(); }
     case 'r-next': skipMark(); setHint(''); return readNew();
+    case 'r-unk': if(!wUnkOk(R.item)) return; R.item = {...R.item, memo:true, word: R.item.icon, unkWord: R.item.icon}; Object.assign(R, {r:{}, fb:null}); setHint(''); return renderRead();
+    case 'r-pics': return wPreviewStart();
+    case 'r-pics-go': R.wpre = null; setHint(''); Object.assign(R, {item:null}); return readNew();
     case 'r-up': case 'r-down': { const lv = rdLevels(R.lvl); Object.assign(R, {lvl: lv[lv.indexOf(R.lvl) + (btn.id === 'r-up' ? 1 : -1)], item:null, streak:0, miss:0}); setHint(''); return render(); }
     case 'r-show': if(R.item.type === 'clockset'){ R.r.h = R.item.target.h; R.r.m = R.item.target.m; R.r.moved = true; } else if(R.item.type === 'write'){ R.r.text = R.item.target; R.r.used = []; R.r.slots = null; R.r.marks = null; } else if(R.item.type === 'sent'){ R.r.order = R.item.words.map((_, i) => i); } else if(R.item.type === 'board'){ const it = R.item; if(it.mode === 'tap') R.r.sel = it.target; else if(it.mode === 'multi') R.r.set = [...it.set]; else { R.r.vals = it.fields.map(String); R.r.wrong = new Set(); } } else if(R.item.type === 'input') R.r.vals = R.item.fields.map(String); else if(BZ_TYPES.includes(R.item.type)) bzSolve(R.item, R.r); else R.r.choice = R.item.correct; R.fb = {choice: R.item.correct, ok:true}; logAttempt({mode: rdMode(R.lvl), task: R.item.label, ok:false, tries: R.tries + 1, lvl: R.lvl, shown:true}); setHint('So ist es richtig.'); return renderRead();
   }
@@ -8772,7 +8849,7 @@ const lineW = (n = 1) => `<div class="ab-wline"></div>`.repeat(n);
 const R_SHEETS = {
   L1: {name:'Bilder und Schilder zuordnen', match:true, gen:() => { const ks = freshN(Object.keys(PICTO_MATCH), 4); return {left: ks.map(k => iconP(PICTO_MATCH[k], 17)), right: shuffle(ks).map(k => `<span class="ab-ic" style="width:16mm">${pictoSvg(k, 100)}</span>`), a: ks.map(k => `${PICTO_MATCH[k]} – ${k}`).join('; ')}; }},
   L2: {name:'Signalwörter', match:true, gen:() => { const ks = freshN(Object.keys(SIGN_PIC), 4); return {left: ks.map(k => SIGN_PIC[k].icon ? iconP(SIGN_PIC[k].icon, 17) : `<span class="ab-ic" style="width:16mm">${pictoSvg(SIGN_PIC[k].picto, 100)}</span>`), right: shuffle(ks).map(k => `<span class="ab-sign${app.sheet.lcase ? ' lc' : ''}">${sigCase(k)}</span>`), a: ks.map(sigCase).join(', ')}; }},
-  L3: {name:'Anfangsbuchstaben', cols:2, gens:[() => { const k = fresh(Object.values(INITIAL).flat()), L = k[0]; const opts = shuffle([L, ...others(['A','M','S','T','L','R','H','B','K','O','E','F','N','P','G','Z','D','W'], [L], 2)]); return T_('kreise', 'Womit fängt das Wort an?', `${iconP(k)}<p class="ab-row big letters">${opts.join(' ')}</p>`, `${k}: ${L}`); }]},
+  L3: {name:'Anfangsbuchstaben', cols:2, gens:[() => { const k = fresh(wPool(W_POOLS.W2())), L = k[0]; const opts = shuffle([L, ...others(['A','M','S','T','L','R','H','B','K','O','E','F','N','P','G','Z','D','W'], [L], 2)]); return T_('kreise', 'Womit fängt das Wort an?', `${iconP(k)}<p class="ab-row big letters">${opts.join(' ')}</p>`, `${k}: ${L}`); }]},
   L4: {name:'Wörter lesen', cols:2, gens:[() => { const k = fresh(L4_POOL), dis = others(WITH_ICON().filter(x => x[0] !== k[0]), [k], 2); return T_(['lies', 'kreise'], 'Lies das Wort. Kreise das Bild ein.', `<p class="ab-word">${k}</p><p class="ab-row">${shuffle([k, ...dis]).map(x => iconP(x, 17)).join(' ')}</p>`, k); }]},
   L5: {name:'Genau lesen', cols:2, gens:[() => { const k = fresh(MINIMAL.map(s => s[0])), set = MINIMAL.find(s => s[0] === k); return T_(['lies', 'kreise'], 'Kreise das richtige Wort ein.', `${iconP(k, 22)}<p class="ab-row words">${shuffle(set).map(w => `<span>${w}</span>`).join('')}</p>`, k); },
                                           () => { const k = fresh(LONG_POOL), dis = others(LONG_POOL, [k], 2); return T_(['lies', 'kreise'], 'Lies das Wort. Kreise das Bild ein.', `<p class="ab-word">${k}</p><p class="ab-row">${shuffle([k, ...dis]).map(x => iconP(x, 17)).join(' ')}</p>`, k); }]},
@@ -8794,10 +8871,10 @@ function traceWord(w, px = 44){
 const W_SHEETS = {
   WX: {name:'Meine Wörter (nachspuren und schreiben)', cols:2, gens:[() => { const ws = ownWords(), k = fresh(ws.length ? ws : ['Name', 'Schule', 'Montag', 'Arbeit']); return T_(['lies', 'schreibe'], 'Spure nach. Schreibe dann selbst.', `${traceWord(k)}${lineW(2)}`, k); }]},
   W1: {name:'Wörter abschreiben', cols:2, gens:[() => { const k = fresh([...LAUT_SHORT, 'Lampe','Tasse','Hose','Banane','Blume','Kiste']); return T_(['lies', 'schreibe'], 'Lies und schreibe ab.', `<div class="ab-pw">${iconP(k, 18)}<p class="ab-word">${k}</p></div>${lineW()}`, k); }]},
-  W2: {name:'Anfangsbuchstaben schreiben', cols:3, gens:[() => { const k = fresh(Object.values(INITIAL).flat()); return T_('schreibe', 'Erster Buchstabe', `${iconP(k, 22)}${ans(13)}`, `${k}: ${k[0]}`); }]},
-  W3: {name:'Kurze Wörter schreiben', cols:2, gens:[() => { const k = fresh(LAUT_SHORT); return T_('schreibe', 'Schreibe das Wort.', `${iconP(k, 22)}${lineW()}`, k); }]},
-  W4: {name:'Lange Wörter schreiben', cols:2, gens:[() => { const k = fresh(LAUT_LONG); return T_('schreibe', 'Sprich in Silben und schreibe.', `${iconP(k, 22)}<p class="ab-syl">${(WORDS[k] || [k]).map(() => '◡').join(' ')}</p>${lineW()}`, `${k} (${(WORDS[k] || [k]).join('-')})`); }]},
-  W5: {name:'Merkstellen: doppelte Mitlaute, ck, tz', cols:2, gens:[() => { const k = fresh(MERK); const m = k.match(/(ss|nn|mm|ll|tt|ck|tz|zz|sch|ft)/); const gap = m ? k.replace(m[0], '__') : k; return T_('schreibe', 'Setze ein und schreibe das Wort.', `${iconP(k, 20)}<p class="ab-word">${gap.replace('__', '<span class="ab-gap"></span>')}</p>${lineW()}`, `${k}${m ? ` (${m[0]})` : ''}`); }]},
+  W2: {name:'Anfangsbuchstaben schreiben', cols:3, gens:[() => { const k = fresh(wPool(W_POOLS.W2())); return T_('schreibe', 'Erster Buchstabe', `${iconP(k, 22)}${ans(13)}`, `${k}: ${k[0]}`); }]},
+  W3: {name:'Kurze Wörter schreiben', cols:2, gens:[() => { const k = fresh(wPool(LAUT_SHORT)); return T_('schreibe', 'Schreibe das Wort.', `${iconP(k, 22)}${lineW()}`, k); }]},
+  W4: {name:'Lange Wörter schreiben', cols:2, gens:[() => { const k = fresh(wPool(LAUT_LONG)); return T_('schreibe', 'Sprich in Silben und schreibe.', `${iconP(k, 22)}<p class="ab-syl">${(WORDS[k] || [k]).map(() => '◡').join(' ')}</p>${lineW()}`, `${k} (${(WORDS[k] || [k]).join('-')})`); }]},
+  W5: {name:'Merkstellen: doppelte Mitlaute, ck, tz', cols:2, gens:[() => { const k = fresh(wPool(MERK)); const m = k.match(/(ss|nn|mm|ll|tt|ck|tz|zz|sch|ft)/); const gap = m ? k.replace(m[0], '__') : k; return T_('schreibe', 'Setze ein und schreibe das Wort.', `${iconP(k, 20)}<p class="ab-word">${gap.replace('__', '<span class="ab-gap"></span>')}</p>${lineW()}`, `${k}${m ? ` (${m[0]})` : ''}`); }]},
   W6: {name:'Sätze richtig schreiben', cols:1, gens:[() => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1], s = [cap(art(n)), n, 'ist', ...t.split(' ')]; return T_(['lege', 'schreibe'], 'Ordne die Wörter zu einem Satz und schreibe ihn auf.', `<div class="ab-pw">${iconP(n, 16)}<p class="ab-row">${shuffle(s).map(w => `<span class="ab-card">${w}</span>`).join(' ')}</p></div>${lineW()}`, s.join(' ') + '.'); },
        () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1], s = `${cap(art(n))} ${n} ist ${t}.`; return T_(['lies', 'schreibe'], 'Schreibe richtig ab. Denk an Großbuchstaben und den Punkt.', `<p class="ab-sent">${s.toLowerCase().replace('.', '')}</p>${lineW()}`, s); }]}
 };
@@ -10006,9 +10083,24 @@ $('#equation').addEventListener('click', e => { if(e.target.closest('#c-check'))
 const dlgSet = $('#dlg-settings'), dlgHelp = $('#dlg-help');
 function fillVoices(){
   const sel = $('#voice-select'); if(!sel) return;
-  sel.innerHTML = '<option value="">Automatisch (beste deutsche Stimme)</option>' + germanVoices().map(v => `<option value="${v.name.replace(/"/g,'&quot;')}">${v.name} (${v.lang})</option>`).join('');
+  sel.innerHTML = '<option value="">Automatisch (beste deutsche Stimme)</option>' + germanVoices().map(v => `<option value="${v.name.replace(/"/g,'&quot;')}">${escHtml(v.name)} (${v.lang})</option>`).join('');
   sel.value = settings.voice || '';
+  const st = $('#say-state'); if(st) st.textContent = germanVoices().length ? `${germanVoices().length} deutsche Stimme${germanVoices().length > 1 ? 'n' : ''} auf diesem Gerät` : 'Keine deutsche Stimme auf diesem Gerät gefunden. iPad: Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Deutsch.';
 }
+/* Anhören je Kind (p.say: 'on' | 'off' | fehlt = Standard) */
+function saySettingsHtml(){
+  return data.profiles.length ? `<table class="guide-tbl">${data.profiles.map(p => `<tr><th>${escHtml(p.name)}</th><td><select data-say-pid="${p.id}"><option value="">Standard</option><option value="on" ${p.say === 'on' ? 'selected' : ''}>an</option><option value="off" ${p.say === 'off' ? 'selected' : ''}>aus</option></select></td></tr>`).join('')}</table>` : '';
+}
+/* Bilder beim Schreiben abwählen (settings.wHide, für die ganze Klasse) */
+function wHideHtml(){
+  const h = wHidden();
+  return wAllPics().map(w => `<label class="whide-it${h.has(w) ? ' off' : ''}"><input type="checkbox" data-whide="${escHtml(w)}" ${h.has(w) ? '' : 'checked'}>${iconSvg(w, 40)}<span>${escHtml(w)}</span></label>`).join('');
+}
+document.addEventListener('change', e => {
+  const sp = e.target.closest('[data-say-pid]'); if(sp){ const p = data.profiles.find(x => x.id === sp.dataset.sayPid); if(p){ if(sp.value) p.say = sp.value; else delete p.say; saveData(); render(); } return; }
+  const wh = e.target.closest('[data-whide]'); if(wh){ const h = wHidden(); if(wh.checked) h.delete(wh.dataset.whide); else h.add(wh.dataset.whide); settings.wHide = [...h]; saveSettings(); wh.closest('.whide-it')?.classList.toggle('off', !wh.checked); }
+});
+document.addEventListener('click', e => { if(e.target.closest('#say-test')){ const v = bestVoice(); if(!v){ toast('Keine deutsche Stimme auf diesem Gerät.'); return; } sayWord('Tomate'); } });
 function syncSettingsForm(){
   fillVoices();
   for(const el of dlgSet.querySelectorAll('[data-key]')){
@@ -10031,7 +10123,7 @@ let holdTimer = null;
 let setTab = 'general';
 function showSetTab(k){ setTab = k; for(const b of dlgSet.querySelectorAll('[data-stab]')) b.setAttribute('aria-selected', b.dataset.stab === k); for(const p of dlgSet.querySelectorAll('[data-stab-panel]')) p.hidden = p.dataset.stabPanel !== k; }
 dlgSet.addEventListener('click', e => { const b = e.target.closest('[data-stab]'); if(b) showSetTab(b.dataset.stab); });
-const openSettings = () => { showSetTab(setTab); syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); $('#subjon-list').innerHTML = subjOnHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
+const openSettings = () => { showSetTab(setTab); syncSettingsForm(); $('#guide-list').innerHTML = guideSettingsHtml(); $('#subjon-list').innerHTML = subjOnHtml(); $('#say-list').innerHTML = saySettingsHtml(); $('#whide-list').innerHTML = wHideHtml(); pinSettingsHtml(); $('#data-text').hidden = true; $('#data-text-note').hidden = true; $('#import-ask').hidden = true; dlgSet.showModal(); };
 $('#btn-settings').addEventListener('click', () => requireTeacher(openSettings));
 document.addEventListener('change', e => {
   const t = e.target, pid = t.dataset?.pworld || t.dataset?.ppic; if(!pid || !teacherOn()) return;
