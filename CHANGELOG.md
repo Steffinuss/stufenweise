@@ -19,7 +19,7 @@ Neu (Backlog I „Optimierung Deutsch“, Stefans Antworten im Dokument vom 24.1
 
 Nach Stefans Rückmeldung zur Testversion (24.11.2026):
 - **Satz-Baukasten:** „Neuer Satz“ erzeugt Sätze aus dem Alltag (kurz, mittel, lang); der Satz steht nicht mehr oben sichtbar. „Eigener Satz“ öffnet ein kleines Feld, das Getipptes als Punkte zeigt.
-- **Anlauttabelle:** Bilder für alle Buchstaben (neu: Computer, Qualle, Vogel, Xylofon, Yoga, Ähre, Öl, Überraschung, Eule bei Eu). Selbstlaute mit langem (Strich) und kurzem (Punkt) Laut: Ameise/Apfel, Esel/Ente, Igel/Insel, Ofen/Ordner, Uhr/Unterhose; beim Buchstaben getrennt nach „lang gesprochen“ und „kurz gesprochen“. „Anlaute hören“ (P4) nutzt deshalb nur Mitlaute.
+- **Anlauttabelle:** Bilder für alle Buchstaben (neu: Computer, Qualle, Vogel, Xylofon, Yoga, Ähre, Öl, Überraschungsei (ohne Marke gezeichnet), Eule bei Eu). Selbstlaute mit langem (Strich) und kurzem (Punkt) Laut: Ameise/Apfel, Esel/Ente, Igel/Insel, Ofen/Ordner, Uhr/Unterhose; beim Buchstaben getrennt nach „lang gesprochen“ und „kurz gesprochen“. „Anlaute hören“ (P4) nutzt deshalb nur Mitlaute.
 - **Bilder neu gezeichnet:** Ente (Stockente statt Badeente), Esel und Kamel ohne Linien an den Übergängen von Kopf, Hals und Körper.
 
 ## 0.33.0 – 24.11.2026
