@@ -273,6 +273,10 @@ body.screening .toolbar{visibility:hidden}
 .dg-pairs{display:flex;flex-direction:column;gap:14px}
 .dg-pair{display:flex;gap:14px;justify-content:center}
 .dg-pair button{min-width:130px}
+.pm-none{display:flex;align-items:center;justify-content:center;height:100%;min-height:160px}.pm-none p{font-size:20px;color:var(--muted);border:2px dashed #d8cfbd;border-radius:16px;padding:18px 28px;margin:0}
+.mat-pair{display:flex;align-items:center;justify-content:center;gap:14px;width:100%}.mat-pair{flex-wrap:wrap}.mat-pair>svg{height:min(150px,22vh);width:auto;max-width:none}.mat-pair>b{font-size:40px}
+.dg-ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%);filter:drop-shadow(0 4px 8px #0004)}
+#stage .money [data-dgden], #stage .money [data-dgrm]{touch-action:none}
 .dg-build{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;height:100%}
 .dg-build>svg{flex:1;width:100%;max-height:260px}
 .dg-build-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
@@ -2038,9 +2042,10 @@ const fieldViewOk = () => ['add', 'sub'].includes(app.mode) && app.range <= 20;
    Nach 8 Aufgaben, die beim ersten Versuch richtig sind, die nächste Darstellung; nach 3 Fehlern in Folge zurück.
    Rechenhilfe (app.calc): eigene Aufgabe eingeben, Plus oder Minus und die Darstellung frei wählen – für alle Kinder. */
 const pmPractice = () => ['add', 'sub'].includes(app.mode) && !app.calc;
-const pmViews = () => app.range <= 20 ? ['material', 'field', 'line'] : app.range === 100 ? ['material', 'board', 'line'] : ['material', 'line'];
-const pmName = v => ({material:'Material', field: app.range <= 10 ? 'Zehnerfeld' : 'Zwanzigerfeld', board:'Hundertertafel', line:'Zahlenstrahl'})[v];
-const pmWith = v => ({material:'mit Material', field: app.range <= 10 ? 'mit dem Zehnerfeld' : 'mit dem Zwanzigerfeld', board:'mit der Hundertertafel', line:'mit dem Zahlenstrahl'})[v];
+/* letzte Stufe „Im Kopf“: nur die Rechnung, ohne Bild (Stefan 24.11.: von der Veranschaulichung zur Abstraktion) */
+const pmViews = () => [...(app.range <= 20 ? ['material', 'field', 'line'] : app.range === 100 ? ['material', 'board', 'line'] : ['material', 'line']), 'none'];
+const pmName = v => ({material:'Material', field: app.range <= 10 ? 'Zehnerfeld' : 'Zwanzigerfeld', board:'Hundertertafel', line:'Zahlenstrahl', none:'Im Kopf'})[v];
+const pmWith = v => ({material:'mit Material', field: app.range <= 10 ? 'mit dem Zehnerfeld' : 'mit dem Zwanzigerfeld', board:'mit der Hundertertafel', line:'mit dem Zahlenstrahl', none:'im Kopf, ohne Bild'})[v];
 const PM_NEXT = 8;
 function pmMem(){ const k = `${data.current || 'guest'}|${app.mode}|${app.range}`, M = (app.pmMem ||= {})[k] ||= {v:0, ok:0, miss:0}; if(M.v >= pmViews().length) M.v = 0; return M; }
 const pmView = () => pmViews()[pmMem().v];
@@ -2081,6 +2086,7 @@ function taskPrompt(t){
   const ex = settings.words === 'bundle';
   if(t.view === 'field'){ const fi = fieldInfo(t); if(app.mode === 'add') return fi.done ? 'Wie viele sind es zusammen?' : fi.over ? 'Das sind zu viele. Tippe einen orangen Punkt an, dann geht er weg.' : `Lege ${t.b} orange Punkte dazu. Erst die obere Reihe voll machen.`; return fi.done ? 'Wie viele bleiben übrig?' : fi.over ? 'Das sind zu viele. Tippe einen durchgestrichenen Punkt an, dann ist er wieder da.' : `Streiche ${t.b} Punkte weg. Fang hinten an.`; }
   if(t.view === 'board'){ const w = app.range === 1000 ? 'im Tausenderbuch' : 'in der Hundertertafel'; return app.mode === 'number' ? (t.find ? `Wo steht die Zahl ${w}? Tippe das Feld an.` : `Hier steht die Zahl ${w}.`) : app.mode === 'add' ? `Starte bei ${t.a} und gehe ${t.b} weiter. Wo landest du?` : `Starte bei ${t.a} und gehe ${t.b} zurück. Wo landest du?`; }
+  if(t.view === 'none') return 'Rechne im Kopf. Schreibe das Ergebnis oben in die Rechnung.';
   if(t.view === 'line') return app.mode === 'number' ? (t.find ? 'Schätze: Wo liegt die Zahl? Tippe auf den Zahlenstrahl.' : 'Hier liegt die Zahl auf dem Zahlenstrahl.') : app.mode === 'add' ? `Springe von ${t.a} aus ${t.b} weiter. Wo landest du?` : `Springe von ${t.a} aus ${t.b} zurück. Wo landest du?`;
   if(countOn(t) && t.check !== 'ok') return t.a < 10 ? 'Wie viele sind es? Zähle nach.' : t.a < 100 ? 'Wie viele sind es? Zähle die Zehner und die Einer.' : 'Wie viele sind es? Zähle die Hunderter, Zehner und Einer.';
   if(app.mode === 'number') return (app.range < 10 || t.a < 10) && !countOn(t) ? 'Wie viele sind es? Zähle nach.' : `Die Zahl ist gelegt. ${ex ? 'Bündle oder entbündle' : 'Tausche um'}: Die Menge bleibt gleich.`;
@@ -2107,7 +2113,8 @@ function renderTask(before){
   if(t.view === 'dice' && !(app.mode === 'number' && app.range <= 6)) t.view = 'material';
   if(t.view === 'board' && !boardViewOk()) t.view = 'material';
   if(t.view === 'field' && !fieldViewOk()) t.view = 'material';
-  stage.innerHTML = t.view === 'field' ? `<div class="tf-wrap">${tfSvg(fieldState(t))}</div>` : t.view === 'board' ? drawTaskBoard(t) : t.view === 'line' ? (app.mode === 'number' && t.find ? drawFindLine(t) : nlWrap(drawLine(t))) : t.view === 'dice' ? dice(a) : drawTask(t);
+  if(t.view === 'none' && !pmPractice()) t.view = 'material';
+  stage.innerHTML = t.view === 'none' ? `<div class="pm-none"><p>Im Kopf rechnen</p></div>` : t.view === 'field' ? `<div class="tf-wrap">${tfSvg(fieldState(t))}</div>` : t.view === 'board' ? drawTaskBoard(t) : t.view === 'line' ? (app.mode === 'number' && t.find ? drawFindLine(t) : nlWrap(drawLine(t))) : t.view === 'dice' ? dice(a) : drawTask(t);
   renderTaskControls(t);
   taskHint(t);
   if(t.view === 'board') hbFit();
@@ -2128,12 +2135,13 @@ function checkBox(t){
   return `<div class="check"><label for="guess">Ergebnis</label><input id="guess" type="number" inputmode="numeric" min="0" ${t.check==='ok' ? 'disabled' : ''}><button id="c-check" class="primary" aria-label="Prüfen">${icon('check','ic')}</button></div>`;
 }
 /* Ergebnis direkt oben in die Rechnung schreiben (statt in ein Feld unten) */
-const guessHere = t => app.mode === 'times' || (app.mode !== 'number' && (t.view === 'board' || t.view === 'line' || t.view === 'field' || t.done));
+const guessHere = t => app.mode === 'times' || (app.mode !== 'number' && (t.view === 'board' || t.view === 'line' || t.view === 'field' || t.view === 'none' || t.done));
 function eqGuess(t, maxDigits){
   const w = Math.max(2, maxDigits);
   return `<span class="res eq-slot"><input id="guess" class="eq-in" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="${w}" aria-label="Ergebnis" style="--w:${w}" value="${escHtml(t.guessVal || '')}"></span><button id="c-check" class="primary eq-check" aria-label="Prüfen">${icon('check','ic')}</button>`;
 }
 function renderTaskControls(t){
+  if(t.view === 'none'){ const c = [viewButtons(t)]; if(resultsOn()) c.push('<span class="sep"></span>', toolBtn({id:'c-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'})); $('#controls').innerHTML = c.join(''); return; }
   if(t.view === 'field'){
     const f = fieldState(t), add = app.mode === 'add', done = t.check === 'ok', col = add ? '#e8890c' : '#c9414a';
     const c = [viewButtons(t), '<span class="sep"></span>', `<div class="nl-jumps tf-steps">${[1, 5].map(k => `<button data-fds="${add ? k : k}" style="--c:${col}" ${done ? 'disabled' : ''}>${add ? '+' : '−'}${k}</button>`).join('')}</div>`,
@@ -2192,6 +2200,7 @@ function renderTaskControls(t){
 }
 
 function taskHint(t){
+  if(t.view === 'none') return t.check ? undefined : setHint('');
   if(countOn(t) && t.check !== 'ok') return setHint('');   /* beim Zählen keine Tausch-Hinweise */
   if(t.view === 'field'){ if(t.check === 'ok' || t.check === 'no') return; const fi = fieldInfo(t); return setHint(settings.help && fi.left > 0 ? `Noch ${fi.left}.` : ''); }
   if(t.view === 'board'){
@@ -3334,8 +3343,16 @@ function popIn(svg, keys, base = 200){
 
 /* ---------- Einmaleins ---------- */
 app.times = {a:null, b:null, ready:false, draft:['',''], check:null, reveal:false, help:false};
+/* Einmaleins: erst mit Punktebild, dann im Kopf (Stefan 24.11.). Nach 8 auf Anhieb richtigen „Im Kopf“, nach 3 Fehlern wieder mit Bild. „Bild zeigen“ hilft im Kopf-Modus. */
+function tmMem(){ return ((app.tmMem ||= {})[data.current || 'guest'] ||= {v:0, ok:0, miss:0}); }
+const tmKopf = () => tmMem().v === 1 && !app.calc;
+function tmTrack(ok){
+  const M = tmMem(); if(teacherView()) return;
+  if(ok){ M.miss = 0; if(M.v === 0 && ++M.ok >= PM_NEXT){ M.v = 1; M.ok = 0; toast('Gut gemacht! Ab jetzt im Kopf, ohne Bild.'); } }
+  else { M.ok = 0; if(M.v === 1 && ++M.miss >= 3){ M.v = 0; M.miss = 0; toast('Jetzt wieder mit Bild.'); } }
+}
 function timesStart(a, b, quiet){
-  Object.assign(app.times, {a, b, ready:true, check:null, reveal:false, tries:0, guessVal:'', draft:[String(a), String(b)]});
+  Object.assign(app.times, {a, b, ready:true, check:null, reveal:false, tries:0, guessVal:'', draft:[String(a), String(b)], pic:false});
   render(); if(!quiet) speak(`${a} mal ${b}`);
 }
 function timesRandom(){
@@ -3398,8 +3415,9 @@ function renderTimes(){
   if(!t.ready) return renderWelcome();
   const {a, b} = t, res = a*b, showRes = (resultsOn() && t.reveal) || t.check === 'ok';
   $('#equation').innerHTML = `${a}<span class="op">·</span>${b}<span class="op">=</span>${showRes ? `<span class="res ${t.check === 'ok' ? 'ok' : ''}">${res}${t.check === 'ok' ? okCheck : ''}</span>` : eqGuess(t, 3)}`;
-  $('#prompt').textContent = `${a}-mal die ${b}: ${a} ${a === 1 ? 'Reihe' : 'Reihen'} mit je ${b}.`;
-  $('#stage').innerHTML = drawTimes(t);
+  const kopf = tmKopf() && !t.pic && t.check !== 'ok';
+  $('#prompt').textContent = kopf ? 'Rechne im Kopf. Schreibe das Ergebnis oben in die Rechnung.' : `${a}-mal die ${b}: ${a} ${a === 1 ? 'Reihe' : 'Reihen'} mit je ${b}.`;
+  $('#stage').innerHTML = kopf ? `<div class="pm-none"><p>Im Kopf rechnen</p></div>` : drawTimes(t);
   const key = `${a}x${b}`;
   if(t.bundle && t.bundleKey !== key && !reduced()){
     // Würfel fliegen aus dem Feld in die Stellenwerttafel
@@ -3416,13 +3434,15 @@ function renderTimes(){
   const c = [];
   if(resultsOn()) c.push(toolBtn({id:'t-reveal', ic: t.reveal ? 'eyeoff' : 'eye', label: t.reveal ? 'Verdecken' : 'Ergebnis'}));
   c.push('<span class="sep"></span>');
-  c.push(toolBtn({id:'t-help', ic:'count', label:'Zählhilfe', pressed: t.help}));
-  c.push(toolBtn({id:'t-bundle', ic:'blocks', label:'Bündeln', pressed: !!t.bundle}));
+  if(kopf) c.push(toolBtn({id:'t-pic', ic:'eye', label:'Bild zeigen'}));
+  else { c.push(toolBtn({id:'t-help', ic:'count', label:'Zählhilfe', pressed: t.help}));
+  c.push(toolBtn({id:'t-bundle', ic:'blocks', label:'Bündeln', pressed: !!t.bundle})); }
   c.push(toolBtn({id:'t-swap', ic:'swap', label:'Tauschaufgabe', disabled: a === b}));
   c.push(toolBtn({id:'t-next', ic:'next', label:'Nächste Aufgabe', primary: t.check === 'ok'}));
   $('#controls').innerHTML = c.join('');
   if(t.check === 'ok') return;
   if(!settings.help) return setHint('');
+  if(kopf) return setHint('');
   if(a > 5) setHint(`Tipp: 5 Reihen sind 5 · ${b}. Dazu noch ${a - 5} ${a - 5 === 1 ? 'Reihe' : 'Reihen'}.`);
   else setHint('Tippe ins Feld, um eine eigene Aufgabe zu legen.');
 }
@@ -3430,7 +3450,8 @@ function timesCheck(){
   const t = app.times, g = $('#guess'); if(!g || g.value.trim() === ''){ g?.focus(); return; }
   t.tries = (t.tries || 0) + 1;
   if(Number(g.value) === t.a*t.b){
-    logAttempt({mode:'times', task:`${t.a} · ${t.b}`, row:t.b, ok: t.tries === 1, tries:t.tries, help: !!(t.help || t.bundle)});
+    logAttempt({mode:'times', task:`${t.a} · ${t.b}`, row:t.b, ok: t.tries === 1, tries:t.tries, help: !!(t.help || t.bundle || t.pic), view: tmKopf() && !t.pic ? 'kopf' : 'bild'});
+    tmTrack(t.tries === 1);
     t.check = 'ok'; renderTimes(); setHint(`Richtig! ${t.a} · ${t.b} = ${t.a*t.b}`, 'good'); celebrate($('#equation .res'));
     speak(`Richtig! ${t.a} mal ${t.b} gleich ${t.a*t.b}.`);
   } else { const v = Number(g.value), res = t.a*t.b, ctx = {mode:'times', a:t.a, b:t.b}, et = errorType(v, res, ctx); noteError('times', et);
@@ -3443,6 +3464,7 @@ function timesControl(btn){
     case 'c-check': return timesCheck();
     case 't-reveal': t.reveal = !t.reveal; renderTimes(); if(t.reveal) speak(String(t.a*t.b)); return;
     case 't-help': t.help = !t.help; return renderTimes();
+    case 't-pic': t.pic = true; return renderTimes();
     case 't-bundle': t.bundle = !t.bundle; return renderTimes();
     case 't-swap': return timesStart(t.b, t.a);
     case 't-next': return timesRandom();
@@ -3624,7 +3646,7 @@ const escHtml = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;',
 const ROUND_MODES = ['add', 'sub', 'written', 'times', 'money', 'blitz', 'read'];
 app.round = {key:null, res:[]};
 const roundLen = () => Number(settings.roundLen ?? 10) || 0;
-const roundOn = () => roundLen() > 0 && ROUND_MODES.includes(app.mode) && app.ctx !== 'class' && !app.kiste;
+const roundOn = () => roundLen() > 0 && (ROUND_MODES.includes(app.mode) || (app.mode === 'number' && countOn(task()))) && app.ctx !== 'class' && !app.kiste; /* „Mengen legen und abzählen“ (Zählaufgabe) läuft auch in Runden (Stefan 24.11.) */
 /* Stufenwechsel innerhalb eines Bereichs beendet die Runde nicht (sonst ließe sich eine Runde durch Hin- und Herschalten „neu starten“) */
 const roundKey = () => `${data.current || 'guest'}|${app.mode}|${app.mode === 'read' ? (app.read.lvl || '')[0] : ''}`;
 function roundSync(){ const k = roundKey(); if(app.round.key !== k){ app.round = {key:k, res:[]}; app.solved = false; document.querySelector('.round-end')?.remove(); } }
@@ -5696,6 +5718,44 @@ const R_INFO = {
   R7:{name:'Einmaleins: Kernaufgaben', short:'Einmaleins', kann:'kennt die Kernaufgaben des Einmaleins (·2, ·5, ·10) und versteht Mal als wiederholtes Plus', ziel:'löst Kernaufgaben auswendig, leitet Nachbaraufgaben ab und erkennt Malaufgaben im Alltag (Packungen, Reihen)', offer:{text:'Einmaleins: 2er-, 5er- und 10er-Reihe', set:{mode:'times', rows:[2, 5, 10]}}, analog:'Malaufgaben im Alltag: Eierkartons, Getränkekisten, Geldscheine (3 × 5 €); Punktefelder legen und abdecken'}
 };
 for(const v of Object.values(R_INFO)) v.bp = 'BP GENT 2022, M 2.1.1.3 Rechenoperationen verstehen und beherrschen';
+/* Rechnen im Test „mit Material“ (Stefan 24.11.): Klappt eine Stufe ohne Material nicht sicher, kommen Aufgaben derselben Art mit Material
+   (Punktefeld, Zehnerstangen und Einer zum Legen, Hunderterplatten, Punktebild beim Einmaleins). Gelingt es damit: „teilweise – mit Material“. */
+function crossFieldSvg(n, k, cap){
+  const cols = cap === 20 ? 10 : 5, C = 47.2; let x = '';
+  for(let i = n - k; i < n; i++){ const cx = 10 + C/2 + (i % cols)*C, cy = 34 + Math.floor(i/cols)*48; x += `<path d="M${cx - 13} ${cy - 13}l26 26M${cx + 13} ${cy - 13}l-26 26" stroke="#c9414a" stroke-width="4" stroke-linecap="round"/>`; }
+  return fieldSvg(n, cap).replace('</svg>', x + '</svg>');
+}
+function dotArraySvg(rows, cols){
+  const C = 26, W = cols*C + (cols > 5 ? 8 : 0), H = rows*C + (rows > 5 ? 8 : 0); let s = '';
+  for(let r = 0; r < rows; r++) for(let c = 0; c < cols; c++) s += `<circle cx="${14 + c*C + (c >= 5 ? 8 : 0)}" cy="${14 + r*C + (r >= 5 ? 8 : 0)}" r="9.5" fill="${PLACE.z}"/>`;
+  return `<svg viewBox="0 0 ${W + 2} ${H + 2}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Punktebild ${rows} Reihen mit je ${cols}">${s}</svg>`;
+}
+const matPair = (a, op, b) => `<div class="mat-pair">${a}<b>${op}</b>${b}</div>`;
+const matIn = (svg, text, f, label, extra = {}) => ({type:'input', svg, text, inl:true, prompt:'Schau das Material an. Rechne.', fields:[f], label:`mit Material: ${label}`, mat:true, ...extra});
+const matBuild = (a, b, plus, extra = {}) => ({type:'build', start:[Math.floor(a/10), a % 10], allowTrade:true, target: plus ? a + b : a - b, prompt: plus ? `Hier liegt ${a}. Lege ${b} dazu. Tausche, wenn es 10 Einer sind.` : `Hier liegt ${a}. Nimm ${b} weg. Tausche, wenn die Einer nicht reichen.`, label:`mit Material: ${a} ${plus ? '+' : '−'} ${b}`, mat:true, ...extra});
+const R_MAT = {
+  R1: [() => { const a = rnd(2, 5), b = rnd(1, 9 - a); return matIn(fieldSvg(a, 10, b), `${a} + ${b} = ?`, a + b, `${a} + ${b}`, {kern:true}); },
+       () => { const c = rnd(5, 9), d = rnd(1, c - 1); return matIn(crossFieldSvg(c, d, 10), `${c} − ${d} = ?`, c - d, `${c} − ${d}`); },
+       () => { const a = rnd(3, 6), b = rnd(1, 9 - a); return matIn(fieldSvg(a, 10, b), `${a} + ${b} = ?`, a + b, `${a} + ${b}`); }],
+  R2: [() => { const a = rnd(11, 14), b = rnd(1, 19 - a); return matIn(fieldSvg(a, 20, b), `${a} + ${b} = ?`, a + b, `${a} + ${b}`, {kern:true}); },
+       () => { const c = rnd(15, 19), d = rnd(1, c - 11); return matIn(crossFieldSvg(c, d, 20), `${c} − ${d} = ?`, c - d, `${c} − ${d}`); },
+       () => { const a = rnd(2, 9); return matIn(fieldSvg(10, 20, a), `10 + ${a} = ?`, 10 + a, `10 + ${a}`); }],
+  R3: [() => { const a = rnd(6, 9), b = rnd(11 - a, 9); return matIn(fieldSvg(a, 20, b), `${a} + ${b} = ?`, a + b, `${a} + ${b}`, {kern:true}); },
+       () => { const c = rnd(11, 16), d = rnd(c - 9, 9); return matIn(crossFieldSvg(c, d, 20), `${c} − ${d} = ?`, c - d, `${c} − ${d}`); },
+       () => { const a = rnd(6, 9); return matIn(fieldSvg(a, 20, a), `${a} + ${a} = ?`, 2*a, `${a} + ${a}`); }],
+  R4: [() => { const a = rnd(2, 6)*10 + rnd(1, 4), b = rnd(1, 3)*10 + rnd(1, 4); return matBuild(a, b, true, {kern:true}); },
+       () => { const a = rnd(5, 9)*10 + rnd(5, 9), b = rnd(1, 4)*10 + rnd(1, 4); return matBuild(a, b, false); },
+       () => { const a = rnd(2, 5)*10, b = rnd(1, 4)*10; return matBuild(a, b, true); }],
+  R5: [() => { const a = rnd(2, 6)*10 + rnd(5, 9), b = rnd(10 - a % 10 + 1, 9); return matBuild(a, b, true, {kern:true}); },
+       () => { const a = rnd(3, 8)*10 + rnd(1, 4), b = rnd(a % 10 + 1, 9); return matBuild(a, b, false); },
+       () => { const a = rnd(2, 4)*10 + rnd(5, 9), b = rnd(1, 3)*10 + rnd(10 - a % 10 + 1, 9); return matBuild(a, b, true); }],
+  R6: [() => { const [h1, z1, h2, z2] = [rnd(2, 5), rnd(1, 4), rnd(1, 3), rnd(1, 4)]; return matIn(matPair(hzeSvg(h1, z1, 0), '+', hzeSvg(h2, z2, 0)), `${h1*100 + z1*10} + ${h2*100 + z2*10} = ?`, (h1 + h2)*100 + (z1 + z2)*10, `${h1*100 + z1*10} + ${h2*100 + z2*10}`, {kern:true}); },
+       () => { const [h1, z1, h2, z2] = [rnd(5, 8), rnd(5, 9), rnd(1, 3), rnd(1, 4)]; return matIn(matPair(hzeSvg(h1, z1, 0), '−', hzeSvg(h2, z2, 0)), `${h1*100 + z1*10} − ${h2*100 + z2*10} = ?`, (h1 - h2)*100 + (z1 - z2)*10, `${h1*100 + z1*10} − ${h2*100 + z2*10}`); },
+       () => { const [h1, z1, z2] = [rnd(2, 6), rnd(5, 9), rnd(3, 6)]; return matIn(matPair(hzeSvg(h1, z1, 0), '+', hzeSvg(0, z2, 0)), `${h1*100 + z1*10} + ${z2*10} = ?`, h1*100 + (z1 + z2)*10, `${h1*100 + z1*10} + ${z2*10} (Hunderterübergang)`); }],
+  R7: [() => { const a = rnd(3, 6), b = pick([2, 5, 10]); return matIn(dotArraySvg(a, b), `${a} · ${b} = ?`, a*b, `${a} · ${b}`, {kern:true, prompt:'Schau das Punktebild an: Reihen mit je gleich vielen. Rechne.'}); },
+       () => { const a = rnd(3, 8), b = pick([2, 5, 10]); return matIn(dotArraySvg(a, b), `${a} · ${b} = ?`, a*b, `${a} · ${b}`, {prompt:'Schau das Punktebild an: Reihen mit je gleich vielen. Rechne.'}); },
+       () => { const k = pick([2, 5]), n = rnd(3, 6); return matIn(dotArraySvg(n, k), `${n*k} : ${k} = ?`, n, `${n*k} : ${k}`, {prompt:`Das sind ${n*k} Punkte in Reihen mit je ${k}. Wie viele Reihen sind es?`}); }]
+};
 
 /* ---------- Größen und Sachrechnen G1–G4 (BP GENT M 2.1.3 Größen: Geld, Längen, Gewichte) ---------- */
 const G_LEVELS = ['G1', 'G2', 'G3', 'G4'];
@@ -6303,10 +6363,16 @@ function diagAnswer(skip){
   d.nItems++;
   let st = TESTS[d.subj]?.decide ? TESTS[d.subj].decide(d) : cellDecision(d.answers);
   if(!st && d.idx + 1 >= d.items.length) st = d.answers.some(a => a.ok) ? 'teilweise' : 'nicht'; /* keine Aufgabe mehr übrig: nie hängen bleiben */
+  if(st && !d.matPrev && st !== 'erreicht' && d.key.startsWith('R|') && R_MAT[d.key.slice(2)] && !d.warm){
+    /* ohne Material nicht sicher → dieselbe Art mit Material (Stefan 24.11.) */
+    d.matPrev = {st, answers: d.answers}; freshNew(); d.items = R_MAT[d.key.slice(2)].map(g => g()); d.answers = []; d.idx = 0; d.resp = null; d.t0 = performance.now(); d.spoken = false;
+    renderDiag(); return;
+  }
   if(st){
-    const ok = d.answers.filter(a => a.ok).length, obs = [...new Set(d.answers.flatMap(a => a.obs))];
-    setCell(d.pid, d.key, {status: st, quelle: d.re ? 're-diagnose' : 'test', sum:`${ok} von ${d.answers.length} richtig`, items: d.answers, obs});
-    d.res[d.key] = st; d.tested.push({key: d.key, status: st, sum:`${ok} von ${d.answers.length}`});
+    let ok = d.answers.filter(a => a.ok).length, obs = [...new Set(d.answers.flatMap(a => a.obs))], sum = `${ok} von ${d.answers.length} richtig`, mat = null, all = d.answers;
+    if(d.matPrev){ const P = d.matPrev, pOk = P.answers.filter(a => a.ok).length; mat = isOk(st) ? 'erreicht' : 'nicht'; sum = `ohne Material ${pOk} von ${P.answers.length}, mit Material ${ok} von ${d.answers.length} richtig`; all = [...P.answers, ...d.answers]; obs = [...new Set(all.flatMap(a => a.obs))]; st = mat === 'erreicht' ? 'teilweise' : P.st; d.matPrev = null; }
+    setCell(d.pid, d.key, {status: st, quelle: d.re ? 're-diagnose' : 'test', sum, items: all, obs, ...(mat ? {mat} : {})});
+    d.res[d.key] = st; d.tested.push({key: d.key, status: st, sum});
     clearTimeout(d.timer);
     diagNextCell();
   } else { d.idx++; d.resp = null; d.t0 = performance.now(); d.spoken = false; }
@@ -6365,6 +6431,35 @@ function materialSvg(z, e){
   if(!z && !e) s = `<rect x="4" y="4" width="252" height="${10*U + 14}" rx="12" fill="none" stroke="#cfc6b4" stroke-width="2" stroke-dasharray="6 5"/><text x="130" y="${5*U + 16}" text-anchor="middle" font-size="16" fill="#a39e97">Noch nichts gelegt</text>`;
   return `<svg viewBox="0 0 ${Math.max(W, 260)} ${10*U + 22}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zehnerstangen und Einer">${s}</svg>`;
 }
+/* Mathe-Test „Lege … €“ (Stefan 24.11.): Scheine und Münzen auch ziehen – auf den Tisch ziehen legt hin, vom Tisch wegziehen legt zurück */
+let dgDrag = null, dgSuppress = 0;
+document.addEventListener('pointerdown', e => {
+  if(e.button !== 0) return; const src = e.target.closest('#stage .money [data-dgden], #stage .money [data-dgrm]'); if(!src) return;
+  dgDrag = {src, id: e.pointerId, sx: e.clientX, sy: e.clientY, moved:false, ghost:null, add: src.hasAttribute('data-dgden'), c: +(src.dataset.dgden || src.dataset.dgrm)};
+  try { src.setPointerCapture?.(e.pointerId); } catch {}
+});
+document.addEventListener('pointermove', e => {
+  const d = dgDrag; if(!d || e.pointerId !== d.id) return;
+  if(!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 8){ d.moved = true; const [w, h] = itemSize(d.c); d.ghost = document.createElement('div'); d.ghost.className = 'dg-ghost'; d.ghost.innerHTML = `<svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${(w + 4)*1.1}" height="${(h + 4)*1.1}">${moneySvg(d.c, 0, 0)}</svg>`; document.body.append(d.ghost); if(!d.add) d.src.style.opacity = .3; }
+  if(!d.moved) return; e.preventDefault();
+  d.ghost.style.left = e.clientX + 'px'; d.ghost.style.top = e.clientY + 'px';
+});
+function dgDragEnd(e, cancel){
+  const d = dgDrag; if(!d || e.pointerId !== d.id) return; dgDrag = null;
+  d.ghost?.remove(); if(d.src.isConnected) d.src.style.opacity = '';
+  if(!d.moved || cancel) return;
+  dgSuppress = performance.now() + 400;
+  const tb = document.querySelector('#stage .money .mtable')?.getBoundingClientRect(); if(!tb) return;
+  const inside = e.clientX >= tb.left && e.clientX <= tb.right && e.clientY >= tb.top && e.clientY <= tb.bottom;
+  const r = app.mode === 'diag' ? (app.diag.resp ||= {}) : app.read.r; r.items ||= [];
+  if(d.add && inside && r.items.length < 40) r.items.push(d.c);
+  else if(!d.add && !inside){ const i = r.items.lastIndexOf(d.c); if(i >= 0) r.items.splice(i, 1); }
+  else return;
+  app.mode === 'diag' ? renderDiag() : renderRead();
+}
+document.addEventListener('pointerup', e => dgDragEnd(e, false));
+document.addEventListener('pointercancel', e => dgDragEnd(e, true));
+document.addEventListener('click', e => { if(performance.now() < dgSuppress && e.target.closest('#stage .money')){ e.stopPropagation(); e.preventDefault(); } }, true);
 function moneyRowSvg(list, tap){
   let x = 10, s = '';
   for(const c of list){ const [w, h] = itemSize(c), m = moneySvg(c, x, isNote(c) ? 10 : 40 - h/2 + 30); s += tap ? `<g data-dgrm="${c}" class="dg-rm" role="button" aria-label="${denomLabel(c)} zurücklegen">${m}</g>` : m; x += w + (isNote(c) ? 14 : 6); }
@@ -6404,7 +6499,7 @@ function itemStage(it, r, opt = {}){
     case 'money': {
       r.items ||= [];
       const laid = [...r.items].sort((a, b) => b - a);
-      return `<div class="money"><div class="mtable">${laid.length ? moneyRowSvg(laid, true) : '<p class="board-empty" style="inset:40% 0 auto">Tippe unten auf Scheine und Münzen. Zum Zurücklegen tippst du sie hier an.</p>'}</div><div class="mtray">${it.denoms.map(c => { const [w, h] = itemSize(c); return `<button class="mden" data-dgden="${c}" aria-label="${denomLabel(c)}"><svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${isNote(c) ? 74 : 40}" aria-hidden="true">${moneySvg(c, 0, 0)}</svg></button>`; }).join('')}<button class="mden dg-undo" data-dgundo aria-label="Letztes zurücklegen" ${r.items.length ? '' : 'disabled'}>${icon('undo')}<span>zurück</span></button></div></div>`;
+      return `<div class="money"><div class="mtable">${laid.length ? moneyRowSvg(laid, true) : '<p class="board-empty" style="inset:40% 0 auto">Tippe oder ziehe Scheine und Münzen hierher. Zum Zurücklegen tippst du sie an oder ziehst sie weg.</p>'}</div><div class="mtray">${it.denoms.map(c => { const [w, h] = itemSize(c); return `<button class="mden" data-dgden="${c}" aria-label="${denomLabel(c)}"><svg viewBox="-2 -2 ${w + 4} ${h + 4}" width="${isNote(c) ? 74 : 40}" aria-hidden="true">${moneySvg(c, 0, 0)}</svg></button>`; }).join('')}<button class="mden dg-undo" data-dgundo aria-label="Letztes zurücklegen" ${r.items.length ? '' : 'disabled'}>${icon('undo')}<span>zurück</span></button></div></div>`;
     }
     case 'build': {
       r.mat ||= [...it.start]; const [Z, E] = r.mat;
@@ -6562,11 +6657,11 @@ function diagControl(btn){
 /* ---------- Lehrkraft: Matrix, Förderzone, Begründung, ILEB (Mathe und Lesen) ---------- */
 function cellChip(m, key, label){
   const c = m[key], st = c?.status, cls = !c ? 'na' : st === 'erreicht' ? (c.quelle === 'abgeleitet' ? 'okd' : 'ok') : st === 'teilweise' ? 'pt' : 'no';
-  const sym = !c ? '–' : st === 'erreicht' ? '✓' : st === 'teilweise' ? '½' : '✗';
+  const sym = !c ? '–' : st === 'erreicht' ? '✓' : st === 'teilweise' ? (c.mat === 'erreicht' ? '½<sup>M</sup>' : '½') : '✗';
   const title = `${cellLabel(key)}: ` + (!c ? 'nicht getestet' : `${STATUS_TXT[st]}${c.quelle === 'abgeleitet' ? ' (abgeleitet)' : c.quelle === 'lehrkraft' ? ' (Lehrkraft)' : ''} · ${c.sum || ''} · ${new Date(c.date).toLocaleDateString('de-DE')}`);
   return `<td><button class="mx ${cls}" data-mx="${key}" title="${escHtml(title)}" aria-label="${escHtml(title)}">${label ?? sym}</button></td>`;
 }
-const legend = '✓ erreicht · ✓ hell = abgeleitet · ½ teilweise · ✗ nicht erreicht · – nicht getestet. Antippen ändert die Einstufung (Lehrkraft).';
+const legend = '✓ erreicht · ✓ hell = abgeleitet · ½ teilweise · ½ᴹ mit Material erreicht · ✗ nicht erreicht · – nicht getestet. Antippen ändert die Einstufung (Lehrkraft).';
 function matrixHtml(pid, subj){
   const m = matrixOf(pid);
   if(TESTS[subj]?.matrix) return TESTS[subj].matrix(m);
@@ -7338,9 +7433,10 @@ function zoneReport(pid, subj){
   else if(subj === 'L'){
     const l = highestIn(m, L_LEVELS.map(x => 'L|' + x)); if(l) kann.push(cellInfo(l).kann);
   }
-  const teil = out.zones.filter(z => z.cell?.status === 'teilweise').map(z => z.info.name);
+  const teil = out.zones.filter(z => z.cell?.status === 'teilweise' && z.cell.mat !== 'erreicht').map(z => z.info.name);
+  const mitMat = out.zones.filter(z => z.cell?.mat === 'erreicht').map(z => z.info.name);
   out.ileb = {
-    lernstand: `${name} ${kann.length ? [...new Set(kann)].join('; ') : TESTS[subj]?.start || 'baut erste Grundlagen auf'}.${teil.length && !TESTS[subj]?.noTeil ? ` Teilweise gelingt: ${teil.join(', ')}.` : ''}`,
+    lernstand: `${name} ${kann.length ? [...new Set(kann)].join('; ') : TESTS[subj]?.start || 'baut erste Grundlagen auf'}.${teil.length && !TESTS[subj]?.noTeil ? ` Teilweise gelingt: ${teil.join(', ')}.` : ''}${mitMat.length ? ` Mit Material gelingt: ${mitMat.join(', ')}.` : ''}`,
     ziel: out.zones.map(z => `${name} ${TESTS[subj]?.ziel ? TESTS[subj].ziel(z) : z.info.ziel}.`).join(' '),
     massnahmen: out.zones.map(z => { const w = matWay(z.key); return w ? `Am Material: ${w.hand.replace(/\.$/, '')}. Im Bild: ${w.bild.replace(/\.$/, '')}. In der App: ${z.info.offer.text}` : `${z.info.offer.text}; analog: ${z.info.analog}`; }).join('. ') + `. Re-Diagnose nach etwa 5 Übungseinheiten.`,
     bp: [...new Set(out.zones.map(z => z.info.bp))].join('; ')

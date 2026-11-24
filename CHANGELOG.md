@@ -17,6 +17,11 @@ Neu (Backlog I „Optimierung Deutsch“, Stefans Antworten im Dokument vom 24.1
 - **Einkaufszettel** (neuer Punkt unter Schreiben, nur Üben, kein Test): die Wörter einer Liste kommen nacheinander.
 - **Legeblatt „Bildkarten mit Wort“** (Wortschatz, Memory; für ein Kind zuerst seine unbekannten Bilder).
 - **Mathe, Hundertertafel „Finden“:** auch teilweise verdeckt (erste Zeile und Zehnerzahlen) und verdeckt; wechselt von selbst (8 richtig → weiter, 3 Fehler → zurück), Lehrkraft wählt oben. Nicht im Test.
+- **Mathe-Test „mit Material“** (Stefan 24.11.): Klappt eine Rechenstufe (R1–R7) ohne Material nicht sicher, kommen zwei bis drei Aufgaben derselben Art mit Material: Punktefeld (bis 20), Zehnerstangen und Einer zum Legen mit Tauschen (bis 100), Hunderterplatten (bis 1000), Punktebild (Einmaleins). Gelingt es damit, steht im Lernstand „teilweise – mit Material“ (½ᴹ, im ILEB „Mit Material gelingt: …“). Die Suche im Test springt wie bisher.
+- **Mathe-Test, Geld legen:** Scheine und Münzen lassen sich auch ziehen (auf den Tisch und wieder weg).
+- **Üben im Kopf:** Plus und Minus haben als letzte Darstellung „Im Kopf“ (nur die Rechnung); Einmaleins wechselt nach 8 auf Anhieb richtigen von „mit Punktebild“ zu „im Kopf“ (3 Fehler → zurück, „Bild zeigen“ hilft).
+- **Mengen legen und abzählen** (Zahlen im Konzentrationsmodus): oben „Aufgabe … von 10“ wie bei den anderen Übungen.
+- Test `tests/mathe_material.py`; `tests/plusminus_ueben.py` kennt die Stufe „Im Kopf“.
 - Test `tests/deutsch_optimierung.py`; `tests/materialkiste.py` zählt jetzt 10 Werkzeuge.
 
 Nach Stefans Rückmeldung zur Testversion (24.11.2026):

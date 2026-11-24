@@ -83,6 +83,8 @@ Am Ende sieht das Kind keine Ergebnisse, nur ein Dankeschön. Für dich führt d
 
 ## Schritt 4: Lernstand ansehen
 
+**Rechnen mit Material:** Klappt im Mathe-Test eine Rechenstufe ohne Material nicht, kommen gleich danach Aufgaben derselben Art mit Material (Punktefeld, Zehnerstangen und Einer zum Legen, Hunderterplatten, Punktebild). Gelingt es damit, steht in der Matrix ½ᴹ („mit Material erreicht“) und im ILEB-Vorschlag „Mit Material gelingt: …“. Beim „Lege … €“ im Test lassen sich Scheine und Münzen tippen oder ziehen.
+
 Der Knopf **Lernstand** (2) zeigt drei Dinge, untereinander. Oben wählst du das Kind oder „Ganze Klasse“. Darunter springst du mit den Knöpfen (Mathematik, Lesen, Schreiben, …) direkt zum Fach.
 
 **Die Kompetenzmatrix:** Dunkelgrünes ✓ heißt erreicht, hellgrünes ✓ abgeleitet (aus einer höheren Stufe geschlossen), ½ teilweise, rotes ✗ nicht erreicht, Strich nicht getestet. Antippen ändert eine Einstufung, wenn du das Kind anders erlebst.
@@ -132,9 +134,11 @@ Bei Plus, Minus und dem Einmaleins schreibt das Kind das Ergebnis direkt oben in
 
 **Plus** und **Minus** sind zum Üben da: Das Kind bekommt sofort eine Aufgabe und muss nichts eintragen oder auswählen. Mit **Weiter** oben geht es weiter (ohne Konzentrationsmodus: **Neue Aufgabe**). Die Darstellung wechselt von selbst, in dieser Reihenfolge:
 
-- bis 10 und bis 20: Material → Zehner- bzw. Zwanzigerfeld → Zahlenstrahl
-- bis 100: Material → Hundertertafel → Zahlenstrahl
-- bis 1000: Material → Zahlenstrahl
+- bis 10 und bis 20: Material → Zehner- bzw. Zwanzigerfeld → Zahlenstrahl → Im Kopf
+- bis 100: Material → Hundertertafel → Zahlenstrahl → Im Kopf
+- bis 1000: Material → Zahlenstrahl → Im Kopf
+
+Bei **Im Kopf** steht nur die Rechnung da, ohne Bild. Beim **Einmaleins** geht es genauso vom Punktebild zu „Im Kopf“; dort hilft **Bild zeigen**, wenn ein Kind nicht weiterkommt.
 
 Nach 8 Aufgaben, die beim ersten Versuch richtig sind, kommt die nächste Darstellung; nach drei Aufgaben in Folge, die nicht auf Anhieb geklappt haben, geht es eine zurück. Oben steht, welche Darstellung gerade dran ist. Als Lehrkraft (mit PIN freigeschaltet oder ohne PIN) kannst du dort direkt eine andere wählen. Den Vorschlag „Schwerer“ (größerer Zahlenraum) gibt es erst bei der letzten Darstellung.
 

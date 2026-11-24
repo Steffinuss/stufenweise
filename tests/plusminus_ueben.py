@@ -28,16 +28,16 @@ async def main():
         await pg.evaluate("app.ctx='practice'; settings.subject='M'; app.range=20; app.mode='home'; render()")
         await pg.click('[data-mode="add"]'); await pg.wait_for_timeout(200)
         st = await pg.evaluate("[app.mode, !!app.calc, task().ready, task().view, !!document.querySelector('#in-a'), document.querySelectorAll('[data-view]').length, document.querySelectorAll('[data-pmv]').length, document.querySelector('#btn-random').textContent]")
-        if st != ['add', False, True, 'material', False, 0, 3, 'Neue Aufgabe']: errs.append(f'Üben Start: {st}')
+        if st != ['add', False, True, 'material', False, 0, 4, 'Neue Aufgabe']: errs.append(f'Üben Start: {st}')
         v = await run(pg, 18)
         if v[:8] != ['material'] * 8 or v[8:16] != ['field'] * 8 or v[16:] != ['line'] * 2: errs.append(f'Reihenfolge bis 20: {v}')
         v = await run(pg, 3, tries=1)  # 3 Aufgaben nicht auf Anhieb → zurück
         if await pg.evaluate("task().view") != 'field': errs.append(f'nach 3 Fehlern nicht zurück: {await pg.evaluate("task().view")}')
         # bis 100: Material → Hundertertafel → Zahlenstrahl; bis 1000 ohne Tafel
         await pg.click('[data-range="100"]'); await pg.wait_for_timeout(150)
-        if await pg.evaluate("pmViews().join()") != 'material,board,line': errs.append('Reihenfolge bis 100')
+        if await pg.evaluate("pmViews().join()") != 'material,board,line,none': errs.append('Reihenfolge bis 100')
         await pg.click('[data-range="1000"]'); await pg.wait_for_timeout(150)
-        if await pg.evaluate("pmViews().join()") != 'material,line': errs.append('Reihenfolge bis 1000')
+        if await pg.evaluate("pmViews().join()") != 'material,line,none': errs.append('Reihenfolge bis 1000')
         await pg.click('[data-range="20"]'); await pg.wait_for_timeout(150)
         # Lehrkraft wählt (ohne PIN erlaubt), mit PIN gesperrt
         await pg.click('[data-pmv="2"]'); await pg.wait_for_timeout(100)
