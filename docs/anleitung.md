@@ -256,9 +256,9 @@ Die Werkzeuge:
 - **Frei legen** und **Blitzblick** wie beim Üben.
 - **Uhr:** Zeiger mit + und − stellen (in Schritten von 1, 5 oder 15 Minuten), dazu auf Wunsch die Digitalzeit und die Uhrzeit in Worten.
 - **Wörter:** ein Wort oder einen Satz eintippen und groß zeigen, mit farbigen Silben und Silbenbögen. Kennt die App ein Bild zum Wort, erscheint es dazu.
-- **Anlauttabelle:** alle Buchstaben mit Bild; ein Buchstabe zeigt alle Bilder, die so anfangen.
+- **Anlauttabelle:** alle Buchstaben mit Bild. Selbstlaute haben zwei Bilder: Strich = lang gesprochen (Esel), Punkt = kurz gesprochen (Ente). Ein Buchstabe zeigt alle Bilder, die so anfangen, bei Selbstlauten getrennt nach lang und kurz.
 - **Blitzlesen:** **Nächstes Wort** zeigt ein Wort für 0,5, 1 oder 2 Sekunden, dann steht dort „?“. Oben eigene Wörter eintragen (mit Komma getrennt) oder leer lassen (Wörter aus der App). **Aufdecken** zeigt das Wort mit Bild.
-- **Satz-Baukasten:** oben einen Satz eintippen, **Wortkarten machen**. Die Kinder tippen die Karten der Reihe nach an; ein grüner Strich zeigt, dass der Satz stimmt.
+- **Satz-Baukasten:** **Neuer Satz** zeigt einen Satz aus dem Alltag als gemischte Wortkarten (Länge: kurz, mittel, lang). Mit **Eigener Satz** tippst du einen eigenen Satz in ein kleines Feld (die Klasse sieht nur Punkte) und drückst Enter. Die Kinder tippen die Karten der Reihe nach an; ein grüner Strich zeigt, dass der Satz stimmt.
 
 In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, dass ein Gerät immer direkt mit Üben oder immer mit Unterricht startet, zum Beispiel der Rechner an der Tafel.
 

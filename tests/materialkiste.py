@@ -3,6 +3,7 @@ Werkzeuge Rechenhilfe, Taschenrechner, Frei legen, Zwanzigerfeld, Hundertertafel
 Kein Protokoll, keine Runden, keine Lenkung; gezählt wird nur, wie oft ein Werkzeug geöffnet wird (Gast: nichts).
 Taschenrechner: + − · :, Zahlen bis 10 000, geteilt mit Rest, Ergebnis wahlweise als Material."""
 import asyncio
+KISTE_N = range(10)  # 7 Mathe- und 3 Deutsch-Werkzeuge (Backlog I)
 from common import URL, launch
 from playwright.async_api import async_playwright
 
@@ -33,8 +34,8 @@ async def main():
         await pg.click('[data-ctx-kiste]'); await pg.wait_for_timeout(150)
         check('erst Wer?', await pg.locator('.home-names [data-home-pick]').count() == 3)
         await pg.click(f'[data-home-pick="{ali}"]'); await pg.wait_for_timeout(150)
-        check('Werkzeugauswahl', await pg.locator('.ct-tile[data-kiste]').count() == 7)
-        check('Kisten-Leiste auf der Auswahl', await pg.locator('.rail [data-kiste]').count() == 7)
+        check('Werkzeugauswahl', await pg.locator('.ct-tile[data-kiste]').count() == len(KISTE_N))
+        check('Kisten-Leiste auf der Auswahl', await pg.locator('.rail [data-kiste]').count() == len(KISTE_N))
 
         # jedes Werkzeug öffnet sich, Leiste zeigt es an, Zählen nur beim Öffnen
         for k in TOOLS:

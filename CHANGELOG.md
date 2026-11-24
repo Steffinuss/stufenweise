@@ -15,7 +15,12 @@ Neu (Backlog I „Optimierung Deutsch“, Stefans Antworten im Dokument vom 24.1
 - **W6 Schreiben im Alltag** (nur Üben): Einkaufszettel und eigener Satz zum Bild.
 - **Legeblatt „Bildkarten mit Wort“** (Wortschatz, Memory; für ein Kind zuerst seine unbekannten Bilder).
 - **Mathe, Hundertertafel „Finden“:** auch teilweise verdeckt (erste Zeile und Zehnerzahlen) und verdeckt; wechselt von selbst (8 richtig → weiter, 3 Fehler → zurück), Lehrkraft wählt oben. Nicht im Test.
-- Test `tests/deutsch_optimierung.py`.
+- Test `tests/deutsch_optimierung.py`; `tests/materialkiste.py` zählt jetzt 10 Werkzeuge.
+
+Nach Stefans Rückmeldung zur Testversion (24.11.2026):
+- **Satz-Baukasten:** „Neuer Satz“ erzeugt Sätze aus dem Alltag (kurz, mittel, lang); der Satz steht nicht mehr oben sichtbar. „Eigener Satz“ öffnet ein kleines Feld, das Getipptes als Punkte zeigt.
+- **Anlauttabelle:** Bilder für alle Buchstaben (neu: Computer, Qualle, Vogel, Xylofon, Yoga, Ähre, Öl, Überraschung, Eule bei Eu). Selbstlaute mit langem (Strich) und kurzem (Punkt) Laut: Ameise/Apfel, Esel/Ente, Igel/Insel, Ofen/Ordner, Uhr/Unterhose; beim Buchstaben getrennt nach „lang gesprochen“ und „kurz gesprochen“. „Anlaute hören“ (P4) nutzt deshalb nur Mitlaute.
+- **Bilder neu gezeichnet:** Ente (Stockente statt Badeente), Esel und Kamel ohne Linien an den Übergängen von Kopf, Hals und Körper.
 
 ## 0.33.0 – 24.11.2026
 
