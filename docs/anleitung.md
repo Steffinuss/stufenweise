@@ -213,7 +213,9 @@ Beim Schreiben nach Bild muss das Kind das Bild erkennen. Damit das nicht zum St
 
 **Lange Wörter (W4):** Die Kästchen stehen in Silben unter Silbenbögen. Beim Üben kommt zusätzlich „Lege das Wort aus Silben“ mit Silbenkarten (nicht im Test).
 
-**Sätze (W6):** Beim Üben kommen zusätzlich ein **Einkaufszettel** (drei Bilder nacheinander aufschreiben) und **Schreibe einen Satz zum Bild**: Die App prüft großen Anfang, Punkt, mindestens drei Wörter und dass das Wort zum Bild (großgeschrieben) vorkommt.
+**Sätze (W6):** Beim Üben schreiben die Kinder nur ganze Sätze: **Schreibe einen Satz zum Bild** (die App prüft großen Anfang, Punkt, mindestens drei Wörter und dass das Wort zum Bild großgeschrieben vorkommt) und **Satz merken und aufschreiben**. Der Test W6 bleibt wie bisher.
+
+**Einkaufszettel** (unter Schreiben) und **Schüttelsätze** (unter Lesen) sind eigene Übungen ohne Test: Beim Einkaufszettel kommen die drei Wörter einer Liste nacheinander, bei den Schüttelsätzen ordnen die Kinder Wortkarten zu einem Satz. Beide stehen im Lernstand unter den Übungen.
 
 ### Hören
 

@@ -12,7 +12,9 @@ Neu (Backlog I „Optimierung Deutsch“, Stefans Antworten im Dokument vom 24.1
 - **Hören P1–P4** mit Übungen (Silben zählen, Silben verbinden, Reime, Anlaute) und im Lese-Test, wenn L4 noch nicht erreicht ist; Arbeitsblätter „Hören“.
 - **Materialkiste Deutsch:** Anlauttabelle, Bildwörterbuch, Wörter. Die Nutzung steht im ILEB-Vorschlag Lesen/Schreiben.
 - **Unterricht Deutsch:** Anlauttabelle, Blitzlesen, Satz-Baukasten.
-- **W6 Schreiben im Alltag** (nur Üben): Einkaufszettel und eigener Satz zum Bild.
+- **W6 Sätze schreiben** (nur Üben): nur echte Sätze – eigener Satz zum Bild und „Satz merken und aufschreiben“ (Großschreibung und Punkt werden geprüft). Der W6-Test bleibt wie bisher.
+- **Schüttelsätze** (neuer Punkt unter Lesen, nur Üben, kein Test): Wortkarten zu einem Satz ordnen, mit und ohne Bild.
+- **Einkaufszettel** (neuer Punkt unter Schreiben, nur Üben, kein Test): die Wörter einer Liste kommen nacheinander.
 - **Legeblatt „Bildkarten mit Wort“** (Wortschatz, Memory; für ein Kind zuerst seine unbekannten Bilder).
 - **Mathe, Hundertertafel „Finden“:** auch teilweise verdeckt (erste Zeile und Zehnerzahlen) und verdeckt; wechselt von selbst (8 richtig → weiter, 3 Fehler → zurück), Lehrkraft wählt oben. Nicht im Test.
 - Test `tests/deutsch_optimierung.py`; `tests/materialkiste.py` zählt jetzt 10 Werkzeuge.

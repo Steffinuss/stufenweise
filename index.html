@@ -1681,7 +1681,7 @@ function guideOf(subj){
     if(!axHas('M')){ MATH_RAIL.forEach(x => modes.add(x)); RANGES.forEach(r => zrs.add(r)); }
     g.modes = modes; g.zrs = zrs;
   }
-  g.lvlOk = l => { const ax = l[0]; if(l === 'LX' || l === 'WX') return true; if(ax === 'Z' && !axHas('Z')) return gm !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20)); if(!axHas(ax)) return gm !== 'zone'; return allow.has(`${ax}|${l}`); };
+  g.lvlOk = l => { const ax = l[0]; if(l === 'LX' || l === 'WX') return true; if(l === 'LS') return g.lvlOk('L5') || g.lvlOk('L6'); if(l === 'WE') return g.lvlOk('W3') || g.lvlOk('W4'); if(ax === 'Z' && !axHas('Z')) return gm !== 'zone' || (g.modes?.has('add') && [...(g.addZrs || [])].some(r => r <= 20)); if(!axHas(ax)) return gm !== 'zone'; return allow.has(`${ax}|${l}`); };
   g.first = ax => { const lv = {L:L_LEVELS, W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS}[ax]; return lv.find(l => g.zones.has(`${ax}|${l}`)) || [...lv].reverse().find(l => g.lvlOk(l)) || lv[0]; };
   g.axVisible = ax => !axHas(ax) ? gm !== 'zone' : [...allow].some(k => k.startsWith(ax + '|'));
   return g;
@@ -1794,8 +1794,8 @@ function railDeutschHtml(g, lvOk){
     /* nur eine Gruppe offen: die mit der aktiven Stufe oder die zuletzt angetippte */
     const open = (app.railGrp && app.railGrpLvl === app.read.lvl && app.mode === 'read' ? app.railGrp : null) || (app.mode === 'read' && 'WP'.includes(String(app.read.lvl)[0]) ? String(app.read.lvl)[0] : 'L');
     const fold = (gp, name, n) => `<button class="rail-fold" data-railgrp="${gp}" aria-expanded="false" title="${name} aufklappen"><span>${name}</span><small>${n} Stufen ▾</small></button>`;
-    const RL = [...READ_RAIL, ...(ownWords().length ? [['LX', '<small>★</small>']] : [])].filter(([l]) => lvOk(l));
-    if(ownWords().length) WR.push(['WX', '<small>★</small>']);
+    const RL = [...READ_RAIL, ['LS', '<small>⇄</small>'], ...(ownWords().length ? [['LX', '<small>★</small>']] : [])].filter(([l]) => lvOk(l));
+    WR.push(['WE', '<small>☰</small>']); if(ownWords().length) WR.push(['WX', '<small>★</small>']);
     const WL = WR.filter(([l]) => lvOk(l));
     h += open !== 'L' ? fold('L', 'Lesen', RL.length) : `<span class="rail-h">Lesen</span>` + RL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${L_INFO[l].short}</button>`).join('');
     h += open !== 'W' ? fold('W', 'Schreiben', WL.length) : `<span class="rail-h">Schreiben</span>` + WL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${W_INFO[l].short}</button>`).join('');
@@ -4210,7 +4210,7 @@ function statsSections(id){
       for(const r of ranges){ const es = E.filter(e => e.range === r); lines.push(`bis ${r}: ${frac(es)} auf einen Blick erkannt`); }
     }
     if(mode === 'write'){
-      for(const l of W_LEVELS){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${W_INFO[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
+      for(const l of [...W_LEVELS, 'WE']){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${W_INFO[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
       const laut = E.filter(e => !e.ok && e.given && !e.unk).slice(-6).map(e => `${e.task.replace(/^.*: /, '')} → „${e.given}“`); if(laut.length) lines.push(`Schreibungen zum Ansehen: ${laut.join(', ')}`);
     }
     if(mode === 'read'){
@@ -4221,6 +4221,7 @@ function statsSections(id){
       for(const l of lv){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${info[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
     }
     for(const a of Object.values(AXES).filter(a => a.mode === mode)) for(const l of a.levels){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${a.info[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
+    if(mode === 'read' && E.some(e => e.lvl === 'LS')) lines.push(`Schüttelsätze: ${frac(E.filter(e => e.lvl === 'LS'))} beim ersten Versuch richtig`);
     if(mode === 'read' && E.some(e => e.lvl === 'LX')) lines.push(`Meine Wörter lesen: ${frac(E.filter(e => e.lvl === 'LX'))} beim ersten Versuch richtig`);
     if(mode === 'count'){
       const ranges = [...new Set(E.map(e => e.range))].sort((a, b) => a - b);
@@ -5218,6 +5219,8 @@ function ownReadItem(kind){
 }
 const READ = {
   LX: [() => ownReadItem('same'), () => ownReadItem('caps'), () => ownReadItem('pic'), () => ownReadItem('gap')],
+  /* Schüttelsätze (Stefan 24.11.): Wortkarten zu einem Satz ordnen – nur Üben, kein Test */
+  LS: [() => shakeFact(), () => shakeBank('kurz'), () => shakeBank('kurz'), () => shakeBank('mittel')],
   L1: [() => pictoItem(true), () => pictoItem(false), () => pictoItem(false)],
   L2: [() => signEasy(true), () => signEasy(false), () => signHard()],
   L3: [() => anlautItem(true), () => anlautItem(false), () => caseItem()],
@@ -5307,6 +5310,7 @@ const S_INFO = {
       offer:{text:'Zahlen bis 1000 legen und umtauschen (Zahlen, Material)', set:{mode:'number', range:1000, view:'material'}}, analog:'Geld: 23 Zehn-Euro-Scheine gegen Hunderter tauschen; Schrauben in Kartons zu 10 und Kisten zu 100 packen'}
 };
 const L_INFO = {
+  LS:{name:'Schüttelsätze', short:'Schüttelsätze', bp:'D 2.1.3.3 Sätze lesen', kann:'ordnet Wortkarten zu einem sinnvollen Satz', ziel:'liest Sätze genau und baut sie richtig zusammen (Großbuchstabe am Anfang, Punkt am Ende)', analog:'Satzstreifen zerschneiden und neu legen; Wortkarten mit Bildern zu Sätzen legen'},
   LX:{name:'Meine Wörter lesen', short:'Meine Wörter', bp:'D 2.1.3.2 Wörter lesen (Lernwörter, Namen)', kann:'erkennt und liest eigene Lernwörter und Namen sicher', ziel:'liest bedeutsame Wörter (Namen der Klasse, Praktikumswörter) als Ganzwort und Buchstabe für Buchstabe', analog:'Namenskarten der Klasse lesen und zuordnen (Garderobe, Sitzplan); Wörterkartei mit Lernwörtern; Etiketten in der Werkstatt lesen'},
   L1:{name:'Bilder und Symbole', short:'Bilder', bp:'D 2.1.3.1 Lesen von Bildern, ikonischen Zeichen und Symbolen',
       kann:'ordnet Alltagsbilder den passenden Piktogrammen zu (Essen, Toilette, Erste Hilfe, Bus)', ziel:'versteht häufige Piktogramme im Schulhaus und im Alltag (Toilette, Erste Hilfe, Bus) und nutzt Bildpläne',
@@ -5377,6 +5381,7 @@ const cellLabel = key => { const [ax, a, b] = key.split('|'), i = cellInfo(key);
    ===================================================================== */
 const W_LEVELS = ['W1','W2','W3','W4','W5','W6'];
 const W_INFO = {
+  WE:{name:'Einkaufszettel', short:'Einkaufszettel', bp:'D 2.1.2.3 Lautgetreues Schreiben (Alltag)', kann:'schreibt einen Einkaufszettel zu Bildern', ziel:'schreibt Wörter für den Alltag lautgetreu auf (Einkaufszettel, Notizen)', analog:'echten Einkaufszettel für die Schulküche schreiben und damit einkaufen'},
   WX:{name:'Meine Wörter', short:'Meine Wörter', bp:'D 2.1.2.4 Logographemisches Schreiben (Lernwörter)', kann:'schreibt eigene Lernwörter ab und aus dem Gedächtnis', ziel:'schreibt bedeutsame Wörter (Namen, Praktikumswörter) sicher und auswendig', analog:'Lernwörterkartei: Lesen – Merken – Abdecken – Schreiben – Vergleichen; Wörter im Alltag suchen (Etiketten, Schilder)'},
   W1:{name:'Abschreiben', short:'Abschreiben', bp:'D 2.1.2.4 Logographemisches Schreiben', kann:'schreibt kurze Wörter mit Buchstabenkärtchen richtig ab', ziel:'schreibt Wörter buchstabengetreu ab (mit Vorlage)', analog:'Namen, Signalwörter und Einkaufswörter mit Buchstabenkarten nachlegen; Wörter auf Etiketten abschreiben'},
   W2:{name:'Anlaute schreiben', short:'Anlaute', bp:'D 2.1.2.5 Alphabetisches Schreiben (Phonem-Graphem-Zuordnung)', kann:'schreibt zu einem Bild den Anfangsbuchstaben', ziel:'hört den Anlaut eines Wortes und schreibt den passenden Buchstaben', analog:'Anlauttabelle nutzen; Gegenstände nach Anlaut sortieren und beschriften'},
@@ -5434,6 +5439,8 @@ function ownItem(kind){
 }
 const WRITE = {
   WX: [() => ownItem('tiles'), () => ownItem('copy'), () => ownItem('memo'), () => ownItem('memo')],
+  /* Einkaufszettel (nur Üben): die Wörter einer Liste kommen nacheinander */
+  WE: [() => shopItem(), () => shopItem(), () => shopItem()],
   W1: [() => { const k = fresh(LAUT_SHORT); return wItem(k, {kern:true, word:k, tiles: shuffle(k.split('')), check:'exact', prompt:'Lege das Wort nach.', label:`abschreiben: ${k}`}); },
        () => { const k = fresh(['Lampe','Tasse','Hose','Gabel','Lupe','Sofa','Limo','Blume','Kiste','Wolke']); return wItem(k, {word:k, tiles: shuffle(k.split('')), check:'exact', prompt:'Lege das Wort nach.', label:`abschreiben: ${k}`}); },
        () => { const k = fresh(LAUT_LONG); return wItem(k, {word:k, tiles: shuffle(k.split('')), check:'exact', prompt:'Lege das Wort nach.', label:`abschreiben: ${k}`}); }],
@@ -5455,17 +5462,27 @@ const SHOP = ['Banane', 'Milch', 'Brot', 'Käse', 'Salat', 'Gurke', 'Tomate', 'P
 function shopItem(){
   const R = app.read, S = R.shop && R.shop.list.length > R.shop.done.length ? R.shop : (R.shop = {list: freshN(wPool(SHOP), 3), done: []});
   const k = S.list[S.done.length];
-  return wItem(k, {shop:S, prompt:'Schreibe den Einkaufszettel.', label:`Einkaufszettel: ${k}`, tip:'Noch nicht. Sprich das Wort langsam mit.'});
+  return wItem(k, {shop:S, prompt: S.done.length ? 'Schreibe das nächste Wort auf den Einkaufszettel.' : 'Schreibe den Einkaufszettel. Fang oben an.', label:`Einkaufszettel: ${k}`, tip:'Noch nicht. Sprich das Wort langsam mit.'});
 }
 function satzItem(){
   const k = wPick(W_POOLS.W6());
   return {type:'write', icon:k, target:k, check:'satz', free:true, prompt:'Schreibe einen Satz zum Bild. Denk an den großen Anfang und den Punkt.', label:`eigener Satz: ${k}`};
 }
-const WRITE_PRACTICE = {W4: [sylCardItem, sylCardItem], W6: [shopItem, shopItem, satzItem]};
+function shakeItem(words, icon){ const tiles = shuffle(words.map((_, i) => i)); if(words.length > 1 && tiles.every((v, i) => v === i)) tiles.reverse(); return {type:'sent', ...(icon ? {icon} : {}), words, tiles, prompt: icon ? 'Lege den Satz zum Bild.' : 'Lege den Satz.', label:`Schüttelsatz: ${words.join(' ')}`}; }
+function shakeFact(){ const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1]; return shakeItem([cap(art(n)), n, 'ist', ...(t + '.').split(' ')], n); }
+function shakeBank(len){ const t = fresh(SATZ_BANK[len]), words = t.split(' '), ic = words.map(w => w.replace(/[.,!?]/g, '')).find(w => ICON[w] && CLEAR.includes(w)); return shakeItem(words, ic); }
+/* Satz merken und aufschreiben (W6, nur Üben): Satz lesen, abdecken, aus dem Gedächtnis schreiben */
+function memoSatzItem(){
+  const t = fresh(SATZ_BANK.kurz.filter(x => x.split(' ').length <= 4)), ic = t.replace(/[.,!?]/g, '').split(' ').find(w => ICON[w] && CLEAR.includes(w));
+  return {type:'write', ...(ic ? {icon: ic} : {}), word: t, target: t, memo:true, check:'satzgleich', free:true, prompt:'Lies den Satz. Merke ihn dir. Schreibe ihn auf.', label:`Satz merken: ${t}`};
+}
+const WRITE_PRACTICE = {W4: [sylCardItem, sylCardItem]};
+/* Beim Üben ersetzt: W6 nur echte Sätze schreiben (Stefan 24.11.); der Test bleibt wie bisher */
+const WRITE_UEBEN = {W6: [satzItem, memoSatzItem]};
 /* Darstellung */
 function writeStage(it, r, opt = {}){
   r.text ??= ''; r.used ??= [];
-  if(it.memo && !r.hidden) return `<div class="it-wrap w-wrap">${it.unkWord ? `<div class="it-icon">${iconSvg(it.icon, 110)}</div>` : ''}<div class="it-word memo-word">${escHtml(it.word)}</div><p class="memo-steps">${it.unkWord ? 'So heißt das Bild. Lies das Wort genau. Merke es dir.' : 'Lies das Wort genau. Sprich es leise mit. Merke es dir.'}</p><button class="memo-btn" data-wmemo>Ich habe es mir gemerkt – abdecken</button></div>`;
+  if(it.memo && !r.hidden) return `<div class="it-wrap w-wrap">${it.unkWord ? `<div class="it-icon">${iconSvg(it.icon, 110)}</div>` : ''}<div class="it-word memo-word">${escHtml(it.word)}</div><p class="memo-steps">${it.unkWord ? 'So heißt das Bild. Lies das Wort genau. Merke es dir.' : it.check === 'satzgleich' ? 'Lies den Satz genau. Sprich ihn leise mit. Merke ihn dir.' : 'Lies das Wort genau. Sprich es leise mit. Merke es dir.'}</p><button class="memo-btn" data-wmemo>Ich habe es mir gemerkt – abdecken</button></div>`;
   const showWord = it.word && (!it.memo || opt.feedback);
   const sayW = it.icon || it.word || (it.target?.length > 1 ? it.target : '');
   const head = (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 130)}${speechBtn(sayW)}</div>` : speechBtn(sayW) ? `<div class="it-icon">${speechBtn(sayW)}</div>` : '') + (showWord ? `<div class="it-word">${escHtml(it.word)}</div>` : '') + (it.memo && !opt.feedback ? `<button class="memo-peek" data-wpeek>Nochmal ansehen</button>` : '');
@@ -5525,6 +5542,14 @@ function evalWrite(it, r){
   if(it.type === 'sent'){ if((r.order || []).length < it.words.length) return null; const ok = r.order.every((v, i) => it.words[v] === it.words[i]); return {ok, given: r.order.map(i => it.words[i]).join(' '), obs: ok ? [] : ['Satzbau unvollständig oder vertauscht']}; }
   if(r.slots && r.slots.some(x => !x.c)) return null;
   const a = (r.text || '').trim(); if(!a) return null;
+  if(it.check === 'satzgleich'){ /* abgeschriebener/gemerkter Satz: Wörter lautgetreu, Großschreibung genau, Punkt */
+    const want = it.target.replace(/[.!?]$/, '').split(/\s+/), got = a.replace(/[.!?]+$/, '').split(/\s+/).filter(Boolean), obs = [];
+    if(got.length !== want.length) obs.push('Wort fehlt');
+    else { want.forEach((w, i) => { const g = got[i]; if(lautNorm(g) !== lautNorm(w)) obs.push('Wort falsch'); else if((g[0] === g[0].toUpperCase()) !== (w[0] === w[0].toUpperCase())) obs.push(i === 0 ? 'Satzanfang klein' : 'groß/klein'); }); }
+    if(!/[.!?]$/.test(a)) obs.push('Punkt fehlt');
+    it.tipNow = obs.includes('Wort fehlt') ? 'Noch nicht. Zähle die Wörter. Schau dir den Satz noch einmal an.' : obs.includes('Wort falsch') ? 'Noch nicht. Ein Wort stimmt nicht. Schau noch einmal hin.' : obs.includes('Satzanfang klein') ? 'Fast! Der Satz fängt mit einem großen Buchstaben an.' : obs.includes('groß/klein') ? 'Fast! Achte auf groß und klein: Dinge und Namen schreibt man groß.' : obs.includes('Punkt fehlt') ? 'Fast! Am Ende vom Satz steht ein Punkt.' : '';
+    return {ok: !obs.length, given: a, obs};
+  }
   if(it.check === 'satz'){ /* eigener Satz: großer Anfang, Punkt (oder ! ?), mindestens 3 Wörter, das Wort zum Bild (lautgetreu genügt) */
     const ws = a.replace(/[.!?]+$/, '').split(/\s+/).filter(Boolean), obs = [];
     if(!/^[A-ZÄÖÜ]/.test(a)) obs.push('Satzanfang klein');
@@ -6619,6 +6644,7 @@ const MAT_WAY = {
   Z1: MW('Eierkarton mit 10 Plätzen: einige Plätze füllen, die leeren zählen. Zehnerpartner mit den Fingern zeigen.', 'Im Zehnerfeld eine Zahl mit Wendeplättchen legen und mit der zweiten Farbe bis 10 auffüllen.', ['Eierkarton (10er)', 'Wendeplättchen'], 'K:zehner'),
   Z2: MW('Partnerkarten-Memory: Karten 1 bis 9 umdrehen, Partner suchen, die zusammen 10 ergeben.', 'Zehnerpartner aufschreiben und mit dem Zehnerfeld prüfen.', ['Zahlenkarten 1–9', 'Wendeplättchen'], 'M:zehnerpartner'),
   Z3: MW('Zwei 10er-Eierkartons: erst den ersten voll machen, dann im zweiten weiter (8 + 5 = 8 + 2 + 3).', 'Im Zwanzigerfeld legen: erst die obere Reihe bis 10 auffüllen, dann unten weiter.', ['zwei 10er-Eierkartons', 'Wendeplättchen'], 'K:zwanzig'),
+  LS: MW('Satzstreifen zerschneiden und neu legen; Wortkarten mit Bildern zu Sätzen legen.', 'Die Wortkarten erst lesen, dann der Reihe nach legen.', ['Satzstreifen', 'Wortkarten'], null),
   LX: MW('Namens- und Wortkarten der Klasse den Personen, Fächern oder Orten im Schulhaus zuordnen.', 'Lernwörter mit Buchstabenkarten nachlegen.', ['Wortkarten', 'Buchstabenkarten'], 'K:buchst'),
   L1: MW('Echte Gegenstände und Orte den passenden Piktogrammen zuordnen (die Piktogrammkarte an die Toilettentür halten).', 'Bildkarten auf die passenden Piktogramme legen.', ['Piktogrammkarten', 'Gegenstände'], 'L:L1'),
   L2: MW('Signalwörter im Schulhaus und unterwegs suchen und die Wortkarte an das Schild halten.', 'Wortkarten auf die passenden Bilder legen.', ['Wortkarten'], 'L:L2'),
@@ -6633,6 +6659,7 @@ const MAT_WAY = {
   P2: MW('Silbenrätsel: Die Lehrkraft spricht in Silben, das Kind holt den passenden Gegenstand.', 'Für die Silben Steine legen und das Wort zusammenschieben.', ['Gegenstände', 'Steine'], 'K:silben'),
   P3: MW('Reimpaare mit Gegenständen finden (Hose – Dose) und nebeneinanderlegen.', 'Reim-Memory mit Bildkarten spielen.', ['Gegenstände', 'Bildkarten']),
   P4: MW('„Ich sehe was, das fängt mit M an“; Gegenstände nach dem Anfangslaut sortieren.', 'Die Buchstabenkarte auf das Feld neben dem Bild legen.', ['Gegenstände', 'Buchstabenkarten'], 'K:anlaut'),
+  WE: MW('Einen echten Einkaufszettel für die Schulküche schreiben und damit einkaufen.', 'Zuerst die Bilder benennen, dann Wort für Wort schreiben.', ['Bildkarten', 'Zettel und Stift'], 'K:bildk'),
   WX: MW('Lernwörter mit Buchstabenkarten legen, anschauen, umdrehen und aus dem Kopf neu legen.', 'Das Wort mit Buchstabenkarten legen, dann schreiben.', ['Buchstabenkarten', 'Wortkarten'], 'K:buchst'),
   W1: MW('Namen und Einkaufswörter mit Buchstabenkarten unter die Vorlage legen.', 'Buchstabenkarten in die Kästchen unter dem vorgegebenen Wort legen.', ['Buchstabenkarten'], 'K:wortv'),
   W2: MW('Gegenstände nach dem Anfangslaut sortieren und mit dem Buchstaben beschriften.', 'Die Buchstabenkarte auf das Feld neben dem Bild legen.', ['Gegenstände', 'Buchstabenkarten'], 'K:anlaut'),
@@ -7400,7 +7427,7 @@ function readNew(){
   const R = app.read; R.lvl ||= readDefaultLevel();
   const axBank = l => AXES[String(l)[0]]?.items[l];
   if(!READ[R.lvl] && !PHON[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl] && !Z_ITEMS[R.lvl] && !axBank(R.lvl)) R.lvl = 'L4';
-  const bank = [...(READ[R.lvl] || PHON[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl) || []), ...(WRITE_PRACTICE[R.lvl] || [])];
+  const bank = WRITE_UEBEN[R.lvl] || [...(READ[R.lvl] || PHON[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl) || []), ...(WRITE_PRACTICE[R.lvl] || [])];
   const arts = bzArts(R.lvl), m = arts && bzMem(); if(m && !arts[m.art]) Object.assign(m, {art:0, ok:0});
   freshNew(); let it, tries = 0; do { it = arts ? arts[m.art][1](bzStep(m, arts[m.art])) : pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
   if(R.lvl === 'H1') it = hCover(it);
@@ -7454,7 +7481,7 @@ function renderRead(){
   $('#controls').innerHTML = (up && R.fb?.ok ? toolBtn({id:'r-up', ic:'next', label:'Nächste Stufe', primary:true}) : '') + (down ? toolBtn({id:'r-down', ic:'undo', label:'Leichtere Stufe'}) : '') + (R.fb?.ok ? toolBtn({id:'r-next', ic:'next', label:up ? 'Hier weiter' : 'Weiter', primary:!up}) : toolBtn({id:'r-check', ic:'check', label:'Prüfen', primary:true, disabled: it.type === 'choice' ? R.r.choice == null : (it.type === 'board' && it.mode === 'fill') || it.type === 'input' ? false : !evalItem(it, R.r, [])})) +
     (R.fb && !R.fb.ok && R.tries >= 2 && it.check !== 'satz' ? toolBtn({id:'r-show', ic:'eye', label:'Lösung zeigen'}) : '') +
     (wUnkOk(it) && !R.fb?.ok ? toolBtn({id:'r-unk', ic:'help', label:'Kenne ich nicht'}) : '') +
-    (W_POOLS[R.lvl] && !document.body.classList.contains('fokus') ? '<span class="sep"></span>' + toolBtn({id:'r-pics', ic:'eye', label:'Bilder vorher ansehen'}) : '');
+    (W_POOLS[R.lvl] && R.lvl !== 'W6' && !document.body.classList.contains('fokus') ? '<span class="sep"></span>' + toolBtn({id:'r-pics', ic:'eye', label:'Bilder vorher ansehen'}) : '');
   itFit();
   glanceArm(it, R.r, () => app.mode === 'read' && app.read.item === it, renderRead);
 }
@@ -7479,7 +7506,7 @@ function readCheck(){
     celebrate(document.querySelector('#stage .fb-ok'));
   } else {
     if(R.tries === 0){ R.miss = (R.miss || 0) + 1; R.streak = 0; }
-    if(it.type === 'write' && !it.max && it.check !== 'satz'){ R.r.marks = wDiff(res.given, it.target, it.check !== 'exact'); if(it.tiles) R.r.marks.slots = null; if(R.r.marks.okN < Math.ceil([...it.target].length / 2)) R.r.marks = null; R.r.slots = null; }
+    if(it.type === 'write' && !it.max && !String(it.check).startsWith('satz')){ R.r.marks = wDiff(res.given, it.target, it.check !== 'exact'); if(it.tiles) R.r.marks.slots = null; if(R.r.marks.okN < Math.ceil([...it.target].length / 2)) R.r.marks = null; R.r.slots = null; }
     R.tries++; renderRead();
     const lautOk = it.type === 'write' && res.obs.some(o => o.startsWith('lautgetreu'));
     if(it.type === 'clockset') return setHint(res.obs.includes('Stunde falsch') ? 'Die Minuten stimmen. Schau auf den kurzen roten Zeiger.' : 'Noch nicht. Langer blauer Zeiger = Minuten, kurzer roter Zeiger = Stunden.', 'bad');
@@ -7535,8 +7562,8 @@ function homeAreasMath(g, lvOk){
   return [['', out]];
 }
 function homeAreasDeutsch(g, lvOk){
-  const RL = READ_RAIL.filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:L_INFO[l].short}));
-  const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>']].filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:W_INFO[l].short}));
+  const RL = [...READ_RAIL, ['LS', '<small>⇄</small>']].filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:L_INFO[l].short}));
+  const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>'],['WE','<small>☰</small>']].filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:W_INFO[l].short}));
   const HR = HEAR_RAIL.filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:L_INFO[l].short}));
   return [['Lesen', RL], ['Schreiben', WR], ['Hören', HR]];
 }

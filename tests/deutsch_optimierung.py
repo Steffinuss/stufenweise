@@ -55,6 +55,18 @@ async def main():
         # W6: eigener Satz
         await pg.evaluate("Object.assign(app.read, {lvl:'W6', item:satzItem(), r:{}, fb:null, tries:0}); app.read.r.text = 'Ich sehe ' + app.read.item.target + '.'; readCheck()")
         check(await pg.evaluate("app.read.fb.ok"), 'W6 eigener Satz wird erkannt')
+        await pg.evaluate("Object.assign(app.read, {lvl:'W6', item:null})")
+        kinds = set()
+        for i in range(12):
+            await pg.evaluate("Object.assign(app.read,{item:null}); readNew()"); kinds.add(await pg.evaluate("app.read.item.check"))
+        check(kinds <= {'satz', 'satzgleich'}, 'W6 beim Üben nur echte Sätze')
+        await pg.evaluate("Object.assign(app.read, {lvl:'LS', item:null}); readNew()")
+        check(await pg.evaluate("app.read.item.type === 'sent'"), 'Schüttelsätze unter Lesen')
+        await pg.evaluate("Object.assign(app.read, {lvl:'WE', item:null, shop:null}); readNew()")
+        l1 = await pg.evaluate("app.read.shop.list.slice()")
+        for w in l1:
+            await pg.evaluate("app.read.r.text = app.read.item.target; readCheck(); Object.assign(app.read,{item:null}); readNew()")
+        check(await pg.evaluate("app.read.shop.done.length") in (0, 3), 'Einkaufszettel: Liste wird nacheinander geschrieben')
         # Hören P1–P4
         for lv in ['P1', 'P2', 'P3', 'P4']:
             await pg.evaluate(f"Object.assign(app.read, {{lvl:'{lv}', item:null}}); render()"); await pg.wait_for_timeout(100)
