@@ -393,7 +393,13 @@ body.screening .toolbar{visibility:hidden}
 .abc-tile b{font-size:30px;font-family:Stufenfibel,Verdana,sans-serif}.abc-tile b small{font-size:24px;margin-left:4px;font-weight:600}
 .abc-one{max-width:980px;margin:0 auto;text-align:center}.abc-big{font-size:96px;font-weight:800;font-family:Stufenfibel,Verdana,sans-serif;margin-bottom:10px}.abc-big span{margin-left:20px;font-weight:600}
 .abc-dict{max-width:980px;margin:0 auto}.abc-dict h3{font-size:28px;margin:16px 0 8px;font-family:Stufenfibel,Verdana,sans-serif}
-.abc-wrap figure{cursor:pointer}.wpre-h{font-size:19px;margin:4px 0 14px}
+.abc-wrap figure{cursor:pointer}
+.tb-hid{cursor:pointer;color:#a39e97;min-width:200px;text-align:center}
+.ts-wrap{flex-direction:column;gap:30px}.ts-line{min-height:90px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:12px 20px;border-bottom:4px solid var(--dark);min-width:60%}
+.ts-line em{color:#a39e97;font-size:20px}.ts-line.ok{border-color:#27834b}.ts-line.no{border-color:#c9414a}
+.ts-tiles{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.ts-card{font:inherit;font-size:clamp(28px,4vw,44px);font-weight:700;padding:10px 22px;border-radius:14px;background:#fff;border:2px solid #2b2930;box-shadow:0 2px 6px #0001;font-family:Stufenfibel,Verdana,sans-serif}
+.ts-card.in{border-color:#346bc3}.ts-card:disabled{opacity:.25}.wpre-h{font-size:19px;margin:4px 0 14px}
 .wpre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
 .wpre-grid figure{margin:0;background:#fff;border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 1px 4px #0001}
 .wpre-grid figcaption{font-size:24px;font-weight:700}.wpre-grid .say-btn{width:44px;height:44px}.wpre-grid .say-btn>svg{width:22px!important;height:22px!important}
@@ -587,7 +593,7 @@ body.rail-off .rail-show{display:block}
 .ctx-tile b{font-size:34px;line-height:1.1}.ctx-tile span{font-size:18px;color:var(--muted);font-weight:700}
 .ctx-tile.practice{background:#eaf5ee;border-color:#9fd3ae}.ctx-tile.kiste{background:#f4ecfa;border-color:#c9aee3}.ctx-tile.class{background:#e8effa;border-color:#8fb3ea}.ctx-tile.test{background:#fdf1e1;border-color:#f0c48a}
 .ctx-tile:hover{transform:translateY(-3px)}
-.ct-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;width:min(980px,100%)}
+.ct-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;width:min(980px,100%)}
 /* Materialkiste: Taschenrechner */
 .trc{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-start;width:100%;padding:8px 0}
 .trc-box{width:min(380px,100%);background:#2b2930;border-radius:26px;padding:16px}
@@ -7538,9 +7544,13 @@ const CLASS_TOOLS = [
   {k:'free', label:'Frei legen', sub:'Würfel und Geld'},
   {k:'blitz', label:'Blitzblick', sub:'Mengen kurz zeigen'},
   {k:'tclock', label:'Uhr', sub:'Zeiger stellen'},
-  {k:'tword', label:'Wörter', sub:'groß zeigen, Silben'}
+  {k:'tword', label:'Wörter', sub:'groß zeigen, Silben'},
+  /* Deutsch im Unterricht (Backlog I, D4) */
+  {k:'abc', label:'Anlauttabelle', rail:'Anlaut&shy;tabelle', sub:'Buchstaben mit Bildern'},
+  {k:'tblitz', label:'Blitzlesen', rail:'Blitz&shy;lesen', sub:'Wörter kurz zeigen'},
+  {k:'tsatz', label:'Satz-Baukasten', rail:'Satz&shy;baukasten', sub:'Wortkarten ordnen'}
 ];
-const TOOL_MODES = ['tfield', 'nline', 'hboard', 'tclock', 'tword', 'tcalc', 'abc', 'dict'];
+const TOOL_MODES = ['tfield', 'nline', 'hboard', 'tclock', 'tword', 'tcalc', 'abc', 'dict', 'tblitz', 'tsatz'];
 const CT_ILL = {
   tfield:`<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="3" y="12" width="74" height="32" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><path d="M3 28h74M40 12v32" stroke="#2b2930" stroke-width="1.8"/>${Array.from({length:12}, (_, i) => `<circle cx="${6.7 + (i % 10)*7.4}" cy="${20 + Math.floor(i/10)*16}" r="3.1" fill="${i < 7 ? '#2f5ea8' : '#e8890c'}"/>`).join('')}</svg>`,
   number:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="19" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="36" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="50" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="64" y="40" width="10" height="10" rx="2" fill="#27834b"/><text x="56" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#2b2930" font-family="Stufenfibel,sans-serif">23</text></svg>',
@@ -7646,6 +7656,9 @@ const KISTE_ILL = k => ({
   abc:'<svg viewBox="0 0 80 56" aria-hidden="true">' + [['A', 6, 4], ['B', 30, 4], ['M', 54, 4], ['S', 6, 30], ['T', 30, 30], ['O', 54, 30]].map(([t, x, y]) => `<rect x="${x}" y="${y}" width="20" height="22" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2"/><text x="${x + 10}" y="${y + 17}" text-anchor="middle" font-size="15" font-weight="800" fill="${'AO'.includes(t) ? '#c9414a' : '#346bc3'}" font-family="Stufenfibel,system-ui,sans-serif">${t}</text>`).join('') + '</svg>',
   dict:'<svg viewBox="0 0 80 56" aria-hidden="true"><path d="M40 10q-14-6-30-3v42q16-3 30 3q14-6 30-3V7q-16-3-30 3z" fill="#fff" stroke="#2b2930" stroke-width="2.5" stroke-linejoin="round"/><path d="M40 10v42" stroke="#2b2930" stroke-width="2"/><circle cx="25" cy="26" r="7" fill="#c9414a"/><path d="M47 22h16M47 29h12M47 36h16" stroke="#346bc3" stroke-width="3" stroke-linecap="round"/></svg>'
 })[k] || CT_ILL[k] || '';
+CT_ILL.abc = KISTE_ILL('abc');
+CT_ILL.tblitz = '<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="8" y="12" width="64" height="32" rx="6" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><text x="40" y="35" text-anchor="middle" font-size="17" font-weight="800" fill="#346bc3" font-family="Stufenfibel,system-ui,sans-serif">Rad</text><path d="M66 4l-6 9h6l-5 9" fill="none" stroke="#e8962e" stroke-width="3" stroke-linejoin="round"/></svg>';
+CT_ILL.tsatz = '<svg viewBox="0 0 80 56" aria-hidden="true">' + [['Der', 4, 8], ['Bus', 30, 8], ['ist', 4, 32], ['gelb.', 30, 32]].map(([t, x, y]) => `<rect x="${x}" y="${y}" width="${t.length > 3 ? 32 : 22}" height="18" rx="3" fill="#fff" stroke="#2b2930" stroke-width="2"/><text x="${x + (t.length > 3 ? 16 : 11)}" y="${y + 13.5}" text-anchor="middle" font-size="11" font-weight="700" fill="#2b2930" font-family="Stufenfibel,system-ui,sans-serif">${t}</text>`).join('') + '</svg>';
 const kisteOn = k => app.kiste && (k === 'calc' ? !!app.calc && ['add', 'sub'].includes(app.mode) : app.mode === k);
 function renderKisteHome(p, W){
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Materialkiste</span></div></header>`, Q = '<b class="wz-q">?</b>';
@@ -8099,6 +8112,42 @@ function abcClick(e){
   if(e.target.closest('#abc-back')){ if(A.word) A.word = null; else A.sel = null; return renderAbc(); }
 }
 
+/* ---------- Blitzlesen (Unterricht, Backlog I D4): ein Wort kurz zeigen, dann abdecken ---------- */
+app.tb = {list:'', words:[], ms:1000, syl:true, cur:'', phase:'idle', timer:null};
+function tbSetWords(t){ const T = app.tb; T.list = String(t || '').trim(); T.words = T.list.split(/[\n,;]+/).map(w => w.trim()).filter(Boolean); T.phase = 'idle'; T.cur = ''; }
+function tbNext(){ const T = app.tb, pool = T.words.length ? T.words : L4_POOL; let w; do w = pick(pool); while(pool.length > 1 && w === T.cur); T.cur = w; tbShow(); }
+function tbShow(){ const T = app.tb; clearTimeout(T.timer); T.phase = 'show'; renderTblitz(); T.timer = setTimeout(() => { if(app.mode === 'tblitz' && T.phase === 'show'){ T.phase = 'hidden'; renderTblitz(); } }, T.ms); }
+function renderTblitz(){
+  const T = app.tb; $('#equation').innerHTML = ''; $('#prompt').textContent = ''; setHint('');
+  const word = T.syl ? sylText(T.cur) : escHtml(T.cur);
+  $('#stage').innerHTML = `<div class="tw-wrap">${T.phase === 'idle' ? '<p class="board-empty">„Nächstes Wort“ zeigt ein Wort kurz an. Oben eigene Wörter eintragen (mit Komma getrennt) oder leer lassen.</p>' : T.phase === 'show' ? `<div class="tw-one"><div class="tw-word">${word}</div></div>` : `<div class="tw-one"><div class="tw-word tb-hid" data-tbreveal title="Aufdecken">?</div></div>`}</div>`;
+  $('#controls').innerHTML = (T.phase === 'hidden' ? toolBtn({id:'tb-again', ic:'eye', label:'Nochmal zeigen'}) + toolBtn({id:'tb-reveal', ic:'eye', label:'Aufdecken'}) : '') + toolBtn({id:'tb-next', ic:'next', label:'Nächstes Wort', primary:true});
+}
+function tblitzClick(e){
+  const T = app.tb;
+  if(e.target.closest('#tb-next')) return tbNext();
+  if(e.target.closest('#tb-again')) return tbShow();
+  if(e.target.closest('#tb-reveal, [data-tbreveal]')){ clearTimeout(T.timer); T.phase = 'shown'; const w = T.syl ? sylText(T.cur) : escHtml(T.cur), ic = Object.keys(ICON).find(k => k.toLowerCase() === T.cur.toLowerCase()); $('#stage').innerHTML = `<div class="tw-wrap"><div class="tw-one">${ic ? `<div class="tw-icon">${iconSvg(ic, 160)}</div>` : ''}<div class="tw-word">${w}</div></div></div>`; $('#controls').innerHTML = toolBtn({id:'tb-again', ic:'eye', label:'Nochmal blitzen'}) + toolBtn({id:'tb-next', ic:'next', label:'Nächstes Wort', primary:true}); }
+}
+/* ---------- Satz-Baukasten (Unterricht, Backlog I D4): Wortkarten in die richtige Reihenfolge bringen ---------- */
+app.ts = {text:'Der Bus ist gelb.', words:[], tiles:[], order:[]};
+function tsSet(t){ const T = app.ts; T.text = String(t || '').trim() || T.text; T.words = T.text.split(/\s+/).filter(Boolean); T.tiles = shuffle(T.words.map((_, i) => i)); T.order = []; }
+function renderTsatz(){
+  const T = app.ts; if(!T.words.length) tsSet(T.text);
+  $('#equation').innerHTML = ''; $('#prompt').textContent = 'Tippe die Wörter der Reihe nach an.'; setHint('');
+  const done = T.order.length === T.words.length, ok = done && T.order.every((v, i) => T.words[v] === T.words[i]);
+  $('#stage').innerHTML = `<div class="tw-wrap ts-wrap"><div class="ts-line${done ? (ok ? ' ok' : ' no') : ''}">${T.order.length ? T.order.map(i => `<span class="ts-card in">${escHtml(T.words[i])}</span>`).join('') : '<em>Hier entsteht der Satz.</em>'}</div><div class="ts-tiles">${T.tiles.map(i => `<button class="ts-card" data-tsw="${i}" ${T.order.includes(i) ? 'disabled' : ''}>${escHtml(T.words[i])}</button>`).join('')}</div></div>`;
+  $('#controls').innerHTML = toolBtn({id:'ts-back', ic:'undo', label:'Zurück'}) + toolBtn({id:'ts-mix', ic:'next', label:'Neu mischen'}) + toolBtn({id:'ts-sol', ic:'eye', label:'Lösung'});
+  if(done) setHint(ok ? 'Der Satz stimmt.' : 'Noch nicht. Lies den Satz laut. Klingt er richtig?', ok ? 'good' : 'bad');
+}
+function tsatzClick(e){
+  const T = app.ts, w = e.target.closest('[data-tsw]');
+  if(w){ const i = +w.dataset.tsw; if(!T.order.includes(i)) T.order.push(i); return renderTsatz(); }
+  if(e.target.closest('#ts-back')){ T.order.pop(); return renderTsatz(); }
+  if(e.target.closest('#ts-mix')){ T.tiles = shuffle(T.tiles); T.order = []; return renderTsatz(); }
+  if(e.target.closest('#ts-sol')){ T.order = T.words.map((_, i) => i); return renderTsatz(); }
+}
+
 /* ---------- Wörter groß zeigen ---------- */
 app.tw = {text:'Hose', syl:true, bows:true};
 function renderTword(){
@@ -8135,6 +8184,8 @@ function renderTopTool(){
   }
   $('#range-label').textContent = ''; $('#ranges').innerHTML = '';
   if(m === 'tcalc'){ $('#inputs').innerHTML = `<button class="chip-toggle" data-trm aria-pressed="${app.tr.mat}" title="Das Ergebnis zusätzlich mit Tausendern, Hundertern, Zehnern und Einern zeigen">Ergebnis als Material</button>`; return true; }
+  if(m === 'tblitz'){ $('#inputs').innerHTML = `<label class="tw-in"><span>Wörter</span><input id="tb-text" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="300" placeholder="leer = Wörter aus der App" value="${escHtml(app.tb.list)}"></label><button id="tb-go" class="primary">Übernehmen</button><span class="seg" role="group" aria-label="Zeigezeit">${[500, 1000, 2000].map(ms => `<button data-tbms="${ms}" aria-pressed="${app.tb.ms === ms}">${ms/1000} s</button>`).join('')}</span><button class="chip-toggle" data-tbs aria-pressed="${app.tb.syl}">Silben färben</button>`; return true; }
+  if(m === 'tsatz'){ $('#inputs').innerHTML = `<label class="tw-in"><span>Satz</span><input id="ts-text" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="120" value="${escHtml(app.ts.text)}"></label><button id="ts-go" class="primary">Wortkarten machen</button>`; return true; }
   if(m === 'tword'){ $('#inputs').innerHTML = `<label class="tw-in"><span>Wort oder Satz</span><input id="tw-text" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" value="${escHtml(app.tw.text)}"></label><button id="tw-go" class="primary">Zeigen</button>`; return true; }
   $('#inputs').innerHTML = '';
   return true;
@@ -8188,6 +8239,8 @@ function picDecor(){
 const picObs = new MutationObserver(() => picDecor());
 function renderTool(){
   if(app.mode === 'abc' || app.mode === 'dict') return renderAbc();
+  if(app.mode === 'tblitz') return renderTblitz();
+  if(app.mode === 'tsatz') return renderTsatz();
   if(app.mode === 'tfield') return renderTfield();
   if(app.mode === 'nline') return renderNline();
   if(app.mode === 'hboard') return renderHboard();
@@ -8201,6 +8254,8 @@ document.addEventListener('click', e => {
   if(e.target.closest('[data-tf-cover]')){ app.tf.shown = false; return renderTfield(); }
   const inStage = e.target.closest('#stage'), inCtl = e.target.closest('#controls'), inTop = e.target.closest('.toolbar');
   if((inStage || inCtl) && (app.mode === 'abc' || app.mode === 'dict')) return abcClick(e);
+  if((inStage || inCtl) && app.mode === 'tblitz') return tblitzClick(e);
+  if((inStage || inCtl) && app.mode === 'tsatz') return tsatzClick(e);
   if(inStage){ if(app.mode === 'tfield') tfieldClick(e); if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
   const b = e.target.closest('button'); if(!b || !(inCtl || inTop)) return;
   if(inTop){
@@ -8213,6 +8268,10 @@ document.addEventListener('click', e => {
     if(b.id === 'tf-set') return tfSetNum($('#tf-num')?.value);
     if(b.id === 'tf-rand'){ const t = app.tf, cur = t.dots.length - t.cross; let n; do n = rnd(1, t.cap); while(n === cur && t.cap > 1); return tfSetNum(n, true); }
     if(b.id === 'tw-go'){ app.tw.text = $('#tw-text').value; return renderTword(); }
+    if(b.id === 'tb-go'){ tbSetWords($('#tb-text').value); return renderTblitz(); }
+    if(b.dataset.tbms){ app.tb.ms = +b.dataset.tbms; return render(); }
+    if(b.hasAttribute('data-tbs')){ app.tb.syl = !app.tb.syl; return render(); }
+    if(b.id === 'ts-go'){ tsSet($('#ts-text').value); return renderTsatz(); }
     return;
   }
   if(app.mode === 'tfield') return tfieldControl(b);
@@ -10090,7 +10149,7 @@ $('#ranges').addEventListener('click', e => {
   render();
 });
 $('#inputs').addEventListener('input', () => { const t = draftOwner(); t.draft = [$('#in-a')?.value ?? '', $('#in-b')?.value ?? '']; $('#error').hidden = true; });
-$('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(app.mode === 'tword'){ app.tw.text = e.target.value || ''; return renderTword(); } if(app.mode === 'tfield' && e.target.id === 'tf-num') return tfSetNum(e.target.value); if(TOOL_MODES.includes(app.mode)) return; commitAny(); } });
+$('#inputs').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(app.mode === 'tword'){ app.tw.text = e.target.value || ''; return renderTword(); } if(app.mode === 'tblitz'){ tbSetWords(e.target.value); return renderTblitz(); } if(app.mode === 'tsatz'){ tsSet(e.target.value); return renderTsatz(); } if(app.mode === 'tfield' && e.target.id === 'tf-num') return tfSetNum(e.target.value); if(TOOL_MODES.includes(app.mode)) return; commitAny(); } });
 $('#inputs').addEventListener('click', e => {
   const fp = e.target.closest('[data-fplace]'); if(fp){ const b = board(); if(b.place !== fp.dataset.fplace){ freeSave(b); b.place = fp.dataset.fplace; { const keep = freeCols(), gone = [...new Set(b.pieces.filter(q => !keep.includes(q.kind)).map(q => NAME[q.kind]))]; if(gone.length){ b.pieces = b.pieces.filter(q => keep.includes(q.kind)); toast(`${gone.join(' und ')} wurden weggelegt.`); } } b.sel.clear(); if(b.ordered) b.pieces = freeArrange(b.pieces); $('#stage').innerHTML = ''; render(); } return; }
   const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'H') app.read.hlvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'Z') app.read.zlvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
