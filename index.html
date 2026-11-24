@@ -5685,7 +5685,7 @@ function boardHtml(bd, o = {}){
   const set = new Set(o.set || []), want = o.want ? new Set(o.want) : null;
   let s = '';
   for(let r = r0; r <= r1; r++) for(let c = c0; c <= c1; c++){
-    const n = hAt(page, r, c), sh = bd.show?.[n] || bd.def || 'num';
+    const n = hAt(page, r, c), sh = (bd.cover && o.fb?.ok ? 'num' : bd.show?.[n] || bd.def) || 'num';
     let cls = 'hb-c' + (c === 4 && c < c1 ? ' g5c' : '') + (r === 4 && r < r1 ? ' g5r' : '') + (bd.marks?.[n] ? ' ' + bd.marks[n] : '');
     if(sh === 'off'){ s += `<span class="hb-c hb-off${c === 4 && c < c1 ? ' g5c' : ''}${r === 4 && r < r1 ? ' g5r' : ''}" aria-hidden="true"></span>`; continue; }
     if(sh === 'in' && o.print){ s += `<span class="${cls} hb-gap"></span>`; continue; }
@@ -5742,6 +5742,22 @@ function hMiss(s, t){
   if(Math.abs(d) === 1) return 'ein Feld daneben (±1)';
   if(hRev(t) === s) return 'Zahlendreher';
   return `${s} statt ${t} angetippt`;
+}
+/* H1 „Zahlen finden“ beim Üben auch mit verdeckter Tafel (Stefan 24.11.): 0 alle Zahlen, 1 teilweise (erste Zeile und Zehnerzahlen), 2 verdeckt.
+   Wechselt wie bei Plus/Minus von selbst: nach 8 auf Anhieb richtigen eine Stufe weiter, nach 3 Fehlern in Folge zurück. Lehrkraft wählt oben. Nicht im Test. */
+const HCOV_NAMES = ['Alle Zahlen', 'Teilweise verdeckt', 'Verdeckt'];
+const hcovLv = () => { const p = curProfile(); return p ? (p.hcov || 0) : (app.hcov || 0); };
+function hcovSet(v){ const p = curProfile(); v = Math.max(0, Math.min(2, v)); if(p){ if(v) p.hcov = v; else delete p.hcov; saveData(); } else app.hcov = v; app.hcovRun = {ok:0, miss:0}; }
+function hCover(it){
+  const lv = hcovLv(); if(!lv || it.type !== 'board' || it.mode !== 'tap' || it.bd?.show) return it;
+  const show = {}; if(lv === 1) for(let i = 1; i <= 10; i++){ show[i] = 'num'; show[i*10] = 'num'; }
+  delete show[it.target];
+  return {...it, bd:{...it.bd, def:'blank', show, cover:true}, label: it.label + (lv === 1 ? ' (teilweise verdeckt)' : ' (verdeckt)'), tip: lv === 1 ? 'Noch nicht. Die Zehnerzahlen stehen rechts. Suche die Zeile, dann zähle die Felder.' : 'Noch nicht. Jede Zeile sind 10. Zähle zuerst die Zeilen, dann die Felder.'};
+}
+function hcovTrack(ok, first){
+  if(app.read.lvl !== 'H1' || teacherView()) return; const run = app.hcovRun ||= {ok:0, miss:0};
+  if(ok && first){ run.ok++; run.miss = 0; if(run.ok >= 8 && hcovLv() < 2){ hcovSet(hcovLv() + 1); toast(`Hundertertafel: ${HCOV_NAMES[hcovLv()]}`); } }
+  else if(!ok){ run.miss++; run.ok = 0; if(run.miss >= 3 && hcovLv() > 0) hcovSet(hcovLv() - 1); }
 }
 const hDecade = () => rnd(1, 9)*10 + rnd(1, 9);           /* 11 … 99 ohne Zehnerzahlen */
 const hInPage = (p, rLo = 0, rHi = 9, cLo = 0, cHi = 9) => hAt(p, rnd(rLo, rHi), rnd(cLo, cHi));
@@ -7248,6 +7264,7 @@ function readNew(){
   const bank = READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl);
   const arts = bzArts(R.lvl), m = arts && bzMem(); if(m && !arts[m.art]) Object.assign(m, {art:0, ok:0});
   freshNew(); let it, tries = 0; do { it = arts ? arts[m.art][1](bzStep(m, arts[m.art])) : pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
+  if(R.lvl === 'H1') it = hCover(it);
   Object.assign(R, {item: it, r:{}, fb:null, tries:0, spoken:false, demo:false});
   setHint(''); /* neue Aufgabe: „Richtig“ der vorigen Aufgabe weg, auch über „Neue Aufgabe“ oben */
   /* Basis: vor jeder neuen Aufgabenart einmal vormachen (je Kind und Sitzung) */
@@ -7260,7 +7277,7 @@ function renderTopRead(){
   const info = rdInfo(R.lvl);
   if(R.lvl[0] === 'G'){ $('#range-label').textContent = 'Größen'; $('#ranges').innerHTML = G_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${G_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   if(R.lvl[0] === 'Z'){ $('#range-label').textContent = 'Partner'; $('#ranges').innerHTML = Z_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${Z_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
-  if(R.lvl[0] === 'H'){ $('#range-label').textContent = 'Tafel'; $('#ranges').innerHTML = H_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${H_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
+  if(R.lvl[0] === 'H'){ $('#range-label').textContent = 'Tafel'; $('#ranges').innerHTML = H_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${H_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = R.lvl === 'H1' ? `<span class="seg" role="group" aria-label="Tafel verdecken">${HCOV_NAMES.map((t, i) => `<button data-hcov="${i}" aria-pressed="${hcovLv() === i}">${t}</button>`).join('')}</span>` : ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   if(R.lvl[0] === 'U'){ $('#range-label').textContent = 'Zeit'; $('#ranges').innerHTML = U_LEVELS.filter(l => !guideOf('M') || guideOf('M').lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${U_INFO[l].short}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   if(bzArts(R.lvl)){ const m = bzMem(); $('#range-label').textContent = 'Aufgabe'; $('#ranges').innerHTML = bzArts(R.lvl).map(([n], i) => `<button data-rart="${i}" aria-pressed="${m.art === i}">${escHtml(n)}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
   if(AXES[R.lvl[0]]){ const ax = R.lvl[0], g = guideOf(subjOfLvl(R.lvl)); $('#range-label').textContent = 'Stufe'; $('#ranges').innerHTML = axLevels(ax).filter(l => !g || g.lvlOk(l)).map(l => `<button data-rlvl="${l}" aria-pressed="${R.lvl === l}">${escHtml(AXES[ax].info[l].short)}</button>`).join(''); $('#inputs').innerHTML = ''; rb.hidden = false; rb.innerHTML = icon('next') + '<span>Neue Aufgabe</span>'; return; }
@@ -7312,6 +7329,7 @@ function readCheck(){
   if(isFill) R.r.wrong = new Set(res.wrong || []);
   if(BZ_TYPES.includes(it.type)) R.r.mark = res.ok ? null : res.mark;
   R.fb = {choice: R.r.choice, ok: res.ok};
+  if(R.lvl === 'H1') hcovTrack(res.ok, R.tries === 0);
   const bzm = bzArts(R.lvl) && bzMem(), bzArt = bzm && bzArts(R.lvl)[bzm.art];
   if(bzm){ if(res.ok && R.tries === 0) bzm.ok++; else if(!res.ok && R.tries === 0 && (R.miss || 0) >= 2) bzm.ok = Math.max(0, Math.min(bzm.ok, bzTop(bzArt)) - 3); /* dreimal daneben: wieder leichter */ }
   if(res.ok){
@@ -9944,6 +9962,7 @@ $('#inputs').addEventListener('click', e => {
   const fp = e.target.closest('[data-fplace]'); if(fp){ const b = board(); if(b.place !== fp.dataset.fplace){ freeSave(b); b.place = fp.dataset.fplace; { const keep = freeCols(), gone = [...new Set(b.pieces.filter(q => !keep.includes(q.kind)).map(q => NAME[q.kind]))]; if(gone.length){ b.pieces = b.pieces.filter(q => keep.includes(q.kind)); toast(`${gone.join(' und ')} wurden weggelegt.`); } } b.sel.clear(); if(b.ordered) b.pieces = freeArrange(b.pieces); $('#stage').innerHTML = ''; render(); } return; }
   const rl = e.target.closest('[data-rlvl]'); if(rl){ app.read.lvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'U') app.read.ulvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'G') app.read.glvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'H') app.read.hlvl = rl.dataset.rlvl; if(rl.dataset.rlvl[0] === 'Z') app.read.zlvl = rl.dataset.rlvl; Object.assign(app.read, {item:null, streak:0, miss:0}); setHint(''); render(); return; }
   if(e.target.closest('[data-rsyl]')){ app.read.colored = !app.read.colored; render(); return; }
+  { const hc = e.target.closest('[data-hcov]'); if(hc){ hcovSet(+hc.dataset.hcov); Object.assign(app.read, {item:null}); render(); return; } }
   if(e.target.closest('#btn-commit')) return commitAny();
   const ms = e.target.closest('[data-msub]'); if(ms){ app.money.sub = ms.dataset.msub; app.money.ready = false; render(); return; }
   if(e.target.closest('[data-mcent]')){ app.money.cents = !app.money.cents; if(!app.money.cents) app.money.exact = false; app.money.ready = false; render(); return; }
