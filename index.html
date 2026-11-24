@@ -381,6 +381,11 @@ body.screening .toolbar{visibility:hidden}
 .say-btn{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;border:2px solid #346bc3;background:#fff;color:#346bc3;cursor:pointer;flex:none;box-shadow:0 2px 6px #0001}
 .say-btn>svg{filter:none;width:30px!important;height:30px!important;max-width:none!important}.say-btn:active{background:#e6eefb}
 .say-btn.big{width:72px;height:72px}
+.say-btn.mini{width:40px;height:40px;position:absolute;right:-6px;bottom:-6px}.say-btn.mini>svg{width:20px!important;height:20px!important}
+.p-pic{position:relative;display:inline-flex;padding:4px}
+.p-dots{display:inline-flex;gap:10px;padding:8px 4px}.p-dots i{width:26px;height:26px;border-radius:50%;background:#346bc3;display:block}
+.p-hear{flex-direction:column;align-items:center;display:flex;gap:6px;font-weight:700}
+.p-teacher{font-size:16px;color:#6b665e;margin:0}
 .wpre{max-width:900px;margin:0 auto;text-align:center}.wpre-h{font-size:19px;margin:4px 0 14px}
 .wpre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
 .wpre-grid figure{margin:0;background:#fff;border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 1px 4px #0001}
@@ -1584,7 +1589,7 @@ const TESTS = {
       plan: d => mathPlan(d), rePlan: d => mathRePlan(d), title: d => d.part === 1 ? 'Mathe-Test Teil 1' : d.part === 2 ? 'Mathe-Test Teil 2' : 'Mathe-Test',
       homeKey: k => /^[MUGH]/.test(k), log: e => MATH_MODES.includes(e.mode),
       buttons: () => `<button class="icon-btn" data-diag="new-M1">${icon('target')}<span style="display:inline">Teil 1: Zahlen und Rechnen</span></button><button class="icon-btn" data-diag="new-M2">${icon('target')}<span style="display:inline">Teil 2: Uhr, Größen, Hundertertafel</span></button>`},
-  L: {subj:'D', name:'Lesen', long:'Lesen', axes:['L', 'P'], cap:30, homeZones:1, start:'baut erste Lesefähigkeiten auf',
+  L: {subj:'D', name:'Lesen', long:'Lesen', axes:['L', 'P'], cap:40, homeZones:1, start:'baut erste Lesefähigkeiten auf',
       plan: d => readPlan(d), rePlan: d => readRePlan(d), title: () => 'Lese-Test', log: e => e.mode === 'read'},
   W: {subj:'D', name:'Schreiben', long:'Schreiben', axes:['W'], cap:24, homeZones:1, start:'baut erste Schreibfähigkeiten auf',
       plan: d => writePlan(d), rePlan: d => writeRePlan(d), title: () => 'Schreib-Test', log: e => e.mode === 'write'},
@@ -1764,13 +1769,15 @@ function railDeutschHtml(g, lvOk){
     const on = l => app.mode === 'read' && app.read.lvl === l;
     const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>']];
     /* nur eine Gruppe offen: die mit der aktiven Stufe oder die zuletzt angetippte */
-    const open = (app.railGrp && app.railGrpLvl === app.read.lvl && app.mode === 'read' ? app.railGrp : null) || (app.mode === 'read' && String(app.read.lvl)[0] === 'W' ? 'W' : 'L');
+    const open = (app.railGrp && app.railGrpLvl === app.read.lvl && app.mode === 'read' ? app.railGrp : null) || (app.mode === 'read' && 'WP'.includes(String(app.read.lvl)[0]) ? String(app.read.lvl)[0] : 'L');
     const fold = (gp, name, n) => `<button class="rail-fold" data-railgrp="${gp}" aria-expanded="false" title="${name} aufklappen"><span>${name}</span><small>${n} Stufen ▾</small></button>`;
     const RL = [...READ_RAIL, ...(ownWords().length ? [['LX', '<small>★</small>']] : [])].filter(([l]) => lvOk(l));
     if(ownWords().length) WR.push(['WX', '<small>★</small>']);
     const WL = WR.filter(([l]) => lvOk(l));
     h += open !== 'L' ? fold('L', 'Lesen', RL.length) : `<span class="rail-h">Lesen</span>` + RL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${L_INFO[l].short}</button>`).join('');
     h += open !== 'W' ? fold('W', 'Schreiben', WL.length) : `<span class="rail-h">Schreiben</span>` + WL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${W_INFO[l].short}</button>`).join('');
+    const HL = HEAR_RAIL.filter(([l]) => lvOk(l));
+    if(HL.length) h += open !== 'P' ? fold('P', 'Hören', HL.length) : `<span class="rail-h">Hören</span>` + HL.map(([l, sym]) => `<button data-mode="read" data-lvl="${l}" aria-pressed="${on(l)}"><b aria-hidden="true">${sym}</b>${L_INFO[l].short}</button>`).join('');
   return h;
 }
 function railHtml(){
@@ -4184,7 +4191,7 @@ function statsSections(id){
       const laut = E.filter(e => !e.ok && e.given && !e.unk).slice(-6).map(e => `${e.task.replace(/^.*: /, '')} → „${e.given}“`); if(laut.length) lines.push(`Schreibungen zum Ansehen: ${laut.join(', ')}`);
     }
     if(mode === 'read'){
-      for(const l of L_LEVELS){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${L_INFO[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
+      for(const l of [...L_LEVELS, ...P_LEVELS]){ const es = E.filter(e => e.lvl === l); if(es.length) lines.push(`${l[0] === 'P' ? 'Hören: ' : ''}${L_INFO[l].name}: ${frac(es)} beim ersten Versuch richtig`); }
     }
     if(mode === 'clock' || mode === 'size' || mode === 'board' || mode === 'tenpair'){
       const [lv, info] = mode === 'clock' ? [U_LEVELS, U_INFO] : mode === 'board' ? [H_LEVELS, H_INFO] : mode === 'tenpair' ? [Z_LEVELS, Z_INFO] : [G_LEVELS, G_INFO];
@@ -5165,7 +5172,41 @@ const READ = {
   L8: [() => seriesItem('L8', true), () => seriesItem('L8', false), () => seriesItem('L8', false)],
   L9: [() => seriesItem('L9', true), () => seriesItem('L9', false), () => seriesItem('L9', false)]
 };
-const PHON = {};
+/* Hören P1–P4 (Backlog I, D1): phonologische Bewusstheit mit Bildern. Mit „Anhören“ liest die App das Wort vor,
+   sonst spricht die Lehrkraft (oder das Kind leise). Nur eindeutige Bilder. */
+const RHYME = [['Hase', 'Nase'], ['Maus', 'Haus'], ['Tasse', 'Kasse'], ['Socke', 'Glocke'], ['Tisch', 'Fisch']];
+const RHYMES = new Set(RHYME.flat());
+const SYL_DOTS = n => `<span class="p-dots" aria-label="${n} Silbe${n > 1 ? 'n' : ''}">${'<i></i>'.repeat(n)}</span>`;
+const sayMini = w => w && sayOn() ? `<span class="say-btn mini" role="button" tabindex="0" data-sayw="${escHtml(w)}" aria-label="Anhören">${SAY_ICON}</span>` : '';
+const picOpt = w => ({h:`<span class="p-pic">${iconSvg(w, 84)}${sayMini(w)}</span>`, a: w});
+const pWords = () => Object.keys(ICON).filter(w => wClear(w) && WORDS[w] && sylOf(w).length <= 3);
+function sylCountItem(kern){
+  const want = rnd(1, 3), pool = pWords().filter(w => sylOf(w).length === want), w = fresh(pool.length ? pool : pWords()), n = sylOf(w).length;
+  return mkChoice({kern, icon:w, say:w, layout:'row', prompt:'Wie viele Silben hat das Wort? Klatsche mit.', label:`Silben zählen: ${w} (${n})`, tip:'Noch nicht. Sprich das Wort langsam und klatsche bei jeder Silbe.'}, [n, ...[1, 2, 3].filter(x => x !== n)].map(x => ({h: SYL_DOTS(x), a: String(x)})));
+}
+function sylJoinItem(kern){
+  const pool = pWords().filter(w => sylOf(w).length >= 2), w = fresh(pool), parts = sylOf(w);
+  const others = shuffle(pool.filter(x => x !== w && x[0] !== w[0])).slice(0, 2);
+  return mkChoice({kern, layout:'row', sayParts: parts, teacher:`Lehrkraft spricht: ${parts.join(' – ')}`, prompt:'Hör zu. Welches Wort ist das? Tippe auf das Bild.', label:`Silben verbinden: ${parts.join('-')}`, tip:'Noch nicht. Hör noch einmal zu und sprich die Silben schnell hintereinander.'}, [w, ...others].map(picOpt));
+}
+function rhymeItem(kern){
+  const pr = RHYME[rnd(0, RHYME.length - 1)], [a, b] = Math.random() < .5 ? pr : [pr[1], pr[0]];
+  const same = pWords().filter(x => x[0] === a[0] && !RHYMES.has(x) && x !== a), other = pWords().filter(x => !RHYMES.has(x) && x[0] !== a[0]);
+  const ds = [...shuffle(same).slice(0, 1), ...shuffle(other)].slice(0, 2);
+  return mkChoice({kern, icon:a, say:a, layout:'row', prompt:'Was reimt sich? Tippe auf das Bild.', label:`Reim: ${a} – ${b}`, tip:`Noch nicht. Sprich die Wörter. Welches klingt am Ende wie „${a}“?`}, [b, ...ds].map(picOpt));
+}
+function anlautHearItem(kern){
+  const groups = Object.entries(INITIAL).map(([L, ws]) => [L, ws.filter(w => wClear(w) && !wHidden().has(w))]).filter(([, ws]) => ws.length >= 2);
+  const [L, ws] = groups[rnd(0, groups.length - 1)], [a, b] = shuffle(ws);
+  const ds = shuffle(groups.filter(([K]) => K !== L && !(/[AEIOU]/.test(K) && /[AEIOU]/.test(L))).map(([, w]) => pick(w))).slice(0, 2);
+  return mkChoice({kern, icon:a, say:a, layout:'row', prompt:'Welches Bild fängt genauso an? Tippe darauf.', label:`Anlaut hören: ${a} – ${b} (${L})`, tip:`Noch nicht. Sprich den ersten Laut von „${a}“ lang. Welches Wort fängt auch so an?`}, [b, ...ds].map(picOpt));
+}
+const PHON = {
+  P1: [() => sylCountItem(true), () => sylCountItem(false), () => sylCountItem(false)],
+  P2: [() => sylJoinItem(true), () => sylJoinItem(false), () => sylJoinItem(false)],
+  P3: [() => rhymeItem(true), () => rhymeItem(false), () => rhymeItem(false)],
+  P4: [() => anlautHearItem(true), () => anlautHearItem(false), () => anlautHearItem(false)]
+};
 
 /* ---------- Beschreibungen je Zelle: Lernstand, Ziel, Lernangebot, analoge Förderung, Bildungsplan ---------- */
 const N_LEVELS = ['I','II','III','IV','V'], S_LEVELS = ['S1','S2','S3','S4'], L_LEVELS = ['L1','L2','L3','L4','L5','L6','L7','L8','L9'], P_LEVELS = ['P1','P2','P3','P4'];
@@ -6065,11 +6106,13 @@ function* readPlan(d){
   const m = matrixOf(d.pid), keys = L_LEVELS.map(l => `L|${l}`);
   const z = keys.findIndex(k => !isOk(m[k]?.status));
   const hi = yield* binary(d, keys, z > 0 ? z : 3);
+  /* Hören P1–P4 (Backlog I): nur, wenn das alphabetische Lesen (L4) noch nicht sicher ist */
+  if(hi <= L_LEVELS.indexOf('L4')){ const pk = P_LEVELS.map(l => `P|${l}`), pz = pk.findIndex(k => !isOk(m[k]?.status)); yield* binary(d, pk, pz > 0 ? pz : 1); }
   return hi;
 }
 function* writePlan(d){ const m = matrixOf(d.pid), keys = W_LEVELS.map(l => `W|${l}`); const z = keys.findIndex(k => !isOk(m[k]?.status)); yield* binary(d, keys, z > 0 ? z : 2); }
 function* writeRePlan(d){ yield* walkUp(d, W_LEVELS.map(l => `W|${l}`)); }
-function* readRePlan(d){ yield* walkUp(d, L_LEVELS.map(l => `L|${l}`)); }
+function* readRePlan(d){ yield* walkUp(d, L_LEVELS.map(l => `L|${l}`)); if(Object.keys(matrixOf(d.pid)).some(k => k.startsWith('P|'))) yield* walkUp(d, P_LEVELS.map(l => `P|${l}`)); }
 
 /* ---------- Testablauf ---------- */
 app.diag = null;
@@ -6111,8 +6154,8 @@ function warmAnswer(skip){
 }
 /* Fortschritt im Test: Abschnitte in fester Reihenfolge und ein Balken, der nur vorwärts läuft.
    Keine Anzeige von richtig/falsch; Rückschritte der adaptiven Suche sieht man nicht. */
-const DG_SEC = k => ({M:'Zahlen', R:'Rechnen', Z:'Rechnen', S:'Stellenwert', U:'Uhr', G:'Größen', H:'Hundertertafel', L:'Lesen', W:'Schreiben'})[String(k)[0]] || TESTS[testOfKey(k)]?.secName?.(k) || TESTS[testOfKey(k)]?.name;
-const DG_EST = {Zahlen:5, Rechnen:5, Stellenwert:2, Uhr:3, 'Größen':3, Hundertertafel:3, Lesen:4, Schreiben:3}; /* geschätzte Stufen je Abschnitt */
+const DG_SEC = k => ({M:'Zahlen', R:'Rechnen', Z:'Rechnen', S:'Stellenwert', U:'Uhr', G:'Größen', H:'Hundertertafel', L:'Lesen', P:'Hören', W:'Schreiben'})[String(k)[0]] || TESTS[testOfKey(k)]?.secName?.(k) || TESTS[testOfKey(k)]?.name;
+const DG_EST = {Zahlen:5, Rechnen:5, Stellenwert:2, Uhr:3, 'Größen':3, Hundertertafel:3, Lesen:4, 'Hören':2, Schreiben:3}; /* geschätzte Stufen je Abschnitt */
 function dgSections(d){
   if(d.secs) return d.secs;
   if(TESTS[d.subj]?.sections) return d.secs = TESTS[d.subj].sections(d);
@@ -6228,7 +6271,8 @@ function itemStage(it, r, opt = {}){
   const inl = opt.inline && inlineQ(it); let qk = 0;
   const qIn = () => `<input class="dg-in it-in" type="number" inputmode="numeric" placeholder=" " aria-label="${escHtml((it.fieldLabels || [])[qk] || 'Antwort ' + (qk + 1))}" data-q="${qk++}">`;
   const head = (it.svg && it.type !== 'flash' ? `<div class="it-svg">${it.svg}</div>` : '') +
-    (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 150)}</div>` : '') +
+    (it.icon ? `<div class="it-icon">${iconSvg(it.icon, 150)}${speechBtn(it.say)}</div>` : '') +
+    (it.sayParts ? (sayOn() ? `<div class="it-icon p-hear">${speechBtn(it.sayParts.join(' … '), true)}<span>Hör zu</span></div>` : `<p class="p-teacher">${escHtml(it.teacher || '')}</p>`) : '') +
     (it.word ? `<div class="it-word">${rdWordHtml(it.word, opt.colored && it.colored !== false)}</div>` : '') +
     (it.text ? `<div class="it-text ${it.textCls || ''}">${it.text.split(/ {3,}/).map(inl ? (x => escHtml(x).replace(Q_RE, (m, pre) => pre + qIn())) : opt.colored ? sylText : escHtml).join('<span class="it-gap" aria-hidden="true"></span>')}</div>` : '') +
     (it.html ? `<div class="it-doc">${it.html}</div>` : '') +
@@ -7268,13 +7312,13 @@ function readDefaultLevel(){
   return z || (L_LEVELS.some(l => m['L|' + l]) ? L_LEVELS.at(-1) : 'L4');
 }
 const rdMode = l => AXES[String(l)[0]]?.mode || ({W:'write', U:'clock', G:'size', H:'board', Z:'tenpair'})[String(l)[0]] || 'read';
-const rdLevels = l => (AXES[String(l)[0]] && axLevels(String(l)[0])) || ({W:W_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS})[String(l)[0]] || L_LEVELS;
+const rdLevels = l => (AXES[String(l)[0]] && axLevels(String(l)[0])) || ({W:W_LEVELS, P:P_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, Z:Z_LEVELS})[String(l)[0]] || L_LEVELS;
 const rdInfo = l => L_INFO[l] || W_INFO[l] || U_INFO[l] || G_INFO[l] || H_INFO[l] || Z_INFO[l] || AXES[String(l)[0]]?.info[l];
 function readNew(){
   const R = app.read; R.lvl ||= readDefaultLevel();
   const axBank = l => AXES[String(l)[0]]?.items[l];
-  if(!READ[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl] && !Z_ITEMS[R.lvl] && !axBank(R.lvl)) R.lvl = 'L4';
-  const bank = [...(READ[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl) || []), ...(WRITE_PRACTICE[R.lvl] || [])];
+  if(!READ[R.lvl] && !PHON[R.lvl] && !WRITE[R.lvl] && !CLOCK[R.lvl] && !G_ITEMS[R.lvl] && !H_ITEMS[R.lvl] && !Z_ITEMS[R.lvl] && !axBank(R.lvl)) R.lvl = 'L4';
+  const bank = [...(READ[R.lvl] || PHON[R.lvl] || WRITE[R.lvl] || CLOCK[R.lvl] || G_ITEMS[R.lvl] || H_ITEMS[R.lvl] || Z_ITEMS[R.lvl] || axBank(R.lvl) || []), ...(WRITE_PRACTICE[R.lvl] || [])];
   const arts = bzArts(R.lvl), m = arts && bzMem(); if(m && !arts[m.art]) Object.assign(m, {art:0, ok:0});
   freshNew(); let it, tries = 0; do { it = arts ? arts[m.art][1](bzStep(m, arts[m.art])) : pick(bank)(); tries++; } while(R.item && it.label === R.item.label && tries < 6);
   if(R.lvl === 'H1') it = hCover(it);
@@ -7410,7 +7454,8 @@ function homeAreasMath(g, lvOk){
 function homeAreasDeutsch(g, lvOk){
   const RL = READ_RAIL.filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:L_INFO[l].short}));
   const WR = [['W1','<small>A→A</small>'],['W2','<small>M…</small>'],['W3','<small>Rad</small>'],['W4','<small>To-ma</small>'],['W5','<small>ss</small>'],['W6','<small>Satz.</small>']].filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:W_INFO[l].short}));
-  return [['Lesen', RL], ['Schreiben', WR]];
+  const HR = HEAR_RAIL.filter(([l]) => lvOk(l)).map(([l, sym]) => ({mode:'read', lvl:l, sym, label:L_INFO[l].short}));
+  return [['Lesen', RL], ['Schreiben', WR], ['Hören', HR]];
 }
 function renderHome(){
   $('#equation').textContent = ''; $('#words').hidden = true; $('#prompt').textContent = ''; setHint(''); $('#controls').innerHTML = ''; $('#btn-say').hidden = true;
