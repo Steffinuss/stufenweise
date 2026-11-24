@@ -386,7 +386,14 @@ body.screening .toolbar{visibility:hidden}
 .p-dots{display:inline-flex;gap:10px;padding:8px 4px}.p-dots i{width:26px;height:26px;border-radius:50%;background:#346bc3;display:block}
 .p-hear{flex-direction:column;align-items:center;display:flex;gap:6px;font-weight:700}
 .p-teacher{font-size:16px;color:#6b665e;margin:0}
-.wpre{max-width:900px;margin:0 auto;text-align:center}.wpre-h{font-size:19px;margin:4px 0 14px}
+.wpre{max-width:900px;margin:0 auto;text-align:center}
+.abc-wrap{width:100%;max-height:100%;overflow:auto;padding:6px}
+.abc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;max-width:980px;margin:0 auto}
+.abc-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;background:#fff;min-height:96px}
+.abc-tile b{font-size:30px;font-family:Stufenfibel,Verdana,sans-serif}.abc-tile b small{font-size:24px;margin-left:4px;font-weight:600}
+.abc-one{max-width:980px;margin:0 auto;text-align:center}.abc-big{font-size:96px;font-weight:800;font-family:Stufenfibel,Verdana,sans-serif;margin-bottom:10px}.abc-big span{margin-left:20px;font-weight:600}
+.abc-dict{max-width:980px;margin:0 auto}.abc-dict h3{font-size:28px;margin:16px 0 8px;font-family:Stufenfibel,Verdana,sans-serif}
+.abc-wrap figure{cursor:pointer}.wpre-h{font-size:19px;margin:4px 0 14px}
 .wpre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
 .wpre-grid figure{margin:0;background:#fff;border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 1px 4px #0001}
 .wpre-grid figcaption{font-size:24px;font-weight:700}.wpre-grid .say-btn{width:44px;height:44px}.wpre-grid .say-btn>svg{width:22px!important;height:22px!important}
@@ -592,7 +599,8 @@ body.rail-off .rail-show{display:block}
 .trc-keys button{min-height:64px;font-size:32px;font-weight:800;border-radius:14px;background:#fff;color:#2b2930;border:0;padding:0}
 .trc-keys .op{background:#ffe2b8}.trc-keys .clr{background:#f6d3cf;font-size:26px}.trc-keys .bk{background:#e6e1d8;font-size:26px}
 .trc-keys .eq{grid-column:1/-1;background:#27834b;color:#fff}.trc-keys .eq:hover{background:#1f6b3d}
-.kiste-tiles{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.kiste-tiles .ct-tile{min-height:0;padding:10px 6px}
+.kiste-tiles{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px}.kiste-tiles .ct-tile{min-height:0;padding:8px 4px}.kiste-tiles .ct-tile svg{width:72px;height:48px}.kiste-tiles .ct-tile b{font-size:17px}.kiste-tiles .ct-tile span{font-size:13px}
+.kiste-h{font-size:15px;color:var(--muted);margin:2px 0 -4px;align-self:flex-start;width:min(980px,100%);margin-inline:auto;text-transform:uppercase;letter-spacing:.06em}
 .trc-side{flex:1 1 320px;min-width:260px;max-width:680px;display:flex;flex-direction:column;gap:10px}
 .trc-note{margin:0;font-size:20px;font-weight:700;color:var(--muted)}
 .trc-mat{background:#fff;border-radius:16px;padding:12px}.trc-mat svg{width:100%;height:auto;max-height:460px}
@@ -4144,7 +4152,7 @@ const pct = (a, b) => b ? Math.round(a/b*100) + ' %' : '–';
 const frac = list => `${list.filter(e => e.ok).length} von ${list.length}`;
 const KISTE_TITLE = 'Materialkiste (selbst genutzt)';
 /* Materialkiste: wie oft welches Werkzeug geöffnet wurde, z. B. „Rechenhilfe 5×, Taschenrechner 2×“ */
-function kisteLine(pid){ try { const ks = data.kiste?.[pid]; return ks ? KISTE_TOOLS.filter(t => ks[t.k]).map(t => `${t.label} ${ks[t.k]}×`).join(', ') : ''; } catch { return ''; } }
+function kisteLine(pid, sj){ try { const ks = data.kiste?.[pid]; return ks ? KISTE_TOOLS.filter(t => ks[t.k] && (!sj || (t.subj || 'M') === sj)).map(t => `${t.label} ${ks[t.k]}×`).join(', ') : ''; } catch { return ''; } }
 function statsSections(id){
   const L = data.log[id] || [], out = [];
   const prof = data.profiles.find(p => p.id === id);
@@ -7236,7 +7244,7 @@ function zoneReport(pid, subj){
     massnahmen: out.zones.map(z => { const w = matWay(z.key); return w ? `Am Material: ${w.hand.replace(/\.$/, '')}. Im Bild: ${w.bild.replace(/\.$/, '')}. In der App: ${z.info.offer.text}` : `${z.info.offer.text}; analog: ${z.info.analog}`; }).join('. ') + `. Re-Diagnose nach etwa 5 Übungseinheiten.`,
     bp: [...new Set(out.zones.map(z => z.info.bp))].join('; ')
   };
-  if(subj === 'M'){ const kl = kisteLine(pid); if(kl) out.ileb.lernstand += ` ${name} nutzt Hilfen aus der Materialkiste (${kl}).`; }
+  if(subj === 'M' || subj === 'L' || subj === 'W'){ const kl = kisteLine(pid, subj === 'M' ? 'M' : 'D'); if(kl) out.ileb.lernstand += ` ${name} nutzt Hilfen aus der Materialkiste (${kl}).`; }
   if(!out.zones.length){ out.ileb.ziel = `${name} festigt und überträgt das Gelernte auf neue Situationen.`; out.ileb.massnahmen = 'Anwendung im Alltag und in Projekten; nächster Zahlenraum oder anspruchsvollere Texte.'; }
   return out;
 }
@@ -7532,7 +7540,7 @@ const CLASS_TOOLS = [
   {k:'tclock', label:'Uhr', sub:'Zeiger stellen'},
   {k:'tword', label:'Wörter', sub:'groß zeigen, Silben'}
 ];
-const TOOL_MODES = ['tfield', 'nline', 'hboard', 'tclock', 'tword', 'tcalc'];
+const TOOL_MODES = ['tfield', 'nline', 'hboard', 'tclock', 'tword', 'tcalc', 'abc', 'dict'];
 const CT_ILL = {
   tfield:`<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="3" y="12" width="74" height="32" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2.5"/><path d="M3 28h74M40 12v32" stroke="#2b2930" stroke-width="1.8"/>${Array.from({length:12}, (_, i) => `<circle cx="${6.7 + (i % 10)*7.4}" cy="${20 + Math.floor(i/10)*16}" r="3.1" fill="${i < 7 ? '#2f5ea8' : '#e8890c'}"/>`).join('')}</svg>`,
   number:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="19" y="6" width="9" height="44" rx="2" fill="#346bc3"/><rect x="36" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="50" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="64" y="40" width="10" height="10" rx="2" fill="#27834b"/><text x="56" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#2b2930" font-family="Stufenfibel,sans-serif">23</text></svg>',
@@ -7625,12 +7633,18 @@ const KISTE_TOOLS = [
   {k:'tfield', label:'Zwanzigerfeld', rail:'20er-Feld', sub:'legen und wegstreichen'},
   {k:'hboard', label:'Hundertertafel', rail:'Hunderter&shy;tafel', sub:'färben und abdecken'},
   {k:'nline', label:'Zahlenstrahl', rail:'Zahlen&shy;strahl', sub:'Sprünge machen'},
-  {k:'tclock', label:'Uhr', sub:'Zeiger stellen'}
+  {k:'tclock', label:'Uhr', sub:'Zeiger stellen'},
+  /* Deutsch (Backlog I, D3) */
+  {k:'abc', label:'Anlauttabelle', rail:'Anlaut&shy;tabelle', sub:'Buchstaben mit Bildern', subj:'D'},
+  {k:'dict', label:'Bildwörterbuch', rail:'Wörter&shy;buch', sub:'Wörter nachschauen', subj:'D'},
+  {k:'tword', label:'Wörter', sub:'schreiben, Silben sehen', subj:'D'}
 ];
 CTX_ILL.kiste = '<svg viewBox="0 0 160 110" aria-hidden="true"><rect x="44" y="10" width="11" height="58" rx="2" fill="#346bc3" transform="rotate(-12 50 40)"/><rect x="60" y="14" width="11" height="54" rx="2" fill="#346bc3" transform="rotate(-4 66 40)"/><rect x="80" y="30" width="34" height="34" rx="3" fill="#c9414a" transform="rotate(8 97 47)"/><path d="M80 37h34M80 44h34M80 51h34M87 30v34M94 30v34M101 30v34M108 30v34" stroke="#fff" stroke-opacity=".5" stroke-width="1" transform="rotate(8 97 47)"/><circle cx="122" cy="38" r="11" fill="#d5b75a" stroke="#9c8433" stroke-width="3"/><rect x="30" y="40" width="10" height="10" rx="2" fill="#27834b"/><rect x="34" y="28" width="10" height="10" rx="2" fill="#27834b"/><rect x="16" y="52" width="128" height="50" rx="7" fill="#d79a5a" stroke="#2b2930" stroke-width="4"/><path d="M16 66h128" stroke="#2b2930" stroke-width="3"/><rect x="66" y="74" width="28" height="12" rx="4" fill="#2b2930"/></svg>';
 const KISTE_ILL = k => ({
   calc:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="10" width="8" height="40" rx="2" fill="#346bc3"/><rect x="17" y="10" width="8" height="40" rx="2" fill="#346bc3"/><rect x="29" y="42" width="8" height="8" rx="2" fill="#27834b"/><rect x="29" y="31" width="8" height="8" rx="2" fill="#27834b"/><text x="60" y="40" text-anchor="middle" font-size="32" font-weight="800" fill="currentColor" font-family="system-ui,sans-serif">±</text></svg>',
-  tcalc:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="22" y="2" width="36" height="52" rx="6" fill="#2b2930"/><rect x="27" y="7" width="26" height="11" rx="2" fill="#e4eedc"/>' + [0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${27 + c*9.5}" y="${22 + r*10}" width="7" height="7" rx="1.5" fill="${c === 2 ? '#ffe2b8' : '#fff'}"/>`).join('')).join('') + '</svg>'
+  tcalc:'<svg viewBox="0 0 80 56" aria-hidden="true"><rect x="22" y="2" width="36" height="52" rx="6" fill="#2b2930"/><rect x="27" y="7" width="26" height="11" rx="2" fill="#e4eedc"/>' + [0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${27 + c*9.5}" y="${22 + r*10}" width="7" height="7" rx="1.5" fill="${c === 2 ? '#ffe2b8' : '#fff'}"/>`).join('')).join('') + '</svg>',
+  abc:'<svg viewBox="0 0 80 56" aria-hidden="true">' + [['A', 6, 4], ['B', 30, 4], ['M', 54, 4], ['S', 6, 30], ['T', 30, 30], ['O', 54, 30]].map(([t, x, y]) => `<rect x="${x}" y="${y}" width="20" height="22" rx="4" fill="#fff" stroke="#2b2930" stroke-width="2"/><text x="${x + 10}" y="${y + 17}" text-anchor="middle" font-size="15" font-weight="800" fill="${'AO'.includes(t) ? '#c9414a' : '#346bc3'}" font-family="Stufenfibel,system-ui,sans-serif">${t}</text>`).join('') + '</svg>',
+  dict:'<svg viewBox="0 0 80 56" aria-hidden="true"><path d="M40 10q-14-6-30-3v42q16-3 30 3q14-6 30-3V7q-16-3-30 3z" fill="#fff" stroke="#2b2930" stroke-width="2.5" stroke-linejoin="round"/><path d="M40 10v42" stroke="#2b2930" stroke-width="2"/><circle cx="25" cy="26" r="7" fill="#c9414a"/><path d="M47 22h16M47 29h12M47 36h16" stroke="#346bc3" stroke-width="3" stroke-linecap="round"/></svg>'
 })[k] || CT_ILL[k] || '';
 const kisteOn = k => app.kiste && (k === 'calc' ? !!app.calc && ['add', 'sub'].includes(app.mode) : app.mode === k);
 function renderKisteHome(p, W){
@@ -7642,8 +7656,8 @@ function renderKisteHome(p, W){
   const stair = `<ol class="wz-stair" aria-label="Schritte">${steps.map(([k, l, pic], i) => `<li class="${i < si ? 'done' : i === si ? 'now' : 'next'}" style="--h:${i + 1}"><button ${i < si ? (k === 'ctx' ? 'data-ctx-reset title="Üben, Unterricht, Testen oder Materialkiste wählen"' : `data-wz-step="${k}" title="Zurück zu diesem Schritt"`) : 'disabled'} aria-current="${i === si ? 'step' : 'false'}"><span class="wz-blk">${pic}</span><span class="wz-lbl">${l}</span></button></li>`).join('')}</ol>`;
   const body = step === 'who'
     ? `<h2>Wer bist du?</h2><div class="home-names">${data.profiles.map(q => `<button data-home-pick="${q.id}" class="${q.sym && ICON[q.sym] ? 'has-sym' : ''}">${q.sym && ICON[q.sym] ? `<i class="kid-sym">${iconSvg(q.sym, 64)}</i>` : `<b>${escHtml(q.name.slice(0, 1).toUpperCase())}</b>`}${escHtml(q.name)}</button>`).join('')}<button data-home-pick="" class="guest"><b>?</b>Gast</button></div>`
-    : `<h2>${p ? `Hallo ${escHtml(p.name)}! ` : ''}Was brauchst du?</h2><p class="home-sub">Hier rechnest und legst du mit Hilfe. Nichts wird bewertet.</p>
-      <div class="ct-tiles kiste-tiles">${KISTE_TOOLS.map(t => `<button class="ct-tile" data-kiste="${t.k}">${KISTE_ILL(t.k)}<b>${t.label}</b><span>${t.sub}</span></button>`).join('')}</div>`;
+    : `<h2>${p ? `Hallo ${escHtml(p.name)}! ` : ''}Was brauchst du?</h2><p class="home-sub">Hier rechnest, legst und schreibst du mit Hilfe. Nichts wird bewertet.</p>
+      ${[['M', 'Mathe'], ['D', 'Deutsch']].map(([sj, n]) => `<h3 class="kiste-h">${n}</h3><div class="ct-tiles kiste-tiles">${KISTE_TOOLS.filter(t => (t.subj || 'M') === sj).map(t => `<button class="ct-tile" data-kiste="${t.k}">${KISTE_ILL(t.k)}<b>${t.label}</b><span>${t.sub}</span></button>`).join('')}</div>`).join('')}`;
   const switchBtn = step === 'tools' && needWho ? `<button class="linkish home-switch" data-home-pick-again>${p ? `Nicht ${escHtml(p.name)}? Namen wechseln` : 'Namen wählen'}</button>` : '';
   $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}${stair}</div><section class="wz-body">${body}</section>${switchBtn}<button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
 }
@@ -8046,6 +8060,45 @@ function tclockControl(b){
   if(b.hasAttribute('data-tcw')){ c.words = !c.words; return renderTclock(); }
 }
 
+/* ---------- Anlauttabelle und Bildwörterbuch (Materialkiste, Backlog I D3; auch Unterricht D4) ---------- */
+const ABC = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','Ä','Ö','Ü','Sch','Ei','Au','St'];
+const ABC_PIC = {A:'Apfel', B:'Ball', D:'Dose', E:'Esel', F:'Fisch', G:'Gabel', H:'Haus', I:'Igel', J:'Jacke', K:'Kamm', L:'Lampe', M:'Maus', N:'Nase', O:'Ofen', P:'Pinsel', R:'Radio', S:'Sonne', T:'Tisch', U:'Uhr', W:'Wolke', Z:'Zug', Sch:'Schere', Ei:'Eimer', Au:'Auto', St:'Stuhl'};
+const ABC_SKIP = new Set(['Essen', 'Toilette', 'Stopp', 'Nudeln', 'Pflaster']);
+const ABC_MULTI = ['Sch', 'Ei', 'Au', 'Eu', 'St', 'Sp', 'Pf', 'Ch', 'Qu'];
+/* Wörter, die mit diesem Laut anfangen (S ohne Sch/St/Sp, E ohne Ei, A ohne Au, P ohne Pf) */
+const abcWords = L => Object.keys(ICON).filter(w => !ABC_SKIP.has(w) && (L.length > 1 ? w.startsWith(L) : w[0] === L && !ABC_MULTI.some(m => m[0] === L && w.startsWith(m)))).sort((a, b) => a.localeCompare(b, 'de'));
+app.abc = {sel:null, word:null};
+const abcFig = w => `<figure data-abcw="${escHtml(w)}">${iconSvg(w, 72)}<figcaption>${sylSpans(sylOf(w))}</figcaption>${speechBtn(w)}</figure>`;
+function renderAbc(){
+  const A = app.abc, dict = app.mode === 'dict';
+  $('#equation').innerHTML = ''; $('#words').hidden = true; setHint('');
+  let h, ctl = '';
+  if(A.word){
+    h = `<div class="tw-one"><div class="tw-icon">${iconSvg(A.word, 200)}</div><div class="tw-word bows">${sylSpans(sylOf(A.word))}</div>${speechBtn(A.word, true)}</div>`;
+    ctl = toolBtn({id:'abc-back', ic:'undo', label:'Zurück'});
+    $('#prompt').textContent = '';
+  } else if(dict){
+    $('#prompt').textContent = 'Tippe auf ein Bild.';
+    h = `<div class="abc-dict">${ABC.map(L => [L, abcWords(L)]).filter(([, ws]) => ws.length).map(([L, ws]) => `<section><h3>${L} ${L.toLowerCase()}</h3><div class="wpre-grid">${ws.map(abcFig).join('')}</div></section>`).join('')}</div>`;
+  } else if(A.sel){
+    const ws = abcWords(A.sel);
+    $('#prompt').textContent = '';
+    h = `<div class="abc-one"><div class="abc-big">${A.sel}<span>${A.sel.toLowerCase()}</span></div><div class="wpre-grid">${ws.length ? ws.map(abcFig).join('') : '<p class="note">Dazu gibt es noch kein Bild.</p>'}</div></div>`;
+    ctl = toolBtn({id:'abc-back', ic:'undo', label:'Alle Buchstaben'});
+  } else {
+    $('#prompt').textContent = 'Tippe auf einen Buchstaben.';
+    h = `<div class="abc-grid">${ABC.map(L => `<button data-abc="${L}" class="abc-tile"><b>${L}<small>${L.toLowerCase()}</small></b>${ABC_PIC[L] ? iconSvg(ABC_PIC[L], 46) : ''}</button>`).join('')}</div>`;
+  }
+  $('#stage').innerHTML = `<div class="abc-wrap">${h}</div>`;
+  $('#controls').innerHTML = ctl;
+}
+function abcClick(e){
+  const A = app.abc;
+  const l = e.target.closest('[data-abc]'); if(l){ A.sel = l.dataset.abc; A.word = null; return renderAbc(); }
+  const w = e.target.closest('[data-abcw]'); if(w){ A.word = w.dataset.abcw; return renderAbc(); }
+  if(e.target.closest('#abc-back')){ if(A.word) A.word = null; else A.sel = null; return renderAbc(); }
+}
+
 /* ---------- Wörter groß zeigen ---------- */
 app.tw = {text:'Hose', syl:true, bows:true};
 function renderTword(){
@@ -8134,6 +8187,7 @@ function picDecor(){
 }
 const picObs = new MutationObserver(() => picDecor());
 function renderTool(){
+  if(app.mode === 'abc' || app.mode === 'dict') return renderAbc();
   if(app.mode === 'tfield') return renderTfield();
   if(app.mode === 'nline') return renderNline();
   if(app.mode === 'hboard') return renderHboard();
@@ -8146,6 +8200,7 @@ document.addEventListener('click', e => {
   if(e.target.closest('[data-tf-reveal]')){ app.tf.shown = true; return renderTfield(); }
   if(e.target.closest('[data-tf-cover]')){ app.tf.shown = false; return renderTfield(); }
   const inStage = e.target.closest('#stage'), inCtl = e.target.closest('#controls'), inTop = e.target.closest('.toolbar');
+  if((inStage || inCtl) && (app.mode === 'abc' || app.mode === 'dict')) return abcClick(e);
   if(inStage){ if(app.mode === 'tfield') tfieldClick(e); if(app.mode === 'nline') zsClick(e); if(app.mode === 'hboard') hboardClick(e); return; }
   const b = e.target.closest('button'); if(!b || !(inCtl || inTop)) return;
   if(inTop){
