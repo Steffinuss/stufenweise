@@ -17,8 +17,19 @@ Stand: 23.11.2026 (0.32.0)
 | 4 | ~~**D** Materialkiste (Hilfen für Schüler*innen)~~ | mittel | freigegeben in 0.30.0 (20.11.2026), siehe `CHANGELOG.md` |
 | 5 | ~~**E** QR-Umzug schneller (+ Fehler F2)~~ | mittel | freigegeben in 0.31.0 (23.11.2026), zusammen mit F3 (Druck wie Vorschau), siehe `CHANGELOG.md` |
 | 6 | ~~**G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar (+ Heft zur Förderzone)~~ | klein | freigegeben in 0.32.0 (23.11.2026), siehe `CHANGELOG.md` |
+| 7 | **H** Konzentrationsmodus für Kinder (+ Usability-Review) | klein bis mittel | Wunsch Stefan 24.11.2026; Vorschlag im Usability-Review, wartet auf Stefans Entscheidung |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
+
+---
+
+## H: Konzentrationsmodus für Kinder
+
+**Status:** Wunsch, noch nicht gebaut (24.11.2026).
+**Anlass (Stefan, 24.11.):** Beim Wechselgeld ist der Bildschirm sehr voll. Idee: eine Art „Fullscreen-Modus“, damit sich Kinder nur auf die Aufgabe konzentrieren.
+**Befund (Usability-Review 24.11., Dokument „Stufenweise – Usability-Review“, claude.ai/artifact/AdqPQacwdjd3vDwH9zfaQx):** Wechselgeld auf dem iPad: 30 Knöpfe sichtbar, 7 gehören zur Aufgabe; vier Anweisungen gleichzeitig; Rechnung „10 € − 7 €“ zum Auftrag „Ergänze“.
+**Vorschlag:** Bereichsleiste, Einstellleiste, Name und Menü ausblenden; ein Satz Auftrag, Tipp erst nach Fehlversuch; Fortschritt groß („3 von 10“); Knopf „Pause“ zurück zu „Heute für dich“; Einstellung wie „Geführte Oberfläche“ (alle oder einzelne Kinder), Lehrkraft mit PIN. Bausteine vorhanden (Leiste ausblenden, abgedunkelte Leiste im Test, PIN, Runden).
+**Offen (Stefan):** alle oder einzeln, von selbst an nach dem Test? „Neue Aufgabe“ weg oder erst nach Fehlversuchen? Wechselgeld-Rechnung als Ergänzung? Weitere Empfehlungen 2–12 aus dem Review übernehmen?
 
 ---
 
