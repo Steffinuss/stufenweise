@@ -1274,10 +1274,10 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 
 <script>
 'use strict';
-/* ---------- Testversion (Zweig „entwicklung“, veröffentlicht unter /stufenweise-test/) ----------
-   Gleiche Adresse (steffinuss.github.io) wie die richtige App, also derselbe Browser-Speicher. Damit die Testversion
+/* ---------- Testversion (Zweig „entwicklung“, veröffentlicht unter test.stufenweise.app, früher /stufenweise-test/) ----------
+   Unter der alten Adresse (steffinuss.github.io) teilte sie sich den Browser-Speicher mit der richtigen App. Damit die Testversion
    die Daten der richtigen App nie berührt, bekommen alle ihre Schlüssel den Vorsatz „test:“. Oben steht gut sichtbar „Testversion“. */
-const TEST_BUILD = /\/stufenweise-test\//.test(location.pathname);
+const TEST_BUILD = /\/stufenweise-test\//.test(location.pathname) || /^test\./.test(location.hostname);
 if(TEST_BUILD){ const P = 'test:', S = Storage.prototype, g = S.getItem, st = S.setItem, rm = S.removeItem;
   S.getItem = function(k){ return g.call(this, P + k); }; S.setItem = function(k, v){ return st.call(this, P + k, v); }; S.removeItem = function(k){ return rm.call(this, P + k); };
   document.title = 'Stufenweise – Testversion';
@@ -10553,7 +10553,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.34.0 · 24.11.2026';
+const APP_VERSION = '0.34.1 · 25.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

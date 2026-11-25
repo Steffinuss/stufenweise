@@ -9,8 +9,8 @@ ZIEL="$1"; QUELLE="$(cd "$(dirname "$0")/.." && pwd)"
 STAND=$(git -C "$QUELLE" rev-parse --short entwicklung)
 find "$ZIEL" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 git -C "$QUELLE" archive entwicklung | tar -x -C "$ZIEL"
-# Die eigene Adresse (CNAME, stufenweise.app) gehört nur zur richtigen App, nie zur Testversion
-rm -f "$ZIEL/CNAME"
+# Eigene Adresse der Testversion (die richtige App hat stufenweise.app)
+printf 'test.stufenweise.app\n' > "$ZIEL/CNAME"
 { printf '> **Testversion von Stufenweise** – Stand aus [Steffinuss/stufenweise](https://github.com/Steffinuss/stufenweise), Zweig `entwicklung` (%s). Nicht für den Unterricht. Hier nicht direkt arbeiten.\n\n' "$STAND"; cat "$ZIEL/README.md"; } > "$ZIEL/README.tmp" && mv "$ZIEL/README.tmp" "$ZIEL/README.md"
 # Eigene Kennung, damit man die Testversion von der richtigen App unterscheidet: nächste Nebenversion + Stand
 CUR=$(grep -o "APP_VERSION = '[0-9.]*" "$ZIEL/index.html" | grep -o "[0-9.]*$")

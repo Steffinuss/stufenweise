@@ -4,8 +4,8 @@ Seit dem 17.11.2026 ist der Funktionsumfang eingefroren: Die App wird an Schulen
 
 | Zweig | Wofür | Wo zu sehen |
 | --- | --- | --- |
-| `main` | Stand für alle. Nur Fehlerbehebungen (0.28.6, 0.28.7 …). | steffinuss.github.io/stufenweise |
-| `entwicklung` | Neue Funktionen (Basis-Test, Lage im Raum, Sachunterricht …). | steffinuss.github.io/stufenweise-test (Testversion) |
+| `main` | Stand für alle. Nur Fehlerbehebungen (0.28.6, 0.28.7 …). | stufenweise.app (früher steffinuss.github.io/stufenweise) |
+| `entwicklung` | Neue Funktionen (Basis-Test, Lage im Raum, Sachunterricht …). | test.stufenweise.app (Testversion, früher steffinuss.github.io/stufenweise-test) |
 
 ## Abläufe
 
@@ -16,7 +16,7 @@ Seit dem 17.11.2026 ist der Funktionsumfang eingefroren: Die App wird an Schulen
 
 ## Testversion und Daten
 
-Beide Versionen laufen unter derselben Adresse `steffinuss.github.io` und teilen sich damit den Speicher des Browsers. Die Testversion erkennt ihren Pfad (`/stufenweise-test/`) und setzt vor alle gespeicherten Schlüssel `test:`. So berührt sie die Daten der richtigen App nie. Oben steht in Rot „Testversion – nicht für den Unterricht“.
+Die richtige App läuft unter `stufenweise.app`, die Testversion unter `test.stufenweise.app` (Datei `CNAME`, schreibt `tests/testversion.sh`). Früher teilten sich beide die Adresse `steffinuss.github.io` und damit den Speicher des Browsers. Die Testversion erkennt sich weiter am Pfad (`/stufenweise-test/`) oder an der Adresse (beginnt mit `test.`) und setzt vor alle gespeicherten Schlüssel `test:`. So berührt sie die Daten der richtigen App nie. Oben steht in Rot „Testversion – nicht für den Unterricht“.
 
 ## Planung und Stand
 

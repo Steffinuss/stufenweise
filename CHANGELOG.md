@@ -7,6 +7,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 - noch nichts
 
+## 0.34.1 – 25.11.2026
+
+- Testversion zieht nach test.stufenweise.app um: Sie erkennt sich jetzt auch an der Adresse (beginnt mit `test.`) und hält ihre Daten weiter getrennt (Vorsatz `test:`). `tests/testversion.sh` schreibt dafür die Datei `CNAME` mit `test.stufenweise.app`.
+
 ## 0.34.0 – 24.11.2026
 
 Neu (Backlog I „Optimierung Deutsch“, Stefans Antworten im Dokument vom 24.11.2026):
