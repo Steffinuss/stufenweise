@@ -218,9 +218,11 @@ Beispiel „Was passt nicht?“:
 
 **Vor der Umsetzung zu klären (Stefan):** Welche Stufen zuerst (Vorschlag: V1 Gleiches, V2 Was passt nicht?, V3 Sortieren – dort wirkt Ähnlichkeit am stärksten)? Welche Gegenstände und Varianten? Soll „mittel“ eine eigene Aufgabenart werden oder eine weitere Schwierigkeit `st` innerhalb der Art? Gilt die neue Progression auch für die Arbeitsblätter?
 
-## J. Arbeitshefte, die aufeinander aufbauen (Wunsch Stefan, 25.11.2026) – offen, Fragen gestellt
+## J. Arbeitshefte, die aufeinander aufbauen (Wunsch Stefan, 25.11.2026) – beantwortet, bereit zum Bauen
 
 Stefan: „Test machen → Arbeitsheft drucken → Schüler üben lassen.“ Heute ist das Heft oft an einem Tag durch (nur Förderzone, 1–2 Seiten je Stufe). Gewünscht: kommende Stufen vorwegnehmen, Heft nur für Mathe oder nur für Deutsch, für Deutsch mehr Texte und Aufgaben, zwischendurch längere Texte; Umfang wie ein Verlagsheft (Westermann „Fördern Inklusiv“, rund 48–64 Seiten).
 
 Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die aufeinander aufbauen“ (claude.ai/artifact/Bay279priYyGDskCEixrv7). Kurz: Heft-Assistent (Fach, Seitenzahl, Vorgriff), Kapitel je Stufe (Einstieg → Üben, schwerer werdend → „Das kann ich schon“), Wiederholungsseiten, Hilfen hinten, Lösungsheft; Mathe-Feinstufen (Material → Bild → im Kopf); Deutsch: Texte in drei Längen (Ziel ~80/40/40), Fortsetzungsgeschichte, neue Papier-Formate; Broschürendruck. Umsetzung in 5 Schritten, erst nach Stefans Antworten.
+
+**Stefans Antworten (25.11.2026, im Dokument):** alle 9 „wie vorgeschlagen“, also: 24 Seiten vorausgewählt, 48 wählbar; Vorgriff „bis das Heft voll ist“, Förderzone mit den meisten Seiten; gemischtes Heft als dritte Wahl; „Das kann ich schon“ mit drei Stufen in Worten und einfachem Zeichen; Lösungen als eigenes Heft; Fortsetzungsgeschichte (Praktikum, Klassenausflug, Wohnen); Folgeheft später; anfangen mit Schritt 1 (Heft-Assistent). Zu Frage 7 (Druck) zusätzlich: **auch A4-Broschüre aus A3-Blättern** (also A4-Seiten, zwei je A3-Bogen, in der Mitte geheftet) neben A5-Broschüre und A4 einseitig.
 
