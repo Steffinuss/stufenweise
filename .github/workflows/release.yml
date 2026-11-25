@@ -1,0 +1,31 @@
+# Legt automatisch ein GitHub-Release an, sobald eine neue Version in „main“ ankommt.
+# Die Version kommt aus version.json, der Text aus CHANGELOG.md (alle Abschnitte seit dem letzten Release).
+# Gibt es das Release schon, passiert nichts.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [version.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V=$(python3 -c "import json;print(json.load(open('version.json'))['version'])")
+          if gh release view "v$V" >/dev/null 2>&1; then
+            echo "Release v$V gibt es schon."; exit 0
+          fi
+          LAST=$(gh release view --json tagName --jq .tagName 2>/dev/null || true)
+          python3 .github/scripts/release_notes.py "$V" "$LAST" > notes.md
+          cat notes.md
+          gh release create "v$V" --target "$GITHUB_SHA" --title "Stufenweise $V" --notes-file notes.md --latest
