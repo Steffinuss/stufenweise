@@ -44,8 +44,9 @@ async def main():
             ('Der Bus ist gelb.', 'Ist der Bus gelb.', False)]:
             ok, m = await pg.evaluate(order_js(target, given))
             chk(f'Umstellung {"richtig" if want else "falsch"}: {given}', ok is want, str(m))
-        r = await pg.evaluate("(()=>{ const it = shakeFact(); const w = [cap(it.words[it.words.length-1].replace('.','')), 'ist', it.words[0].toLowerCase(), it.words[1] + '.'], used = new Set(); const o = w.map(g => { const i = it.words.findIndex((x, k) => x.toLowerCase().replace(/[.,]/g,'') === g.toLowerCase().replace(/[.,]/g,'') && !used.has(k)); used.add(i); return i; }); return evalWrite(it, {order:o}).ok; })()")
-        chk('Bildsatz: Anfang und Punkt bleiben („Gelb ist die Banane.“ zählt nicht)', r is False)
+        r = await pg.evaluate("(()=>{ const it = shakeItem(['Die','Banane','ist','gelb.'], 'Banane'); return [evalWrite(it, {order:[3,2,0,1]}).ok, evalWrite(it, {order:[0,1,2,3]}).ok]; })()")
+        r = r == [False, True]
+        chk('Bildsatz: Anfang und Punkt bleiben („Gelb ist die Banane.“ zählt nicht)', r is True)
 
         # Tafel: erst alle Sätze einer Länge, dann wieder von vorn
         r = await pg.evaluate("""(()=>{ const T = app.ts, seen = []; T.len = 'lang'; T.queue = {}; const n = SATZ_BANK.lang.length;

@@ -5,5 +5,4 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 25.11.2026
 
-- **Mehr Sätze, Warteschlange an der Tafel, lange Schüttelsätze** (Stefan, 25.11.): in `entwicklung` gebaut, wartet auf Freigabe.
-- **Testversion mit eigenem Symbol** (Stefan, 25.11.): nur `tests/testversion.sh`/`tests/test_icons.py`, wirkt sofort in der Testversion.
+Gerade nichts in Arbeit. Mehr Sätze und das Symbol der Testversion sind mit 0.37.0 freigegeben (siehe `CHANGELOG.md`).
