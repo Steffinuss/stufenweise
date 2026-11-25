@@ -19,11 +19,14 @@ Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, al
 
 ## Was die App kann
 
-- **Lernstand ermitteln:** kurze adaptive Tests in Mathe (zwei Teile), Lesen und Schreiben
+- **Lernstand ermitteln:** kurze adaptive Tests in Mathe (zwei Teile), Lesen, Hören und Schreiben, dazu ein Basis-Test für Kinder vor dem Zählen; nach einer nicht sicheren Rechenstufe prüft der Mathe-Test, ob es mit Material gelingt
 - **Förderzone zeigen:** Kompetenzmatrix, begründete Förderzone, ILEB-Formulierungsvorschläge und zu jeder Stufe ein Weg am echten Material (Handeln, Bild, Zahl) mit Materialliste
 - **Themenwelten GS, HS, BSS:** gleiche Stufen und Tests, aber Texte, Pläne und Sachaufgaben passend zur Schulstufe; Bildmodus für Kinder, die noch nicht lesen
-- **Unterricht an der Tafel:** Werkzeuge für die interaktive Tafel ohne Namen und ohne Speichern: Zwanzigerfeld zum Legen und Wegstreichen, Zahlenstrahl mit Sprüngen und Rechenstrich, Hundertertafel zum Färben und Abdecken, Uhr, Wörter mit Silben, Material frei legen
-- **Selbstständig üben:** Übungen passend zur Stufe, mit Material wie Zehnerstangen, Hundertertafel, Tausenderbuch, Geld und Uhr; altersgerecht und ohne Spielmechanik
+- **Unterricht an der Tafel:** Werkzeuge für die interaktive Tafel ohne Namen und ohne Speichern: Zwanzigerfeld zum Legen und Wegstreichen, Zahlenstrahl mit Sprüngen und Rechenstrich, Hundertertafel zum Färben und Abdecken, Uhr, Wörter mit Silben, Material frei legen; für Deutsch Anlauttabelle (Selbstlaute lang und kurz), Blitzlesen und Satz-Baukasten
+- **Selbstständig üben:** Übungen passend zur Stufe, mit Material wie Zehnerstangen, Hundertertafel, Tausenderbuch, Geld und Uhr; Schritt für Schritt vom Material über das Bild zum Rechnen im Kopf; altersgerecht und ohne Spielmechanik
+- **Konzentrationsmodus:** Kinder sehen beim Üben nur die Aufgabe, ohne Leiste und Menüs
+- **Materialkiste:** Hilfen auf Abruf (Rechenhilfe, Taschenrechner, Frei legen, Zwanzigerfeld, Hundertertafel, Zahlenstrahl, Uhr, Anlauttabelle, Bildwörterbuch, Wörter); die Nutzung erscheint im Lernstand
+- **Hilfen beim Schreiben:** Bilder vorher ansehen, „Kenne ich nicht“, unklare Bilder abwählen; auf Wunsch je Kind „Anhören“ mit der Stimme des Geräts
 - **Arbeit abnehmen:** Arbeitsblätter zur Förderzone (auch „Basis“ für Kinder vor dem Zählen: Gleiches finden, Sortieren, eins zu eins, Muster, Formen, Richtungen), Legeblätter in Originalgröße für echtes Material (Zwanzigerfeld, Stellentafel, Hunderterfeld, Zifferblatt, Buchstabenkarten …), Elterninfo in einfacher Sprache, Klassenübersicht als Tabelle
 
 ## Installieren
@@ -47,9 +50,10 @@ Nach dem ersten Öffnen funktioniert die App auch ohne Internet. Updates kommen 
 - Alle Namen und Ergebnisse bleiben im Browser des Geräts (localStorage).
 - Es gibt keinen Server, kein Konto und kein Tracking.
 - Die Schrift ist in die App eingebunden; es wird nichts aus dem Internet nachgeladen. Die App funktioniert nach dem ersten Laden auch offline.
+- „Anhören“ ist ausgeschaltet, bis die Lehrkraft es einschaltet. Vorgelesen wird nur mit der Stimme, die auf dem Gerät selbst liegt; dabei geht nichts ins Internet.
 - Die Rückmeldefunktion öffnet nur das eigene Mailprogramm oder GitHub; ein Kindername wird nicht mitgeschickt.
 
-## Impressum und Datenschutz
+## Impressum
 
 Stefan Hackl, c/o Gustav-Werner-Schule, Böfinger Weg 28, 89075 Ulm. Stufenweise ist ein privates, nicht kommerzielles Projekt und kein Angebot der Schule. Ausführlich: [Impressum und Datenschutz](https://stufenweise.app/impressum.html) (auch in der App über die Startseite und die Anleitung erreichbar).
 
@@ -75,6 +79,8 @@ Fehler, Ideen und Lob:
 
 - **[Neue Meldung auf GitHub](https://github.com/Steffinuss/stufenweise/issues/new)** (kostenloses GitHub-Konto nötig, öffentlich sichtbar, bitte keine Namen von Kindern). Am einfachsten über den Knopf „Rückmeldung“ in der App, der die Meldung schon vorausfüllt.
 - Ohne GitHub-Konto: die Rückmeldung an die Person geben, die Stufenweise an deiner Schule betreut. Wer an einer Schule Rückmeldungen sammelt, kann in den Einstellungen eine eigene E-Mail-Adresse eintragen; dann bietet der Knopf „Rückmeldung“ zusätzlich „Per E-Mail senden“ an.
+
+Neue Funktionen erscheinen zuerst in der **Testversion** unter [test.stufenweise.app](https://test.stufenweise.app) (nicht für den Unterricht; Daten getrennt von der richtigen App).
 
 Für Entwickler*innen: Die automatischen Tests (echter Browser, Playwright) liegen in [`tests/`](tests/README.md); `sh tests/run_all.sh` startet sie.
 

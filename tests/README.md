@@ -11,8 +11,8 @@ Automatische Tests, die die App in einem echten Chrome-Browser bedienen (mit [Pl
 ## Alles auf einmal
 
 ```sh
-sh tests/run_all.sh        # schnelle Tests, etwa 3 Minuten
-sh tests/run_all.sh lang   # dazu alle Arbeitsblätter, simulierte Kinder, Zufallsklicks (etwa 15 Minuten)
+sh tests/run_all.sh        # schnelle Tests, etwa 10 Minuten
+sh tests/run_all.sh lang   # dazu alle Arbeitsblätter, simulierte Kinder, Zufallsklicks (etwa 25 Minuten)
 ```
 
 Das Skript startet selbst einen Webserver auf Port 8766. „ok“ heißt: keine JavaScript-Fehler und kein Absturz. Viele Tests geben zusätzlich Messwerte aus; die stehen in der Beschreibung unten.
