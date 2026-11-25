@@ -26,6 +26,26 @@ async def main():
         v = await pg.evaluate("sentVariants('Am Freitag kaufen wir Milch, Brot und Käse.'.split(' '))")
         chk('Aufzählung: alle Reihenfolgen', len(v) == 6 and 'Am Freitag kaufen wir Käse, Brot und Milch.' in v)
 
+        # weitere sinnvolle Wortstellungen (25.11. abends)
+        def order_js(target, given):
+            return f"""(()=>{{ const w = {target!r}.split(' '), want = {given!r}.split(' '), used = new Set();
+              const norm = x => x.toLowerCase().replace(/[.,!?]/g, '');
+              const o = want.map(g => {{ const i = w.findIndex((x, k) => norm(x) === norm(g) && !used.has(k)); used.add(i); return i; }});
+              return [sentOk(w, o), sentMatch(w, o)]; }})()"""
+        for target, given, want in [
+            ('Morgen früh fahren wir mit dem Zug in die Stadt.', 'Morgen fahren wir früh mit dem Zug in die Stadt.', True),
+            ('Morgen früh fahren wir mit dem Zug in die Stadt.', 'Wir fahren morgen früh mit dem Zug in die Stadt.', True),
+            ('In der Küche schneiden wir Gurke und Tomate.', 'In der Küche schneiden wir Tomate und Gurke.', True),
+            ('Wenn es regnet, nehme ich eine Jacke mit.', 'Ich nehme eine Jacke mit, wenn es regnet.', True),
+            ('Am Freitag kaufen wir Milch, Brot und Käse.', 'Am Freitag kaufen wir Käse, Milch und Brot.', True),
+            ('Lea hat Hunger.', 'Hunger hat Lea.', True),
+            ('Morgen früh fahren wir mit dem Zug in die Stadt.', 'Morgen früh wir fahren mit dem Zug in die Stadt.', False),
+            ('Der Bus ist gelb.', 'Ist der Bus gelb.', False)]:
+            ok, m = await pg.evaluate(order_js(target, given))
+            chk(f'Umstellung {"richtig" if want else "falsch"}: {given}', ok is want, str(m))
+        r = await pg.evaluate("(()=>{ const it = shakeFact(); const w = it.alt[0].split(' '), used = new Set(); const o = w.map(g => { const i = it.words.findIndex((x, k) => x.toLowerCase().replace(/[.,]/g,'') === g.toLowerCase().replace(/[.,]/g,'') && !used.has(k)); used.add(i); return i; }); return evalWrite(it, {order:o}).ok; })()")
+        chk('Bildsatz umgestellt („Gelb ist die Banane.“)', r is True)
+
         # Satz-Baukasten an der Tafel
         r = await pg.evaluate("""(()=>{ tsSet('Mia stellt die Tassen und die Teller in den Schrank.'); const T = app.ts;
           const want = 'Mia stellt die Teller und die Tassen in den Schrank.'.split(' '), used = new Set();

@@ -5,9 +5,15 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+- noch nichts
+
+## 0.36.0 – 25.11.2026
+
 - **Frei legen an der Tafel: gelegte Zahl einblenden.** Im Unterricht gibt es jetzt immer den Knopf „Zahl zeigen“ (bisher nur mit der Einstellung „Ergebnisse und Mengen anzeigen erlauben“). Die Zahl erscheint groß und farbig nach Stellen, dazu H/Z/E; beim Geld die Summe. „Verdecken“ blendet sie wieder aus (Wunsch Stefan, 25.11.2026).
 - **Sätze legen mit Ziehen** (Satz-Baukasten an der Tafel, Schüttelsätze, Sätze im Lesen und im Test): Wortkarten lassen sich an eine Stelle im Satz ziehen und im Satz verschieben; ein gelegtes Wort antippen oder nach unten ziehen legt es zurück. Ein orangefarbener Strich zeigt beim Ziehen, wo das Wort landet. Antippen der Reihe nach geht wie bisher (Wunsch Stefan, 25.11.2026). Test `tests/satz_ziehen.py`.
 - **Stift beim Frei legen an der Tafel:** Knopf „Stift“ schaltet zwischen Legen und Schreiben um; vier Farben, Radierer, „Strich zurück“, „Schrift weg“ (als Symbole). Die Schrift gehört zur Legefläche (Würfel und Geld), bleibt beim Legen stehen und passt sich der Größe an; „Alles weg“ löscht auch die Schrift. Nur im Unterricht (Wunsch Stefan, 25.11.2026). Test `tests/frei_stift.py`.
+- **Sätze legen: weitere richtige Wortstellungen.** Alle Sätze des Satz-Baukastens und der Schüttelsätze geprüft; sinnvolle Umstellungen gelten jetzt als richtig, z. B. „Morgen fahren wir früh mit dem Zug in die Stadt.“, „Ich nehme eine Jacke mit, wenn es regnet.“, „Hunger hat Lea.“, „Gelb ist die Banane.“ (`SATZ_ALT`, `sentMatch`). Verglichen wird ohne Groß-/Kleinschreibung und Satzzeichen (die Karten behalten sie als Hilfe); stimmt der Satz, zeigt die Zeile ihn richtig geschrieben. Auch „Tomate und Gurke.“ am Satzende zählt jetzt.
+
 
 ## 0.35.2 – 25.11.2026
 

@@ -5536,7 +5536,7 @@ const WRITE = {
   W4: [() => wItem(wPick(LAUT_LONG), {kern:true, syl:true, prompt:'Sprich in Silben. Schreibe Silbe für Silbe.'}), () => wItem(wPick(LAUT_LONG), {syl:true, prompt:'Sprich in Silben. Schreibe Silbe für Silbe.'}), () => wItem(wPick(LAUT_LONG), {syl:true, prompt:'Sprich in Silben. Schreibe Silbe für Silbe.'})],
   W5: [() => wItem(wPick(MERK), {kern:true, check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(wPick(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'}), () => wItem(wPick(MERK), {check:'ci', prompt:'Schreibe das Wort richtig.'})],
   W6: [() => wItem(wPick(W_POOLS.W6()), {kern:true, check:'exact', prompt:'Schreibe das Wort richtig – denk an den großen Anfangsbuchstaben.', label:'Nomen groß schreiben'}),
-       () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1]; const s = [cap(art(n)), n, 'ist', ...(t + '.').split(' ')]; return {type:'sent', icon: n, words: s, tiles: shuffle(s.map((_, i) => i)), prompt:'Lege den Satz zum Bild.', label:`Satz legen: ${s.join(' ')}`}; },
+       () => { const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1]; const s = [cap(art(n)), n, 'ist', ...(t + '.').split(' ')]; return {type:'sent', icon: n, words: s, alt: [`${cap(t)} ist ${art(n)} ${n}.`], tiles: shuffle(s.map((_, i) => i)), prompt:'Lege den Satz zum Bild.', label:`Satz legen: ${s.join(' ')}`}; },
        () => { const w2 = fresh(['Hose','Lampe','Gabel','Tasse','Jacke','Mütze','Blume','Kerze','Kiste','Leiter','Schere','Pizza','Banane','Tomate']); const right = `Die ${w2} ist neu.`; return mkChoice({layout:'col', icon: w2, prompt:'Welcher Satz ist richtig geschrieben?', label:`richtig geschriebener Satz (${w2})`}, [right, `die ${w2} ist neu.`, `Die ${w2.toLowerCase()} ist neu.`, `Die ${w2} Ist neu`].map(t => ({h:`<span class="rd-word" style="font-size:26px">${escHtml(t)}</span>`, a:t})), 0); }]
 };
 /* Nur beim Üben (nicht im Test): W4 Silbenkarten legen als Zwischenschritt (Backlog I, D2) */
@@ -5556,7 +5556,7 @@ function satzItem(){
   return {type:'write', icon:k, target:k, check:'satz', free:true, prompt:'Schreibe einen Satz zum Bild. Denk an den großen Anfang und den Punkt.', label:`eigener Satz: ${k}`};
 }
 function shakeItem(words, icon){ const tiles = shuffle(words.map((_, i) => i)); if(words.length > 1 && tiles.every((v, i) => v === i)) tiles.reverse(); return {type:'sent', ...(icon ? {icon} : {}), words, tiles, prompt: icon ? 'Lege den Satz zum Bild.' : 'Lege den Satz.', label:`Schüttelsatz: ${words.join(' ')}`}; }
-function shakeFact(){ const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1]; return shakeItem([cap(art(n)), n, 'ist', ...(t + '.').split(' ')], n); }
+function shakeFact(){ const n = fresh(FACTS.map(f => f[0])), t = FACTS.find(f => f[0] === n)[1]; return {...shakeItem([cap(art(n)), n, 'ist', ...(t + '.').split(' ')], n), alt: [`${cap(t)} ist ${art(n)} ${n}.`]}; }
 function shakeBank(len){ const t = fresh(SATZ_BANK[len]), words = t.split(' '), ic = words.map(w => w.replace(/[.,!?]/g, '')).find(w => ICON[w] && CLEAR.includes(w)); return shakeItem(words, ic); }
 /* Satz merken und aufschreiben (W6, nur Üben): Satz lesen, abdecken, aus dem Gedächtnis schreiben */
 function memoSatzItem(){
@@ -5598,7 +5598,8 @@ function writeStage(it, r, opt = {}){
 }
 function sentStage(it, r){
   r.order ??= [];
-  return `<div class="it-wrap w-wrap"><div class="it-icon">${iconSvg(it.icon, 120)}</div><div class="w-sent" data-sdline>${r.order.length ? r.order.map((i, k) => `<button class="w-sw" data-sdin="${k}" aria-label="${escHtml(it.words[i])}: antippen legt zurück, ziehen verschiebt">${escHtml(it.words[i])}</button>`).join(' ') : '<em>Tippe die Wörter der Reihe nach an. Gelegte Wörter kannst du verschieben.</em>'}</div>
+  const mv = sentMatch(it.words, r.order, it.alt)?.split(' ');
+  return `<div class="it-wrap w-wrap"><div class="it-icon">${iconSvg(it.icon, 120)}</div><div class="w-sent" data-sdline>${r.order.length ? r.order.map((i, k) => `<button class="w-sw" data-sdin="${k}" aria-label="${escHtml(it.words[i])}: antippen legt zurück, ziehen verschiebt">${escHtml(mv ? mv[k] : it.words[i])}</button>`).join(' ') : '<em>Tippe die Wörter der Reihe nach an. Gelegte Wörter kannst du verschieben.</em>'}</div>
     <div class="w-tiles words">${it.tiles.map(i => `<button data-wword="${i}" data-sdw="${i}" ${r.order.includes(i) ? 'disabled' : ''}>${escHtml(it.words[i])}</button>`).join('')}<button data-wdel aria-label="Letztes Wort zurück">⌫</button></div></div>`;
 }
 function writeClick(e, it, r){
@@ -5627,7 +5628,7 @@ function writeKey(e, it, r){
   return false;
 }
 function evalWrite(it, r){
-  if(it.type === 'sent'){ if((r.order || []).length < it.words.length) return null; const ok = sentOk(it.words, r.order); return {ok, given: r.order.map(i => it.words[i]).join(' '), obs: ok ? [] : ['Satzbau unvollständig oder vertauscht']}; }
+  if(it.type === 'sent'){ if((r.order || []).length < it.words.length) return null; const ok = sentOk(it.words, r.order, it.alt); return {ok, given: r.order.map(i => it.words[i]).join(' '), obs: ok ? [] : ['Satzbau unvollständig oder vertauscht']}; }
   if(r.slots && r.slots.some(x => !x.c)) return null;
   const a = (r.text || '').trim(); if(!a) return null;
   if(it.check === 'satzgleich'){ /* abgeschriebener/gemerkter Satz: Wörter lautgetreu, Großschreibung genau, Punkt */
@@ -8424,7 +8425,51 @@ function sentVariants(words){
   });
   return out.map(v => v.join(' '));
 }
-const sentOk = (words, order) => order.length === words.length && sentVariants(words).includes(order.map(i => words[i]).join(' '));
+/* Weitere sinnvolle Wortstellungen (geprüft 25.11.2026). Die Wortkarten behalten Groß-/Kleinschreibung und Satzzeichen
+   des vorgegebenen Satzes als Hilfe; verglichen wird deshalb ohne beides. Stimmt der Satz, zeigt die Zeile ihn richtig geschrieben. */
+const SATZ_ALT = {
+  'Der Bus ist gelb.': ['Gelb ist der Bus.'],
+  'Ich trinke Milch.': ['Milch trinke ich.'],
+  'Lea hat Hunger.': ['Hunger hat Lea.'],
+  'Tom kauft Brot.': ['Brot kauft Tom.'],
+  'Wir kochen Nudeln.': ['Nudeln kochen wir.'],
+  'Ich habe Pause.': ['Pause habe ich.'],
+  'Mia putzt den Tisch.': ['Den Tisch putzt Mia.'],
+  'Ben holt den Besen.': ['Den Besen holt Ben.'],
+  'Es regnet heute.': ['Heute regnet es.'],
+  'Ich mag Pizza.': ['Pizza mag ich.'],
+  'Die Tasse steht auf dem Tisch.': ['Auf dem Tisch steht die Tasse.'],
+  'Tom malt mit dem Pinsel.': ['Mit dem Pinsel malt Tom.'],
+  'Lea kauft eine Banane.': ['Eine Banane kauft Lea.'],
+  'Ich fahre mit dem Bus.': ['Mit dem Bus fahre ich.'],
+  'Der Hammer liegt in der Kiste.': ['In der Kiste liegt der Hammer.'],
+  'Wir schneiden die Tomate klein.': ['Die Tomate schneiden wir klein.'],
+  'Mia legt den Löffel weg.': ['Den Löffel legt Mia weg.'],
+  'Der Schlüssel ist in der Jacke.': ['In der Jacke ist der Schlüssel.'],
+  'Ben trägt eine rote Mütze.': ['Eine rote Mütze trägt Ben.'],
+  'Die Katze schläft auf dem Sofa.': ['Auf dem Sofa schläft die Katze.'],
+  'Ich spüle den Teller ab.': ['Den Teller spüle ich ab.'],
+  'Am Montag gehen wir einkaufen.': ['Wir gehen am Montag einkaufen.', 'Einkaufen gehen wir am Montag.'],
+  'Die Säge hängt an der Wand.': ['An der Wand hängt die Säge.'],
+  'Lea zahlt an der Kasse.': ['An der Kasse zahlt Lea.'],
+  'Nach der Schule fahre ich mit dem Bus nach Hause.': ['Ich fahre nach der Schule mit dem Bus nach Hause.', 'Mit dem Bus fahre ich nach der Schule nach Hause.', 'Nach Hause fahre ich nach der Schule mit dem Bus.'],
+  'In der Küche schneiden wir Gurke und Tomate.': ['Wir schneiden in der Küche Gurke und Tomate.', 'Gurke und Tomate schneiden wir in der Küche.'],
+  'Tom holt die Zange aus der Kiste in der Werkstatt.': ['Die Zange holt Tom aus der Kiste in der Werkstatt.', 'Aus der Kiste in der Werkstatt holt Tom die Zange.', 'In der Werkstatt holt Tom die Zange aus der Kiste.'],
+  'Am Freitag kaufen wir Milch, Brot und Käse.': ['Wir kaufen am Freitag Milch, Brot und Käse.', 'Milch, Brot und Käse kaufen wir am Freitag.'],
+  'Mia stellt die Tassen und die Teller in den Schrank.': ['In den Schrank stellt Mia die Tassen und die Teller.', 'Die Tassen und die Teller stellt Mia in den Schrank.'],
+  'Wenn es regnet, nehme ich eine Jacke mit.': ['Ich nehme eine Jacke mit, wenn es regnet.', 'Eine Jacke nehme ich mit, wenn es regnet.'],
+  'Ben wäscht seine Hände mit Wasser und Seife.': ['Mit Wasser und Seife wäscht Ben seine Hände.', 'Seine Hände wäscht Ben mit Wasser und Seife.'],
+  'Morgen früh fahren wir mit dem Zug in die Stadt.': ['Morgen fahren wir früh mit dem Zug in die Stadt.', 'Wir fahren morgen früh mit dem Zug in die Stadt.', 'Mit dem Zug fahren wir morgen früh in die Stadt.', 'In die Stadt fahren wir morgen früh mit dem Zug.'],
+};
+const sentNorm = s => s.toLowerCase().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+/* Passt die gelegte Reihenfolge zu einer richtigen Fassung? Gibt die richtig geschriebene Fassung zurück (oder null). */
+function sentMatch(words, order, alt){
+  if(!order || order.length !== words.length) return null;
+  const got = sentNorm(order.map(i => words[i]).join(' ')), text = words.join(' ');
+  for(const base of [text, ...(alt || SATZ_ALT[text] || [])]) for(const v of sentVariants(base.split(' '))) if(sentNorm(v) === got) return v;
+  return null;
+}
+const sentOk = (words, order, alt) => !!sentMatch(words, order, alt);
 const SATZ_BANK = {
   kurz: ['Der Bus ist gelb.', 'Ich trinke Milch.', 'Lea hat Hunger.', 'Tom kauft Brot.', 'Die Lampe ist an.', 'Wir kochen Nudeln.', 'Das Handy klingelt.', 'Der Hund bellt.', 'Ich habe Pause.', 'Mia putzt den Tisch.', 'Die Sonne scheint.', 'Ben holt den Besen.', 'Es regnet heute.', 'Der Zug kommt.', 'Ich mag Pizza.'],
   mittel: ['Die Tasse steht auf dem Tisch.', 'Tom malt mit dem Pinsel.', 'Lea kauft eine Banane.', 'Ich fahre mit dem Bus.', 'Der Hammer liegt in der Kiste.', 'Wir schneiden die Tomate klein.', 'Mia legt den Löffel weg.', 'Der Schlüssel ist in der Jacke.', 'Ben trägt eine rote Mütze.', 'Die Katze schläft auf dem Sofa.', 'Ich spüle den Teller ab.', 'Am Montag gehen wir einkaufen.', 'Die Säge hängt an der Wand.', 'Lea zahlt an der Kasse.'],
@@ -8436,8 +8481,8 @@ function tsGen(){ const T = app.ts, bank = SATZ_BANK[T.len] || SATZ_BANK.kurz; l
 function renderTsatz(){
   const T = app.ts; if(!T.words.length) tsGen();
   $('#equation').innerHTML = ''; $('#prompt').textContent = 'Tippe die Wörter der Reihe nach an. Gelegte Wörter kannst du verschieben.'; setHint('');
-  const done = T.order.length === T.words.length, ok = done && sentOk(T.words, T.order);
-  $('#stage').innerHTML = `<div class="tw-wrap ts-wrap"><div class="ts-line${done ? (ok ? ' ok' : ' no') : ''}" data-sdline>${T.order.length ? T.order.map((i, k) => `<button class="ts-card in" data-sdin="${k}" aria-label="${escHtml(T.words[i])}: antippen legt zurück, ziehen verschiebt">${escHtml(T.words[i])}</button>`).join('') : '<em>Hier entsteht der Satz.</em>'}</div><div class="ts-tiles">${T.tiles.map(i => `<button class="ts-card" data-tsw="${i}" data-sdw="${i}" ${T.order.includes(i) ? 'disabled' : ''}>${escHtml(T.words[i])}</button>`).join('')}</div></div>`;
+  const done = T.order.length === T.words.length, mv = done ? sentMatch(T.words, T.order)?.split(' ') : null, ok = !!mv;
+  $('#stage').innerHTML = `<div class="tw-wrap ts-wrap"><div class="ts-line${done ? (ok ? ' ok' : ' no') : ''}" data-sdline>${T.order.length ? T.order.map((i, k) => `<button class="ts-card in" data-sdin="${k}" aria-label="${escHtml(T.words[i])}: antippen legt zurück, ziehen verschiebt">${escHtml(mv ? mv[k] : T.words[i])}</button>`).join('') : '<em>Hier entsteht der Satz.</em>'}</div><div class="ts-tiles">${T.tiles.map(i => `<button class="ts-card" data-tsw="${i}" data-sdw="${i}" ${T.order.includes(i) ? 'disabled' : ''}>${escHtml(T.words[i])}</button>`).join('')}</div></div>`;
   $('#controls').innerHTML = toolBtn({id:'ts-back', ic:'undo', label:'Zurück'}) + toolBtn({id:'ts-mix', ic:'next', label:'Neu mischen'}) + toolBtn({id:'ts-sol', ic:'eye', label:'Lösung'});
   if(done) setHint(ok ? 'Der Satz stimmt.' : 'Noch nicht. Lies den Satz laut. Klingt er richtig?', ok ? 'good' : 'bad');
 }
@@ -10709,7 +10754,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.35.2 · 25.11.2026';
+const APP_VERSION = '0.36.0 · 25.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

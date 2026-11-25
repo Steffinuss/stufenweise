@@ -5,6 +5,4 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 25.11.2026
 
-- **Frei legen an der Tafel: Zahl einblenden** (Stefan, 25.11.): in `entwicklung` gebaut, in der Testversion zu sehen, wartet auf Freigabe.
-- **Sätze legen mit Ziehen** (Stefan, 25.11.): Satz-Baukasten und Schüttelsätze; in `entwicklung` gebaut, wartet auf Freigabe.
-- **Stift beim Frei legen an der Tafel** (Stefan, 25.11.): in `entwicklung` gebaut, wartet auf Freigabe.
+Gerade nichts in Arbeit. „Zahl zeigen“, Sätze legen mit Ziehen und weitere Wortstellungen, Stift beim Frei legen sind mit 0.36.0 freigegeben (siehe `CHANGELOG.md`).
