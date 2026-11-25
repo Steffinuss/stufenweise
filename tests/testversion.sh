@@ -13,6 +13,10 @@ git -C "$QUELLE" archive entwicklung | tar -x -C "$ZIEL"
 printf 'test.stufenweise.app\n' > "$ZIEL/CNAME"
 # Automatische Releases nur im Haupt-Repository
 rm -rf "$ZIEL/.github"
+# Eigenes Symbol und eigener Name auf dem Home-Bildschirm (rotes Band „TEST“, Name „SW Test“)
+python3 "$QUELLE/tests/test_icons.py" "$ZIEL"
+sed -i 's/"name": "Stufenweise"/"name": "Stufenweise – Testversion"/; s/"short_name": "Stufenweise"/"short_name": "SW Test"/' "$ZIEL/manifest.webmanifest"
+sed -i 's#<title>Stufenweise</title>#<title>Stufenweise – Testversion</title>#; s#<meta name="apple-mobile-web-app-title" content="Stufenweise">#<meta name="apple-mobile-web-app-title" content="SW Test">#' "$ZIEL/index.html"
 { printf '> **Testversion von Stufenweise** – Stand aus [Steffinuss/stufenweise](https://github.com/Steffinuss/stufenweise), Zweig `entwicklung` (%s). Nicht für den Unterricht. Hier nicht direkt arbeiten.\n\n' "$STAND"; cat "$ZIEL/README.md"; } > "$ZIEL/README.tmp" && mv "$ZIEL/README.tmp" "$ZIEL/README.md"
 # Eigene Kennung, damit man die Testversion von der richtigen App unterscheidet: nächste Nebenversion + Stand
 CUR=$(grep -o "APP_VERSION = '[0-9.]*" "$ZIEL/index.html" | grep -o "[0-9.]*$")

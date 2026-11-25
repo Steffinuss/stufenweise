@@ -47,6 +47,12 @@ async def main():
         r = await pg.evaluate("(()=>{ const it = shakeFact(); const w = [cap(it.words[it.words.length-1].replace('.','')), 'ist', it.words[0].toLowerCase(), it.words[1] + '.'], used = new Set(); const o = w.map(g => { const i = it.words.findIndex((x, k) => x.toLowerCase().replace(/[.,]/g,'') === g.toLowerCase().replace(/[.,]/g,'') && !used.has(k)); used.add(i); return i; }); return evalWrite(it, {order:o}).ok; })()")
         chk('Bildsatz: Anfang und Punkt bleiben („Gelb ist die Banane.“ zählt nicht)', r is False)
 
+        # Tafel: erst alle Sätze einer Länge, dann wieder von vorn
+        r = await pg.evaluate("""(()=>{ const T = app.ts, seen = []; T.len = 'lang'; T.queue = {}; const n = SATZ_BANK.lang.length;
+          for(let k = 0; k < n; k++){ tsGen(); seen.push(T.words.join(' ')); } const all = new Set(seen).size === n;
+          tsGen(); const next = T.words.join(' '); return [all, next !== seen[n - 1], SATZ_BANK.kurz.length, SATZ_BANK.mittel.length, n]; })()""")
+        chk('Tafel: jeder Satz einmal, bevor einer wiederkommt', r[0] is True and r[1] is True, str(r))
+        chk('mehr Sätze (40/40/25)', r[2:] == [40, 40, 25], str(r[2:]))
         # Satz-Baukasten an der Tafel
         r = await pg.evaluate("""(()=>{ tsSet('Mia stellt die Tassen und die Teller in den Schrank.'); const T = app.ts;
           const want = 'Mia stellt die Teller und die Tassen in den Schrank.'.split(' '), used = new Set();

@@ -5,4 +5,5 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 25.11.2026
 
-Gerade nichts in Arbeit. „Zahl zeigen“, Sätze legen mit Ziehen und weitere Wortstellungen, Stift beim Frei legen sind mit 0.36.0 freigegeben (siehe `CHANGELOG.md`).
+- **Mehr Sätze, Warteschlange an der Tafel, lange Schüttelsätze** (Stefan, 25.11.): in `entwicklung` gebaut, wartet auf Freigabe.
+- **Testversion mit eigenem Symbol** (Stefan, 25.11.): nur `tests/testversion.sh`/`tests/test_icons.py`, wirkt sofort in der Testversion.

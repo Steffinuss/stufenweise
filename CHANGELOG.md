@@ -5,7 +5,8 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+- **Mehr Sätze zum Legen:** 105 statt 37 (kurz 40, mittel 40, lang 25), Alltag aus Schule, Küche, Werkstatt, Einkaufen, Weg und Freizeit; erlaubte Umstellungen im Satz geprüft (`SATZ_ALT`). An der Tafel kommt jeder Satz einer Länge einmal dran, bevor sich einer wiederholt (`tsGen` mit Warteschlange). Schüttelsätze: in der zweiten Hälfte einer Runde auch lange Sätze (Wunsch Stefan, 25.11.2026).
+- **Testversion mit eigenem Symbol und Namen** auf dem Home-Bildschirm: rotes Band „TEST“, Name „SW Test“ (`tests/test_icons.py`, von `tests/testversion.sh` aufgerufen; die richtige App bleibt unverändert).
 
 ## 0.36.1 – 25.11.2026
 

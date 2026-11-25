@@ -5307,7 +5307,8 @@ function ownReadItem(kind){
 const READ = {
   LX: [() => ownReadItem('same'), () => ownReadItem('caps'), () => ownReadItem('pic'), () => ownReadItem('gap')],
   /* Schüttelsätze (Stefan 24.11.): Wortkarten zu einem Satz ordnen – nur Üben, kein Test */
-  LS: [() => shakeFact(), () => shakeBank('kurz'), () => shakeBank('kurz'), () => shakeBank('mittel')],
+  LS: [() => shakeFact(), () => shakeBank('kurz'), () => shakeBank('kurz'), () => shakeBank('mittel'), () => shakeBank('mittel'),
+       () => shakeBank((app.round?.res?.length || 0) >= 5 ? 'lang' : 'mittel')],  // lange Sätze erst in der zweiten Hälfte der Runde
   L1: [() => pictoItem(true), () => pictoItem(false), () => pictoItem(false)],
   L2: [() => signEasy(true), () => signEasy(false), () => signHard()],
   L3: [() => anlautItem(true), () => anlautItem(false), () => caseItem()],
@@ -8429,6 +8430,9 @@ function sentVariants(words){
    („Anfangs- und Endzeichen“); richtig sind nur Umstellungen im Satz. Verglichen wird die gelegte Reihe der Karten, wie sie sind. */
 const SATZ_ALT = {
   'Morgen früh fahren wir mit dem Zug in die Stadt.': ['Morgen fahren wir früh mit dem Zug in die Stadt.'],
+  'Wir kaufen für das Frühstück Milch und Brötchen ein.': ['Wir kaufen Milch und Brötchen für das Frühstück ein.'],
+  'Mia fährt am Nachmittag mit dem Fahrrad zum Sport.': ['Mia fährt mit dem Fahrrad am Nachmittag zum Sport.'],
+  'Tom gießt jeden Morgen die Blumen im Klassenzimmer.': ['Tom gießt die Blumen jeden Morgen im Klassenzimmer.'],
 };
 /* Passt die gelegte Reihenfolge zu einer richtigen Fassung? Gibt sie zurück (oder null). */
 function sentMatch(words, order, alt){
@@ -8439,13 +8443,124 @@ function sentMatch(words, order, alt){
 }
 const sentOk = (words, order, alt) => !!sentMatch(words, order, alt);
 const SATZ_BANK = {
-  kurz: ['Der Bus ist gelb.', 'Ich trinke Milch.', 'Lea hat Hunger.', 'Tom kauft Brot.', 'Die Lampe ist an.', 'Wir kochen Nudeln.', 'Das Handy klingelt.', 'Der Hund bellt.', 'Ich habe Pause.', 'Mia putzt den Tisch.', 'Die Sonne scheint.', 'Ben holt den Besen.', 'Es regnet heute.', 'Der Zug kommt.', 'Ich mag Pizza.'],
-  mittel: ['Die Tasse steht auf dem Tisch.', 'Tom malt mit dem Pinsel.', 'Lea kauft eine Banane.', 'Ich fahre mit dem Bus.', 'Der Hammer liegt in der Kiste.', 'Wir schneiden die Tomate klein.', 'Mia legt den Löffel weg.', 'Der Schlüssel ist in der Jacke.', 'Ben trägt eine rote Mütze.', 'Die Katze schläft auf dem Sofa.', 'Ich spüle den Teller ab.', 'Am Montag gehen wir einkaufen.', 'Die Säge hängt an der Wand.', 'Lea zahlt an der Kasse.'],
-  lang: ['Nach der Schule fahre ich mit dem Bus nach Hause.', 'In der Küche schneiden wir Gurke und Tomate.', 'Tom holt die Zange aus der Kiste in der Werkstatt.', 'Am Freitag kaufen wir Milch, Brot und Käse.', 'Mia stellt die Tassen und die Teller in den Schrank.', 'Wenn es regnet, nehme ich eine Jacke mit.', 'Ben wäscht seine Hände mit Wasser und Seife.', 'Morgen früh fahren wir mit dem Zug in die Stadt.']
+  kurz: [
+    'Der Bus ist gelb.',
+    'Ich trinke Milch.',
+    'Lea hat Hunger.',
+    'Tom kauft Brot.',
+    'Die Lampe ist an.',
+    'Wir kochen Nudeln.',
+    'Das Handy klingelt.',
+    'Der Hund bellt.',
+    'Ich habe Pause.',
+    'Mia putzt den Tisch.',
+    'Die Sonne scheint.',
+    'Ben holt den Besen.',
+    'Es regnet heute.',
+    'Der Zug kommt.',
+    'Ich mag Pizza.',
+    'Ben spielt Fußball.',
+    'Lea malt ein Bild.',
+    'Der Hund ist müde.',
+    'Wir singen ein Lied.',
+    'Tom liest ein Buch.',
+    'Die Tür ist offen.',
+    'Mia hat einen Ball.',
+    'Ich wasche die Hände.',
+    'Das Wasser ist kalt.',
+    'Der Kaffee ist heiß.',
+    'Ben isst einen Apfel.',
+    'Die Uhr tickt.',
+    'Wir haben Sport.',
+    'Lea trinkt Tee.',
+    'Das Auto ist rot.',
+    'Tom macht Pause.',
+    'Ich räume auf.',
+    'Die Katze miaut.',
+    'Mia lacht laut.',
+    'Der Teller ist leer.',
+    'Wir spielen Karten.',
+    'Ben schneidet Brot.',
+    'Das Licht ist aus.',
+    'Ich bin müde.',
+    'Lea fegt den Boden.'],
+  mittel: [
+    'Die Tasse steht auf dem Tisch.',
+    'Tom malt mit dem Pinsel.',
+    'Lea kauft eine Banane.',
+    'Ich fahre mit dem Bus.',
+    'Der Hammer liegt in der Kiste.',
+    'Wir schneiden die Tomate klein.',
+    'Mia legt den Löffel weg.',
+    'Der Schlüssel ist in der Jacke.',
+    'Ben trägt eine rote Mütze.',
+    'Die Katze schläft auf dem Sofa.',
+    'Ich spüle den Teller ab.',
+    'Am Montag gehen wir einkaufen.',
+    'Die Säge hängt an der Wand.',
+    'Lea zahlt an der Kasse.',
+    'Tom stellt die Milch in den Kühlschrank.',
+    'Lea spült das Glas in der Küche.',
+    'Ich lege das Heft auf den Tisch.',
+    'Mia gießt die Blumen am Fenster.',
+    'Der Bus fährt zum Bahnhof.',
+    'Ben kocht Wasser für den Tee.',
+    'Wir essen in der Pause einen Apfel.',
+    'Die Schere liegt in der Schublade.',
+    'Tom zieht seine Jacke an.',
+    'Lea hängt das Bild an die Wand.',
+    'Ich packe meine Tasche.',
+    'Mia holt Brot beim Bäcker.',
+    'Der Hund wartet vor der Tür.',
+    'Wir spielen im Hof Fußball.',
+    'Ben bringt den Müll weg.',
+    'Die Lehrerin schreibt an die Tafel.',
+    'Tom sägt das Holz in der Werkstatt.',
+    'Lea kauft im Laden Milch.',
+    'Ich putze mir die Zähne.',
+    'Wir fahren mit dem Rad zur Schule.',
+    'Der Ball liegt unter dem Tisch.',
+    'Mia schreibt ihren Namen auf das Blatt.',
+    'Ben deckt den Tisch für das Essen.',
+    'Die Sonne scheint am Morgen.',
+    'Ich höre Musik mit dem Handy.',
+    'Tom sucht seinen Schlüssel.'],
+  lang: [
+    'Nach der Schule fahre ich mit dem Bus nach Hause.',
+    'In der Küche schneiden wir Gurke und Tomate.',
+    'Tom holt die Zange aus der Kiste in der Werkstatt.',
+    'Am Freitag kaufen wir Milch, Brot und Käse.',
+    'Mia stellt die Tassen und die Teller in den Schrank.',
+    'Wenn es regnet, nehme ich eine Jacke mit.',
+    'Ben wäscht seine Hände mit Wasser und Seife.',
+    'Morgen früh fahren wir mit dem Zug in die Stadt.',
+    'Am Morgen fahre ich mit dem Bus zur Schule.',
+    'Nach dem Essen spülen wir die Teller und die Gläser.',
+    'Lea kauft im Laden Brot, Butter und Eier.',
+    'Tom bohrt in der Werkstatt ein Loch in das Brett.',
+    'In der Pause spielen wir im Hof mit dem Ball.',
+    'Mia legt die Stifte und die Hefte in den Schrank.',
+    'Wenn es kalt ist, ziehe ich eine Mütze auf.',
+    'Ben wäscht die Gurke und schneidet sie in Scheiben.',
+    'Am Wochenende besuche ich mit Mama die Oma.',
+    'Heute backen wir in der Küche einen Kuchen.',
+    'Der Hausmeister repariert mit dem Hammer den Stuhl.',
+    'Nach der Arbeit trinkt Lea eine Tasse Tee.',
+    'Im Sommer gehen wir mit der Klasse ins Schwimmbad.',
+    'Tom gießt jeden Morgen die Blumen im Klassenzimmer.',
+    'Wir kaufen für das Frühstück Milch und Brötchen ein.',
+    'Mia fährt am Nachmittag mit dem Fahrrad zum Sport.',
+    'Bevor wir essen, waschen wir uns die Hände.'],
 };
 app.ts = {text:'', words:[], tiles:[], order:[], len:'kurz', own:false, last:''};
 function tsSet(t){ const T = app.ts; T.text = String(t || '').trim() || T.text; T.words = T.text.split(/\s+/).filter(Boolean); T.tiles = shuffle(T.words.map((_, i) => i)); if(T.words.length > 1 && T.tiles.every((v, i) => v === i)) T.tiles.reverse(); T.order = []; }
-function tsGen(){ const T = app.ts, bank = SATZ_BANK[T.len] || SATZ_BANK.kurz; let t; do t = pick(bank); while(bank.length > 1 && t === T.last); T.last = t; tsSet(t); }
+/* Erst kommen alle Sätze einer Länge einmal dran (gemischt), dann wieder von vorn – ohne den letzten Satz gleich zu wiederholen. */
+function tsGen(){
+  const T = app.ts, len = SATZ_BANK[T.len] ? T.len : 'kurz', bank = SATZ_BANK[len];
+  T.queue ||= {};
+  if(!T.queue[len]?.length){ const q = shuffle(bank.slice()); if(q.length > 1 && q[q.length - 1] === T.last) q.unshift(q.pop()); T.queue[len] = q; }
+  const t = T.queue[len].pop(); T.last = t; tsSet(t);
+}
 function renderTsatz(){
   const T = app.ts; if(!T.words.length) tsGen();
   $('#equation').innerHTML = ''; $('#prompt').textContent = 'Tippe die Wörter der Reihe nach an. Gelegte Wörter kannst du verschieben.'; setHint('');
