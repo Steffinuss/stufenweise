@@ -5,4 +5,4 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 25.11.2026
 
-Gerade nichts in Arbeit. Schlichtes I und 1 ist mit 0.35.0 freigegeben (siehe `CHANGELOG.md`).
+- **Frei legen an der Tafel: Zahl einblenden** (Stefan, 25.11.): in `entwicklung` gebaut, in der Testversion zu sehen, wartet auf Freigabe.

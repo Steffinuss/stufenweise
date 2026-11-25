@@ -79,6 +79,7 @@ main{padding:12px 18px 12px 10px;height:100%;min-height:0;min-width:0;display:fl
 .equation .op{color:var(--muted);font-weight:400;margin:0 .15em}
 .equation .ca{color:var(--ca,#c9414a)}.equation .cb{color:#346bc3}
 .equation .dh{color:var(--h)}.equation .dz{color:var(--z)}.equation .de{color:var(--e)}
+.total .dh{color:var(--h)}.total .dz{color:var(--z)}.total .de{color:var(--e)}
 .equation .res{display:inline-block;min-width:1.2em;padding:0 .2em;border-bottom:4px dotted #cfc6b4}
 .equation .res.ok{color:var(--ok);border-bottom-color:transparent}
 .equation .eq-slot{border-bottom:0;padding:0;vertical-align:middle;position:relative;top:-.15em}
@@ -161,6 +162,7 @@ html{overscroll-behavior:none;touch-action:manipulation}
 #board [data-p]:active{cursor:grabbing}
 .total{display:flex;align-items:center;gap:8px;padding:0 14px;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;border-radius:14px;background:#fff;box-shadow:var(--shadow)}
 .total small{font-size:14px;font-weight:700;color:var(--muted)}
+.class-mode .total{font-size:34px}
 
 #dlg-qr{width:min(760px,calc(100vw - 16px));max-height:96dvh;padding:14px 18px}
 .qr-show{display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -2551,10 +2553,10 @@ function renderFreeControls(){
   c.push(toolBtn({id:'f-clear', ic:'clear', label:'Abwählen', disabled:!ps.length}));
   c.push(toolBtn({id:'f-del', ic:'selTrash', label:'Auswahl weg', disabled:!ps.length}));
   c.push('<span class="sep"></span>');
-  if(resultsOn()){
+  if(resultsOn() || classMode()){  // an der Tafel immer: die Lehrkraft blendet die gelegte Zahl ein
     const counts = ['t','h','z','e'].filter(k => freeCols().includes(k)).map(k => `${k.toUpperCase()} ${b.pieces.filter(p => p.kind === k).length}`).join(' · ');
-    c.push(`<div class="total" aria-live="polite">${b.show ? `${total} <small>${counts}</small>` : '?'}</div>`);
-    c.push(toolBtn({id:'f-show', ic: b.show ? 'eyeoff' : 'eye', label: b.show ? 'Verdecken' : 'Menge'}));
+    c.push(`<div class="total" aria-live="polite">${b.show ? `${classMode() ? numHtml(total, '') : total} <small>${counts}</small>` : '?'}</div>`);
+    c.push(toolBtn({id:'f-show', ic: b.show ? 'eyeoff' : 'eye', label: b.show ? 'Verdecken' : classMode() ? 'Zahl zeigen' : 'Menge'}));
   }
   c.push(toolBtn({id:'f-undo', ic:'undo', label:'Zurück', disabled:!b.hist.length}));
   c.push(toolBtn({id:'f-all', ic:'trash', label:'Alles weg', disabled:!b.pieces.length}));
@@ -2731,7 +2733,7 @@ function renderFreeMoney(){
   c.push(toolBtn({id:'fm-clear', ic:'clear', label:'Abwählen', disabled:!selN}));
   c.push(toolBtn({id:'fm-del', ic:'selTrash', label:'Auswahl weg', disabled:!selN}));
   c.push('<span class="sep"></span>');
-  if(resultsOn()){ c.push(`<div class="total" aria-live="polite">${b.show ? fmtMoney(sum) : '?'}</div>`); c.push(toolBtn({id:'fm-show', ic: b.show ? 'eyeoff' : 'eye', label: b.show ? 'Verdecken' : 'Summe'})); }
+  if(resultsOn() || classMode()){ c.push(`<div class="total" aria-live="polite">${b.show ? fmtMoney(sum) : '?'}</div>`); c.push(toolBtn({id:'fm-show', ic: b.show ? 'eyeoff' : 'eye', label: b.show ? 'Verdecken' : 'Summe'})); }
   c.push(toolBtn({id:'fm-undo', ic:'undo', label:'Zurück', disabled:!b.mhist.length}));
   c.push(toolBtn({id:'fm-all', ic:'trash', label:'Alles weg', disabled:!b.money.length}));
   $('#controls').innerHTML = c.join('');

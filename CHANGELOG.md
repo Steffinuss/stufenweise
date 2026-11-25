@@ -5,7 +5,7 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+- **Frei legen an der Tafel: gelegte Zahl einblenden.** Im Unterricht gibt es jetzt immer den Knopf „Zahl zeigen“ (bisher nur mit der Einstellung „Ergebnisse und Mengen anzeigen erlauben“). Die Zahl erscheint groß und farbig nach Stellen, dazu H/Z/E; beim Geld die Summe. „Verdecken“ blendet sie wieder aus (Wunsch Stefan, 25.11.2026).
 
 ## 0.35.2 – 25.11.2026
 
