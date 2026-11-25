@@ -159,7 +159,8 @@ html{overscroll-behavior:none;touch-action:manipulation}
 .board-wrap svg.ink{pointer-events:none;z-index:3}.board-wrap.pen-on svg.ink{pointer-events:auto;cursor:crosshair}.board-wrap.pen-on{box-shadow:inset 0 0 0 3px #e8890c}
 .ink-bar{position:absolute;top:8px;right:8px;z-index:4;display:flex;gap:6px;align-items:center;background:#fffdf8;border-radius:12px;padding:6px 8px;box-shadow:var(--shadow)}
 .ink-bar [data-inkc]{flex:0 0 32px;width:32px;height:32px;padding:0;border-radius:50%;background:var(--sw);border:3px solid #fff;box-shadow:0 0 0 1px #0003;cursor:pointer}.ink-bar [data-inkc][aria-pressed="true"]{box-shadow:0 0 0 3px #e8890c}
-.ink-bar .ink-txt{font:inherit;font-size:15px;font-weight:700;padding:6px 10px;border-radius:9px;border:1px solid #0002;background:#fff;cursor:pointer}.ink-bar .ink-txt[aria-pressed="true"]{background:var(--dark);color:#fff}.ink-bar .ink-txt:disabled{opacity:.4}
+.ink-bar .ink-ic{flex:0 0 42px;width:42px;height:42px;padding:0;display:grid;place-items:center;border-radius:10px;border:1px solid #0002;background:#fff;color:var(--ink,#2b2930);cursor:pointer}.ink-bar .ink-ic svg{width:24px;height:24px}.ink-bar .ink-ic[aria-pressed="true"]{background:var(--dark);color:#fff}.ink-bar .ink-ic:disabled{opacity:.35}
+.board-wrap .ink-bar svg{position:static;inset:auto;width:24px;height:24px;touch-action:auto}.board-wrap .ink-bar button{min-height:0;min-width:0;box-sizing:border-box}
 .board-wrap.out{box-shadow:inset 0 0 0 3px var(--bad);background:#f8ecea}
 .board-wrap.out::after{content:'Loslassen = zurücklegen';position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#fff;padding:8px 14px;border-radius:10px;color:var(--bad);font-weight:700}
 #board [data-p]{cursor:grab}
@@ -2709,7 +2710,7 @@ function inkMount(){
   if(b.pen){
     if(!bar){ bar = document.createElement('div'); bar.className = 'ink-bar'; wrap.appendChild(bar); }
     bar.innerHTML = INK_COLORS.map(([c, n], i) => `<button data-inkc="${i}" style="--sw:${c}" aria-label="${n}" title="${n}" aria-pressed="${b.inkTool === 'pen' && b.inkC === i}"></button>`).join('') +
-      `<button data-inkt="erase" class="ink-txt" aria-pressed="${b.inkTool === 'erase'}">Radierer</button><button data-inkt="undo" class="ink-txt" ${b.ink.length ? '' : 'disabled'}>Strich zurück</button><button data-inkt="clear" class="ink-txt" ${b.ink.length ? '' : 'disabled'}>Schrift weg</button>`;
+      `<button data-inkt="erase" class="ink-ic" aria-label="Radierer" title="Radierer" aria-pressed="${b.inkTool === 'erase'}">${icon('eraser')}</button><button data-inkt="undo" class="ink-ic" aria-label="Strich zurück" title="Strich zurück" ${b.ink.length ? '' : 'disabled'}>${icon('undo')}</button><button data-inkt="clear" class="ink-ic" aria-label="Schrift weg" title="Schrift weg" ${b.ink.length ? '' : 'disabled'}>${icon('trash')}</button>`;
   } else bar?.remove();
 }
 const inkPath = st => st.p.length < 2 ? `M${st.p[0][0]} ${st.p[0][1]}l0.0001 0` : 'M' + st.p.map(([x, y]) => `${x.toFixed(4)} ${y.toFixed(4)}`).join('L');
