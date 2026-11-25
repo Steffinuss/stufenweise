@@ -217,3 +217,10 @@ Beispiel „Was passt nicht?“:
 **Zusammenhang mit dem Basis-Test:** Der Test nutzt je Stufe eine leichte und eine schwerere Aufgabenart (`B_TEST`, `B_ST`). Ändert C die Aufgabenarten oder ihre Schwierigkeit, müssen Test, Lernstand-Texte und Arbeitsblätter nachgezogen werden. Mit Stefan klären, ob C vor oder nach der Freigabe des Basis-Tests kommt.
 
 **Vor der Umsetzung zu klären (Stefan):** Welche Stufen zuerst (Vorschlag: V1 Gleiches, V2 Was passt nicht?, V3 Sortieren – dort wirkt Ähnlichkeit am stärksten)? Welche Gegenstände und Varianten? Soll „mittel“ eine eigene Aufgabenart werden oder eine weitere Schwierigkeit `st` innerhalb der Art? Gilt die neue Progression auch für die Arbeitsblätter?
+
+## J. Arbeitshefte, die aufeinander aufbauen (Wunsch Stefan, 25.11.2026) – offen, Fragen gestellt
+
+Stefan: „Test machen → Arbeitsheft drucken → Schüler üben lassen.“ Heute ist das Heft oft an einem Tag durch (nur Förderzone, 1–2 Seiten je Stufe). Gewünscht: kommende Stufen vorwegnehmen, Heft nur für Mathe oder nur für Deutsch, für Deutsch mehr Texte und Aufgaben, zwischendurch längere Texte; Umfang wie ein Verlagsheft (Westermann „Fördern Inklusiv“, rund 48–64 Seiten).
+
+Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die aufeinander aufbauen“ (claude.ai/artifact/Bay279priYyGDskCEixrv7). Kurz: Heft-Assistent (Fach, Seitenzahl, Vorgriff), Kapitel je Stufe (Einstieg → Üben, schwerer werdend → „Das kann ich schon“), Wiederholungsseiten, Hilfen hinten, Lösungsheft; Mathe-Feinstufen (Material → Bild → im Kopf); Deutsch: Texte in drei Längen (Ziel ~80/40/40), Fortsetzungsgeschichte, neue Papier-Formate; Broschürendruck. Umsetzung in 5 Schritten, erst nach Stefans Antworten.
+
