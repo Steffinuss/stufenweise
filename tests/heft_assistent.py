@@ -4,7 +4,10 @@
 - Vorgriff: nur Förderzone / je eine Stufe weiter / bis das Heft voll ist (Standard); vorweggenommen werden nur Stufen,
   die noch nicht erreicht sind, in Lernreihenfolge; die Förderzone bekommt die meisten Seiten
 - Kapitel je Stufe: Inhalt nennt die Kapitel mit Seitenzahl, unten auf jeder Seite „Seite n · Kapitel k“
-- Kapitel abwählen und „mehr“/„weniger“ Seiten verteilt die Seiten neu, gemerkt im Heft"""
+- Kapitel abwählen und „mehr“/„weniger“ Seiten verteilt die Seiten neu, gemerkt im Heft
+Schritt 2: Kapitel = Einstieg mit Beispiel → Üben → „Das kann ich schon“ (drei Stufen zum Ankreuzen); Wiederholung nach je
+zwei Kapiteln; Hilfen hinten (Hundertertafel, Anlauttabelle, Einmaleins-Tafel); Lösungsheft. Schritt 3: Mathe-Feinstufen.
+Schritt 5: Broschürendruck (A5 aus A4, A4 aus A3), Seiten in Falt-Reihenfolge."""
 import asyncio, re
 from common import URL, launch
 from playwright.async_api import async_playwright
@@ -39,7 +42,7 @@ async def main():
         # 1. Planung: Seitenzahlen gehen immer genau auf, Förderzone zuerst und mit den meisten Seiten
         res = await pg.evaluate("""pid => { const out = []; for(const fach of ['mix', 'M', 'D']) for(const pages of [12, 24, 36, 48]) for(const vor of ['zone', 'next', 'voll']) for(const taf of [false, true]){
             const P = heftPlan(pid, {...app.heft, fach, pages, vor, taf}), used = P.chapters.filter(c => c.pages);
-            out.push({id:`${fach} ${pages} ${vor} ${taf}`, fach:P.fach, total: 1 + (P.tocOwn ? 1 : 0) + (P.taf ? 1 : 0) + used.reduce((s, c) => s + c.pages, 0), N:P.N,
+            out.push({id:`${fach} ${pages} ${vor} ${taf}`, fach:P.fach, total: 1 + (P.tocOwn ? 1 : 0) + P.wdh + P.helps.length + used.reduce((s, c) => s + c.pages, 0), N:P.N, wdh:P.wdh, nUsed: used.length,
               zoneFirst: P.chapters.findIndex(c => !c.zone) < 0 || P.chapters.slice(P.chapters.findIndex(c => !c.zone)).every(c => !c.zone),
               zoneMore: Math.min(...used.filter(c => c.zone).map(c => c.pages)) >= Math.max(0, ...used.filter(c => !c.zone).map(c => c.pages)),
               nPrev: P.chapters.filter(c => !c.zone).length, keys: P.chapters.map(c => c.key), subj: [...new Set(P.chapters.map(c => keySubj(c.key)))]}); }
@@ -52,11 +55,12 @@ async def main():
         check('nur Förderzone: kein Vorgriff', all(r['nPrev'] == 0 for r in res if ' zone ' in r['id']))
         check('je eine Stufe weiter: Vorgriff', all(r['nPrev'] > 0 for r in res if ' next ' in r['id']))
         r48 = next(r for r in res if r['id'] == 'M 48 voll false')
-        check('bis voll, 48 Seiten: mehrere Stufen weiter', r48['nPrev'] >= 3, str(r48['keys']))
+        check('bis voll, 48 Seiten: mehrere Stufen weiter', r48['nPrev'] >= 2, str(r48['keys']))
         check('erreichte Stufen werden nicht vorweggenommen', all('R|R5' not in r['keys'] for r in res), '')
         check('Mathe-Heft nur Mathe', all(r['subj'] == ['M'] for r in res if r['id'].startswith('M ')))
         check('Deutsch-Heft nur Deutsch', all(r['subj'] == ['D'] for r in res if r['id'].startswith('D ')))
         m24 = next(r for r in res if r['id'] == 'M 24 next false')
+        check('Wiederholung nach je zwei Kapiteln', all(r['wdh'] == r['nUsed'] // 2 for r in res))
         check('Lernreihenfolge: nach ZR 20 II kommt III, nach R3 kommt R4', 'M|20|III' in m24['keys'] and 'R|R4' in m24['keys'], str(m24['keys']))
 
         # 2. Oberfläche: Fach, Umfang, Vorgriff, Kapitel abwählen und verlängern
@@ -77,14 +81,22 @@ async def main():
         pages = {k: int(v) for k, v in (x.split(':') for x in plan)}
         check('abgewählt: 0 Seiten', pages['W|W3'] == 0)
         check('mehr Seiten für L3', pages['L|L3'] > pages['W|W2'] > pages['L|L4'], str(pages))
-        check('Summe bleibt 36', sum(pages.values()) + 1 == 36, str(sum(pages.values())))
+        P = await pg.evaluate("pid => (P => [P.wdh, P.helps, P.tocOwn])(heftPlan(pid))", mia)
+        check('Summe bleibt 36', sum(pages.values()) + 1 + P[0] + len(P[1]) + (1 if P[2] else 0) == 36, f'{sum(pages.values())} {P}')
+        check('Anlauttabelle hinten (Deutsch, Anlaute)', P[1] == ['abc'], str(P[1]))
         saved = await pg.evaluate("(h => [h.fach, h.pages, h.vor, h.off, h.adj])(JSON.parse(localStorage.getItem(HEFT_KEY)))")
         check('Einstellungen gemerkt', saved == ['D', 36, 'next', {'W|W3': True}, {'L|L3': 1}], str(saved))
 
         # 3. Heft erstellen (Deutsch, 36 Seiten): Druck hat genau 36 Seiten, Kapitel im Inhalt, Seitenzahlen
         await pg.click('#hf-zone')
         await pg.wait_for_function("app.heft.book && document.querySelector('#hf-zone') && !document.querySelector('#hf-zone').disabled", timeout=120000)
-        H = await pg.evaluate("({items: app.heft.items.map(i => [i.ch, i.title]), chapters: app.heft.chapters, title: app.heft.title, dup: app.heft.items.length - new Set(app.heft.items.map(i => i.html)).size})")
+        H = await pg.evaluate("({items: app.heft.items.filter(i => i.ch !== undefined).map(i => [i.ch, i.title]), kinds: app.heft.items.map(i => (i.ch ?? '-') + (i.kind || '')), chapters: app.heft.chapters, title: app.heft.title, dup: app.heft.items.length - new Set(app.heft.items.map(i => i.html)).size, sol: app.heft.items.filter(i => i.sol?.length).length})")
+        print(H['kinds'])
+        k = H['kinds']
+        check('Kapitel: Einstieg zuerst, „Das kann ich schon“ zuletzt', all(k[[i for i, x in enumerate(k) if x.startswith(str(c))][0]] == f'{c}einstieg' and k[[i for i, x in enumerate(k) if x.startswith(str(c))][-1]] == f'{c}kann' for c in range(3)), str(k))
+        check('Wiederholung nach Kapitel 2', '-wdh' in k and k.index('-wdh') == max(i for i, x in enumerate(k) if x.startswith('1')) + 1)
+        check('Anlauttabelle ganz hinten', k[-1] == '-hilfe')
+        check('Lösungen gesammelt', H['sol'] >= len(k) - 1, str(H['sol']))
         check('Titel Deutsch-Heft', H['title'] == 'Mein Deutsch-Heft', H['title'])
         check('3 Kapitel', len(H['chapters']) == 3, str([c['title'] for c in H['chapters']]))
         check('Kapitel nacheinander', [c for c, _ in H['items']] == sorted(c for c, _ in H['items']))
@@ -96,7 +108,12 @@ async def main():
         toc = re.sub(r'\s+', ' ', toc)
         print(toc)
         check('Inhalt mit Kapiteln ab Seite 2', 'Kapitel 1:' in toc and re.search(r'Kapitel 1: [^0-9]+ 2 ', toc) is not None, toc)
-        check('Fußzeile Seite und Kapitel', 'Seite 2 · Kapitel 1 · ' in html and 'Seite 36 · Kapitel 3 · ' in html)
+        check('Fußzeile Seite und Kapitel', 'Seite 2 · Kapitel 1 · ' in html and 'Seite 36 · ' in html and 'Seite 37' not in html)
+        check('Einstieg mit Beispiel', html.count('class="ab-bsp-lab"') == 3 and html.count('class="hf-intro"') == 3)
+        check('„Das kann ich schon“ mit drei Stufen zum Ankreuzen', html.count('class="hf-kis"') == 3 and all(t in html for t in ['Das kann ich.', 'Das kann ich fast.', 'Das übe ich noch.']))
+        loes = await pg.evaluate("buildLoesung().html")
+        check('Lösungsheft mit Seitenzahlen', 'Seite 2 · Einstieg' in loes and loes.count('<section class="ls">') >= 30, str(loes.count('<section class="ls">')))
+        check('Lösungsheft-Knöpfe', await pg.locator('#hf-sol-print').count() == 1 and await pg.locator('#hf-sol-save').count() == 1)
         lst = await pg.evaluate("[...document.querySelectorAll('.hf-list li.hf-ch')].map(l => l.textContent)")
         check('Seitenliste mit Kapitelüberschriften', len(lst) == 3, str(lst))
 
@@ -110,10 +127,36 @@ async def main():
         own = 'class="page tocp"' in html
         print('Kapitel:', await pg.evaluate("app.heft.chapters.length"), 'eigene Inhaltsseite:', own)
         check('48 Seiten gedruckt', n == pr == 48, f'{n} Seiten, {pr} gedruckt')
-        check('Hundertertafel ganz hinten', 'Hundertertafel zum Nachschauen' in await pg.evaluate("app.heft.items.at(-1).title"))
+        tail = await pg.evaluate("app.heft.items.slice(-2).map(i => i.kind + ' ' + i.title)")
+        check('Hilfen hinten: Hundertertafel und Anlauttabelle', tail == ['hilfe Hundertertafel zum Nachschauen', 'hilfe Anlauttabelle'], str(tail))
         if own: check('mit Inhaltsseite beginnt Kapitel 1 auf Seite 3', 'Seite 3 · Kapitel 1 · ' in html)
 
-        # 5. Leeren setzt die Kapitel zurück; Seiten von Hand danach wieder ab 1 gezählt
+        # 5. Mathe-Feinstufen: mit Bild → selbst zeichnen → im Kopf, Zahlen werden größer
+        await pg.evaluate("app.heft.fach = 'M'; app.heft.pages = 24; app.heft.vor = 'zone'; app.heft.off = {}; app.heft.adj = {}; app.heft.taf = false; saveHeft()")
+        await pg.evaluate("async pid => { await heftMake(pid); }", mia)
+        st = await pg.evaluate("""() => { const c = app.heft.chapters.findIndex(c => c.key === 'R|R3'), it = app.heft.items.filter(i => i.ch === c && i.kind === 'ueben');
+            const big = i => { const ns = i.sol.map(x => Math.max(...(x.match(/\\d+/g) || [0]).map(Number))); return ns.reduce((s, x) => s + x, 0)/ns.length; };
+            return {labels: it.map(i => i.title.match(/\\(([^)]*)\\)$/)?.[1]), first: big(it[0]), last: big(it.at(-1))}; }""")
+        print(st)
+        check('Feinstufen: mit Bild zuerst, im Kopf zuletzt', st['labels'][0] == 'mit Bild' and st['labels'][-1] == 'im Kopf' and 'Bild selbst zeichnen' in st['labels'], str(st['labels']))
+        dd = await pg.evaluate("""() => { const keep = {...app.sheet}, m = st => { let s = 0, n = 0; for(let i = 0; i < 12; i++){ Object.assign(app.sheet, {topic:'M:plus', zr:100, ue:'egal', n:6, stufe:st}); buildSheet(); const G = app.sheetGen; G.d.slice(0, 6).forEach(d => { s += d; n++; }); } return s/n; };
+            const r = [m(0), m(1)]; Object.assign(app.sheet, keep); return r; }""")
+        check('Feinstufen: Stufe 0 wählt kleinere Zahlen als Stufe 1', dd[0] < dd[1] * 0.8, f'{dd[0]:.1f} / {dd[1]:.1f}')
+
+        # 6. Broschürendruck: A5-Heft aus A4-Bögen und A4-Heft aus A3-Bögen, Seiten in Falt-Reihenfolge
+        for druck, w, sides in [('a5', 842, 12), ('a3', 1191, 12)]:
+            await pg.evaluate("d => { app.heft.druck = d; saveHeft(); renderHeft(); }", druck); await pg.wait_for_timeout(300)
+            doc = await pg.evaluate("(d => ({html: d.html, booklet: d.booklet, sheets: d.sheets}))(buildHeft())")
+            first = re.search(r'<div class="bk-side"><div class="bk-slot">(.*?)</div><div class="bk-slot"><div class="page cover"', doc['html'], re.S)
+            check(f'{druck}: Deckblatt rechts auf dem ersten Bogen, letzte Seite links', first is not None and 'Seite 24 ·' in first.group(1))
+            dp = await br.new_page(); await dp.set_content(doc['html']); await dp.wait_for_timeout(800)
+            pdf = await dp.pdf(prefer_css_page_size=True, print_background=True); await dp.close()
+            n = len(re.findall(rb'/Type\s*/Page[^s]', pdf)); box = re.search(rb'/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)', pdf)
+            check(f'{druck}: {sides} Seiten quer gedruckt', n == sides and box and abs(float(box.group(1)) - w) < 3 and float(box.group(1)) > float(box.group(2)), f'{n} Seiten, {box.group(1) if box else None}')
+            check(f'{druck}: Hinweis zum Falten', await pg.locator('.hf-bk-note').count() == 1)
+        await pg.evaluate("app.heft.druck = 'a4'; saveHeft()")
+
+        # 7. Leeren setzt die Kapitel zurück; Seiten von Hand danach wieder ab 1 gezählt
         await pg.evaluate("renderHeft()"); await pg.click('#hf-clear'); await pg.click('#hf-clear'); await pg.wait_for_timeout(200)
         st = await pg.evaluate("[app.heft.items.length, app.heft.chapters, app.heft.book]")
         check('Leeren setzt Kapitel zurück', st == [0, None, None], str(st))

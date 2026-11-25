@@ -9955,7 +9955,7 @@ function zoneToSheet(key){
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
-app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, taf:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[]};
+app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, taf:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[], stufe:null};   /* stufe: nur im Heft (0 leicht … 1 schwer), nicht gemerkt */
 const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'taf', 'recent'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
@@ -10156,12 +10156,18 @@ function buildSheet0(limit){
       const nb = fill ? 3 : Math.max(1, Math.round(S.n/4));
       for(let i = 0; i < nb; i++){ const g = def.gen(); G.sols.push(g.a); G.ops.push(['verbinde']); G.d.push(0); G.gi.push(0); G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${abOp('verbinde')}</span>Verbinde, was zusammengehört.</div><div class="ab-body"><div class="ab-match">${g.left.map((l, j) => `<div class="l">${l}<span class="ab-dot"></span></div><div></div><div class="r"><span class="ab-dot"></span>${g.right[j]}</div>`).join('')}</div></div></div>`); }
     } else {
-      const want = fill ? (def.max || 30) : Math.min(S.n, def.max || S.n), seen = new Set();
+      const lvl = typeof S.stufe === 'number', want = fill ? (def.max || 30) : lvl ? Math.max(Math.min(S.n, def.max || S.n), Math.min(def.max || 30, S.n*3)) : Math.min(S.n, def.max || S.n), seen = new Set();
       for(let i = 0; i < want; i++){
         let g, t = 0; do { g = def.gens[i % def.gens.length](sj === 'M' ? S.zr : null); t++; } while(seen.has(String(g.k ?? g.a)) && t < 12);
         if(fill && seen.has(String(g.k ?? g.a)) && i >= def.gens.length*2) break; /* Blatt füllen: keine Wiederholungen, wenn der Vorrat erschöpft ist */
         seen.add(String(g.k ?? g.a)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
         G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${g.ops.map(abOp).join('')}</span><span>${g.text}</span></div><div class="ab-body">${g.body}</div></div>`);
+      }
+      /* Heft (Mathe-Feinstufen): Aufgaben passender Schwierigkeit zuerst; S.stufe 0 = die leichtesten, 1 = die schwersten je Aufgabenart */
+      if(typeof S.stufe === 'number' && G.tasks.length > 2){
+        const pct = G.d.map((d, i) => { const grp = G.d.filter((_, j) => G.gi[j] === G.gi[i]); return grp.length < 2 ? .5 : grp.filter(x => x < d).length/(grp.length - 1); });
+        const ord = G.tasks.map((_, i) => i).sort((x, y) => Math.abs(pct[x] - S.stufe) - Math.abs(pct[y] - S.stufe) || x - y);
+        for(const k of ['tasks', 'sols', 'ops', 'd', 'gi']) G[k] = ord.map(i => G[k][i]).slice(0, fill ? Infinity : Math.min(S.n, def.max || S.n));
       }
     }
     G.limit = G.tasks.length;
@@ -10227,39 +10233,144 @@ function heftAdd(){
   saveHeft(); toast(`Ins Arbeitsheft übernommen – jetzt ${app.heft.items.length} ${app.heft.items.length === 1 ? 'Seite' : 'Seiten'}.`);
   renderSheets(true);
 }
+const heftEntries = H => { const chs = H.chapters || [], out = []; H.items.forEach((it, i) => { if(it.ch !== undefined && chs[it.ch]){ if(!out.some(e => e.ch === it.ch)) out.push({ch: it.ch, title:`Kapitel ${it.ch + 1}: ${chs[it.ch].title}`, i}); } else out.push({title: it.title, i}); }); return out; };
+const heftTotal = H => 1 + (H.toc && heftEntries(H).length > 8 ? 1 : 0) + H.items.length;
+const heftFirst = H => H.book ? 2 + (H.toc && heftEntries(H).length > 8 ? 1 : 0) : 1;
 function buildHeft(){
   const H = app.heft, kid = kids().find(p => p.id === H.pid), name = kid ? kid.name : '';
   /* Inhalt: Kapitel (Heft-Assistent) mit ihrer ersten Seite, sonst jede Seite einzeln */
-  const chs = H.chapters || [], entries = [];
-  H.items.forEach((it, i) => { if(it.ch !== undefined && chs[it.ch]){ if(!entries.some(e => e.ch === it.ch)) entries.push({ch: it.ch, title:`Kapitel ${it.ch + 1}: ${chs[it.ch].title}`, i}); } else entries.push({title: it.title, i}); });
+  const chs = H.chapters || [], entries = heftEntries(H);
   const tocOwn = entries.length > 8;   /* langes Inhaltsverzeichnis: eigene Seite nach dem Deckblatt */
-  const first = H.book ? 2 + (H.toc && tocOwn ? 1 : 0) : 1;   /* Heft-Assistent: Seiten wie gedruckt gezählt, Deckblatt = Seite 1 */
+  const first = heftFirst(H);   /* Heft-Assistent: Seiten wie gedruckt gezählt, Deckblatt = Seite 1 */
   const pages = H.items.map((it, i) => `<div class="page ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + first}${it.ch !== undefined && chs[it.ch] ? ` · Kapitel ${it.ch + 1}` : ''} · `)}</div>`).join('');
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li><span>${escHtml(e.title)}</span><span class="cv-dots"></span><span>${e.i + first}</span></li>`).join('')}</ol></div>` : '';
   const fach = H.book && SUBJECTS[H.book.fach] && !(H.title || '').includes(SUBJECTS[H.book.fach].name) ? `<div class="cv-fach">${escHtml(SUBJECTS[H.book.fach].name)}</div>` : '';
   const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1>${fach}<div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
   const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
-  return {title: H.title || 'Mein Arbeitsheft', html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${css}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}${cover}${tocOwn && toc ? `<div class="page tocp">${toc}</div>` : ''}${pages}</body></html>`};
+  const all = cover + (tocOwn && toc ? `<div class="page tocp">${toc}</div>` : '') + pages, druck = HEFT_DRUCK[H.druck] ? H.druck : 'a4';
+  const head = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}${css}`;
+  if(druck === 'a4') return {title: H.title || 'Mein Arbeitsheft', html:`${head}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}${all}</body></html>`};
+  /* Broschüre (Schritt 5): je Bogen quer zwei Heftseiten nebeneinander, so angeordnet, dass gefaltet und in der Mitte geheftet die Reihenfolge stimmt.
+     A5-Heft: A4-Bögen quer (Seiten verkleinert auf 71 %); A4-Heft: A3-Bögen quer (Originalgröße). Beidseitig drucken, an der kurzen Kante wenden. */
+  const P = [...new DOMParser().parseFromString(`<body>${all}</body>`, 'text/html').body.children].filter(e => e.classList.contains('page')).map(e => e.outerHTML);
+  while(P.length % 4) P.push('<div class="page bk-blank"></div>');
+  const n = P.length, sides = [];
+  for(let k = 0; k < n/4; k++) sides.push([P[n - 1 - 2*k], P[2*k]], [P[2*k + 1], P[n - 2 - 2*k]]);
+  const D = HEFT_DRUCK[druck], [sw, sh] = D.side, z = D.zoom;
+  const bcss = `@page{size:${sw}mm ${sh}mm;margin:0}.bk-side{width:${sw}mm;height:${sh}mm;display:flex;overflow:hidden;page-break-after:always;break-after:page;margin:0 auto}.bk-side:last-child{page-break-after:auto;break-after:auto}.bk-slot{width:${sw/2}mm;height:${sh}mm;overflow:hidden;flex:none}.bk-slot>.page{zoom:${z};margin:0!important;height:297mm;min-height:297mm!important;box-shadow:none!important;page-break-after:auto!important;overflow:hidden}body.bk-measure .bk-slot>.page{zoom:1;height:auto;min-height:0!important}@media screen{.bk-side{margin:6mm auto;background:#fff;box-shadow:0 2px 8px #0002}.bk-slot+.bk-slot{border-left:1px dashed #bbb}}`;
+  const bjs = `<script>(function(){function lay(){document.body.classList.add('bk-measure');try{window.__fitPages&&window.__fitPages();}catch(e){}document.body.classList.remove('bk-measure');}if(document.readyState==='complete')lay();else addEventListener('load',lay);addEventListener('beforeprint',lay);})();<\/script>`;
+  return {title: H.title || 'Mein Arbeitsheft', booklet: druck, sheets: n/4, html:`${head}${bcss}</style>${PAGE_FIT_JS}${bjs}</head><body>${B_BW_DEFS}${sides.map(([l, r]) => `<div class="bk-side"><div class="bk-slot">${l}</div><div class="bk-slot">${r}</div></div>`).join('')}</body></html>`};
+}
+const HEFT_DRUCK = {
+  a4: {name:'A4, jede Seite ein Blatt'},
+  a5: {name:'A5-Heft aus A4-Bögen (in der Mitte heften)', side:[297, 210], zoom:.7071},
+  a3: {name:'A4-Heft aus A3-Bögen (in der Mitte heften)', side:[420, 297], zoom:1}
+};
+/* Lösungsheft für die Lehrkraft (Schritt 2): Lösungen aller Seiten, mit Seitenzahl wie im Heft */
+function buildLoesung(){
+  const H = app.heft, kid = kids().find(p => p.id === H.pid), first = heftFirst(H);
+  const secs = H.items.map((it, i) => it.sol?.length && it.sol.some(x => x && x !== '–') ? `<section class="ls"><h3>Seite ${i + first} · ${escHtml(it.title)}</h3><ol>${it.sol.map(x => `<li>${escHtml(x)}</li>`).join('')}</ol></section>` : '').join('');
+  const css = `@page{size:A4;margin:12mm}.page.rp{width:auto;padding:0;margin:0}@media screen{.page.rp{width:210mm;padding:12mm;margin:6mm auto}}.ls-cols{column-count:2;column-gap:8mm}.ls{break-inside:avoid;margin:0 0 4mm}.ls h3{font-size:11.5pt;margin:0 0 1mm;border-bottom:1px solid #999}.ls ol{margin:0;padding-left:7mm;font-size:10.5pt}.ls li{margin:.4mm 0}`;
+  return {title:`Lösungen ${H.title || 'Arbeitsheft'}`, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Lösungen ${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${css}</style></head><body><div class="page rp"><div class="ab-top"><h1>Lösungen: ${escHtml(H.title || 'Arbeitsheft')}</h1>${kid ? `<p style="margin:0">${escHtml(kid.name)}</p>` : ''}</div>${secs ? `<div class="ls-cols">${secs}</div>` : '<p>Zu diesen Seiten gibt es keine Lösungen.</p>'}${HEFT_LIC}</div></body></html>`};
 }
 /* Heft zur Förderzone: je Förderzone ein (oder zwei) passende Blätter, auf die Seite eingepasst */
 const zoneTaf = key => { const t = zoneToSheet(key); return !!(t && t.topic.startsWith('H:') && H_SHEETS[t.topic.slice(2)]?.taf); };
 const zoneBasis = key => !!zoneToSheet(key)?.topic.startsWith('B:');
 const heftZones = pid => TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones).filter(z => { const t = zoneToSheet(z.key); return t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic)); });
-/* Heftseiten bauen: specs = [{t:{topic, zr, ue}, ch}], jedes Blatt neu gewürfelt und auf die Seite eingepasst */
+/* Heftseiten bauen. specs: {t, ch, kind:'ueben'|'einstieg'|'kann'|'wdh', o:{Blatt-Optionen}, label, parts:[{t, ch, title}]}
+   Ohne kind = ein volles Blatt wie bisher. Jedes Blatt wird neu gewürfelt, auf die Seite eingepasst; Lösungen kommen in it.sol. */
+const HEFT_CSS = `.hf-band{display:flex;align-items:center;gap:3mm;font-size:11pt;font-weight:700;color:#444;margin:-3mm 0 3mm}.hf-band span{background:#222;color:#fff;border-radius:2mm;padding:.6mm 3mm}
+.hf-intro{font-size:13pt;line-height:1.35;margin:0 0 4mm;padding:3mm 4mm;background:#f1ece1;border-radius:3mm}
+.ab-task.ab-bsp{outline:1.8px dashed #777;outline-offset:1.2mm}.ab-bsp-lab{display:inline-block;font-size:10pt;font-weight:700;color:#555;border:1.2px solid #777;border-radius:2mm;padding:0 2mm;margin:0 0 1.5mm}.ab-bsp-sol{margin-top:2mm;font-size:12.5pt;color:#444}
+.ab-stufe{font-size:12pt;font-weight:600;color:#555;margin-left:2mm;white-space:nowrap}
+.hf-kis{margin-top:6mm;border:2px solid #222;border-radius:3mm;padding:3mm 5mm;break-inside:avoid}.hf-kis h2{font-size:14pt;margin:0 0 1mm}.hf-kis-row{display:flex;align-items:center;gap:4mm;font-size:14pt;padding:1.5mm 0}.hf-kis-row .kb{width:8mm;height:8mm;border:2px solid #222;border-radius:1.5mm;flex:none}.hf-kis-row svg{width:8mm;height:8mm;flex:none}
+.hf-sub{font-size:14pt;margin:4mm 0 2mm;border-bottom:1.5px solid #999;padding-bottom:1mm}
+.abc-p{display:grid;grid-template-columns:repeat(6,1fr);gap:2.5mm}.abc-p div{border:1.4px solid #222;border-radius:2mm;padding:1.5mm;text-align:center;min-height:37mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between}.abc-p b{font-size:22pt;display:block;line-height:1.1}.abc-p b small{font-size:17pt;margin-left:1.5mm;font-weight:600}.abc-p svg{width:20mm;height:20mm}.abc-p .two svg{width:13mm;height:13mm}.abc-p .two span{display:flex;gap:1mm}
+.ein-p{border-collapse:collapse;margin:6mm auto;font-size:15pt}.ein-p td,.ein-p th{border:1.2px solid #222;width:15.5mm;height:13mm;text-align:center}.ein-p th{background:#f1ece1}.ein-p td.q{font-weight:700;background:#faf6ee}`;
+const HEFT_LIC = '<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>';
+const kisSym = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#222" stroke-width="2"/>${k === 2 ? '<circle cx="12" cy="12" r="10" fill="#222"/>' : k === 1 ? '<path d="M12 2a10 10 0 0 1 0 20z" fill="#222"/>' : ''}</svg>`;
+const KIS_HTML = `<div class="hf-kis"><h2>Wie gut kannst du das? Kreuze an.</h2>${[[2, 'Das kann ich.'], [1, 'Das kann ich fast.'], [0, 'Das übe ich noch.']].map(([k, t]) => `<div class="hf-kis-row"><span class="kb"></span>${kisSym(k)}<span>${t}</span></div>`).join('')}</div>`;
+/* Hilfen hinten im Heft (Backlog J, Schritt 2) */
+const abcHelp = () => `<div class="ab-top"><h1>Anlauttabelle</h1></div><div class="abc-p">${ABC.map(L => { const pp = ABC_PIC[L]; return `<div${Array.isArray(pp) ? ' class="two"' : ''}><b>${L}<small>${L.toLowerCase()}</small></b>${!pp ? '' : Array.isArray(pp) ? `<span>${pp.map(w => iconSvg(w, 40)).join('')}</span>` : iconSvg(pp, 50)}</div>`; }).join('')}</div>${HEFT_LIC}`;
+const einsHelp = () => { const N = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; return `<div class="ab-top"><h1>Einmaleins-Tafel</h1></div><table class="ein-p"><tr><th>·</th>${N.map(n => `<th>${n}</th>`).join('')}</tr>${N.map(a => `<tr><th>${a}</th>${N.map(b => `<td${a === b ? ' class="q"' : ''}>${a*b}</td>`).join('')}</tr>`).join('')}</table>${HEFT_LIC}`; };
+const HEFT_HELP = {
+  taf: {name:'Hundertertafel zum Nachschauen', label:'Ausgefüllte Hundertertafel zum Nachschauen', on: H => !!H.taf, need: c => chTaf(c), html: () => tafHelp()},
+  abc: {name:'Anlauttabelle', label:'Anlauttabelle', on: H => H.abc !== false, need: c => /^(L:L[1-5]|W:W[1-4])$/.test(c.t.topic), html: () => abcHelp()},
+  ein: {name:'Einmaleins-Tafel', label:'Einmaleins-Tafel', on: H => H.ein !== false, need: c => c.t.topic === 'M:einmaleins', html: () => einsHelp()}
+};
+/* Mathe-Feinstufen (Schritt 3): Übungsseiten eines Kapitels werden schwerer – mit Bild → Bild selbst zeichnen/streichen → im Kopf;
+   dazu innerhalb des Zahlenraums von kleinen zu großen Zahlen (app.sheet.stufe 0…1 wählt Aufgaben passender Schwierigkeit) */
+function heftStufe(t, p){
+  const [sj, key] = t.topic.split(':'), o = {stufe: p}, third = p < 1/3 ? 0 : p < 2/3 ? 1 : 2;
+  if(sj === 'M' && !['schriftlich', 'zahlenstrahl', 'geld', 'zaehlen', 'zeichnen', 'stellenwert'].includes(key)){
+    if(third === 0) Object.assign(o, {mat:true, draw:false, mstrich:'gezeigt', label:'mit Bild'});
+    else if(third === 1){
+      if(key === 'minus' && (t.zr || 20) <= 20) Object.assign(o, {mat:true, draw:false, mstrich:'selbst', label:'selbst wegstreichen'});
+      else if(DRAW_KEYS.includes(key)) Object.assign(o, {mat:true, draw:true, label:'Bild selbst zeichnen'});
+      else Object.assign(o, {mat:true, draw:false, label:'mit Bild'});
+    } else Object.assign(o, {mat:false, draw:false, label:'im Kopf'});
+  }
+  if(['B:V1', 'B:V2', 'B:V3'].includes(t.topic)) Object.assign(o, {bsim: third, label:['deutlich', 'ähnlich', 'fein'][third]});
+  return o;
+}
 async function heftPages(pid, specs, prog = () => {}){
   const keep = {...app.sheet}, H = app.heft, items = [];
   const fr = document.createElement('iframe'); fr.setAttribute('aria-hidden', 'true'); fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:820px;height:1200px;visibility:hidden'; document.body.append(fr);
   const load = html => new Promise(r => { fr.onload = () => setTimeout(r, 30); fr.srcdoc = html; });
+  const set = (t, {label, ...o} = {}) => Object.assign(app.sheet, {pid, topic:t.topic, zr:t.zr || keep.zr, ue:t.ue || 'egal', n:'fill', sol:true, taf:false, bw:!!H.bw, stufe:null, mat:keep.mat, draw:keep.draw, mstrich:keep.mstrich, bsim:keep.bsim, gross:keep.gross}, o);
+  const parse = html => { const d = new DOMParser().parseFromString(html, 'text/html'), pg = d.querySelector('.page'); pg.querySelector('.ab-meta')?.remove(); return {pg, title: app.sheetDoc.title, sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())}; };
+  const wrap = inner => `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}<div class="page">${inner}</div></body></html>`;
+  const tooLong = async inner => { await load(wrap(inner)); return !!fr.contentDocument.querySelector('.page')?.dataset.over; };
+  const band = (txt, ch) => `<div class="hf-band">${ch !== undefined ? `<span>Kapitel ${ch + 1}</span>` : ''}${txt}</div>`;
+  async function full(t, o){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen */
+    set(t, o); app.sheetDoc = buildSheet();
+    for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G || !G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
+    return parse(app.sheetDoc.html);
+  }
+  async function fixed(t, o, n, deco){   /* feste Aufgabenzahl, notfalls weniger, bis die Seite passt */
+    let r;
+    for(let k = n; k >= 1; k--){ set(t, {...o, n:k}); app.sheetDoc = buildSheet(); r = parse(app.sheetDoc.html); deco(r); if(k === 1 || !(await tooLong(r.pg.innerHTML))) break; }
+    return r;
+  }
   try{
     for(const [n, s] of specs.entries()){
       prog(n + 1, specs.length);
-      const t = s.t;
-      Object.assign(app.sheet, {pid, topic:t.topic, zr:t.zr || app.sheet.zr, ue:t.ue || 'egal', n:'fill', sol:false, taf:false, bw:!!H.bw});
-      app.sheetDoc = buildSheet();
-      for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G || !G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
-      const d = new DOMParser().parseFromString(app.sheetDoc.html, 'text/html'), pg = d.querySelector('.page');
-      pg.querySelector('.ab-meta')?.remove();
-      items.push({title: app.sheetDoc.title, html: pg.innerHTML, ...(s.ch !== undefined ? {ch: s.ch} : {})});
+      const ch = s.ch, at = ch !== undefined ? {ch} : {};
+      if(s.kind === 'einstieg'){
+        const demo = s.t.topic.startsWith('B:');   /* Basis-Blätter haben schon ein vorgemachtes Beispiel */
+        const r = await fixed(s.t, {gross:true, stufe:0, mat: s.t.topic.startsWith('M:') ? true : keep.mat, draw:false, mstrich:'gezeigt'}, 4, r => {
+          const top = r.pg.querySelector('.ab-top'), t1 = r.pg.querySelector('.ab-task');
+          top.insertAdjacentHTML('beforebegin', band('Einstieg', ch));
+          r.pg.querySelector('.ab-legend')?.insertAdjacentHTML('afterend', `<p class="hf-intro"><b>Das übst du in diesem Kapitel.</b> ${demo ? 'Die erste Aufgabe ist grau vorgemacht.' : 'Die erste Aufgabe ist ein Beispiel. Schaut sie zusammen an.'}</p>`);
+          if(!demo && t1){ t1.classList.add('ab-bsp'); t1.insertAdjacentHTML('afterbegin', '<span class="ab-bsp-lab">Beispiel</span>'); if(r.sol[0] && r.sol[0] !== '–') t1.insertAdjacentHTML('beforeend', `<div class="ab-bsp-sol">Lösung: <b>${escHtml(r.sol[0])}</b></div>`); }
+        });
+        items.push({title:`Einstieg: ${r.title}`, base: r.title, kind:'einstieg', html: r.pg.innerHTML, sol: r.sol, ...at});
+      } else if(s.kind === 'kann'){
+        const r = await fixed(s.t, {gross:false, draw:false, mstrich:'gezeigt'}, 6, r => {
+          const top = r.pg.querySelector('.ab-top'), h1 = r.pg.querySelector('h1');
+          top.insertAdjacentHTML('beforebegin', band('Das kann ich schon', ch));
+          h1.textContent = `Das kann ich schon: ${r.title}`;
+          (r.pg.querySelector('.ab-foot') || r.pg.lastElementChild).insertAdjacentHTML('beforebegin', KIS_HTML);
+        });
+        items.push({title:`Das kann ich schon: ${r.title}`, base: r.title, kind:'kann', html: r.pg.innerHTML, sol: r.sol, ...at});
+      } else if(s.kind === 'wdh'){
+        let inner = '', sol = [];
+        for(let k = 4; k >= 1; k--){
+          inner = band('Wiederholung') + `<div class="ab-top"><h1>Wiederholung</h1></div>`; sol = [];
+          for(const p of s.parts){
+            set(p.t, {...heftStufe(p.t, .5), label:undefined, n:k, gross:false}); app.sheetDoc = buildSheet(); const r = parse(app.sheetDoc.html);
+            inner += `<h2 class="hf-sub">Kapitel ${p.ch + 1}: ${escHtml(r.title)}</h2>` + [...r.pg.children].filter(e => !e.matches('.ab-top,.ab-foot,.hf-band')).map(e => e.outerHTML).join('');
+            sol.push(...r.sol.map((x, i) => `Kapitel ${p.ch + 1}, ${i + 1}: ${x}`));
+          }
+          inner += HEFT_LIC;
+          if(k === 1 || !(await tooLong(inner))) break;
+        }
+        items.push({title:`Wiederholung: Kapitel ${s.parts.map(p => p.ch + 1).join(' und ')}`, kind:'wdh', html: inner, sol});
+      } else {
+        const r = await full(s.t, s.o);
+        if(s.label) r.pg.querySelector('h1')?.insertAdjacentHTML('beforeend', `<small class="ab-stufe">· ${escHtml(s.label)}</small>`);
+        items.push({title: r.title + (s.label ? ` (${s.label})` : ''), base: r.title, ...(s.kind ? {kind: s.kind} : {}), html: r.pg.innerHTML, sol: r.sol, ...at});
+      }
     }
   } finally { fr.remove(); Object.assign(app.sheet, keep); app.sheetDoc = null; }
   return items;
@@ -10284,6 +10395,7 @@ const HEFT_PAGES = [12, 24, 36, 48];
 const HEFT_VOR = [['zone', 'nur Förderzone'], ['next', 'je eine Stufe weiter'], ['voll', 'bis das Heft voll ist']];
 const HEFT_ADJ = {'-1': .5, 0: 1, 1: 2};   /* weniger / normal / mehr Seiten für ein Kapitel */
 const HEFT_TITLE = {mix:'Mein Übungsheft', M:'Mein Mathe-Heft', D:'Mein Deutsch-Heft', B:'Mein Basis-Heft'};
+const sheetDef = t => { const [sj, key] = t.topic.split(':'); return ({M:M_SHEETS, L:R_SHEETS, U:U_SHEETS, G:G_SHEETS, H:H_SHEETS, W:W_SHEETS, ...SHEET_SETS})[sj]?.[key] || null; };
 const keySubj = key => { const ax = key.split('|')[0], t = TEST_IDS.find(id => TESTS[id].axes?.includes(ax)); return t ? TESTS[t].subj : null; };
 const sheetSig = t => `${t.topic}|${t.zr || ''}|${t.ue || ''}`;
 const sheetOk = t => !!t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic));
@@ -10308,33 +10420,46 @@ function heftPlan(pid, H = app.heft){
   const W = c => off[c.key] ? 0 : (c.zone ? 3 : 2) * HEFT_ADJ[adj[c.key] || 0];
   const sumW = () => ch.reduce((s, c) => s + W(c), 0);
   const act = () => ch.filter(c => W(c) > 0);
-  const extra = () => 1 + (H.toc && act().length > 8 ? 1 : 0) + (H.taf && act().some(chTaf) ? 1 : 0);   /* Deckblatt, eigene Inhaltsseite, Hundertertafel hinten */
+  /* Seiten außerhalb der Kapitel: Deckblatt, eigene Inhaltsseite (mehr als 8 Einträge), Wiederholung nach je zwei Kapiteln, Hilfen hinten */
+  const helpsOf = L => Object.keys(HEFT_HELP).filter(k => HEFT_HELP[k].on(H) && L.some(HEFT_HELP[k].need));
+  const extraFor = L => { const w = Math.floor(L.length/2), h = helpsOf(L).length; return 1 + (H.toc && L.length + w + h > 8 ? 1 : 0) + w + h; };
+  const extra = () => extraFor(act());
   const rows = zones.map(k => heftRow(k).filter(x => !isOk(m[x]?.status)));
   if(vor === 'next') rows.forEach(r => { for(const k of r) if(add(k, false)) break; });
   if(vor === 'voll'){   /* reihum aus allen Zeilen, solange ein vorweggenommenes Kapitel noch etwa 5 Seiten bekommt (Förderzone etwa 8) */
     const cand = []; for(let d = 0; rows.some(r => r.length > d); d++) rows.forEach(r => { if(r[d]) cand.push(r[d]); });
     for(const k of cand){ if(!fits(k)) continue; const w = off[k] ? 0 : 2 * HEFT_ADJ[adj[k] || 0]; if(w && (sumW() + w) * 2.5 > N - extra()) break; add(k, false); }
   }
-  const C = Math.max(0, N - extra()), A = act();
-  while(A.length > C) A.pop();   /* mehr Kapitel als Seiten: die letzten fallen weg */
+  const A = act();
+  while(A.length && A.length + extraFor(A) > N) A.pop();   /* mehr Kapitel als Seiten: die letzten fallen weg */
+  const C = Math.max(0, N - extraFor(A));
   const S = A.reduce((s, c) => s + W(c), 0), raw = A.map(c => C * W(c) / S), pg = raw.map(x => Math.max(1, Math.floor(x)));
   let rest = C - pg.reduce((s, x) => s + x, 0);
   const ord = raw.map((x, i) => i).sort((i, j) => (raw[j] - pg[j]) - (raw[i] - pg[i]) || i - j);
   for(let n = 0; rest > 0; n++, rest--) pg[ord[n % ord.length]]++;
   for(let n = 0; rest < 0 && n < 99; n++){ const i = pg.indexOf(Math.max(...pg)); if(pg[i] <= 1) break; pg[i]--; rest++; }
   ch.forEach(c => { const i = A.indexOf(c); c.pages = i < 0 ? 0 : pg[i]; c.cut = i < 0 && W(c) > 0; });
-  return {fach, N, vor, chapters: ch, content: C, tocOwn: !!H.toc && A.length > 8, taf: !!H.taf && A.some(chTaf), bw: A.some(c => c.t.topic.startsWith('B:'))};
+  const helps = helpsOf(A), wdh = Math.floor(A.length/2);
+  return {fach, N, vor, chapters: ch, content: C, wdh, helps, helpAvail: Object.keys(HEFT_HELP).filter(k => A.some(HEFT_HELP[k].need)), tocOwn: !!H.toc && A.length + wdh + helps.length > 8, taf: helps.includes('taf'), bw: A.some(c => c.t.topic.startsWith('B:'))};
 }
 async function heftMake(pid){
   const kid = data.profiles.find(p => p.id === pid); if(!kid) return;
   const H = app.heft, P = heftPlan(pid, H), used = P.chapters.filter(c => c.pages > 0);
   if(!used.length){ toast(`Für ${kid.name} gibt es noch keine Förderzone mit passendem Arbeitsblatt. Zuerst einen Test machen.`); return renderHeft(); }
-  const specs = used.flatMap((c, ci) => Array.from({length: c.pages}, () => ({t: c.t, ch: ci})));
+  /* Kapitel (Schritt 2): Einstieg → Üben, Seite für Seite schwerer (Schritt 3) → „Das kann ich schon“; nach je zwei Kapiteln eine Wiederholung */
+  const specs = [];
+  used.forEach((c, ci) => {
+    const p = c.pages, m = p >= 3 ? p - 2 : p === 2 ? 1 : 1, mat = !!sheetDef(c.t)?.mat;
+    if(p >= 2 && !mat) specs.push({kind:'einstieg', t: c.t, ch: ci});
+    for(let i = 0; i < (mat ? p : m); i++){ const o = heftStufe(c.t, m > 1 && !mat ? i/(m - 1) : .5); specs.push({kind:'ueben', t: c.t, ch: ci, o, label: o.label}); }
+    if(p >= 3 && !mat) specs.push({kind:'kann', t: c.t, ch: ci});
+    if(ci % 2 === 1) specs.push({kind:'wdh', parts:[ci - 1, ci].map(k => ({t: used[k].t, ch: k}))});
+  });
   const btn = () => $('#hf-zone span');
   toast('Das Heft wird zusammengestellt …');
   const items = await heftPages(pid, specs, (i, n) => { const b = btn(); if(b) b.textContent = `Seite ${i} von ${n} …`; });
-  H.chapters = used.map((c, ci) => ({key: c.key, label: c.label, zone: c.zone, title: items.find(it => it.ch === ci)?.title || c.label}));
-  if(P.taf) items.push({title:'Hundertertafel zum Nachschauen', cls:'hilfe', html:tafHelp()});
+  H.chapters = used.map((c, ci) => ({key: c.key, label: c.label, zone: c.zone, title: items.find(it => it.ch === ci)?.base || c.label}));
+  for(const k of P.helps) items.push({title: HEFT_HELP[k].name, cls:'hilfe', kind:'hilfe', html: HEFT_HELP[k].html()});
   if(!H.title || Object.values(HEFT_TITLE).includes(H.title) || H.title === 'Mein Arbeitsheft') H.title = HEFT_TITLE[P.fach] || HEFT_TITLE.mix;
   H.items = items; H.pid = pid; H.book = {N: P.N, fach: P.fach};
   saveHeft(); app.sheetMode = 'heft'; renderSheets();
@@ -10351,8 +10476,8 @@ function heftAssistHtml(kid){
     <span class="sh-lab">Umfang in Seiten</span>${seg('hfpages', HEFT_PAGES.map(n => [n, n]), P.N, 'Umfang in Seiten')}
     <span class="sh-lab">Wie weit nach vorne</span><select id="hf-vor">${HEFT_VOR.map(([v, n]) => `<option value="${v}" ${v === P.vor ? 'selected' : ''}>${n}</option>`).join('')}</select>
     <span class="sh-lab">Kapitel</span><ol class="hf-plan">${plan}</ol>
-    <span class="note">Jede Stufe ist ein Kapitel, jede Seite hat neue Aufgaben. Dazu kommen Deckblatt${P.tocOwn ? ', eine Seite Inhalt' : ' mit Inhalt'}${P.taf ? ' und hinten die Hundertertafel' : ''} – zusammen ${P.N} Seiten.${P.chapters.some(c => c.cut) ? ' Für einige Kapitel ist kein Platz mehr: mehr Seiten wählen oder Kapitel abwählen.' : ''}</span>
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${P.bw ? `<label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${P.chapters.some(c => c.pages && chTaf(c)) ? `<label class="row cb"><input type="checkbox" id="hf-taf" ${H.taf ? 'checked' : ''}> Ausgefüllte Hundertertafel als Extraseite zum Nachschauen</label>` : ''}</div>
+    <span class="note">Jede Stufe ist ein Kapitel: Einstieg mit Beispiel, Übungsseiten (Seite für Seite etwas schwerer), zum Schluss „Das kann ich schon“. Jede Seite hat neue Aufgaben. Dazu kommen Deckblatt${P.tocOwn ? ', eine Seite Inhalt' : ' mit Inhalt'}${P.wdh ? `, ${P.wdh === 1 ? 'eine Wiederholung' : `${P.wdh} Wiederholungen`} (nach je zwei Kapiteln)` : ''}${P.helps.length ? ` und hinten ${P.helps.map(k => HEFT_HELP[k].label).join(', ')}` : ''} – zusammen ${P.N} Seiten. Die Lösungen gibt es als eigenes Heft.${P.chapters.some(c => c.cut) ? ' Für einige Kapitel ist kein Platz mehr: mehr Seiten wählen oder Kapitel abwählen.' : ''}</span>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${P.bw ? `<label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${P.helpAvail.map(k => `<label class="row cb"><input type="checkbox" id="hf-${k}" ${HEFT_HELP[k].on(H) ? 'checked' : ''}> Hinten im Heft: ${HEFT_HELP[k].label}</label>`).join('')}</div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-zone" ${P.chapters.some(c => c.pages) ? '' : 'disabled'}>${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'} (${P.N} Seiten)</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>`;
 }
 function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.sheet.pid = pid; $('#dlg-sheet').showModal(); renderSheets(); }
@@ -10364,12 +10489,16 @@ function renderHeft(){
     <label class="row cb"><input type="checkbox" id="hf-toc" ${H.toc ? 'checked' : ''}> Inhaltsverzeichnis auf dem Titelblatt</label>
     ${(() => { const kid = kids().find(p => p.id === H.pid); if(!kid) return kids().length ? `<p class="note">Tipp: Wähle oben ein Kind – dann kann Stufenweise das Heft passend zu seiner Förderzone zusammenstellen.</p>` : ''; return heftAssistHtml(kid); })()}
     ${H.items.length ? `<ol class="hf-list">${H.items.map((it, i) => `${it.ch !== undefined && H.chapters?.[it.ch] && H.items.findIndex(x => x.ch === it.ch) === i ? `<li class="hf-ch">Kapitel ${it.ch + 1}: ${escHtml(H.chapters[it.ch].title)}</li>` : ''}<li value="${i + 1}"><span>${escHtml(it.title)}</span><button class="icon-btn" data-hf-up="${i}" ${i ? '' : 'disabled'} aria-label="nach oben">↑</button><button class="icon-btn" data-hf-down="${i}" ${i < H.items.length - 1 ? '' : 'disabled'} aria-label="nach unten">↓</button><button class="icon-btn" data-hf-del="${i}" aria-label="Seite entfernen">✕</button></li>`).join('')}</ol>` : `<p class="note"><b>Noch leer.</b> Wechsle zu „Einzelblatt“, stell ein Blatt zusammen und tippe auf „Ins Arbeitsheft“. Das wiederholst du für jede Seite.</p>`}
+    <label class="row">Drucken als <select id="hf-druck">${Object.entries(HEFT_DRUCK).map(([k, d]) => `<option value="${k}" ${k === (H.druck || 'a4') ? 'selected' : ''}>${d.name}</option>`).join('')}</select></label>
+    ${H.druck && H.druck !== 'a4' && H.items.length ? `<p class="note hf-bk-note"><b>Als Heft drucken:</b> beidseitig, an der kurzen Kante wenden${H.druck === 'a3' ? ', Papier A3' : ', Papier A4'}. Dann die Bögen zusammen in der Mitte falten und heften. ${(() => { const n = heftTotal(H), b = Math.ceil(n/4); return `${b} ${b === 1 ? 'Bogen' : 'Bögen'}${n % 4 ? `, ${4 - n % 4} Seite${4 - n % 4 === 1 ? '' : 'n'} bleib${4 - n % 4 === 1 ? 't' : 'en'} leer` : ''}.`; })()}</p>` : ''}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
-    <p class="note">Das Heft hat ein Titelblatt mit Namen. Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Aufgaben bleiben so, wie du sie übernommen hast. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst. Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
+    ${H.items.some(it => it.sol?.length) ? `<div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="hf-sol-print">${icon('print')}<span style="display:inline">Lösungsheft drucken</span></button><button class="icon-btn" id="hf-sol-save">${icon('check')}<span style="display:inline">Lösungsheft speichern</span></button></div>` : ''}
+    <p class="note">Das Heft hat ein Titelblatt mit Namen. Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Lösungen gibt es als eigenes Lösungsheft für dich. Die Aufgaben bleiben so, wie du sie übernommen hast. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst. Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
     <iframe id="sh-frame" title="Vorschau Arbeitsheft"></iframe>`;
   app.heftDoc = buildHeft();
   const fr = $('#sh-frame'); fr.onload = null;
-  fr.srcdoc = app.heftDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.4, ((fr.clientWidth || 700) - 30)/830)).toFixed(2)}}}</style></head>`);
+  const wpx = app.heftDoc.booklet === 'a3' ? 1630 : app.heftDoc.booklet ? 1160 : 830;
+  fr.srcdoc = app.heftDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.3, ((fr.clientWidth || 700) - 30)/wpx)).toFixed(2)}}}</style></head>`);
 }
 const sheetModeSwitch = () => `<div class="seg sh-mode" role="group" aria-label="Was drucken?"><button data-shmode="single" aria-pressed="${app.sheetMode === 'single'}">Einzelblatt</button><button data-shmode="heft" aria-pressed="${app.sheetMode === 'heft'}">Arbeitsheft${app.heft.items.length ? ` (${app.heft.items.length})` : ''}</button></div>`;
 function renderSheets(keep){
@@ -10429,6 +10558,9 @@ function sheetEvents(e){
   if(e.target.closest('#hf-clear')){ const b = e.target.closest('#hf-clear'); if(!b.dataset.sure){ b.dataset.sure = '1'; b.textContent = 'Wirklich leeren?'; return; } H.items = []; H.chapters = null; H.book = null; saveHeft(); return renderHeft(); }
   if(e.target.closest('#hf-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
   if(e.target.closest('#hf-save')){ const doc = app.heftDoc || buildHeft(); return saveFile(`Arbeitsheft ${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
+  if(e.target.closest('#hf-sol-save')){ const doc = buildLoesung(); return saveFile(`${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
+  if(e.target.closest('#hf-sol-print')){ const doc = buildLoesung(), f = document.createElement('iframe'); f.style.cssText = 'position:fixed;left:-10000px;top:0;width:820px;height:1200px'; document.body.append(f);
+    f.onload = () => { let ok = false; try{ f.contentWindow.focus(); f.contentWindow.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Lösungsheft speichern“ und die Datei im Browser drucken.'); setTimeout(() => f.remove(), 60000); }; f.srcdoc = doc.html; return; }
   const zt = e.target.closest('[data-shtopic]'); if(zt){ S.topic = zt.dataset.shtopic; sheetSave(); return renderSheets(); }
   const sf = e.target.closest('[data-shfach]'); if(sf){ const id = sf.dataset.shfach; if(sheetPlace(S.topic)?.fach !== id){ const f = sheetTree().find(x => x.id === id); S.topic = app.sheetLast?.[id] || f.areas[0].items[0][0]; sheetSave(); } return renderSheets(); }
   const sa = e.target.closest('[data-sharea]'); if(sa){ const pl = sheetPlace(S.topic), ai = +sa.dataset.sharea; if(pl && pl.ai !== ai){ S.topic = app.sheetLast?.[`${pl.fach}|${ai}`] || pl.f.areas[ai].items[0][0]; sheetSave(); } return renderSheets(); }
@@ -10440,7 +10572,7 @@ function sheetEvents(e){
 }
 function sheetChange(e){
   const S = app.sheet, t = e.target;
-  if((t.id && t.id.startsWith('hf-')) || t.dataset.hfoff){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid'){ H.pid = t.value; H.off = {}; H.adj = {}; } if(t.id === 'hf-vor') H.vor = t.value; if(t.dataset.hfoff){ H.off ||= {}; if(t.checked) delete H.off[t.dataset.hfoff]; else H.off[t.dataset.hfoff] = true; } if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; if(t.id === 'hf-bw') H.bw = t.checked; if(t.id === 'hf-taf') H.taf = t.checked; saveHeft(); return renderHeft(); }
+  if((t.id && t.id.startsWith('hf-')) || t.dataset.hfoff){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid'){ H.pid = t.value; H.off = {}; H.adj = {}; } if(t.id === 'hf-vor') H.vor = t.value; if(t.dataset.hfoff){ H.off ||= {}; if(t.checked) delete H.off[t.dataset.hfoff]; else H.off[t.dataset.hfoff] = true; } if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; if(t.id === 'hf-bw') H.bw = t.checked; if(t.id === 'hf-taf') H.taf = t.checked; if(t.id === 'hf-abc') H.abc = t.checked; if(t.id === 'hf-druck') H.druck = t.value; if(t.id === 'hf-ein') H.ein = t.checked; saveHeft(); return renderHeft(); }
   if(t.id === 'sh-kid'){ S.pid = t.value; const zs = TEST_IDS.flatMap(sj => S.pid !== 'none' ? zoneReport(S.pid, sj).zones : []).map(z => zoneToSheet(z.key)).filter(z => z && sheetPlace(z.topic)); /* Fach mit Förderzone voreinstellen */
     if(zs.length && !zs.some(z => sheetPlace(z.topic).fach === sheetPlace(S.topic)?.fach)){ S.topic = zs[0].topic; if(zs[0].zr) S.zr = zs[0].zr; } }
   if(t.id === 'sh-topic') S.topic = t.value;
