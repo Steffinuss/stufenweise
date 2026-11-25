@@ -156,6 +156,10 @@ html{overscroll-behavior:none;touch-action:manipulation}
 .board-wrap{position:relative;flex:1;min-width:0;background:#f7f3ea;border-radius:18px;box-shadow:inset 0 1px 4px #2b293014;overflow:hidden}
 .board-wrap svg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .board-empty{position:absolute;inset:45% 0 auto;text-align:center;color:var(--muted);pointer-events:none;font-size:21px;margin:0}
+.board-wrap svg.ink{pointer-events:none;z-index:3}.board-wrap.pen-on svg.ink{pointer-events:auto;cursor:crosshair}.board-wrap.pen-on{box-shadow:inset 0 0 0 3px #e8890c}
+.ink-bar{position:absolute;top:8px;right:8px;z-index:4;display:flex;gap:6px;align-items:center;background:#fffdf8;border-radius:12px;padding:6px 8px;box-shadow:var(--shadow)}
+.ink-bar [data-inkc]{flex:0 0 32px;width:32px;height:32px;padding:0;border-radius:50%;background:var(--sw);border:3px solid #fff;box-shadow:0 0 0 1px #0003;cursor:pointer}.ink-bar [data-inkc][aria-pressed="true"]{box-shadow:0 0 0 3px #e8890c}
+.ink-bar .ink-txt{font:inherit;font-size:15px;font-weight:700;padding:6px 10px;border-radius:9px;border:1px solid #0002;background:#fff;cursor:pointer}.ink-bar .ink-txt[aria-pressed="true"]{background:var(--dark);color:#fff}.ink-bar .ink-txt:disabled{opacity:.4}
 .board-wrap.out{box-shadow:inset 0 0 0 3px var(--bad);background:#f8ecea}
 .board-wrap.out::after{content:'Loslassen = zurücklegen';position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#fff;padding:8px 14px;border-radius:10px;color:var(--bad);font-weight:700}
 #board [data-p]{cursor:grab}
@@ -2525,6 +2529,7 @@ function renderFree(before){
   updateExtent();
   drawBoard();
   renderFreeControls();
+  inkMount();
   if(before) flip($('#board'), before);
 }
 function drawBoard(){
@@ -2561,8 +2566,9 @@ function renderFreeControls(){
     c.push(`<div class="total" aria-live="polite">${b.show ? `${classMode() ? numHtml(total, '') : total} <small>${counts}</small>` : '?'}</div>`);
     c.push(toolBtn({id:'f-show', ic: b.show ? 'eyeoff' : 'eye', label: b.show ? 'Verdecken' : classMode() ? 'Zahl zeigen' : 'Menge'}));
   }
+  if(classMode()) c.push(toolBtn({id:'ink-pen', ic:'edit', label: b.pen ? 'Stift aus' : 'Stift', pressed: !!b.pen}));
   c.push(toolBtn({id:'f-undo', ic:'undo', label:'Zurück', disabled:!b.hist.length}));
-  c.push(toolBtn({id:'f-all', ic:'trash', label:'Alles weg', disabled:!b.pieces.length}));
+  c.push(toolBtn({id:'f-all', ic:'trash', label:'Alles weg', disabled:!b.pieces.length && !b.ink?.length}));
   $('#controls').innerHTML = c.join('');
   if(!settings.help){ setHint(''); return; }
   if(!b.pieces.length) setHint(b.place === 'thze' ? 'Tippe oder ziehe Tausender, Hunderter, Zehner oder Einer.' : b.place === 'hze' ? 'Tippe oder ziehe Hunderter, Zehner oder Einer.' : 'Tippe oder ziehe Zehner oder Einer.');
@@ -2687,6 +2693,57 @@ function moneyAdd(c, at){
   it = at ? mPlaceNear({...it, x: at.x - itemSize(c)[0]/2, y: at.y - itemSize(c)[1]/2}, m.items, MT.W, MT.H, mtTop()) : mAutoPlace(it, m.items, MT.W, MT.H, mtTop());
   m.items.push(it); m.check = null; renderMoney();
 }
+/* ---------- Stift an der Tafel (Frei legen): auf die Legefläche schreiben und zeichnen ----------
+   Striche in Anteilen der Fläche (0–1), damit sie bei anderer Größe an derselben Stelle bleiben.
+   „Stift“ schaltet zwischen Legen und Schreiben um (Smartboards unterscheiden Stift und Finger oft nicht). */
+const INK_COLORS = [['#2b2930', 'Schwarz'], ['#c9414a', 'Rot'], ['#346bc3', 'Blau'], ['#2f8a4f', 'Grün']];
+function inkMount(){
+  const b = board(), wrap = $('#stage .board-wrap'); if(!wrap) return;
+  b.ink ||= []; b.inkC ??= 0; b.inkTool ||= 'pen';
+  if(!classMode()) b.pen = false;
+  let svg = wrap.querySelector('svg.ink');
+  if(!svg){ svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'ink'); svg.setAttribute('viewBox', '0 0 1 1'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('aria-hidden', 'true'); wrap.appendChild(svg); }
+  wrap.classList.toggle('pen-on', !!b.pen);
+  inkDraw();
+  let bar = wrap.querySelector('.ink-bar');
+  if(b.pen){
+    if(!bar){ bar = document.createElement('div'); bar.className = 'ink-bar'; wrap.appendChild(bar); }
+    bar.innerHTML = INK_COLORS.map(([c, n], i) => `<button data-inkc="${i}" style="--sw:${c}" aria-label="${n}" title="${n}" aria-pressed="${b.inkTool === 'pen' && b.inkC === i}"></button>`).join('') +
+      `<button data-inkt="erase" class="ink-txt" aria-pressed="${b.inkTool === 'erase'}">Radierer</button><button data-inkt="undo" class="ink-txt" ${b.ink.length ? '' : 'disabled'}>Strich zurück</button><button data-inkt="clear" class="ink-txt" ${b.ink.length ? '' : 'disabled'}>Schrift weg</button>`;
+  } else bar?.remove();
+}
+const inkPath = st => st.p.length < 2 ? `M${st.p[0][0]} ${st.p[0][1]}l0.0001 0` : 'M' + st.p.map(([x, y]) => `${x.toFixed(4)} ${y.toFixed(4)}`).join('L');
+function inkDraw(){
+  const svg = $('#stage .board-wrap svg.ink'); if(!svg) return;
+  svg.innerHTML = board().ink.map(st => `<path d="${inkPath(st)}" stroke="${st.c}" stroke-width="${st.w}" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`).join('');
+}
+function inkPt(e){ const r = $('#stage .board-wrap').getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))]; }
+function inkErase(e){
+  const b = board(), r = $('#stage .board-wrap').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, n = b.ink.length;
+  b.ink = b.ink.filter(st => !st.p.some(([px, py]) => Math.hypot(px * r.width - x, py * r.height - y) < 18));
+  if(b.ink.length !== n){ inkDraw(); return true; }
+}
+document.addEventListener('pointerdown', e => {
+  const svg = e.target.closest?.('#stage .board-wrap.pen-on svg.ink'); if(!svg || e.button > 0) return;
+  const b = board(); e.preventDefault(); e.stopPropagation(); svg.setPointerCapture?.(e.pointerId);
+  if(b.inkTool === 'erase'){ app.ink = {id: e.pointerId, erase: true}; if(inkErase(e)) inkMount(); return; }
+  const st = {c: INK_COLORS[b.inkC][0], w: 5, p: [inkPt(e)]}; b.ink.push(st); app.ink = {id: e.pointerId, st}; inkDraw();
+}, true);
+document.addEventListener('pointermove', e => {
+  const D = app.ink; if(!D || e.pointerId !== D.id) return; e.preventDefault();
+  if(D.erase){ if(inkErase(e)) D.changed = true; return; }
+  const p = inkPt(e), q = D.st.p[D.st.p.length - 1]; if(Math.abs(p[0] - q[0]) + Math.abs(p[1] - q[1]) < 0.002) return;
+  D.st.p.push(p); const path = $('#stage svg.ink path:last-child'); if(path) path.setAttribute('d', inkPath(D.st));
+}, {passive:false});
+const inkEnd = e => { const D = app.ink; if(!D || e.pointerId !== D.id) return; app.ink = null; app.inkT = Date.now(); inkMount(); if(app.mode === 'free'){ if(board().mat === 'money') renderFreeMoney(); else renderFreeControls(); } };
+document.addEventListener('pointerup', inkEnd); document.addEventListener('pointercancel', inkEnd);
+document.addEventListener('click', e => {
+  const b = board(), c = e.target.closest?.('#stage .ink-bar [data-inkc]'), t = e.target.closest?.('#stage .ink-bar [data-inkt]');
+  if(c){ b.inkC = +c.dataset.inkc; b.inkTool = 'pen'; return inkMount(); }
+  if(t){ const k = t.dataset.inkt; if(k === 'erase') b.inkTool = b.inkTool === 'erase' ? 'pen' : 'erase'; else if(k === 'undo') b.ink.pop(); else if(k === 'clear') b.ink = []; return inkMount(); }
+  if(e.target.closest?.('#ink-pen')){ b.pen = !b.pen; b.sel?.clear(); b.msel?.clear(); return b.mat === 'money' ? renderFreeMoney() : freeRefresh(); }
+});
+
 /* Frei legen mit Geld */
 const MB = {W:900, H:520};
 function mbExchange(b){
@@ -2737,10 +2794,12 @@ function renderFreeMoney(){
   c.push(toolBtn({id:'fm-del', ic:'selTrash', label:'Auswahl weg', disabled:!selN}));
   c.push('<span class="sep"></span>');
   if(resultsOn() || classMode()){ c.push(`<div class="total" aria-live="polite">${b.show ? fmtMoney(sum) : '?'}</div>`); c.push(toolBtn({id:'fm-show', ic: b.show ? 'eyeoff' : 'eye', label: b.show ? 'Verdecken' : 'Summe'})); }
+  if(classMode()) c.push(toolBtn({id:'ink-pen', ic:'edit', label: b.pen ? 'Stift aus' : 'Stift', pressed: !!b.pen}));
   c.push(toolBtn({id:'fm-undo', ic:'undo', label:'Zurück', disabled:!b.mhist.length}));
-  c.push(toolBtn({id:'fm-all', ic:'trash', label:'Alles weg', disabled:!b.money.length}));
+  c.push(toolBtn({id:'fm-all', ic:'trash', label:'Alles weg', disabled:!b.money.length && !b.ink?.length}));
   $('#controls').innerHTML = c.join('');
   setHint(!settings.help ? '' : !b.money.length ? 'Tippe oder ziehe einen Schein oder eine Münze.' : ex ? '' : selN ? 'Zum Tauschen: Teile wählen, die zusammen einen Schein ergeben – oder einen Schein zum Wechseln.' : '');
+  inkMount();
 }
 function freeMoneyControl(btn){
   const b = board();
@@ -2756,7 +2815,7 @@ function freeMoneyControl(btn){
     case 'fm-del': mbSave(b); b.mcheck = false; b.money = b.money.filter(i => !b.msel.has(i.id)); b.msel.clear(); return renderFreeMoney();
     case 'fm-show': b.show = !b.show; return renderFreeMoney();
     case 'fm-undo': b.mcheck = false; if(b.mhist.length){ b.money = b.mhist.pop(); b.msel.clear(); } return renderFreeMoney();
-    case 'fm-all': mbSave(b); b.money = []; b.msel.clear(); return renderFreeMoney();
+    case 'fm-all': mbSave(b); b.money = []; b.msel.clear(); b.ink = []; return renderFreeMoney();
   }
 }
 function freeMoneyAdd(c, at){
@@ -10540,7 +10599,7 @@ $('#controls').addEventListener('click', e => {
       case 'f-del': freeSave(b); b.pieces = b.pieces.filter(p => !b.sel.has(p.id)); b.sel.clear(); return freeRefresh();
       case 'f-show': b.show = !b.show; freeRefresh(); if(b.show) speak(String(freeTotal(b))); return;
       case 'f-undo': if(b.hist.length){ b.pieces = b.hist.pop(); b.sel.clear(); freeRefresh(); } return;
-      case 'f-all': freeSave(b); b.pieces = []; b.sel.clear(); return freeRefresh();
+      case 'f-all': freeSave(b); b.pieces = []; b.sel.clear(); b.ink = []; return freeRefresh();
     }
     return;
   }
