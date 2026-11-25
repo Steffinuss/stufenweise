@@ -5,7 +5,7 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+- Schrift Stufenfibel: großes I als einfacher Strich (ohne Querstriche oben und unten), Ziffer 1 ohne Querstrich unten (Stefan, 25.11.2026). `fonts/schlichte_formen.py`, Í/Î/Ï/Ì mit angepasst.
 
 ## 0.34.1 – 25.11.2026
 
