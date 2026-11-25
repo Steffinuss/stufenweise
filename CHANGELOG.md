@@ -5,7 +5,7 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
-- noch nichts
+- **Heft-Assistent** (Backlog J, Schritt 1; Wunsch Stefan, 25.11.2026): Das „Heft zur Förderzone“ wird zum Heft-Assistenten. Wählbar sind Fach (Mathe, Deutsch, Basis oder gemischt), Umfang (12, 24, 36 oder 48 Seiten, 24 vorausgewählt; Deckblatt und Inhalt zählen mit, das gedruckte Heft hat genau so viele Seiten) und wie weit das Heft vorgreift (nur Förderzone, je eine Stufe weiter, bis das Heft voll ist – Standard). Jede Stufe ist ein Kapitel, zuerst die Förderzone mit den meisten Seiten, dann die nächsten noch nicht erreichten Stufen in Lernreihenfolge (`heftRow`). Jede Seite hat neue Aufgaben. Kapitel lassen sich abwählen, kürzer oder länger machen. Deckblatt mit Fach, Inhalt mit Kapiteln und Seitenzahl, unten „Seite n · Kapitel k“ (Seiten wie gedruckt gezählt). Bisher „Blätter je Stufe 1/2“ entfällt. Funktionen `heftPlan`, `heftMake`, `heftPages`, `heftAssistHtml`; Test `tests/heft_assistent.py`.
 
 ## 0.37.0 – 25.11.2026
 

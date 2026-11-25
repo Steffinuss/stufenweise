@@ -373,7 +373,13 @@ Mehrere Blätter lassen sich zu einem Heft zusammenstellen:
 
 Das Heft bleibt auf dem Gerät gespeichert, bis du es leerst.
 
-**Heft zur Förderzone:** Wenn ein Kind schon getestet wurde, kann Stufenweise das Heft selbst zusammenstellen. Im Lernstand des Kindes auf **Arbeitsheft zur Förderzone** tippen (oder im Arbeitsheft oben das Kind wählen). Die App zeigt die Förderzonen in Mathe, Lesen und Schreiben. Wähle 1 oder 2 Blätter je Stufe und tippe auf **Heft erstellen**. Sind Basis-Blätter dabei, kannst du **Schwarz-Weiß-Drucker** ankreuzen (Muster statt Farben). Sind Blätter zur Hundertertafel dabei, kannst du **Ausgefüllte Hundertertafel als Extraseite zum Nachschauen** ankreuzen; die Tafel kommt dann einmal hinten ins Heft. Jedes Blatt wird mit neuen Aufgaben gefüllt. Ein vorhandenes Heft wird dabei ersetzt; danach kannst du wie gewohnt Seiten verschieben, entfernen oder weitere hinzufügen.
+**Heft-Assistent:** Wenn ein Kind schon getestet wurde, stellt Stufenweise das Heft selbst zusammen. Im Lernstand des Kindes auf **Arbeitsheft zur Förderzone** tippen (oder im Arbeitsheft oben das Kind wählen). Dann im Kasten **Heft-Assistent** wählen:
+
+1. **Fach:** Mathe, Deutsch, Basis oder Gemischt (es stehen nur Fächer mit Förderzone zur Wahl).
+2. **Umfang:** 12, 24, 36 oder 48 Seiten. Deckblatt und Inhalt zählen mit, das gedruckte Heft hat genau so viele Seiten (durch 4 teilbar, damit es sich falten und heften lässt).
+3. **Wie weit nach vorne:** „nur Förderzone“, „je eine Stufe weiter“ oder „bis das Heft voll ist“. Nach der Förderzone kommen die nächsten Stufen, die das Kind noch nicht erreicht hat (zum Beispiel Rechnen R3 → R4, Zahlenraum 20 → 100).
+
+Darunter steht die Liste der **Kapitel** mit ihren Seiten: jede Stufe ist ein Kapitel, zuerst die Förderzone (sie bekommt die meisten Seiten), dann die nächsten Stufen. Ein Kapitel lässt sich abwählen oder mit − und + kürzer oder länger machen; die Seiten werden dann neu verteilt. Sind Basis-Blätter dabei, kannst du **Schwarz-Weiß-Drucker** ankreuzen (Muster statt Farben). Sind Blätter zur Hundertertafel dabei, kannst du **Ausgefüllte Hundertertafel als Extraseite zum Nachschauen** ankreuzen; die Tafel kommt dann einmal hinten ins Heft. Auf **Heft erstellen** tippen: Jede Seite bekommt neue Aufgaben. Das Inhaltsverzeichnis nennt die Kapitel mit ihrer ersten Seite, unten auf jeder Seite stehen Seitenzahl und Kapitel. Ein vorhandenes Heft wird dabei ersetzt; danach kannst du wie gewohnt Seiten verschieben, entfernen oder weitere hinzufügen.
 
 ## Schritt 7: Rückmeldung geben
 

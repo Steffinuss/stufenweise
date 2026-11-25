@@ -776,6 +776,9 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 #sheet-body{display:grid;grid-template-columns:320px 1fr;gap:14px;flex:1;min-height:0}
 .sh-mode{display:flex}.hf-zone{display:flex;flex-direction:column;gap:6px;background:#fff;border:1.5px solid var(--line);border-left:5px solid #27834b;border-radius:12px;padding:10px 12px}.sh-mode button{flex:1}
 .hf-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:14px}.hf-list li{display:flex;align-items:center;gap:4px}.hf-list li span{flex:1;min-width:0}.hf-list .icon-btn{min-height:34px;min-width:34px;padding:2px 6px}
+.hf-list li.hf-ch{list-style:none;margin:6px 0 0 -22px;font-weight:700}.hf-seg button{flex:1;min-width:0;padding-left:6px;padding-right:6px}
+.hf-plan{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:14px}.hf-plan li{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.hf-plan li label{flex:1;min-width:180px;display:flex;align-items:center;gap:6px}.hf-plan li.hf-off label span{color:var(--muted)}
+.hf-plan .icon-btn{min-height:34px;min-width:34px;padding:2px 6px}.hf-tag{font-size:12px;border-radius:10px;padding:2px 8px;background:var(--soft)}.hf-tag.z{background:#e3f1e8;color:#1f6b3d;font-weight:700}.hf-n{font-size:13px;min-width:70px;text-align:right}
 .sh-nav{display:flex;flex-direction:column;gap:6px}.sh-lab{font-size:12px;font-weight:700;color:var(--muted);margin-top:4px}
 .sh-fach{display:grid;grid-template-columns:repeat(3,1fr)}.sh-fach button{min-height:40px;font-weight:700}
 .sh-areas,.sh-recent{display:flex;flex-wrap:wrap;gap:6px}.sh-areas .chip-toggle,.sh-recent .chip-toggle{min-height:36px;padding:4px 12px;font-size:15px}.sh-areas .lg{border:1.5px dashed #b9ac94}
@@ -10226,40 +10229,131 @@ function heftAdd(){
 }
 function buildHeft(){
   const H = app.heft, kid = kids().find(p => p.id === H.pid), name = kid ? kid.name : '';
-  const pages = H.items.map((it, i) => `<div class="page ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + 1} · `)}</div>`).join('');
-  const tocOwn = H.items.length > 8;   /* langes Inhaltsverzeichnis: eigene Seite nach dem Deckblatt */
-  const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><span class="cv-dots"></span><span>${i + 1}</span></li>`).join('')}</ol></div>` : '';
-  const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1><div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
-  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
+  /* Inhalt: Kapitel (Heft-Assistent) mit ihrer ersten Seite, sonst jede Seite einzeln */
+  const chs = H.chapters || [], entries = [];
+  H.items.forEach((it, i) => { if(it.ch !== undefined && chs[it.ch]){ if(!entries.some(e => e.ch === it.ch)) entries.push({ch: it.ch, title:`Kapitel ${it.ch + 1}: ${chs[it.ch].title}`, i}); } else entries.push({title: it.title, i}); });
+  const tocOwn = entries.length > 8;   /* langes Inhaltsverzeichnis: eigene Seite nach dem Deckblatt */
+  const first = H.book ? 2 + (H.toc && tocOwn ? 1 : 0) : 1;   /* Heft-Assistent: Seiten wie gedruckt gezählt, Deckblatt = Seite 1 */
+  const pages = H.items.map((it, i) => `<div class="page ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + first}${it.ch !== undefined && chs[it.ch] ? ` · Kapitel ${it.ch + 1}` : ''} · `)}</div>`).join('');
+  const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li><span>${escHtml(e.title)}</span><span class="cv-dots"></span><span>${e.i + first}</span></li>`).join('')}</ol></div>` : '';
+  const fach = H.book && SUBJECTS[H.book.fach] && !(H.title || '').includes(SUBJECTS[H.book.fach].name) ? `<div class="cv-fach">${escHtml(SUBJECTS[H.book.fach].name)}</div>` : '';
+  const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1>${fach}<div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
+  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
   return {title: H.title || 'Mein Arbeitsheft', html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${css}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}${cover}${tocOwn && toc ? `<div class="page tocp">${toc}</div>` : ''}${pages}</body></html>`};
 }
 /* Heft zur Förderzone: je Förderzone ein (oder zwei) passende Blätter, auf die Seite eingepasst */
 const zoneTaf = key => { const t = zoneToSheet(key); return !!(t && t.topic.startsWith('H:') && H_SHEETS[t.topic.slice(2)]?.taf); };
 const zoneBasis = key => !!zoneToSheet(key)?.topic.startsWith('B:');
 const heftZones = pid => TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones).filter(z => { const t = zoneToSheet(z.key); return t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic)); });
-async function heftFromZones(pid, per = 1){
-  const kid = data.profiles.find(p => p.id === pid); if(!kid) return;
-  const zones = heftZones(pid); if(!zones.length){ toast(`Für ${kid.name} gibt es noch keine Förderzone. Zuerst einen Test machen.`); return; }
+/* Heftseiten bauen: specs = [{t:{topic, zr, ue}, ch}], jedes Blatt neu gewürfelt und auf die Seite eingepasst */
+async function heftPages(pid, specs, prog = () => {}){
   const keep = {...app.sheet}, H = app.heft, items = [];
   const fr = document.createElement('iframe'); fr.setAttribute('aria-hidden', 'true'); fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:820px;height:1200px;visibility:hidden'; document.body.append(fr);
   const load = html => new Promise(r => { fr.onload = () => setTimeout(r, 30); fr.srcdoc = html; });
-  toast('Das Heft wird zusammengestellt …');
   try{
-    for(const z of zones) for(let k = 0; k < per; k++){
-      const t = zoneToSheet(z.key);
+    for(const [n, s] of specs.entries()){
+      prog(n + 1, specs.length);
+      const t = s.t;
       Object.assign(app.sheet, {pid, topic:t.topic, zr:t.zr || app.sheet.zr, ue:t.ue || 'egal', n:'fill', sol:false, taf:false, bw:!!H.bw});
       app.sheetDoc = buildSheet();
-      for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
+      for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G || !G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
       const d = new DOMParser().parseFromString(app.sheetDoc.html, 'text/html'), pg = d.querySelector('.page');
       pg.querySelector('.ab-meta')?.remove();
-      items.push({title: app.sheetDoc.title, html: pg.innerHTML});
+      items.push({title: app.sheetDoc.title, html: pg.innerHTML, ...(s.ch !== undefined ? {ch: s.ch} : {})});
     }
   } finally { fr.remove(); Object.assign(app.sheet, keep); app.sheetDoc = null; }
+  return items;
+}
+async function heftFromZones(pid, per = 1){
+  const kid = data.profiles.find(p => p.id === pid); if(!kid) return;
+  const zones = heftZones(pid); if(!zones.length){ toast(`Für ${kid.name} gibt es noch keine Förderzone. Zuerst einen Test machen.`); return; }
+  const H = app.heft;
+  toast('Das Heft wird zusammengestellt …');
+  const items = await heftPages(pid, zones.flatMap(z => Array.from({length: per}, () => ({t: zoneToSheet(z.key)}))));
   /* ausgefüllte Hundertertafel einmal hinten im Heft, nur wenn Hundertertafel-Blätter dabei sind (Stefan, 23.11.) */
   if(H.taf && zones.some(z => zoneTaf(z.key))) items.push({title:'Hundertertafel zum Nachschauen', cls:'hilfe', html:tafHelp()});
-  H.items = items; H.pid = pid; if(!H.title || H.title === 'Mein Arbeitsheft') H.title = 'Mein Übungsheft';
+  H.items = items; H.pid = pid; H.chapters = null; H.book = null; if(!H.title || H.title === 'Mein Arbeitsheft') H.title = 'Mein Übungsheft';
   saveHeft(); app.sheetMode = 'heft'; renderSheets();
   toast(`Fertig: ${items.length} ${items.length === 1 ? 'Seite' : 'Seiten'} passend zur Förderzone von ${kid.name}.`);
+}
+/* ---------- Heft-Assistent (Backlog J, Schritt 1, Stefan 25.11.2026) ----------
+   Fach (Mathe, Deutsch, Basis oder gemischt), Umfang 12/24/36/48 Seiten (mit Deckblatt und Inhalt, durch 4 teilbar),
+   Vorgriff (nur Förderzone, plus nächste Stufe, bis das Heft voll ist). Ein Kapitel je Stufe, in Lernreihenfolge:
+   erst die Förderzone, dann die nächsten Stufen. Die Förderzone bekommt die meisten Seiten, jede Seite neue Aufgaben. */
+const HEFT_PAGES = [12, 24, 36, 48];
+const HEFT_VOR = [['zone', 'nur Förderzone'], ['next', 'je eine Stufe weiter'], ['voll', 'bis das Heft voll ist']];
+const HEFT_ADJ = {'-1': .5, 0: 1, 1: 2};   /* weniger / normal / mehr Seiten für ein Kapitel */
+const HEFT_TITLE = {mix:'Mein Übungsheft', M:'Mein Mathe-Heft', D:'Mein Deutsch-Heft', B:'Mein Basis-Heft'};
+const keySubj = key => { const ax = key.split('|')[0], t = TEST_IDS.find(id => TESTS[id].axes?.includes(ax)); return t ? TESTS[t].subj : null; };
+const sheetSig = t => `${t.topic}|${t.zr || ''}|${t.ue || ''}`;
+const sheetOk = t => !!t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic));
+/* Stufen nach dieser Stufe in Lernreihenfolge (Mathe: danach der nächste Zahlenraum; Basis: empfohlene Reihenfolge) */
+function heftRow(key){
+  const [ax, a] = key.split('|');
+  const row = ax === 'M' ? ZR.filter(z => z >= +a).flatMap(z => N_LEVELS.map(l => `M|${z}|${l}`))
+    : ax === 'V' || ax === 'O' ? B_ZONE_ORDER
+    : ({S:S_LEVELS, U:U_LEVELS, G:G_LEVELS, H:H_LEVELS, R:R_LEVELS, Z:Z_LEVELS, L:L_LEVELS, W:W_LEVELS, P:P_LEVELS}[ax] || AXES[ax]?.levels || []).map(l => `${ax}|${l}`);
+  const i = row.indexOf(key); return i < 0 ? [] : row.slice(i + 1);
+}
+const heftSubjects = pid => SUBJ_IDS.filter(s => heftZones(pid).some(z => keySubj(z.key) === s));
+const heftFach = (pid, H = app.heft) => { const ss = heftSubjects(pid); return ss.includes(H.fach) || (H.fach === 'mix' && ss.length > 1) ? H.fach : ss.length === 1 ? ss[0] : 'mix'; };
+const chTaf = c => c.t.topic.startsWith('H:') && !!H_SHEETS[c.t.topic.slice(2)]?.taf;
+function heftPlan(pid, H = app.heft){
+  const m = matrixOf(pid), fach = heftFach(pid, H), N = HEFT_PAGES.includes(H.pages) ? H.pages : 24, vor = H.vor || 'voll', off = H.off || {}, adj = H.adj || {};
+  const zones = heftZones(pid).map(z => z.key).filter(k => fach === 'mix' || keySubj(k) === fach);
+  const seen = new Set(), ch = [];
+  const fits = k => { const t = zoneToSheet(k); return sheetOk(t) && !seen.has(sheetSig(t)) ? t : null; };
+  const add = (key, zone) => { const t = fits(key); if(!t) return false; seen.add(sheetSig(t)); const i = cellInfo(key); ch.push({key, zone, t, label:`${i.place}: ${i.name}`}); return true; };
+  zones.forEach(k => add(k, true));
+  const W = c => off[c.key] ? 0 : (c.zone ? 3 : 2) * HEFT_ADJ[adj[c.key] || 0];
+  const sumW = () => ch.reduce((s, c) => s + W(c), 0);
+  const act = () => ch.filter(c => W(c) > 0);
+  const extra = () => 1 + (H.toc && act().length > 8 ? 1 : 0) + (H.taf && act().some(chTaf) ? 1 : 0);   /* Deckblatt, eigene Inhaltsseite, Hundertertafel hinten */
+  const rows = zones.map(k => heftRow(k).filter(x => !isOk(m[x]?.status)));
+  if(vor === 'next') rows.forEach(r => { for(const k of r) if(add(k, false)) break; });
+  if(vor === 'voll'){   /* reihum aus allen Zeilen, solange ein vorweggenommenes Kapitel noch etwa 5 Seiten bekommt (Förderzone etwa 8) */
+    const cand = []; for(let d = 0; rows.some(r => r.length > d); d++) rows.forEach(r => { if(r[d]) cand.push(r[d]); });
+    for(const k of cand){ if(!fits(k)) continue; const w = off[k] ? 0 : 2 * HEFT_ADJ[adj[k] || 0]; if(w && (sumW() + w) * 2.5 > N - extra()) break; add(k, false); }
+  }
+  const C = Math.max(0, N - extra()), A = act();
+  while(A.length > C) A.pop();   /* mehr Kapitel als Seiten: die letzten fallen weg */
+  const S = A.reduce((s, c) => s + W(c), 0), raw = A.map(c => C * W(c) / S), pg = raw.map(x => Math.max(1, Math.floor(x)));
+  let rest = C - pg.reduce((s, x) => s + x, 0);
+  const ord = raw.map((x, i) => i).sort((i, j) => (raw[j] - pg[j]) - (raw[i] - pg[i]) || i - j);
+  for(let n = 0; rest > 0; n++, rest--) pg[ord[n % ord.length]]++;
+  for(let n = 0; rest < 0 && n < 99; n++){ const i = pg.indexOf(Math.max(...pg)); if(pg[i] <= 1) break; pg[i]--; rest++; }
+  ch.forEach(c => { const i = A.indexOf(c); c.pages = i < 0 ? 0 : pg[i]; c.cut = i < 0 && W(c) > 0; });
+  return {fach, N, vor, chapters: ch, content: C, tocOwn: !!H.toc && A.length > 8, taf: !!H.taf && A.some(chTaf), bw: A.some(c => c.t.topic.startsWith('B:'))};
+}
+async function heftMake(pid){
+  const kid = data.profiles.find(p => p.id === pid); if(!kid) return;
+  const H = app.heft, P = heftPlan(pid, H), used = P.chapters.filter(c => c.pages > 0);
+  if(!used.length){ toast(`Für ${kid.name} gibt es noch keine Förderzone mit passendem Arbeitsblatt. Zuerst einen Test machen.`); return renderHeft(); }
+  const specs = used.flatMap((c, ci) => Array.from({length: c.pages}, () => ({t: c.t, ch: ci})));
+  const btn = () => $('#hf-zone span');
+  toast('Das Heft wird zusammengestellt …');
+  const items = await heftPages(pid, specs, (i, n) => { const b = btn(); if(b) b.textContent = `Seite ${i} von ${n} …`; });
+  H.chapters = used.map((c, ci) => ({key: c.key, label: c.label, zone: c.zone, title: items.find(it => it.ch === ci)?.title || c.label}));
+  if(P.taf) items.push({title:'Hundertertafel zum Nachschauen', cls:'hilfe', html:tafHelp()});
+  if(!H.title || Object.values(HEFT_TITLE).includes(H.title) || H.title === 'Mein Arbeitsheft') H.title = HEFT_TITLE[P.fach] || HEFT_TITLE.mix;
+  H.items = items; H.pid = pid; H.book = {N: P.N, fach: P.fach};
+  saveHeft(); app.sheetMode = 'heft'; renderSheets();
+  toast(`Fertig: Heft mit ${1 + (P.tocOwn ? 1 : 0) + items.length} Seiten für ${kid.name}.`);
+}
+function heftAssistHtml(kid){
+  const H = app.heft, ss = heftSubjects(kid.id);
+  if(!ss.length) return `<p class="note">Für ${escHtml(kid.name)} gibt es noch keine Förderzone mit passendem Arbeitsblatt. Zuerst einen Test machen.</p>`;
+  const P = heftPlan(kid.id, H), opts = ss.length > 1 ? [...ss, 'mix'] : ss, adj = H.adj || {}, off = H.off || {};
+  const seg = (attr, list, cur, label) => `<div class="seg hf-seg" role="group" aria-label="${label}">${list.map(([v, n]) => `<button data-${attr}="${v}" aria-pressed="${String(v) === String(cur)}">${n}</button>`).join('')}</div>`;
+  const plan = P.chapters.map((c, i) => `<li class="${c.pages ? '' : 'hf-off'}"><label class="cb"><input type="checkbox" data-hfoff="${c.key}" ${off[c.key] ? '' : 'checked'}><span>${escHtml(c.label)}</span></label><span class="hf-tag${c.zone ? ' z' : ''}">${c.zone ? 'Förderzone' : 'kommt danach'}</span><span class="hf-n">${c.pages ? `${c.pages} ${c.pages === 1 ? 'Seite' : 'Seiten'}` : c.cut ? 'kein Platz' : 'abgewählt'}</span><button class="icon-btn" data-hfadj="${c.key}" data-d="-1" ${off[c.key] || (adj[c.key] || 0) <= -1 ? 'disabled' : ''} aria-label="weniger Seiten">−</button><button class="icon-btn" data-hfadj="${c.key}" data-d="1" ${off[c.key] || (adj[c.key] || 0) >= 1 ? 'disabled' : ''} aria-label="mehr Seiten">+</button></li>`).join('');
+  return `<div class="hf-zone hf-assist"><b>Heft-Assistent für ${escHtml(kid.name)}</b>
+    <span class="sh-lab">Fach</span>${seg('hffach', opts.map(s => [s, s === 'mix' ? 'Gemischt' : SUBJECTS[s].name]), P.fach, 'Fach')}
+    <span class="sh-lab">Umfang in Seiten</span>${seg('hfpages', HEFT_PAGES.map(n => [n, n]), P.N, 'Umfang in Seiten')}
+    <span class="sh-lab">Wie weit nach vorne</span><select id="hf-vor">${HEFT_VOR.map(([v, n]) => `<option value="${v}" ${v === P.vor ? 'selected' : ''}>${n}</option>`).join('')}</select>
+    <span class="sh-lab">Kapitel</span><ol class="hf-plan">${plan}</ol>
+    <span class="note">Jede Stufe ist ein Kapitel, jede Seite hat neue Aufgaben. Dazu kommen Deckblatt${P.tocOwn ? ', eine Seite Inhalt' : ' mit Inhalt'}${P.taf ? ' und hinten die Hundertertafel' : ''} – zusammen ${P.N} Seiten.${P.chapters.some(c => c.cut) ? ' Für einige Kapitel ist kein Platz mehr: mehr Seiten wählen oder Kapitel abwählen.' : ''}</span>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${P.bw ? `<label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${P.chapters.some(c => c.pages && chTaf(c)) ? `<label class="row cb"><input type="checkbox" id="hf-taf" ${H.taf ? 'checked' : ''}> Ausgefüllte Hundertertafel als Extraseite zum Nachschauen</label>` : ''}</div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-zone" ${P.chapters.some(c => c.pages) ? '' : 'disabled'}>${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'} (${P.N} Seiten)</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>`;
 }
 function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.sheet.pid = pid; $('#dlg-sheet').showModal(); renderSheets(); }
 function renderHeft(){
@@ -10268,9 +10362,8 @@ function renderHeft(){
     <label class="row">Titel <input id="hf-title" value="${escHtml(H.title)}" maxlength="40" style="flex:1;min-width:0"></label>
     <label class="row">Name auf dem Titelblatt <select id="hf-kid">${[['none', 'leer lassen (zum Selbstschreiben)'], ...kids().map(p => [p.id, escHtml(p.name)])].map(([v, n]) => `<option value="${v}" ${v === H.pid ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
     <label class="row cb"><input type="checkbox" id="hf-toc" ${H.toc ? 'checked' : ''}> Inhaltsverzeichnis auf dem Titelblatt</label>
-    ${(() => { const kid = kids().find(p => p.id === H.pid); if(!kid) return kids().length ? `<p class="note">Tipp: Wähle oben ein Kind – dann kann Stufenweise das Heft passend zu seiner Förderzone zusammenstellen.</p>` : ''; const zs = heftZones(kid.id);
-      return zs.length ? `<div class="hf-zone"><b>Heft zur Förderzone von ${escHtml(kid.name)}</b><span class="note">${zs.map(z => escHtml(cellLabel(z.key))).join(' · ')}</span><div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><label class="row">Blätter je Stufe <select id="hf-per">${[1, 2].map(n => `<option value="${n}" ${n === (H.per || 1) ? 'selected' : ''}>${n}</option>`).join('')}</select></label>${zs.some(z => zoneBasis(z.key)) ? `<label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${zs.some(z => zoneTaf(z.key)) ? `<label class="row cb"><input type="checkbox" id="hf-taf" ${H.taf ? 'checked' : ''}> Ausgefüllte Hundertertafel als Extraseite zum Nachschauen</label>` : ''}<button class="icon-btn primary" id="hf-zone">${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'}</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>` : `<p class="note">Für ${escHtml(kid.name)} gibt es noch keine Förderzone mit passendem Arbeitsblatt. Zuerst einen Test machen.</p>`; })()}
-    ${H.items.length ? `<ol class="hf-list">${H.items.map((it, i) => `<li><span>${escHtml(it.title)}</span><button class="icon-btn" data-hf-up="${i}" ${i ? '' : 'disabled'} aria-label="nach oben">↑</button><button class="icon-btn" data-hf-down="${i}" ${i < H.items.length - 1 ? '' : 'disabled'} aria-label="nach unten">↓</button><button class="icon-btn" data-hf-del="${i}" aria-label="Seite entfernen">✕</button></li>`).join('')}</ol>` : `<p class="note"><b>Noch leer.</b> Wechsle zu „Einzelblatt“, stell ein Blatt zusammen und tippe auf „Ins Arbeitsheft“. Das wiederholst du für jede Seite.</p>`}
+    ${(() => { const kid = kids().find(p => p.id === H.pid); if(!kid) return kids().length ? `<p class="note">Tipp: Wähle oben ein Kind – dann kann Stufenweise das Heft passend zu seiner Förderzone zusammenstellen.</p>` : ''; return heftAssistHtml(kid); })()}
+    ${H.items.length ? `<ol class="hf-list">${H.items.map((it, i) => `${it.ch !== undefined && H.chapters?.[it.ch] && H.items.findIndex(x => x.ch === it.ch) === i ? `<li class="hf-ch">Kapitel ${it.ch + 1}: ${escHtml(H.chapters[it.ch].title)}</li>` : ''}<li value="${i + 1}"><span>${escHtml(it.title)}</span><button class="icon-btn" data-hf-up="${i}" ${i ? '' : 'disabled'} aria-label="nach oben">↑</button><button class="icon-btn" data-hf-down="${i}" ${i < H.items.length - 1 ? '' : 'disabled'} aria-label="nach unten">↓</button><button class="icon-btn" data-hf-del="${i}" aria-label="Seite entfernen">✕</button></li>`).join('')}</ol>` : `<p class="note"><b>Noch leer.</b> Wechsle zu „Einzelblatt“, stell ein Blatt zusammen und tippe auf „Ins Arbeitsheft“. Das wiederholst du für jede Seite.</p>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
     <p class="note">Das Heft hat ein Titelblatt mit Namen. Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Aufgaben bleiben so, wie du sie übernommen hast. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst. Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
     <iframe id="sh-frame" title="Vorschau Arbeitsheft"></iframe>`;
@@ -10325,11 +10418,15 @@ function sheetEvents(e){
   const S = app.sheet, H = app.heft;
   const md = e.target.closest('[data-shmode]'); if(md){ app.sheetMode = md.dataset.shmode; return renderSheets(true); }
   if(e.target.closest('#sh-heft')) return heftAdd();
-  const hz = e.target.closest('#hf-zone'); if(hz){ if(hz.disabled) return; hz.disabled = true; return heftFromZones(H.pid, H.per || 1); }
+  const hz = e.target.closest('#hf-zone'); if(hz){ if(hz.disabled) return; hz.disabled = true; return heftMake(H.pid); }
+  const hfo = e.target.closest('[data-hffach],[data-hfpages],[data-hfadj]'); if(hfo){ if(hfo.disabled) return; const d = hfo.dataset;
+    if(d.hffach){ H.fach = d.hffach; H.off = {}; H.adj = {}; } if(d.hfpages) H.pages = +d.hfpages;
+    if(d.hfadj){ H.adj ||= {}; H.adj[d.hfadj] = Math.max(-1, Math.min(1, (H.adj[d.hfadj] || 0) + +d.d)); }
+    saveHeft(); return renderHeft(); }
   const up = e.target.closest('[data-hf-up]'), dn = e.target.closest('[data-hf-down]'), del = e.target.closest('[data-hf-del]');
   if(up || dn){ const i = +(up || dn).dataset[up ? 'hfUp' : 'hfDown'], j = up ? i - 1 : i + 1; [H.items[i], H.items[j]] = [H.items[j], H.items[i]]; saveHeft(); return renderHeft(); }
   if(del){ H.items.splice(+del.dataset.hfDel, 1); saveHeft(); return renderHeft(); }
-  if(e.target.closest('#hf-clear')){ const b = e.target.closest('#hf-clear'); if(!b.dataset.sure){ b.dataset.sure = '1'; b.textContent = 'Wirklich leeren?'; return; } H.items = []; saveHeft(); return renderHeft(); }
+  if(e.target.closest('#hf-clear')){ const b = e.target.closest('#hf-clear'); if(!b.dataset.sure){ b.dataset.sure = '1'; b.textContent = 'Wirklich leeren?'; return; } H.items = []; H.chapters = null; H.book = null; saveHeft(); return renderHeft(); }
   if(e.target.closest('#hf-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
   if(e.target.closest('#hf-save')){ const doc = app.heftDoc || buildHeft(); return saveFile(`Arbeitsheft ${doc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), doc.html); }
   const zt = e.target.closest('[data-shtopic]'); if(zt){ S.topic = zt.dataset.shtopic; sheetSave(); return renderSheets(); }
@@ -10343,7 +10440,7 @@ function sheetEvents(e){
 }
 function sheetChange(e){
   const S = app.sheet, t = e.target;
-  if(t.id && t.id.startsWith('hf-')){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid') H.pid = t.value; if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; if(t.id === 'hf-bw') H.bw = t.checked; if(t.id === 'hf-taf') H.taf = t.checked; saveHeft(); return renderHeft(); }
+  if((t.id && t.id.startsWith('hf-')) || t.dataset.hfoff){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid'){ H.pid = t.value; H.off = {}; H.adj = {}; } if(t.id === 'hf-vor') H.vor = t.value; if(t.dataset.hfoff){ H.off ||= {}; if(t.checked) delete H.off[t.dataset.hfoff]; else H.off[t.dataset.hfoff] = true; } if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; if(t.id === 'hf-bw') H.bw = t.checked; if(t.id === 'hf-taf') H.taf = t.checked; saveHeft(); return renderHeft(); }
   if(t.id === 'sh-kid'){ S.pid = t.value; const zs = TEST_IDS.flatMap(sj => S.pid !== 'none' ? zoneReport(S.pid, sj).zones : []).map(z => zoneToSheet(z.key)).filter(z => z && sheetPlace(z.topic)); /* Fach mit Förderzone voreinstellen */
     if(zs.length && !zs.some(z => sheetPlace(z.topic).fach === sheetPlace(S.topic)?.fach)){ S.topic = zs[0].topic; if(zs[0].zr) S.zr = zs[0].zr; } }
   if(t.id === 'sh-topic') S.topic = t.value;
