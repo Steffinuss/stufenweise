@@ -762,6 +762,9 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 .w-tiles.words button{padding:0 16px;font-size:22px}
 .w-sent{min-height:56px;font-size:30px;font-weight:700;font-family:Stufenfibel,Verdana,Arial,sans-serif;background:#fff;border-radius:14px;padding:8px 18px;box-shadow:var(--shadow)}
 .w-sent em{font-size:18px;color:var(--muted);font-weight:500}
+.w-sent .w-sw{font:inherit;color:inherit;background:none;border:0;border-radius:8px;padding:2px 4px;margin:0;cursor:grab}
+[data-sdw],[data-sdin]{touch-action:none}.ts-card.in{cursor:grab}.sd-dragging{opacity:.25}
+.sd-before{box-shadow:-10px 0 0 -1px #e8890c}[data-sdline].sd-end::after{content:'';display:inline-block;width:5px;height:1.2em;background:#e8890c;border-radius:3px;margin-left:4px}
 
 #dlg-sheet{width:min(1100px,96vw);height:min(900px,94vh)}
 #dlg-sheet[open]{display:flex;flex-direction:column}
@@ -5535,12 +5538,13 @@ function writeStage(it, r, opt = {}){
 }
 function sentStage(it, r){
   r.order ??= [];
-  return `<div class="it-wrap w-wrap"><div class="it-icon">${iconSvg(it.icon, 120)}</div><div class="w-sent">${r.order.length ? r.order.map(i => `<span>${escHtml(it.words[i])}</span>`).join(' ') : '<em>Tippe die Wörter der Reihe nach an.</em>'}</div>
-    <div class="w-tiles words">${it.tiles.map(i => `<button data-wword="${i}" ${r.order.includes(i) ? 'disabled' : ''}>${escHtml(it.words[i])}</button>`).join('')}<button data-wdel aria-label="Letztes Wort zurück">⌫</button></div></div>`;
+  return `<div class="it-wrap w-wrap"><div class="it-icon">${iconSvg(it.icon, 120)}</div><div class="w-sent" data-sdline>${r.order.length ? r.order.map((i, k) => `<button class="w-sw" data-sdin="${k}" aria-label="${escHtml(it.words[i])}: antippen legt zurück, ziehen verschiebt">${escHtml(it.words[i])}</button>`).join(' ') : '<em>Tippe die Wörter der Reihe nach an. Gelegte Wörter kannst du verschieben.</em>'}</div>
+    <div class="w-tiles words">${it.tiles.map(i => `<button data-wword="${i}" data-sdw="${i}" ${r.order.includes(i) ? 'disabled' : ''}>${escHtml(it.words[i])}</button>`).join('')}<button data-wdel aria-label="Letztes Wort zurück">⌫</button></div></div>`;
 }
 function writeClick(e, it, r){
   if(it.type === 'sent'){
     const w = e.target.closest('[data-wword]'); if(w){ r.order.push(+w.dataset.wword); return true; }
+    const o = e.target.closest('[data-sdin]'); if(o){ r.order.splice(+o.dataset.sdin, 1); return true; }
     if(e.target.closest('[data-wdel]')){ r.order.pop(); return true; }
     return false;
   }
@@ -8371,19 +8375,68 @@ function tsSet(t){ const T = app.ts; T.text = String(t || '').trim() || T.text; 
 function tsGen(){ const T = app.ts, bank = SATZ_BANK[T.len] || SATZ_BANK.kurz; let t; do t = pick(bank); while(bank.length > 1 && t === T.last); T.last = t; tsSet(t); }
 function renderTsatz(){
   const T = app.ts; if(!T.words.length) tsGen();
-  $('#equation').innerHTML = ''; $('#prompt').textContent = 'Tippe die Wörter der Reihe nach an.'; setHint('');
+  $('#equation').innerHTML = ''; $('#prompt').textContent = 'Tippe die Wörter der Reihe nach an. Gelegte Wörter kannst du verschieben.'; setHint('');
   const done = T.order.length === T.words.length, ok = done && sentOk(T.words, T.order);
-  $('#stage').innerHTML = `<div class="tw-wrap ts-wrap"><div class="ts-line${done ? (ok ? ' ok' : ' no') : ''}">${T.order.length ? T.order.map(i => `<span class="ts-card in">${escHtml(T.words[i])}</span>`).join('') : '<em>Hier entsteht der Satz.</em>'}</div><div class="ts-tiles">${T.tiles.map(i => `<button class="ts-card" data-tsw="${i}" ${T.order.includes(i) ? 'disabled' : ''}>${escHtml(T.words[i])}</button>`).join('')}</div></div>`;
+  $('#stage').innerHTML = `<div class="tw-wrap ts-wrap"><div class="ts-line${done ? (ok ? ' ok' : ' no') : ''}" data-sdline>${T.order.length ? T.order.map((i, k) => `<button class="ts-card in" data-sdin="${k}" aria-label="${escHtml(T.words[i])}: antippen legt zurück, ziehen verschiebt">${escHtml(T.words[i])}</button>`).join('') : '<em>Hier entsteht der Satz.</em>'}</div><div class="ts-tiles">${T.tiles.map(i => `<button class="ts-card" data-tsw="${i}" data-sdw="${i}" ${T.order.includes(i) ? 'disabled' : ''}>${escHtml(T.words[i])}</button>`).join('')}</div></div>`;
   $('#controls').innerHTML = toolBtn({id:'ts-back', ic:'undo', label:'Zurück'}) + toolBtn({id:'ts-mix', ic:'next', label:'Neu mischen'}) + toolBtn({id:'ts-sol', ic:'eye', label:'Lösung'});
   if(done) setHint(ok ? 'Der Satz stimmt.' : 'Noch nicht. Lies den Satz laut. Klingt er richtig?', ok ? 'good' : 'bad');
 }
 function tsatzClick(e){
   const T = app.ts, w = e.target.closest('[data-tsw]');
   if(w){ const i = +w.dataset.tsw; if(!T.order.includes(i)) T.order.push(i); return renderTsatz(); }
+  const o = e.target.closest('[data-sdin]'); if(o){ T.order.splice(+o.dataset.sdin, 1); return renderTsatz(); }
   if(e.target.closest('#ts-back')){ T.order.pop(); return renderTsatz(); }
   if(e.target.closest('#ts-mix')){ T.tiles = shuffle(T.tiles); T.order = []; return renderTsatz(); }
   if(e.target.closest('#ts-sol')){ T.order = T.words.map((_, i) => i); return renderTsatz(); }
 }
+
+/* ---------- Sätze legen: Wörter ziehen (Tafel, Schüttelsätze, Sätze im Lesen und im Test) ----------
+   Aus dem Vorrat an eine Stelle im Satz ziehen, im Satz verschieben, aus dem Satz herausziehen = zurücklegen.
+   Antippen geht weiter wie bisher (Vorrat: hinten anlegen, im Satz: zurücklegen). */
+function sdHost(){
+  if(app.mode === 'tsatz') return {order: app.ts.order, redraw: () => renderTsatz()};
+  if(app.mode === 'read'){ const R = app.read; if(R.item?.type !== 'sent' || R.fb?.ok) return null; R.r.order ??= []; return {order: R.r.order, redraw: () => { R.fb = null; setHint(''); renderRead(); }}; }
+  if(app.mode === 'diag' && app.diag && !app.diag.done){ const d = app.diag, it = d.items[d.idx]; if(it?.type !== 'sent') return null; const r = d.resp ||= {}; r.order ??= []; return {order: r.order, redraw: () => { const st = $('#stage .dg-stage'); if(st) st.innerHTML = itemStage(it, r); }}; }
+  return null;
+}
+function sdSpot(D, x, y){
+  const line = document.querySelector('#stage [data-sdline]'); if(!line) return null;
+  const lb = line.getBoundingClientRect(), pad = 40;
+  if(x < lb.left - pad || x > lb.right + pad || y < lb.top - pad || y > lb.bottom + pad) return null;
+  const cards = [...line.querySelectorAll('[data-sdin]')].filter(c => c !== D.src);
+  let idx = cards.length, before = null;
+  for(let k = 0; k < cards.length; k++){ const b = cards[k].getBoundingClientRect(); if(y < b.top - 6 || (y <= b.bottom + 6 && x < b.left + b.width/2)){ idx = k; before = cards[k]; break; } }
+  return {line, idx, before};
+}
+document.addEventListener('pointerdown', e => {
+  const src = e.target.closest?.('#stage [data-sdw]:not(:disabled), #stage [data-sdin]'); if(!src || e.button > 0) return; const h = sdHost(); if(!h) return;
+  app.sdDrag = {src, h, x0: e.clientX, y0: e.clientY, id: e.pointerId, ghost: null, spot: null};
+});
+document.addEventListener('pointermove', e => {
+  const D = app.sdDrag; if(!D || e.pointerId !== D.id) return;
+  const dx = e.clientX - D.x0, dy = e.clientY - D.y0;
+  if(!D.ghost){ if(Math.hypot(dx, dy) < 10) return; const b = D.src.getBoundingClientRect(); D.ghost = D.src.cloneNode(true); D.ghost.classList.add('bz-ghost');
+    Object.assign(D.ghost.style, {position:'fixed', left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px'}); document.body.appendChild(D.ghost); D.src.classList.add('sd-dragging'); }
+  D.ghost.style.transform = `translate(${dx}px,${dy}px) scale(1.06)`;
+  document.querySelectorAll('#stage .sd-before, #stage .sd-end').forEach(el => el.classList.remove('sd-before', 'sd-end'));
+  D.spot = sdSpot(D, e.clientX, e.clientY);
+  if(D.spot) (D.spot.before || D.spot.line).classList.add(D.spot.before ? 'sd-before' : 'sd-end');
+  e.preventDefault();
+}, {passive:false});
+function sdDragEnd(e, cancel){
+  const D = app.sdDrag; if(!D || e.pointerId !== D.id) return; app.sdDrag = null;
+  if(!D.ghost) return; /* nur angetippt: das macht der Klick */
+  D.ghost.remove(); D.src.classList.remove('sd-dragging'); app.sdDropT = Date.now();
+  document.querySelectorAll('#stage .sd-before, #stage .sd-end').forEach(el => el.classList.remove('sd-before', 'sd-end'));
+  if(cancel) return;
+  const o = D.h.order, spot = sdSpot(D, e.clientX, e.clientY);
+  if(D.src.dataset.sdin !== undefined){ const w = o.splice(+D.src.dataset.sdin, 1)[0]; if(spot) o.splice(spot.idx, 0, w); }
+  else { const w = +D.src.dataset.sdw; if(!spot || o.includes(w)) return; o.splice(spot.idx, 0, w); }
+  D.h.redraw();
+}
+document.addEventListener('pointerup', e => sdDragEnd(e, false));
+document.addEventListener('pointercancel', e => sdDragEnd(e, true));
+document.addEventListener('click', e => { if(Date.now() - (app.sdDropT || 0) < 400 && e.target.closest?.('#stage')){ e.stopPropagation(); e.preventDefault(); } }, true);
 
 /* ---------- Wörter groß zeigen ---------- */
 app.tw = {text:'Hose', syl:true, bows:true};
