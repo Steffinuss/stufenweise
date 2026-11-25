@@ -7,6 +7,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 - noch nichts
 
+## 0.35.2 – 25.11.2026
+
+- **Zifferntastatur wie am Telefon:** 1 2 3 oben, 7 8 9 unten, darunter ⌫ 0 ✓ (bisher wie am Taschenrechner mit 7 8 9 oben). So kennen es die Kinder von Handy, Tablet und Smartboard (Rückmeldung Stefan). Der Taschenrechner in der Materialkiste bleibt wie ein echter Taschenrechner.
+
 ## 0.35.1 – 25.11.2026
 
 Behoben (Rückmeldung aus dem Einsatz an der Tafel):

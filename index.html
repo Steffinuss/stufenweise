@@ -10144,7 +10144,7 @@ function npPrep(root){
 function npBuild(){
   if(NP.el) return NP.el;
   const d = document.createElement('div'); d.id = 'numpad'; d.setAttribute('role', 'group'); d.setAttribute('aria-label', 'Zifferntastatur');
-  d.innerHTML = `<button class="np-max" data-np="max" aria-label="Zifferntastatur ausklappen">123 ▴</button><button class="np-side np-drag" data-np="drag" aria-label="Tastatur verschieben" title="Zum Verschieben ziehen">⠿</button><button class="np-side np-min" data-np="min" aria-label="Tastatur einrollen">▾</button>${['7','8','9','4','5','6','1','2','3'].map(k => `<button data-np="${k}">${k}</button>`).join('')}<button data-np="del" aria-label="Löschen">⌫</button><button data-np="0">0</button><button data-np="ok" class="np-ok" aria-label="Fertig">✓</button>`;
+  d.innerHTML = `<button class="np-max" data-np="max" aria-label="Zifferntastatur ausklappen">123 ▴</button><button class="np-side np-drag" data-np="drag" aria-label="Tastatur verschieben" title="Zum Verschieben ziehen">⠿</button><button class="np-side np-min" data-np="min" aria-label="Tastatur einrollen">▾</button>${['1','2','3','4','5','6','7','8','9'].map(k => `<button data-np="${k}">${k}</button>`).join('')}<button data-np="del" aria-label="Löschen">⌫</button><button data-np="0">0</button><button data-np="ok" class="np-ok" aria-label="Fertig">✓</button>`;
   d.addEventListener('pointerdown', e => {
     e.preventDefault();
     /* Am Griff ziehen: Tastatur frei verschieben (schwebt über der Aufgabe) */
@@ -10594,7 +10594,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.35.1 · 25.11.2026';
+const APP_VERSION = '0.35.2 · 25.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';
