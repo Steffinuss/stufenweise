@@ -5,8 +5,9 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 25.11.2026
 
-## Backlog J, Schritt 1: Heft-Assistent (gebaut in `entwicklung`, wartet auf Stefans Rückmeldung zur Testversion)
+## Backlog J, Schritte 1–5: Arbeitshefte (gebaut in `entwicklung`, Testversion; Stefan: „erst alle Schritte bauen, dann freigeben“)
 
-- Fach (Mathe/Deutsch/Basis/gemischt), Umfang 12/24/36/48 (24 vorausgewählt), Vorgriff (nur Förderzone / je eine Stufe weiter / bis voll, Standard), Kapitel je Stufe mit Abwählen und −/+, Deckblatt mit Fach, Inhalt mit Kapiteln, „Seite n · Kapitel k“. Details: `CHANGELOG.md` „Unveröffentlicht“.
-- Seitenverteilung (`heftPlan`): Gewicht Förderzone 3, nächste Stufe 2 (− halbiert, + verdoppelt); „bis voll“ nimmt reihum weitere Stufen dazu, solange eine vorweggenommene Stufe noch etwa 5 Seiten bekommt (Förderzone etwa 8). Seiten nach größtem Rest verteilt, Summe geht immer genau auf.
-- Nach Stefans OK: Schritt 2 (Einstiegsseite, „Das kann ich schon“, Wiederholung, Hilfen hinten, Lösungsheft).
+- Schritt 1 Heft-Assistent, 2 Kapitelaufbau (Einstieg, Üben, „Das kann ich schon“, Wiederholung, Hilfen hinten, Lösungsheft), 3 Mathe-Feinstufen, 4 Deutsch-Stoff (Texte, Geschichten, Papier-Formate), 5 Broschürendruck. Details: `CHANGELOG.md` „Unveröffentlicht“.
+- **Offen vor der Freigabe:** Stefans Durchsicht der neuen Texte (Seite „Neue Texte zum Durchsehen“, claude.ai/artifact/VWhQbsUtqM9JendPLR8JKs, mit 3 Fragen), dann seine Rückmeldung zur Testversion. Texte stehen als Entwurf in `TEXTS_NEU`, `TEXTS_MID`, `LONG_NEU`, `STORIES`; die Prüfseite wird aus diesen Daten erzeugt.
+- Seitenplanung (`heftPlan`): Gewicht Förderzone 3, nächste Stufe 2 (− halbiert, + verdoppelt); „bis voll“ nimmt reihum weitere Stufen, solange `(Summe Gewichte) × 2,5 ≤ Seiten`. Außerhalb der Kapitel: Deckblatt, eigene Inhaltsseite (> 8 Einträge), Wiederholung nach je zwei Kapiteln, Hilfen, 2 Seiten je Geschichtsteil (min(6, Seiten/8)). Kapitel ≥ 3 Seiten: Einstieg + Üben + „Das kann ich schon“; 2 Seiten: Einstieg + Üben; 1 Seite: Üben.
+- Danach (später, Stefan): Heft merken und Folgeheft vorschlagen (Frage 8).

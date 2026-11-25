@@ -47,7 +47,7 @@ Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. D
 | `doppelte_zeilen.py` | keine Zeile doppelt in einer Aufgabe (z. B. zweimal „7 = 4 + □“), keine gleichen Aufgaben direkt nacheinander |
 | `legeblaetter.py` | alle Legeblätter als PDF: genau 1 Seite, nichts abgeschnitten (`scroll` ≤ verfügbare Höhe) |
 | `arbeitsheft.py` | Arbeitsheft mit mehreren Blättern |
-| `heft_assistent.py` | Heft-Assistent: Fach, 12/24/36/48 Seiten (gedruckt genau so viele), Vorgriff auf nächste Stufen, Kapitel abwählen/verlängern, Inhalt mit Kapiteln, Seitenzahlen |
+| `heft_assistent.py` | Arbeitshefte (Backlog J): Fach, 12/24/36/48 Seiten (gedruckt genau so viele), Vorgriff, Kapitel mit Einstieg/Üben/„Das kann ich schon“, Wiederholung, Hilfen, Lösungsheft, Mathe-Feinstufen, Fortsetzungsgeschichte, neue Deutsch-Formate, Broschürendruck |
 | `tausenderbuch_nachspuren.py` | Tausenderbuch-Seiten wählen, ganzes Buch, Nachspur-Buchstaben |
 | `einstellungen.py` | Einstellungen mit Registerkarten |
 | `runden.py`, `ueberspringen.py` | Übungsrunden; Überspringen zählt mit |

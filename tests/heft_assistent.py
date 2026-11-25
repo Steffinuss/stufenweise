@@ -7,7 +7,7 @@
 - Kapitel abwählen und „mehr“/„weniger“ Seiten verteilt die Seiten neu, gemerkt im Heft
 Schritt 2: Kapitel = Einstieg mit Beispiel → Üben → „Das kann ich schon“ (drei Stufen zum Ankreuzen); Wiederholung nach je
 zwei Kapiteln; Hilfen hinten (Hundertertafel, Anlauttabelle, Einmaleins-Tafel); Lösungsheft. Schritt 3: Mathe-Feinstufen.
-Schritt 5: Broschürendruck (A5 aus A4, A4 aus A3), Seiten in Falt-Reihenfolge."""
+Schritt 4: Fortsetzungsgeschichte, mittlere Texte, neue Papier-Formate. Schritt 5: Broschürendruck (A5 aus A4, A4 aus A3), Seiten in Falt-Reihenfolge."""
 import asyncio, re
 from common import URL, launch
 from playwright.async_api import async_playwright
@@ -23,6 +23,8 @@ KID = """(z) => { const id = newId('p-'); data.profiles.push({id, name:z.name, c
   saveData(); return id; }"""
 MIA = {'name': 'Mia', 'ok': ['M|10|I', 'M|10|II', 'M|20|I', 'R|R1', 'R|R2', 'L|L1', 'L|L2', 'W|W1', 'R|R5'],
        'part': ['M|20|II', 'R|R3', 'L|L3', 'W|W2', 'U|U1', 'H|H3']}
+
+BEN = {'name': 'Ben', 'ok': ['L|L1', 'L|L2', 'L|L3', 'L|L4', 'L|L5', 'W|W1', 'W|W2', 'W|W3', 'W|W4'], 'part': ['L|L6', 'W|W5']}
 
 async def printed(br, html):
     doc = await br.new_page(); await doc.set_content(html); await doc.wait_for_timeout(700)
@@ -42,7 +44,7 @@ async def main():
         # 1. Planung: Seitenzahlen gehen immer genau auf, Förderzone zuerst und mit den meisten Seiten
         res = await pg.evaluate("""pid => { const out = []; for(const fach of ['mix', 'M', 'D']) for(const pages of [12, 24, 36, 48]) for(const vor of ['zone', 'next', 'voll']) for(const taf of [false, true]){
             const P = heftPlan(pid, {...app.heft, fach, pages, vor, taf}), used = P.chapters.filter(c => c.pages);
-            out.push({id:`${fach} ${pages} ${vor} ${taf}`, fach:P.fach, total: 1 + (P.tocOwn ? 1 : 0) + P.wdh + P.helps.length + used.reduce((s, c) => s + c.pages, 0), N:P.N, wdh:P.wdh, nUsed: used.length,
+            out.push({id:`${fach} ${pages} ${vor} ${taf}`, fach:P.fach, total: 1 + (P.tocOwn ? 1 : 0) + P.wdh + P.helps.length + 2*P.story + used.reduce((s, c) => s + c.pages, 0), N:P.N, wdh:P.wdh, nUsed: used.length,
               zoneFirst: P.chapters.findIndex(c => !c.zone) < 0 || P.chapters.slice(P.chapters.findIndex(c => !c.zone)).every(c => !c.zone),
               zoneMore: Math.min(...used.filter(c => c.zone).map(c => c.pages)) >= Math.max(0, ...used.filter(c => !c.zone).map(c => c.pages)),
               nPrev: P.chapters.filter(c => !c.zone).length, keys: P.chapters.map(c => c.key), subj: [...new Set(P.chapters.map(c => keySubj(c.key)))]}); }
@@ -156,7 +158,30 @@ async def main():
             check(f'{druck}: Hinweis zum Falten', await pg.locator('.hf-bk-note').count() == 1)
         await pg.evaluate("app.heft.druck = 'a4'; saveHeft()")
 
-        # 7. Leeren setzt die Kapitel zurück; Seiten von Hand danach wieder ab 1 gezählt
+        # 7. Deutsch-Stoff (Schritt 4): Fortsetzungsgeschichte ab L6/W5, mittlere Texte auf schweren L7-Seiten, neue Papier-Formate
+        ben = await pg.evaluate(KID, BEN)
+        await pg.evaluate("pid => { app.heft = {title:'Mein Arbeitsheft', pid, items:[], toc:true, fach:'D', pages:36}; saveHeft(); openHeftZone(pid); }", ben); await pg.wait_for_timeout(300)
+        check('Auswahl Fortsetzungsgeschichte', await pg.locator('#hf-story option').count() == 4)
+        await pg.evaluate("async pid => { await heftMake(pid); }", ben)
+        G = await pg.evaluate("app.heft.items.map(i => (i.kind || '') + '|' + i.title)")
+        st = [g for g in G if g.startswith('story|')]
+        check('4 Teile Geschichte, je Text und Aufgaben', len(st) == 8 and all(st[2*k].startswith(f'story|Geschichte Teil {k + 1}') and st[2*k + 1] == f'story|Aufgaben zu Teil {k + 1}' for k in range(4)), str(st))
+        html = await pg.evaluate("buildHeft().html")
+        n, pr = await printed(br, html)
+        check('mit Geschichte genau 36 Seiten', n == pr == 36, f'{n} {pr}')
+        toc = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', re.search(r'<div class="cv-toc">.*?</ol>', html).group(0)))
+        check('Inhalt nennt Geschichte, nicht die Aufgabenseiten', 'Geschichte Teil 1' in toc and 'Aufgaben zu Teil' not in toc, toc)
+        check('Aufgabenseite: Fragen, richtig/falsch, Schreiben', 'class="hf-rf"' in html and 'Richtig oder falsch?' in html)
+        await pg.evaluate("async pid => { app.heft.story = 'aus'; await heftMake(pid); }", ben)
+        check('ohne Geschichte', not any(i.startswith('story') for i in await pg.evaluate("app.heft.items.map(i => i.kind || '')")))
+        mid = await pg.evaluate("""() => { const keep = {...app.sheet}; Object.assign(app.sheet, {topic:'L:L7', n:3, stufe:1}); const h1 = buildSheet().html; Object.assign(app.sheet, {stufe:0}); const h0 = buildSheet().html; Object.assign(app.sheet, keep);
+            return [TEXTS_MID.some(t => h1.includes(t.text)), TEXTS_MID.some(t => h0.includes(t.text)), TEXTS.length, TEXTS_MID.length, LONG.length]; }""")
+        check('L7: mittlere Texte nur auf schweren Seiten', mid[0] and not mid[1], str(mid))
+        check('Textmengen (rund 80/40/40)', mid[2] >= 78 and mid[3] >= 38 and mid[4] >= 40, str(mid[2:]))
+        fm = await pg.evaluate("""() => { const keep = {...app.sheet}, out = {}; for(const [t, w] of [['L:L4', 'Male ein Bild'], ['L:L6', 'Male ein Bild'], ['L:L7', 'Unterstreiche'], ['L:L7', 'Schreibe 1, 2, 3'], ['W:W3', 'Setze den Buchstaben ein'], ['W:W4', 'Setze die Silben zusammen'], ['W:W6', 'Satz zum Bild'], ['P:P4', 'Kreuze an']]){ let ok = false; for(let i = 0; i < 6 && !ok; i++){ Object.assign(app.sheet, {topic:t, n:12, stufe:null}); ok = buildSheet().html.includes(w); } out[t + ' ' + w] = ok; } Object.assign(app.sheet, keep); return out; }""")
+        check('neue Papier-Formate', all(fm.values()), str([k for k, v in fm.items() if not v]))
+
+        # 8. Leeren setzt die Kapitel zurück; Seiten von Hand danach wieder ab 1 gezählt
         await pg.evaluate("renderHeft()"); await pg.click('#hf-clear'); await pg.click('#hf-clear'); await pg.wait_for_timeout(200)
         st = await pg.evaluate("[app.heft.items.length, app.heft.chapters, app.heft.book]")
         check('Leeren setzt Kapitel zurück', st == [0, None, None], str(st))
