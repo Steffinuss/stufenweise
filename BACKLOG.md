@@ -227,3 +227,12 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 **Stefans Antworten (25.11.2026, im Dokument):** alle 9 „wie vorgeschlagen“, also: 24 Seiten vorausgewählt, 48 wählbar; Vorgriff „bis das Heft voll ist“, Förderzone mit den meisten Seiten; gemischtes Heft als dritte Wahl; „Das kann ich schon“ mit drei Stufen in Worten und einfachem Zeichen; Lösungen als eigenes Heft; Fortsetzungsgeschichte (Praktikum, Klassenausflug, Wohnen); Folgeheft später; anfangen mit Schritt 1 (Heft-Assistent). Zu Frage 7 (Druck) zusätzlich: **auch A4-Broschüre aus A3-Blättern** (also A4-Seiten, zwei je A3-Bogen, in der Mitte geheftet) neben A5-Broschüre und A4 einseitig.
 
 **Stand 25.11.2026 nachts:** Schritt 1 (Heft-Assistent) in `entwicklung` gebaut, siehe `IN_PROGRESS.md`. Offen: Schritt 2 Kapitelaufbau (Einstieg, „Das kann ich schon“ mit drei Stufen in Worten und Zeichen, Wiederholung nach zwei Kapiteln, Hilfen hinten, Lösungsheft), Schritt 3 Mathe-Feinstufen, Schritt 4 Deutsch-Stoff (Texte zuerst als Dokument für Stefan), Schritt 5 Broschürendruck (A5 aus A4, A4 aus A3, A4 einseitig).
+
+---
+
+## K: Name auf Arbeitsblättern durch Projektnamen ersetzen (Wunsch Stefan, 25.11.2026)
+
+**Status:** offen, nur dokumentiert.
+**Anlass:** Unten auf Arbeitsblättern, Legeblättern und Hilfeseiten steht „© Stefan Hackl“ (5 Stellen in `index.html`, Klasse `ab-lic`, z. B. `tafHelp`, Legeblätter). Blätter anderer Lehrkräfte tragen so Stefans Namen; der Name gehört nicht in Hefte und zu Eltern.
+**Vorschlag:** Fußzeile „Stufenweise · stufenweise.app · CC BY-SA 4.0“. Das genügt der Namensnennung der Lizenz; Stefan bleibt als Urheber im Impressum, in `LICENSE`/`LIZENZ-INHALTE.md` und auf GitHub genannt. Impressum und Kopfkommentar in `index.html` unverändert lassen.
+**Größe:** klein. Prüfen: `arbeitsblaetter.py`, `legeblaetter.py` (Fußzeile darf keine Seite verlängern).
