@@ -7,6 +7,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 - noch nichts
 
+## 0.36.1 – 25.11.2026
+
+- **Sätze legen: Großbuchstabe vorne, Punkt hinten bleiben fest** (Stefan: „als Anfangs- und End-Symbol … und auch nur so gelten“). Richtig sind nur Umstellungen im Satz, z. B. „Mia stellt die Teller und die Tassen in den Schrank.“ oder „Morgen fahren wir früh mit dem Zug in die Stadt.“. Fassungen mit anderem Satzanfang (aus 0.36.0) gelten nicht mehr; verglichen werden die Karten wieder genau so, wie sie sind.
+
 ## 0.36.0 – 25.11.2026
 
 - **Frei legen an der Tafel: gelegte Zahl einblenden.** Im Unterricht gibt es jetzt immer den Knopf „Zahl zeigen“ (bisher nur mit der Einstellung „Ergebnisse und Mengen anzeigen erlauben“). Die Zahl erscheint groß und farbig nach Stellen, dazu H/Z/E; beim Geld die Summe. „Verdecken“ blendet sie wieder aus (Wunsch Stefan, 25.11.2026).
