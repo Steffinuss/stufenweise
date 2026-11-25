@@ -2,7 +2,7 @@
 
 Stufenweise ist eine kostenlose Lern-App für Schüler*innen mit Förderschwerpunkt geistige Entwicklung. Sie orientiert sich am Bildungsplan GENT Baden-Württemberg 2022 und läuft im Browser, vor allem auf dem iPad.
 
-### ▶ [Stufenweise jetzt öffnen](https://steffinuss.github.io/stufenweise/)
+### ▶ [Stufenweise jetzt öffnen](https://stufenweise.app/)
 
 Kostenlos, ohne Anmeldung, ohne Download aus einem App-Store. Einfach den Link öffnen und loslegen; wer möchte, legt die App danach auf den Home-Bildschirm (siehe [Installieren](#installieren)).
 
@@ -28,7 +28,7 @@ Stufenweise richtet den Blick auf den Lernstand und die aktuelle Förderzone, al
 
 ## Installieren
 
-Stufenweise ist eine Web-App. Es gibt sie nicht im App Store und nicht im Play Store, und man braucht sie dort auch nicht: Die Adresse **https://steffinuss.github.io/stufenweise/** im Browser öffnen genügt. Damit sie wie eine normale App mit eigenem Symbol startet:
+Stufenweise ist eine Web-App. Es gibt sie nicht im App Store und nicht im Play Store, und man braucht sie dort auch nicht: Die Adresse **https://stufenweise.app** im Browser öffnen genügt. Damit sie wie eine normale App mit eigenem Symbol startet:
 
 - **iPad und iPhone (Safari):** Adresse öffnen → „Teilen“ (Quadrat mit Pfeil) → „Zum Home-Bildschirm“ → „Hinzufügen“.
 - **Android (Chrome):** Adresse öffnen → Menü ⋮ → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.
@@ -51,7 +51,7 @@ Nach dem ersten Öffnen funktioniert die App auch ohne Internet. Updates kommen 
 
 ## Impressum und Datenschutz
 
-Stefan Hackl, c/o Gustav-Werner-Schule, Böfinger Weg 28, 89075 Ulm. Stufenweise ist ein privates, nicht kommerzielles Projekt und kein Angebot der Schule. Ausführlich: [Impressum und Datenschutz](https://steffinuss.github.io/stufenweise/impressum.html) (auch in der App über die Startseite und die Anleitung erreichbar).
+Stefan Hackl, c/o Gustav-Werner-Schule, Böfinger Weg 28, 89075 Ulm. Stufenweise ist ein privates, nicht kommerzielles Projekt und kein Angebot der Schule. Ausführlich: [Impressum und Datenschutz](https://stufenweise.app/impressum.html) (auch in der App über die Startseite und die Anleitung erreichbar).
 
 ## Lizenz
 
