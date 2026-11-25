@@ -73,7 +73,7 @@ Zuerst sieht das Kind eine ermutigende Begrüßung. Lies sie bei Bedarf vor und 
 
 ![Begrüßung vor dem Mathe-Test](bilder/05_intro.png)
 
-Bei jeder Aufgabe steht oben, was zu tun ist. Zahlen gibt das Kind über die Zifferntastatur ein. Kennt es eine Aufgabe nicht, tippt es auf **Weiß ich nicht**. Das ist ausdrücklich erlaubt und verfälscht nichts. Die Zifferntastatur bleibt stehen, solange es auf dem Bildschirm ein Zahlenfeld gibt, auch wenn das Kind zwischendurch etwas antippt (z. B. die Schrauben beim Zählen). So verrutscht nichts. Sie schwebt über der Aufgabe: Am Griff **⠿** lässt sie sich an jede Stelle ziehen, mit **▾** rollt man sie zu einem kleinen Knopf „123“ ein.
+Bei jeder Aufgabe steht oben, was zu tun ist. Zahlen gibt das Kind über die Zifferntastatur ein. Kennt es eine Aufgabe nicht, tippt es auf **Weiß ich nicht**. Das ist ausdrücklich erlaubt und verfälscht nichts. Die Zifferntastatur bleibt stehen, solange es auf dem Bildschirm ein Zahlenfeld gibt, auch wenn das Kind zwischendurch etwas antippt (z. B. die Schrauben beim Zählen). So verrutscht nichts. Sie schwebt über der Aufgabe: Am Griff **⠿** lässt sie sich an jede Stelle ziehen, mit **▾** rollt man sie zu einem kleinen Knopf „123“ ein. Solange sie offen ist, erscheint die Tastatur des Geräts nicht (auch nicht auf dem Smartboard); eingerollt kann man wieder mit der Tastatur des Geräts tippen.
 
 ![Testaufgabe mit Zifferntastatur und dem Knopf „Weiß ich nicht“](bilder/06_aufgabe.png)
 

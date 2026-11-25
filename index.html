@@ -5561,7 +5561,7 @@ function writeKey(e, it, r){
   return false;
 }
 function evalWrite(it, r){
-  if(it.type === 'sent'){ if((r.order || []).length < it.words.length) return null; const ok = r.order.every((v, i) => it.words[v] === it.words[i]); return {ok, given: r.order.map(i => it.words[i]).join(' '), obs: ok ? [] : ['Satzbau unvollständig oder vertauscht']}; }
+  if(it.type === 'sent'){ if((r.order || []).length < it.words.length) return null; const ok = sentOk(it.words, r.order); return {ok, given: r.order.map(i => it.words[i]).join(' '), obs: ok ? [] : ['Satzbau unvollständig oder vertauscht']}; }
   if(r.slots && r.slots.some(x => !x.c)) return null;
   const a = (r.text || '').trim(); if(!a) return null;
   if(it.check === 'satzgleich'){ /* abgeschriebener/gemerkter Satz: Wörter lautgetreu, Großschreibung genau, Punkt */
@@ -8328,6 +8328,37 @@ function tblitzClick(e){
 }
 /* ---------- Satz-Baukasten (Unterricht, Backlog I D4): Wortkarten in die richtige Reihenfolge bringen ---------- */
 /* Satzgenerator (Stefan 24.11.): Sätze aus dem Alltag, nach Länge; der Satz steht nirgends sichtbar */
+/* Satz legen: richtig ist der Satz wie vorgegeben, aber auch mit vertauschten Teilen bei „und“/„oder“
+   („die Tassen und die Teller“ = „die Teller und die Tassen“, „Milch, Brot und Käse“ in jeder Reihenfolge).
+   Die Satzzeichen bleiben an ihrem Platz (sie hängen an den Wortkarten, deshalb wird der gelegte Text verglichen). */
+const SENT_DET = new Set(['der','die','das','den','dem','des','ein','eine','einen','einem','einer','eines','mein','meine','meinen','dein','deine','sein','seine','seinen','ihr','ihre','ihren','unser','unsere']);
+function sentVariants(words){
+  const bare = w => w.replace(/[.,!?;:]+$/, ''), tail = w => w.slice(bare(w).length);
+  let out = [words.slice()];
+  words.forEach((w, k) => {
+    if(!/^(und|oder)$/.test(w) || k === 0 || k >= words.length - 1) return;
+    const span = end => (end >= 1 && SENT_DET.has(bare(words[end - 1]).toLowerCase()) && !tail(words[end - 1])) ? [end - 1, end] : [end, end];
+    const rEnd = SENT_DET.has(words[k + 1].toLowerCase()) && k + 2 < words.length ? k + 2 : k + 1;
+    const items = [[k + 1, rEnd]]; let end = k - 1;
+    while(end >= 0){ const [a, b] = span(end); items.unshift([a, b]); if(a > 0 && /,$/.test(words[a - 1]) && a - 1 !== b) end = a - 1; else break; }
+    if(items.length < 2) return;
+    const shape = ([a, b]) => (b > a ? 'D' : '') + (/^\p{Lu}/u.test(words[b]) ? 'G' : 'k');
+    if(new Set(items.map(shape)).size !== 1) return;
+    const parts = items.map(([a, b]) => words.slice(a, b + 1)), marks = parts.map(p => tail(p[p.length - 1]));
+    const strip = p => [...p.slice(0, -1), bare(p[p.length - 1])];
+    const perms = a => a.length <= 1 ? [a] : a.flatMap((x, i) => perms([...a.slice(0, i), ...a.slice(i + 1)]).map(r => [x, ...r]));
+    const first = items[0][0], last = items[items.length - 1][1];
+    const extra = [];
+    for(const base of out) for(const order of perms(parts.map((_, i) => i))){
+      if(order.every((v, i) => v === i)) continue;
+      const mid = []; order.forEach((pi, j) => { const p = strip(parts[pi]); p[p.length - 1] += marks[j]; mid.push(...p); if(j === order.length - 2) mid.push(w); });
+      extra.push([...base.slice(0, first), ...mid, ...base.slice(last + 1)]);
+    }
+    out = out.concat(extra);
+  });
+  return out.map(v => v.join(' '));
+}
+const sentOk = (words, order) => order.length === words.length && sentVariants(words).includes(order.map(i => words[i]).join(' '));
 const SATZ_BANK = {
   kurz: ['Der Bus ist gelb.', 'Ich trinke Milch.', 'Lea hat Hunger.', 'Tom kauft Brot.', 'Die Lampe ist an.', 'Wir kochen Nudeln.', 'Das Handy klingelt.', 'Der Hund bellt.', 'Ich habe Pause.', 'Mia putzt den Tisch.', 'Die Sonne scheint.', 'Ben holt den Besen.', 'Es regnet heute.', 'Der Zug kommt.', 'Ich mag Pizza.'],
   mittel: ['Die Tasse steht auf dem Tisch.', 'Tom malt mit dem Pinsel.', 'Lea kauft eine Banane.', 'Ich fahre mit dem Bus.', 'Der Hammer liegt in der Kiste.', 'Wir schneiden die Tomate klein.', 'Mia legt den Löffel weg.', 'Der Schlüssel ist in der Jacke.', 'Ben trägt eine rote Mütze.', 'Die Katze schläft auf dem Sofa.', 'Ich spüle den Teller ab.', 'Am Montag gehen wir einkaufen.', 'Die Säge hängt an der Wand.', 'Lea zahlt an der Kasse.'],
@@ -8339,7 +8370,7 @@ function tsGen(){ const T = app.ts, bank = SATZ_BANK[T.len] || SATZ_BANK.kurz; l
 function renderTsatz(){
   const T = app.ts; if(!T.words.length) tsGen();
   $('#equation').innerHTML = ''; $('#prompt').textContent = 'Tippe die Wörter der Reihe nach an.'; setHint('');
-  const done = T.order.length === T.words.length, ok = done && T.order.every((v, i) => T.words[v] === T.words[i]);
+  const done = T.order.length === T.words.length, ok = done && sentOk(T.words, T.order);
   $('#stage').innerHTML = `<div class="tw-wrap ts-wrap"><div class="ts-line${done ? (ok ? ' ok' : ' no') : ''}">${T.order.length ? T.order.map(i => `<span class="ts-card in">${escHtml(T.words[i])}</span>`).join('') : '<em>Hier entsteht der Satz.</em>'}</div><div class="ts-tiles">${T.tiles.map(i => `<button class="ts-card" data-tsw="${i}" ${T.order.includes(i) ? 'disabled' : ''}>${escHtml(T.words[i])}</button>`).join('')}</div></div>`;
   $('#controls').innerHTML = toolBtn({id:'ts-back', ic:'undo', label:'Zurück'}) + toolBtn({id:'ts-mix', ic:'next', label:'Neu mischen'}) + toolBtn({id:'ts-sol', ic:'eye', label:'Lösung'});
   if(done) setHint(ok ? 'Der Satz stimmt.' : 'Noch nicht. Lies den Satz laut. Klingt er richtig?', ok ? 'good' : 'bad');
@@ -10101,10 +10132,14 @@ function sheetChange(e){
 /* ---------- Zifferntastatur auf dem Bildschirm (iPad: ersetzt die Systemtastatur) ---------- */
 const NP = {el:null, target:null, side:'right'};
 const npWanted = () => settings.numpad === 'on' || (settings.numpad !== 'off' && matchMedia('(pointer: coarse)').matches);
-const npEligible = el => el && el.tagName === 'INPUT' && !el.readOnly && (el.type === 'number' || el.getAttribute('inputmode') === 'numeric' || el.dataset.np === '1');
+const npEligible = el => el && el.tagName === 'INPUT' && (el.dataset.np === '1' || (!el.readOnly && (el.type === 'number' || el.getAttribute('inputmode') === 'numeric')));
+/* Manche Geräte (z. B. Smartboards) zeigen ihre Systemtastatur trotz inputmode="none". Solange die eigene
+   Zifferntastatur offen ist, sind die Felder deshalb schreibgeschützt; eingerollt kann man wieder normal tippen. */
+const npLock = el => { el.dataset.np = '1'; el.readOnly = !NP.min; el.setAttribute('inputmode', NP.min ? 'numeric' : 'none'); };
+const npLockAll = () => document.querySelectorAll('input[data-np="1"]').forEach(npLock);
 function npPrep(root){
   if(!npWanted()) return;
-  for(const el of (root.querySelectorAll ? root.querySelectorAll('input') : [])) if(npEligible(el)){ el.dataset.np = '1'; el.setAttribute('inputmode', 'none'); }
+  for(const el of (root.querySelectorAll ? root.querySelectorAll('input') : [])) if(npEligible(el)) npLock(el);
 }
 function npBuild(){
   if(NP.el) return NP.el;
@@ -10132,7 +10167,7 @@ const npFirst = () => [...document.querySelectorAll('main input')].find(el => np
 function npHide(){ if(NP.el) NP.el.hidden = true; NP.target = null; document.body.classList.remove('np-open', 'np-left'); }
 function npKey(k){
   if(k === 'drag') return;
-  if(k === 'min' || k === 'max'){ NP.min = k === 'min'; return npShow(); }
+  if(k === 'min' || k === 'max'){ NP.min = k === 'min'; npLockAll(); if(NP.min && NP.target && document.contains(NP.target)){ NP.target.blur(); NP.target.focus(); } return npShow(); }
   const el = NP.target; if(!el || !document.contains(el)) return npHide();
   if(k === 'ok'){ el.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true, cancelable:true})); return; }
   if(k === 'del') el.value = String(el.value).slice(0, -1);
@@ -10145,7 +10180,13 @@ new MutationObserver(ms => {
   /* Tastatur bleibt stehen, solange es ein Ziffernfeld gibt – so springt der Bildschirm nicht */
   if(NP.el && !NP.el.hidden && (!NP.target || !document.contains(NP.target))){ const alt = npFirst(); if(alt) NP.target = alt; else npHide(); }
 }).observe(document.body, {childList:true, subtree:true});
-document.addEventListener('focusin', e => { if(!npWanted() || !npEligible(e.target)) return; e.target.setAttribute('inputmode', 'none'); NP.target = e.target; npShow(); });
+document.addEventListener('focusin', e => { if(!npWanted() || !npEligible(e.target)) return; npLock(e.target); NP.target = e.target; npShow(); });
+/* Echte Tastatur (iPad mit Tastatur, Computer) geht auch bei schreibgeschütztem Feld */
+document.addEventListener('keydown', e => {
+  const el = e.target; if(!el || el.dataset?.np !== '1' || !el.readOnly || e.ctrlKey || e.metaKey || e.altKey) return;
+  if(/^[0-9]$/.test(e.key)){ e.preventDefault(); NP.target = el; npKey(e.key); }
+  else if(e.key === 'Backspace'){ e.preventDefault(); NP.target = el; npKey('del'); }
+}, true);
 document.addEventListener('focusout', () => setTimeout(() => {
   if(npEligible(document.activeElement)) return;
   if(NP.target && document.contains(NP.target) && NP.target.offsetParent) return;
@@ -10553,7 +10594,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.35.0 · 25.11.2026';
+const APP_VERSION = '0.35.1 · 25.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

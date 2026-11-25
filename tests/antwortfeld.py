@@ -21,7 +21,7 @@ async def main():
             await pg.click('#numpad [data-np="ok"]'); await pg.wait_for_timeout(300)
             print(W, 'wrong hint:', await pg.evaluate("document.querySelector('#hint').innerText"))
             await pg.screenshot(path=f'eq_wrong_{W}.png')
-            await pg.fill('#guess', ''); await pg.type('#guess', str(a+bb)); await pg.click('#equation #c-check'); await pg.wait_for_timeout(400)
+            await pg.evaluate("v=>{const e=document.querySelector('#guess'); e.focus(); e.value=v; e.dispatchEvent(new Event('input',{bubbles:true}))}", ''); await pg.type('#guess', str(a+bb)); await pg.click('#equation #c-check'); await pg.wait_for_timeout(400)
             print(W, 'right:', await pg.evaluate("document.querySelector('#hint').innerText"), await pg.evaluate("document.querySelector('#equation').innerText"))
             await pg.screenshot(path=f'eq_ok_{W}.png')
             # board view keeps typed value across jumps

@@ -7,6 +7,13 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 - noch nichts
 
+## 0.35.1 – 25.11.2026
+
+Behoben (Rückmeldung aus dem Einsatz an der Tafel):
+- **Satz legen:** Vertauschte Teile bei „und“/„oder“ gelten jetzt als richtig, z. B. „Mia stellt die Teller und die Tassen in den Schrank.“ statt „… die Tassen und die Teller …“ (Satz-Baukasten an der Tafel und Schüttelsätze). Bei Aufzählungen ist jede Reihenfolge richtig, solange die Satzzeichen stimmen. Falsche Tausche wie „Ich koche und Tom spült.“ → „Ich Tom und koche spült.“ bleiben falsch (`sentVariants`, `sentOk`).
+- **Smartboard: keine Systemtastatur mehr** neben der eigenen Zifferntastatur. Manche Geräte zeigen ihre Tastatur trotz `inputmode="none"`; solange die Zifferntastatur offen ist, sind Ziffernfelder jetzt schreibgeschützt (eine echte Tastatur geht trotzdem). Eingerollt („▾“) kann man wieder mit der Systemtastatur tippen.
+- Test `tests/tafel_rueckmeldung.py`.
+
 ## 0.35.0 – 25.11.2026
 
 - Schrift Stufenfibel: großes I als einfacher Strich (ohne Querstriche oben und unten), Ziffer 1 ohne Querstrich unten (Stefan, 25.11.2026). `fonts/schlichte_formen.py`, Í/Î/Ï/Ì mit angepasst.
