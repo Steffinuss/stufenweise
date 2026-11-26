@@ -249,3 +249,21 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerkt (`app.sheet`, `SHEET_KEEP`) und gilt auch im Heft.
 **Betrifft:** nur Arbeitsblätter und Arbeitshefte (Stefan, 26.11.2026), also die Schreibzeilen `.ab-wline` und `.hf-lines` (W6 „Satz zum Bild“, „Satz abschreiben“, Aufgabenseiten der Fortsetzungsgeschichte). Nicht der Stift an der Tafel.
 **Größe:** klein bis mittel. Schreibzeilen mit fester Höhe je Lineatur; prüfen mit `heft_seiten_passen.py` (Seiten dürfen nicht überlaufen).
+
+## M: Arbeitsblätter im Design der Arbeitshefte (Wunsch Stefan, 26.11.2026)
+
+**Status:** nur dokumentiert, nicht begonnen.
+**Wunsch (Stefan):** „Passend zu den Arbeitsheften auch Arbeitsblätter im Design anpassen/aktualisieren.“
+**Idee:** Einzelne Arbeitsblätter („Material drucken“) bekommen das Aussehen der Heftseiten, wie in 0.38.0 eingeführt:
+- Kopfzeile wie im Heft, z. B. Fach und Stufe; Name und Datum bleiben.
+- Fußzeile immer auf gleicher Höhe, mit Bildungsplan und Lizenz.
+- Aufgabenkästen reichen bis zur Fußzeile (Layout B), keine großen Lücken.
+- Evtl. schmaler Farbrand je Fach wie auf dem Deckblatt.
+
+Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) wäre sinnvoll, damit beide gleich bleiben.
+**Zu klären mit Stefan:**
+- Farbrand auch auf einzelnen Blättern?
+- Gilt das auch für Lösungsblätter und Legeblätter? Legeblätter sind genau bemaßt und bleiben vermutlich wie sie sind.
+- Am besten vorher wieder Vorschläge als Bilder zeigen.
+
+**Größe:** mittel. Prüfen: `arbeitsblaetter.py`, `druck_seiten.py`, `grosse_aufgaben.py`, Anleitungsbilder neu.
