@@ -265,3 +265,19 @@ Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerk
 Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) wäre sinnvoll, damit beide gleich bleiben.
 **Entschieden (Stefan, 26.11.2026):** kein Farbrand; Schwarz-Weiß für alle Blätter; Lösungsblätter bleiben, nur angepasst. Noch offen: Legeblätter sind genau bemaßt und bleiben vermutlich, wie sie sind. Vor dem Bauen wieder Vorschläge als Bilder zeigen.
 **Größe:** mittel. Prüfen: `arbeitsblaetter.py`, `druck_seiten.py`, `grosse_aufgaben.py`, Anleitungsbilder neu.
+
+## N: „Große Aufgaben“ auch im Heft-Assistenten (Wunsch Stefan, 26.11.2026)
+
+**Status:** nur dokumentiert, nicht begonnen.
+**Wunsch (Stefan):** „‚Große Aufgaben (mehr Platz zum Schreiben und Streichen)‘ auch bei Arbeitsheften anbieten als Option.“
+**Ist-Stand:** Bei einzelnen Arbeitsblättern gibt es das Häkchen (`app.sheet.gross`, Zoom 1,35). Im Heft bekommen nur die Einstiegsseiten große Aufgaben, und nur wenn die Seite damit zu drei Vierteln voll wird (`fixed()`). Übungsseiten übernehmen sonst zufällig die Einstellung des letzten Einzelblatts (siehe Übergabe, offene Punkte).
+**Idee:**
+- Häkchen „Große Aufgaben (mehr Platz zum Schreiben und Streichen)“ im Heft-Assistenten (`H.gross`). Es gilt für alle Übungsseiten, „Das kann ich schon“ und die Wiederholung.
+- Weniger Aufgaben je Seite. Die Seiten füllen sich weiter ganz (Layout B) und werden nicht verkleinert, große Aufgaben bleiben groß.
+- Die Einstellung des letzten Einzelblatts wird im Heft nicht mehr übernommen.
+
+**Zu bedenken:**
+- Mehr Seiten für dieselbe Übungsmenge, die Seitenzahl bleibt aber fest.
+- Sehr große Aufgaben (z. B. lange Texte) brauchen eventuell eine Ausnahme, damit sie auf eine Seite passen.
+
+**Größe:** klein bis mittel. Prüfen: `heft_seiten_passen.py` (alle Stufen mit großen Aufgaben), `heft_assistent.py`.
