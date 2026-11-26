@@ -9,7 +9,7 @@ Oben rechts liegen zwei Knöpfe: der **Name** des Kindes (am Anfang „Gast“) 
 1. **Name / Kind wählen:** Kinder anlegen, Themenwelt und Bildmodus einstellen und Tests starten.
 2. **Menü ⋯** mit:
    - **Lernstand:** Kompetenzmatrix, Förderzone und ILEB-Formulierungen. Nur für die Lehrkraft.
-   - **Arbeitsblätter:** Blätter passend zur Förderzone erstellen und drucken.
+   - **Material drucken:** Arbeitsblätter, Legeblätter und Arbeitshefte passend zur Förderzone erstellen und drucken.
    - **Rückmeldung geben:** Fehler, Ideen und Lob melden.
    - **Anleitung:** Hilfe zu allen Bereichen und „Über Stufenweise“ mit Lizenz und Danke.
    - **Vollbild:** blendet die Leisten des Browsers aus.
@@ -243,7 +243,7 @@ Die Zeiger lassen sich auch mit dem Finger ziehen, beim Uhr-Stellen und im Unter
 
 ## Mehr Platz auf dem Bildschirm
 
-Oben rechts stehen nur noch der Name und das Menü **⋯**. Im Menü findest du Lernstand, Arbeitsblätter, Rückmeldung, Anleitung, Vollbild und Einstellungen. Die Überschrift über der Aufgabe (z. B. „Hundertertafel · Tafel und Material verbinden“) fällt beim Üben weg, weil die Stufe schon oben in der Leiste markiert ist; so bekommt die Aufgabe mehr Höhe.
+Oben rechts stehen nur noch der Name und das Menü **⋯**. Im Menü findest du Lernstand, Material drucken, Rückmeldung, Anleitung, Vollbild und Einstellungen. Die Überschrift über der Aufgabe (z. B. „Hundertertafel · Tafel und Material verbinden“) fällt beim Üben weg, weil die Stufe schon oben in der Leiste markiert ist; so bekommt die Aufgabe mehr Höhe.
 
 Ganz unten in der linken Leiste blendet **‹** die Leiste aus (für Kinder übernimmt das der Konzentrationsmodus). Die Aufgabe bekommt dann die ganze Breite. Am linken Rand erscheint ein kleiner Knopf **›**, der die Leiste wieder einblendet. Die Einstellung bleibt auf dem Gerät gespeichert.
 
@@ -270,7 +270,7 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 
 ## Schritt 6: Arbeitsblätter drucken
 
-1. Oben auf **Arbeitsblätter** (3) tippen.
+1. Im Menü **⋯** auf **Material drucken** (3) tippen.
 2. Das Kind wählen. Unter „Passend zur Förderzone“ stehen seine Stufen, zum Beispiel „Rechnen R3“.
 3. Das Blatt wählst du in drei Schritten: **Fach** (Basis, Mathe, Deutsch), dann **Bereich** (zum Beispiel bei Mathe: Zahlen, Rechnen, Hundertertafel, Uhr, Größen und Geld, Legeblätter), dann **Blatt** aus einer kurzen Liste. Wechselst du zurück in ein Fach, ist das dort zuletzt gewählte Blatt wieder da. Unter „Zuletzt benutzt“ stehen die Blätter, die du zuletzt gedruckt, gespeichert oder ins Heft übernommen hast. Wählst du ein Kind mit Förderzone, stellt sich das passende Fach ein. Dann bei Bedarf Zahlenraum und Material anpassen. Bei „Aufgaben“ füllt „Blatt füllen“ die Seite mit vollen Reihen; du kannst auch eine feste Zahl wählen. Rechts siehst du die Vorschau.
 4. **Drucken** tippen. „Lösungsblatt anhängen“ legt eine Seite mit den Lösungen dazu.

@@ -10,7 +10,7 @@ if ! curl -s -o /dev/null "http://localhost:$PORT/version.json"; then
   SERVER=$!; sleep 1.5
 fi
 FAST="fehler smoke einstellungen runden gefuehrt hinweis_neu springen antwortfeld feld_ueben ueberspringen update_hinweis wochenuebersicht lernort_material legeblaetter tausenderbuch_nachspuren arbeitsheft doppelte_zeilen grosse_aufgaben arbeitsblatt_optionen zehnerpartner_ueben durchsicht_0_21 oberflaeche_details test_fortschritt test_nie_haengen test_passt handy drittes_fach basis_grundlagen basis_blaetter basis_ueben basis_test zwanzigerfeld_zahl plusminus_ueben blatt_auswahl mehrere_fenster materialkiste qr_umzug druck_seiten hundertertafel_blaetter heft_zone_optionen konzentrationsmodus deutsch_optimierung mathe_material tafel_rueckmeldung satz_ziehen frei_stift heft_assistent"
-SLOW="sweep zufallsklicks kinder_sim arbeitsblaetter"
+SLOW="sweep zufallsklicks kinder_sim arbeitsblaetter heft_seiten_passen"
 LIST=$FAST; [ "$1" = "lang" ] && LIST="$FAST $SLOW"
 FAIL=0
 for t in $LIST; do

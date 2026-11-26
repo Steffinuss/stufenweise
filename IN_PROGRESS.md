@@ -13,6 +13,10 @@ Stand: 26.11.2026
 - Seitenplanung (`heftPlan`): Gewicht Förderzone 3, nächste Stufe 2 (− halbiert, + verdoppelt); „bis voll“ nimmt reihum weitere Stufen, solange `(Summe Gewichte) × 2,5 ≤ Seiten`. Außerhalb der Kapitel: Deckblatt, eigene Inhaltsseite (> 8 Einträge), Wiederholung nach je zwei Kapiteln, Hilfen, 2 Seiten je Geschichtsteil (min(6, Seiten/8)). Kapitel ≥ 3 Seiten: Einstieg + Üben + „Das kann ich schon“; 2 Seiten: Einstieg + Üben; 1 Seite: Üben.
 - Danach (später, Stefan): Heft merken und Folgeheft vorschlagen (Frage 8).
 
+## Rückmeldung Stefan 26.11. (gebaut in `entwicklung`)
+
+- Überlauf im Heft (54 statt 48 Seiten, abgeschnittene Seite in der Broschüre) behoben, siehe `CHANGELOG.md`. Menü „Material drucken“.
+
 ## Backlog K: Fußzeile ohne Namen (gebaut in `entwicklung`, 26.11.2026)
 
 - Kommt mit Backlog J zusammen in die Freigabe (0.38.0). Anleitungsbilder dann neu aufnehmen (zeigen noch die alte Fußzeile).

@@ -1117,10 +1117,10 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
       <div class="top-tools">
       <button id="btn-profile" class="icon-btn profile-chip" aria-label="Wer übt?"></button>
       <div class="more-wrap">
-      <button id="btn-more" class="icon-btn" aria-label="Menü" aria-haspopup="true" aria-expanded="false" title="Lernstand, Arbeitsblätter, Anleitung, Einstellungen">⋯</button>
+      <button id="btn-more" class="icon-btn" aria-label="Menü" aria-haspopup="true" aria-expanded="false" title="Lernstand, Material drucken, Anleitung, Einstellungen">⋯</button>
       <div id="more-menu" class="more-menu" hidden>
       <button id="btn-stats" class="icon-btn" aria-label="Lernstand"></button>
-      <button id="btn-sheet" class="icon-btn" aria-label="Arbeitsblätter"></button>
+      <button id="btn-sheet" class="icon-btn" aria-label="Material drucken"></button>
       <button id="btn-fb" class="icon-btn fb-btn" aria-label="Rückmeldung geben"></button>
       <button id="btn-help" class="icon-btn" aria-label="Anleitung"></button>
       <button id="btn-full" class="icon-btn" aria-label="Vollbild"></button>
@@ -1263,7 +1263,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
 </dialog>
 
 <dialog id="dlg-sheet" aria-labelledby="sheet-title">
-  <div class="dlg-head"><h2 id="sheet-title">Arbeitsblätter</h2><button data-close class="icon-btn">Schließen</button></div>
+  <div class="dlg-head"><h2 id="sheet-title">Material drucken</h2><button data-close class="icon-btn">Schließen</button></div>
   <div id="sheet-body"></div>
 </dialog>
 
@@ -10041,7 +10041,7 @@ const PAGE_FIT_JS = `<script>(function(){
         box.style.cssText = 'display:' + cs.display + ';flex-direction:' + cs.flexDirection + ';align-items:' + cs.alignItems + ';gap:' + cs.gap;
         while(p.firstChild) box.appendChild(p.firstChild); p.appendChild(box);
         for(var i = 0; i < 6 && h > max; i++){ z = z*(max - pad)/(h - pad)*0.99; box.style.zoom = z; h = p.getBoundingClientRect().height; }
-        if(z < 0.8){ while(box.firstChild) p.insertBefore(box.firstChild, box); box.remove(); z = 1; p.dataset.over = Math.ceil((p.getBoundingClientRect().height - pad)/(max - pad)); }
+        if(z < (p.classList.contains('fitlow') ? 0.6 : 0.8)){ while(box.firstChild) p.insertBefore(box.firstChild, box); box.remove(); z = 1; p.dataset.over = Math.ceil((p.getBoundingClientRect().height - pad)/(max - pad)); }
       }
       p.style.minHeight = ''; p.dataset.fit = z < 1 ? z.toFixed(2) : '';
     });
@@ -10380,8 +10380,9 @@ function buildSheet0(limit){
       if(typeof S.stufe === 'number' && G.tasks.length > 2){
         const pct = G.d.map((d, i) => { const grp = G.d.filter((_, j) => G.gi[j] === G.gi[i]); return grp.length < 2 ? .5 : (grp.filter(x => x < d).length + (grp.filter(x => x === d).length - 1)/2)/(grp.length - 1); });   /* Mittelrang: gleich schwere Aufgaben zählen als mittel */
         const ord = G.tasks.map((_, i) => i).sort((x, y) => Math.abs(pct[x] - S.stufe) - Math.abs(pct[y] - S.stufe) || x - y);
-        for(const k of ['tasks', 'sols', 'ops', 'd', 'gi']) G[k] = ord.map(i => G[k][i]).slice(0, fill ? Infinity : Math.min(S.n, def.max || S.n));
+        for(const k of ['tasks', 'sols', 'ops', 'd', 'gi']) G[k] = ord.map(i => G[k][i]);
       }
+      if(lvl && !fill) for(const k of ['tasks', 'sols', 'ops', 'd', 'gi']) G[k] = G[k].slice(0, Math.min(S.n, def.max || S.n));   /* nie mehr Aufgaben als gewählt */
     }
     G.limit = G.tasks.length;
   }
@@ -10533,17 +10534,19 @@ async function heftPages(pid, specs, prog = () => {}){
   const load = html => new Promise(r => { fr.onload = () => setTimeout(r, 30); fr.srcdoc = html; });
   const set = (t, {label, ...o} = {}) => Object.assign(app.sheet, {pid, topic:t.topic, zr:t.zr || keep.zr, ue:t.ue || 'egal', n:'fill', sol:true, taf:false, bw:!!H.bw, stufe:null, mat:keep.mat, draw:keep.draw, mstrich:keep.mstrich, bsim:keep.bsim, gross:keep.gross}, o);
   const parse = html => { const d = new DOMParser().parseFromString(html, 'text/html'), pg = d.querySelector('.page'); pg.querySelector('.ab-meta')?.remove(); return {pg, title: app.sheetDoc.title, sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())}; };
-  const wrap = inner => `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}<div class="page">${inner}</div></body></html>`;
-  const tooLong = async inner => { await load(wrap(inner)); return !!fr.contentDocument.querySelector('.page')?.dataset.over; };
+  const wrap = (inner, cls = '') => `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}<div class="page ${cls}">${inner}</div></body></html>`;
+  const tooLong = async (inner, cls) => { await load(wrap(inner, cls)); return !!fr.contentDocument.querySelector('.page')?.dataset.over; };
   const band = (txt, ch) => `<div class="hf-band">${ch !== undefined ? `<span>Kapitel ${ch + 1}</span>` : ''}${txt}</div>`;
   async function full(t, o){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen */
     set(t, o); app.sheetDoc = buildSheet();
     for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G || !G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
     return parse(app.sheetDoc.html);
   }
-  async function fixed(t, o, n, deco){   /* feste Aufgabenzahl, notfalls weniger, bis die Seite passt */
+  async function fixed(t, o, n, deco){   /* feste Aufgabenzahl, notfalls weniger, bis die Seite passt; passt eine große Aufgabe nicht, normale Größe */
     let r;
-    for(let k = n; k >= 1; k--){ set(t, {...o, n:k}); app.sheetDoc = buildSheet(); r = parse(app.sheetDoc.html); deco(r); if(k === 1 || !(await tooLong(r.pg.innerHTML))) break; }
+    for(const oo of o.gross ? [o, {...o, gross:false}] : [o]){
+      for(let k = n; k >= 1; k--){ set(t, {...oo, n:k}); app.sheetDoc = buildSheet(); r = parse(app.sheetDoc.html); deco(r); if(!(await tooLong(r.pg.innerHTML))) return r; }
+    }
     return r;
   }
   try{
@@ -10578,24 +10581,27 @@ async function heftPages(pid, specs, prog = () => {}){
         });
         items.push({title:`Das kann ich schon: ${r.title}`, base: r.title, kind:'kann', html: r.pg.innerHTML, sol: r.sol, ...at});
       } else if(s.kind === 'wdh'){
-        let inner = '', sol = [];
-        for(let k = 4; k >= 1; k--){
-          inner = band('Wiederholung') + `<div class="ab-top"><h1>Wiederholung</h1></div>`; sol = [];
-          for(const p of s.parts){
+        let inner = '', sol = [], parts = s.parts;
+        /* Aufgaben aus beiden Kapiteln, je 4 … 1; passt selbst je eine nicht, nur das neuere Kapitel (sehr große Aufgaben, z. B. lange Texte) */
+        wdhLoop: for(const ps of [s.parts, s.parts.slice(-1)]) for(let k = 4; k >= 1; k--){
+          parts = ps; inner = band('Wiederholung') + `<div class="ab-top"><h1>Wiederholung</h1></div>`; sol = [];
+          for(const p of ps){
             set(p.t, {...heftStufe(p.t, .5), label:undefined, n:k, gross:false}); app.sheetDoc = buildSheet(); const r = parse(app.sheetDoc.html);
             inner += `<h2 class="hf-sub">Kapitel ${p.ch + 1}: ${escHtml(r.title)}</h2>` + [...r.pg.children].filter(e => !e.matches('.ab-top,.ab-foot,.hf-band')).map(e => e.outerHTML).join('');
             sol.push(...r.sol.map((x, i) => `Kapitel ${p.ch + 1}, ${i + 1}: ${x}`));
           }
           inner += HEFT_LIC;
-          if(k === 1 || !(await tooLong(inner))) break;
+          if(!(await tooLong(inner))) break wdhLoop;
         }
-        items.push({title:`Wiederholung: Kapitel ${s.parts.map(p => p.ch + 1).join(' und ')}`, kind:'wdh', html: inner, sol});
+        items.push({title:`Wiederholung: Kapitel ${parts.map(p => p.ch + 1).join(' und ')}`, kind:'wdh', html: inner, sol});
       } else {
         const r = await full(s.t, s.o);
         if(s.label) r.pg.querySelector('h1')?.insertAdjacentHTML('beforeend', `<small class="ab-stufe">· ${escHtml(s.label)}</small>`);
         items.push({title: r.title + (s.label ? ` (${s.label})` : ''), base: r.title, ...(s.kind ? {kind: s.kind} : {}), html: r.pg.innerHTML, sol: r.sol, ...at});
       }
     }
+    /* Sicherheitsnetz (Stefan, 26.11.: Überlauf selbst beheben): passt eine Seite trotzdem nicht, darf sie bis 60 % verkleinert werden */
+    for(const it of items) if(await tooLong(it.html, it.cls)){ it.cls = `${it.cls || ''} fitlow`.trim(); if(await tooLong(it.html, it.cls)) it.over = true; }
   } finally { fr.remove(); Object.assign(app.sheet, keep); app.sheetDoc = null; }
   return items;
 }
@@ -11409,7 +11415,7 @@ $('#btn-help').addEventListener('click', () => dlgHelp.showModal());
 $('#btn-profile').addEventListener('click', () => { renderProfiles(); $('#dlg-profile').showModal(); });
 $('#btn-stats').innerHTML = icon('chart') + '<span>Lernstand</span>';
 $('#btn-stats').addEventListener('click', () => requireTeacher(openStats));
-$('#btn-sheet').innerHTML = icon('print') + '<span>Arbeitsblätter</span>';
+$('#btn-sheet').innerHTML = icon('print') + '<span>Material drucken</span>';   /* Stefan, 26.11.2026: statt „Arbeitsblätter“ (Blätter, Legeblätter, Hefte) */
 $('#btn-sheet').addEventListener('click', () => requireTeacher(() => openSheets()));
 $('#dlg-sheet').addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target === $('#dlg-sheet')) return $('#dlg-sheet').close(); sheetEvents(e); });
 $('#dlg-sheet').addEventListener('change', sheetChange);

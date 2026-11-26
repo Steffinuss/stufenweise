@@ -18,7 +18,7 @@ async def main():
             await pg.screenshot(path=OUT+n+'.png')
         await shot('01_start')
         TB={}
-        for sel,lab in [('#btn-home','Startseite'),('#btn-profile','Kind wählen'),('#btn-stats','Lernstand'),('#btn-sheet','Arbeitsblätter'),('#btn-fb','Rückmeldung'),('#btn-help','Anleitung'),('#btn-full','Vollbild'),('#btn-settings','Einstellungen')]:
+        for sel,lab in [('#btn-home','Startseite'),('#btn-profile','Kind wählen'),('#btn-stats','Lernstand'),('#btn-sheet','Material drucken'),('#btn-fb','Rückmeldung'),('#btn-help','Anleitung'),('#btn-full','Vollbild'),('#btn-settings','Einstellungen')]:
             TB[lab]=await pg.locator(sel).bounding_box()
         HL['_toolbar']=TB
         # Einstellungen / PIN
