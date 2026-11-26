@@ -279,6 +279,8 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 
 **Aussehen:** Die Blätter sehen aus wie die Seiten der Arbeitshefte: oben eine schmale Zeile mit Fach und Bereich (z. B. „Mathe · Rechnen“), darunter Titel, Name und Datum. Die Aufgabenkästen reichen bis zur Fußzeile, so bleibt Platz zum Rechnen, Malen und Schreiben. Unten stehen Bildungsplan und Lizenz, rechts das Fach. Lösungsblatt und Hundertertafel zum Nachschauen haben dieselbe Kopf- und Fußzeile. Legeblätter bleiben genau bemaßt wie bisher.
 
+**Lineatur:** Blätter mit Schreibzeilen (z. B. Wörter abschreiben, Sätze schreiben, Uhr in Worten) haben die Auswahl „Lineatur“: **Haus** mit drei Stockwerken (Dach, Erdgeschoss grau, Keller), **zwei Linien** oder **eine Linie**. Standard ist „passend zur Stufe“: Grundstufe Haus, Hauptstufe und Berufsschulstufe eine Linie (Themenwelt des Kindes). Im Heft-Assistenten gibt es dieselbe Auswahl für das ganze Heft.
+
 **Schwarz-Weiß-Drucker:** Das Häkchen „Schwarz-Weiß-Drucker (Muster statt Farben)“ gibt es bei allen Blättern. Dann werden blaue Plättchen und Zehnerstangen schwarz, orange Plättchen schraffiert, grüne Einer bekommen ein Gitter, rote Hunderter Punkte. Bilder, Uhren und Geld werden grau. So lassen sich die Blätter gut schwarz-weiß drucken und kopieren. Bei Basis-Blättern gibt es eigene Muster (siehe unten).
 
 **Deutsch → Hören:** Silben zählen, Silben verbinden (die Lehrkraft spricht; was sie sagt, steht auf dem Lösungsblatt), Reime finden und Anlaute hören – alles mit Bildern, ohne Lesen.

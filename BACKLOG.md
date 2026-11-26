@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 26.11.2026 (0.40.0; L in Arbeit)
+Stand: 26.11.2026 (0.40.0; L in der Testversion)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -22,7 +22,7 @@ Stand: 26.11.2026 (0.40.0; L in Arbeit)
 | 9 | ~~**J** Arbeitshefte, die aufeinander aufbauen + **K** Fußzeile ohne Namen~~ | groß | freigegeben in 0.38.0 (26.11.2026), siehe `CHANGELOG.md` |
 | 10 | ~~**O1** Voller Speicher melden, **P1** Safari-Tab auf dem iPad, **Q1** Raten im Test~~ | klein | Datensicherheit aus der Prüfung vom 22.11.; O1 freigegeben in 0.38.1, P1 und Q1 in 0.39.0 |
 | 11 | ~~**N** Große Aufgaben im Heft-Assistenten~~ | klein | freigegeben in 0.39.0 (26.11.2026) |
-| 12 | ~~**M** Blätter im Heft-Design~~, dann **L** Lineatur | klein bis mittel | M freigegeben in 0.40.0 (26.11.); L in Arbeit |
+| 12 | ~~**M** Blätter im Heft-Design~~, dann **L** Lineatur | klein bis mittel | M freigegeben in 0.40.0 (26.11.); L gebaut, in der Testversion |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -245,7 +245,7 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 
 ## L: Lineatur zum freien Schreiben wählbar (Wunsch Stefan, 26.11.2026)
 
-**Status:** entschieden (26.11.2026), kommt nach M.
+**Status:** gebaut in `entwicklung`, in der Testversion (26.11.2026; Stefan: „Anschließend mach mit L weiter.“), wartet auf Stefans Freigabe.
 **Wunsch (Stefan):** „Beim freien Schreiben Arten von Lineatur aussuchen. Standard (dreiteilig → Dach/Erdgeschoss/Keller) Standard für 1./2. Klasse. Dann 2 Linien (3. Klasse) und 1 Linie (Standard 4. Klasse).“
 **Idee:** Auswahl „Lineatur“ mit drei Arten:
 - **Haus mit drei Stockwerken:** Dach, Erdgeschoss, Keller (Oberlänge, Mittelband, Unterlänge). Standard für Klasse 1/2.
