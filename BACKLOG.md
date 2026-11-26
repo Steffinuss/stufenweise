@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 24.11.2026 (0.34.0)
+Stand: 26.11.2026 (0.38.0; O, P, Q aus der Prüfung vom 22.11. dokumentiert, warten auf Stefans Entscheidung)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -20,6 +20,9 @@ Stand: 24.11.2026 (0.34.0)
 | 7 | ~~**H** Konzentrationsmodus für Kinder (+ Usability-Review)~~ | klein bis mittel | freigegeben in 0.33.0 (24.11.2026), siehe `CHANGELOG.md` |
 | 8 | ~~**I** Optimierung Deutsch (Bilder beim Schreiben, Anhören, Ausbau) + Hundertertafel verdeckt, Mathe mit Material~~ | groß | freigegeben in 0.34.0 (24.11.2026), siehe `CHANGELOG.md` |
 | 9 | ~~**J** Arbeitshefte, die aufeinander aufbauen + **K** Fußzeile ohne Namen~~ | groß | freigegeben in 0.38.0 (26.11.2026), siehe `CHANGELOG.md` |
+| 10 | **O** Voller Speicher melden, **P** Safari-Tab auf dem iPad, **Q** Raten im Test | klein bis mittel | Datensicherheit aus der Prüfung vom 22.11.; Stefan 26.11.: zuerst |
+| 11 | **N** Große Aufgaben im Heft-Assistenten | klein | Stefan 26.11.: nach der Datensicherheit |
+| 12 | **L** Lineatur, **M** Blätter im Heft-Design | klein bis mittel | danach |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -284,3 +287,70 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 - Sehr große Aufgaben (z. B. lange Texte) brauchen eventuell eine Ausnahme, damit sie auf eine Seite passen.
 
 **Größe:** klein bis mittel. Prüfen: `heft_seiten_passen.py` (alle Stufen mit großen Aufgaben), `heft_assistent.py`.
+
+## O: Voller Speicher wird nicht gemeldet (Prüfung vom 22.11.2026, Empfehlung „Speicher volllaufen lassen verhindern“)
+
+**Status:** dokumentiert 26.11.2026, wartet auf Stefans Entscheidung.
+**Ist-Stand (geprüft 26.11. im Code und in Chrome gemessen):**
+- Alles liegt in `localStorage` unter `stufenweise.data` (Kinder, Protokoll, Lernstand), dazu `stufenweise.settings`, `stufenweise.blatt` und `stufenweise.heft`.
+- `saveData()` hat außen `try { … } catch {}`. Schlägt `localStorage.setItem` fehl, passiert nichts Sichtbares. Die App arbeitet mit dem Stand im Arbeitsspeicher weiter. Nach dem nächsten Neustart fehlt alles seit dem letzten gelungenen Speichern. Gemessen: Speicher aufgefüllt, dann 2000 neue Protokolleinträge und ein umbenanntes Kind → gespeichert blieb der alte Stand (2 712 Zeichen statt 178 767), ohne Meldung. `saveSettings()` und `sheetSave()` schweigen genauso; nur `saveHeft()` meldet „Das Heft ist zu groß zum Merken“.
+- Platz: Chrome erlaubt je Adresse etwa 5 Mio. Zeichen. Safari erlaubt ebenfalls etwa 5 MB; wie viele Zeichen das sind, kann ich hier ohne iPad nicht messen (möglicherweise nur die Hälfte).
+- Was Platz braucht: je Kind bis zu 3 000 Protokolleinträge (Kürzung in `logAttempt`, je etwa 70–90 Zeichen, also bis etwa 0,25 Mio. Zeichen), 500 übersprungene Aufgaben, Lernstand-Verlauf `mhist` (ohne Grenze). **Neu seit 0.38.0: Das gemerkte Arbeitsheft ist groß.** Ein Heft mit 24 Seiten braucht etwa 0,4 Mio. Zeichen, mit 48 Seiten etwa 0,8 Mio. Es bleibt gemerkt, bis es geleert wird.
+- Testversion: Seit dem Umzug (0.34.1) liegt sie unter test.stufenweise.app, also unter einer eigenen Adresse mit eigenem Speicher. Sie teilt sich den Platz nicht mehr mit der App. Der Vorsatz `test:` bleibt als zweite Sicherung. Dieser Teil der Empfehlung ist erledigt.
+
+**Vorschläge:**
+- **O1 Melden (Kern):** `saveData()` erkennt den Fehler. Dann erscheint eine deutliche Leiste für die Lehrkraft, kein Kindertext: „Der Speicher ist voll. Neue Ergebnisse werden gerade nicht gespeichert. Bitte jetzt eine Sicherung speichern.“ Mit Knopf „Jetzt sichern“. Die Sicherung nimmt den Stand aus dem Arbeitsspeicher, also auch alles Ungespeicherte. Die Leiste bleibt, bis das Speichern wieder klappt. Dasselbe für Einstellungen und Blatt-Einstellungen, aber nur als kurzer Hinweis.
+- **O2 Platz machen:** Ist der Speicher voll, gibt die App zuerst das gemerkte Arbeitsheft frei (es lässt sich mit dem Heft-Assistenten neu bauen) und versucht es dann noch einmal. Es kommt der Hinweis „Das gemerkte Arbeitsheft wurde entfernt, damit die Ergebnisse gespeichert werden können.“ Varianten: (a) Heft nur noch bis zum Schließen merken, (b) Heft nach dem Drucken nicht mehr merken.
+- **O3 Früh warnen:** Beim Start prüft die App einmal am Tag mit einer Probe (etwa 0,5 Mio. Zeichen kurz schreiben und wieder löschen), ob noch Platz ist. Wenn nicht, kommt vorher der Hinweis „Speicher fast voll“. Das funktioniert in jedem Browser. `navigator.storage.estimate()` misst `localStorage` nicht zuverlässig.
+- **O4 Später, nur bei Bedarf:** ältere Protokolleinträge zu Tageswerten verdichten. Das ist größer, weil Lernstand, Bericht und QR-Umzug das Protokoll lesen.
+
+**Frage an Stefan:** Fehlerbehebung direkt in `main` (0.38.1) oder über `entwicklung`/Testversion?
+**Größe:** O1 + O2 + O3 klein. Test: neuer `tests/speicher_voll.py` (Speicher künstlich füllen, Meldung prüfen, Sicherung enthält den ungespeicherten Stand, Heft wird freigegeben, nach Freigabe gespeichert).
+
+## P: Safari-Tab auf dem iPad löscht Daten nach 7 Tagen (Prüfung vom 22.11.2026, Empfehlung „iPad nur als App vom Home-Bildschirm nutzen“)
+
+**Status:** dokumentiert 26.11.2026, wartet auf Stefans Entscheidung.
+**Ist-Stand (geprüft 26.11.):**
+- Safari löscht allen Speicher, den eine Website per Skript schreibt (auch `localStorage`), wenn die Website an 7 Tagen, an denen Safari benutzt wird, nicht angetippt wurde (Tracking-Schutz ITP, WebKit 2020). Apps vom Home-Bildschirm sind davon ausgenommen (WebKit, „Home Screen Web Application Domain Exempt From ITP“). Laut WebKit-Entwickler*innen (2024) gilt die Regel für alle Speicherarten. `navigator.storage.persist()` schützt vor dem Aufräumen bei Platzmangel, nach heutigem Wissen aber nicht vor dieser 7-Tage-Regel.
+- Die App ruft `navigator.storage.persist()` beim Start schon auf (still, ohne Ergebnis anzuzeigen).
+- Die App erkennt nicht, ob sie im Safari-Tab oder als Home-Bildschirm-App läuft (kein `navigator.standalone`, kein `display-mode`).
+- Die Erinnerung an die Sicherung kommt nach 14 Tagen und nur im Lernstand (`backupBox`).
+- Anleitung und README erklären den Home-Bildschirm und sagen schon, dass Tab und Home-Bildschirm-App getrennte Daten haben.
+- Gefahr im Alltag: Ferien. Wird das iPad in den Ferien für anderes in Safari genutzt, ist der Klassensatz danach leer. Eine Warnung *nach* dem Löschen ist nicht möglich, weil dann auch jeder Merker gelöscht ist.
+
+**Vorschläge:**
+- **P1 Erkennen und deutlich hinweisen:** Auf iPad und iPhone (auch iPadOS im Desktop-Modus: „Macintosh“ mit Touch) im Safari-Tab (`navigator.standalone === false`) erscheint für die Lehrkraft ein Hinweis: „Im Safari-Tab kann das iPad die Ergebnisse nach 7 Tagen ohne Nutzung löschen, zum Beispiel in den Ferien. Lege Stufenweise als App auf den Home-Bildschirm.“ Mit kurzer Anleitung (Teilen → Zum Home-Bildschirm) und dem Hinweis zum Umzug: Sind schon Kinder angelegt, erst hier „Sicherung speichern“ und in der App „Sicherung laden“. Ort: Lernstand und Einstellungen (Daten sichern) immer. Dazu einmal je Tag auf dem Startbildschirm, wenn Kinder angelegt sind (wie der Update-Hinweis, nicht beim Üben). Ausblendbar für 30 Tage.
+- **P2 Häufiger an die Sicherung erinnern, nur im Safari-Tab:** nach 7 statt 14 Tagen, und auch auf dem Startbildschirm statt nur im Lernstand. In der Home-Bildschirm-App und auf anderen Geräten bleibt es bei 14 Tagen.
+- **P3 Leere App nach Wechsel:** Startet die Home-Bildschirm-App ohne Kinder, zeigt sie unter „Wer übt?“ einen Satz: „Kinder schon im Safari-Tab angelegt? Dort Sicherung speichern, hier laden.“
+- Nicht möglich ohne Server: Daten vor dem Löschen retten. Eine Sicherungsdatei muss eine Person speichern.
+
+**Frage an Stefan:** Fehlerbehebung direkt in `main` (0.38.x) oder über die Testversion? Prüfen lässt sich P nur auf einem echten iPad (in Chrome kann ich iPad-Safari nur nachahmen).
+**Größe:** klein. Test: neuer `tests/safari_tab.py` (Erkennung mit nachgeahmtem iPad-Safari, Hinweis an den richtigen Stellen, nicht beim Üben, nicht in der App).
+
+## Q: Raten bei Auswahlaufgaben im Test (Prüfung vom 22.11.2026, Empfehlung „Raten im Test begrenzen“)
+
+**Status:** dokumentiert 26.11.2026, didaktisch – Stefan entscheidet.
+**Ist-Stand (geprüft 26.11.; Simulation mit einem Kind, das nur rät, je 600–3 000 Durchläufe):**
+- `cellDecision`: erreicht bei 2 von 2 oder 2 von 3, aber nicht, wenn die Kernaufgabe (die erste Aufgabe, `kern:true`) falsch ist. Wegen dieser Regel liegt der Wert je Stufe bei 3 Bildern bei etwa **19 %** und nicht bei 26 %. Bei 2 Antworten (z. B. „Stimmt das?“ in L6) sind es etwa 26 %.
+- Betroffen sind fast alle Stufen in **Lesen L1–L9**, **Hören P1–P4**, **Uhr U1–U6** und **Größen G1–G4** (3 Antworten, je Stufe 11–26 % „erreicht“, 32–50 % mindestens „teilweise“). Zahlen, Rechnen, Stellenwert und Schreiben fast nicht (Zahlen eintippen).
+- **Ganzer Test:** Der Lese-Test sucht ab L4 nach oben und unten (`binary`). Unter der höchsten erreichten Stufe trägt `inferCells` alle tieferen als „erreicht (abgeleitet)“ ein. Ergebnis für ein Kind, das nur rät: In **etwa 2 von 3 Lese-Tests** steht danach mindestens eine Stufe auf „erreicht“, im Mittel 2 Stufen. L1 in etwa 47 %, L4 in etwa 18 % der Tests. Mathe-Test Teil 2: in etwa der Hälfte (meist G1, U1, G2).
+- **Basis-Test** ist schon besser geschützt (Block a und b nötig): Teil 1 etwa 6 %, Teil 2 etwa 22 % (V5 „Wo sind mehr?“ mit 2 Bildern), Teil 3 etwa 6 %.
+- „Weiß ich nicht“ senkt das Raten, wenn Kinder es nutzen.
+
+**Vorschläge (simuliert, Kind rät nur; Anteil Lese-Tests mit mindestens einer Stufe „erreicht“ / Mathe Teil 2):**
+| | Lesen | Mathe Teil 2 |
+| --- | --- | --- |
+| heute | 69 % (im Mittel 2,0 Stufen) | 49 % |
+| **Q1** Stufen nur mit Auswahlaufgaben: „erreicht“ erst bei 3 von 3 (nach 2 von 2 kommt eine dritte Aufgabe; 2 von 3 = „teilweise“) | 17 % (0,4 Stufen) | 30 % |
+| **Q2** mindestens 4 Antworten statt 3 | 45 % | 30 % |
+| Q1 + Q2 | 9 % | 16 % |
+| **Q3** nichts ableiten aus Stufen, die nur mit Auswahlaufgaben erreicht wurden | 66 %, aber nur 1,0 Stufen | 47 % |
+| Q1 + Q3 | 17 % (0,2 Stufen) | 28 % |
+
+- **Q1** ist die stärkste Einzelmaßnahme und klein: Kinder, die es können, bekommen je solcher Stufe höchstens eine Aufgabe mehr. Der Lese-Test prüft meist 4 bis 6 Stufen, wird also um höchstens so viele Aufgaben länger.
+- **Q2** ist mehr Arbeit: Für jede Aufgabenart braucht es eine vierte passende Antwort, und vier Bilder in einer Reihe werden auf dem iPad kleiner. Bei Silben zählen (1, 2, 3) und „Stimmt das?“ (ja/nein) geht es nicht.
+- **Q4** Hinweis im Lernstand: Stufen, die nur mit Auswahlaufgaben erreicht wurden, bekommen ein Zeichen („durch Auswahl“, bitte beim Üben bestätigen). Das ändert nichts an der Einstufung.
+- **Basis:** Stefans Regel (2 von 2 oder 2 von 3 je Block) bleibt, außer Stefan möchte Q1 auch für Block b.
+
+**Fragen an Stefan:** welche Maßnahmen? Auch für den Basis-Test? Weg über `entwicklung`/Testversion (Änderung an der Testauswertung, kein Fehler im engeren Sinn).
+**Größe:** Q1, Q3, Q4 klein; Q2 mittel. Test: `tests/test_fortschritt.py`, `tests/basis_test.py`, neuer `tests/raten.py` (die Simulation von oben als Test mit Obergrenzen).
