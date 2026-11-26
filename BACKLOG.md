@@ -366,3 +366,31 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 **Messung (26.11.2026, Umgebung mit 2 Prozessorkernen, 7 GB Speicher):** vorher nacheinander schnell 10:30 min, lang 18:57 min (63 Tests). Nachher mit 4 gleichzeitig: schnell 3:33 min, lang 6:37 min, dieselben Ergebnisse (alle ok). Mit 2 gleichzeitig: lang 10:26 min. Längste Tests: Zufallsklicks 133 s, Heftseiten passen / mit großen Aufgaben je 120 s, Arbeitsblätter 105 s, Heft-Assistent 69 s.
 **Umsetzung:** `tests/run_all.sh` startet die Tests mit `xargs -P` (Standard 4, `STUFENWEISE_JOBS`), lange zuerst; ein gemeinsamer Server auf Port 8766 (wartet bis zu 10 s, bis er antwortet); jeder Test hat einen eigenen Ausgabeordner `tests/out/lauf/<Test>/` (`STUFENWEISE_OUT`) und eine Logdatei; am Ende Liste ok/FEHLER in fester Reihenfolge mit den letzten Zeilen bei Fehlern; `nur NAME …` für einzelne Tests; `timeout` nur, wenn vorhanden (macOS). `tests/README.md`: Tabelle „Gezielt testen“ (Bereich → Tests) und alle Tests beschrieben.
 **Dabei gefunden:** `mehrere_fenster.py` schlug unter Last einmal fehl (Fehlerzähler 2 statt 3). Ursache ist Chrome: Ein Fenster sieht die localStorage-Änderung eines anderen Fensters erst nach kurzer Zeit; der Test ließ beide Fenster im selben Augenblick schreiben. Die App selbst zählt richtig (nachgestellt). Der Test wartet jetzt, bis das andere Fenster den neuen Stand sieht. `frei_stift.py` schrieb sein Bild an einen festen Pfad dieser Umgebung, jetzt in den Ausgabeordner.
+
+## S: Rückmeldungen zu Arbeitsblättern und Heften (Stefan, 26.11.2026 abends)
+
+**Status:** dokumentiert, wartet auf Stefans Entscheidungen. Ein erster Blick in den Code steht jeweils dabei.
+
+Fehler:
+- **S1 Schriftlich rechnen bis 1000 mit „Große Aufgaben“ läuft rechts über den Rand.** Das Blatt hat 3 Spalten (`schriftlich.cols`), große Aufgaben werden auf 135 % vergrößert (`AB_GROSS`). Vorschlag: Mit großen Aufgaben höchstens 2 Spalten, für alle Blätter mit 3 oder mehr Spalten. Test: jedes Blatt mit großen Aufgaben darf nicht breiter als die Seite sein.
+- **S2 Einmal lief eine Heftseite über** („Das kann ich schon: Längere Texte verstehen“, Hinweis „Zu lang für ein Blatt“), nicht nachstellbar. Bekannt: Lange Texte (L9) mit Fragen sind sehr hoch; bei „Das kann ich schon“ kommt die Selbsteinschätzung dazu. Vorschlag: viele Hefte mit L8/L9 bauen und prüfen; passt eine solche Seite nicht, nur eine Aufgabe (ein Text) auf die Seite und notfalls ein kürzerer Text. Möglich auch: ein altes gemerktes Heft (vor 0.38) – das zeigt den Hinweis weiter, bis es neu erstellt wird.
+- **S3 Schwarz-Weiß: Material (Hunderterplatten, Zehnerstangen, Einerwürfel) sieht komisch aus** (Plus bis 1000, Mengen erfassen und zerlegen bis 1000 u. a.). Heute: Hunderter mit Punktmuster, Zehner schwarz, Einer mit Gitter. Stefans Wunsch: „wie in Farbe, nur ohne farbige Füllung“. Vorschlag: Material in Schwarz-Weiß weiß gefüllt, mit dunklem Umriss und den Kästchenlinien wie in Farbe; Plättchen im Zwanzigerfeld bleiben schwarz und schraffiert (so freigegeben).
+- **S4 Schwarz-Weiß: Pfeil am Zahlenstrahl undeutlich** (Zahlenstrahl und Nachbarzahlen bis 1000). Der rote Pfeil bekommt heute das Punktmuster der Hunderter. Vorschlag: Pfeile und Markierungen in Schwarz-Weiß schwarz gefüllt.
+
+Didaktik und Gestaltung:
+- **S5 Unterschiede bestimmen bis 1000 braucht Platz zum Rechnen** („Solche Aufgaben kann ja ich noch nicht mal ohne weiteres im Kopf lösen.“). Vorschlag: ab Zahlenraum 1000 (oder schon ab 100) in jeder Aufgabe ein Feld zum Rechnen (kariert, z. B. 6 × 4 Kästchen oder Stellenwerttafel für schriftliches Rechnen); dafür eine Aufgabe je Zeile.
+- **S6 Ergänzen bis 1000: Platz für Nebenrechnungen und Text über die ganze Breite.** Heute bricht „In den Karton passen 1000. 640 sind schon drin.“ mitten im Satz um, die Zahl steht am Zeilenende. Vorschlag: Sachaufgaben (Text) über die ganze Seitenbreite; Umbruch nur zwischen Sätzen; unten auf der Seite ein kariertes Feld „Nebenrechnung“ (füllt den Rest der Seite).
+- **S7 Zehnerpartner: das Zehnerfeld als eine Reihe mit 10** („dass es immer 10 in einer Reihe sein sollen, auch wenn es nur bis 10 geht – bekannte Logik“). Heute 2 Reihen mit je 5 (`fieldSvg(n, 10)`). Offen: nur auf Arbeitsblättern oder überall (auch Üben, Test, Materialkiste, Tafel)?
+- **S8 Lochrand: Arbeitsblätter links mehr Rand** (werden gelocht). Heute 12 mm rundum. Vorschlag: links 20 mm (Lochung braucht etwa 12–15 mm), rechts 12 mm; Hefte bleiben.
+
+Nebenbei gefunden (26.11., Testlauf): Im Lese-Test L8 „Stundenplan“ steht im Protokoll bei manchen Fragen „(undefined)“ statt der Fragenart (Beschriftung in `READ`/`SERIES`, Frage „Wie oft ist BNT in der Woche?“). Nur die Beschriftung, die Aufgabe selbst ist richtig.
+
+## T: Basis-Arbeitsblätter didaktisch überarbeiten (Stefan, 26.11.2026)
+
+**Status:** dokumentiert. Stefan: „Bei den Basis-Arbeitsblättern scheint mir didaktisch noch am meisten der Wurm drin zu sein … Vielleicht müssen wir uns extra nochmal darum kümmern.“
+Rückmeldungen:
+- **T1 V2 Was passt nicht?** Lieber nur eine Bildreihe je eingerahmter Aufgabe (heute zwei Reihen in einem Kasten).
+- **T2 V4 Eins zu eins zuordnen:** Das Beispiel verbindet quer (erster Teller mit dritter Gabel); der Sinn fehlt. Gabeln stehen schon unter den Tellern.
+- **T3 V5 Mehr, weniger, gleich viel:** nicht alle drei auf einem Blatt – Kinder, die nicht lesen, schaffen den Wechsel nicht, und man sitzt nicht ständig daneben.
+- **T4 V6 Der Größe nach ordnen:** unklar, wie das Kind es machen soll.
+Vorschlag: eigenes Konzept-Dokument „Basis-Arbeitsblätter“ wie bei den Arbeitsheften – je Blatt V1–V8, O2–O4: Ziel, was das Kind tut (ohne Lesen), Aufbau, Beispiel, Varianten; dazu Bild-Vorschläge zum Ansehen. Grundsätze aus Stefans Entscheidungen zum Basis-Test (nicht mischen, vor jeder neuen Art unübersehbar vormachen, eine Art je Blatt bzw. Kasten).
