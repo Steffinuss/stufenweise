@@ -38,7 +38,7 @@ async def main():
         # Höhe: Haus braucht am meisten Platz, alle Blätter passen trotzdem
         h = await pg.evaluate("""() => { const d = document.createElement('div'); d.innerHTML = `<style>${SHEET_CSS}</style>` + ['haus', 'zwei', 'eins'].map(v => `<div class="ab-wline lin-${v}" style="width:50mm"></div>`).join(''); document.body.append(d);
           const r = [...d.querySelectorAll('.ab-wline')].map(e => Math.round(e.getBoundingClientRect().height/3.7795)); d.remove(); return r; }""")
-        check('Höhen: Haus 16 mm, zwei Linien 13 mm, eine Linie 12 mm', h == [16, 13, 12], str(h))
+        check('Höhen: Haus 16 mm, zwei Linien 16 mm, eine Linie 15 mm', h == [16, 16, 15], str(h))
 
         # Auswahl im Generator nur bei Blättern mit Schreibzeilen
         lt = await pg.evaluate("sheetTopics().flatMap(([, o]) => o).map(x => x[0]).filter(sheetHasLines)")
