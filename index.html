@@ -4099,9 +4099,8 @@ app.blitz = {range:10, dur:2, n:null, phase:'idle', tries:0, shown:0, check:null
 function drawQty(n, range){
   if(range <= 6) return dice(n);
   if(range <= 20){
-    const cols = 10, rows = range <= 10 ? 1 : 2, per = range <= 10 ? 5 : 10;
-    // bis 10: Zehnerfeld 2 × 5, bis 20: Zwanzigerfeld 2 × 10
-    const R = 19, P = 46, gap = 16, nr = range <= 10 ? 2 : 2, nc = range <= 10 ? 5 : 10;
+    // bis 10: Zehnerfeld 1 × 10, bis 20: Zwanzigerfeld 2 × 10 (Backlog S7, Stefan 26.11.2026: immer 10 in einer Reihe)
+    const R = 19, P = 46, gap = 16, nr = range <= 10 ? 1 : 2, nc = 10;
     let s = ''; const W = nc*P + (nc > 5 ? gap : 0) + 24, H = nr*P + 24;
     for(let r=0;r<nr;r++) for(let c=0;c<nc;c++){
       const i = r*nc + c, x = 12 + c*P + (c >= 5 ? gap : 0) + P/2, y = 12 + r*P + P/2;
@@ -4705,12 +4704,12 @@ function lineSvg(zr, {guess = null, marks = null, cls = 'dg-line'} = {}){
   if(guess != null) s += `<line x1="${X(guess)}" y1="58" x2="${X(guess)}" y2="110" stroke="#e8890c" stroke-width="3" pointer-events="none"/><circle cx="${X(guess)}" cy="110" r="9" fill="#e8890c" pointer-events="none"/>`;
   return `<svg class="${cls}" viewBox="0 0 1000 190" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zahlenstrahl 0 bis ${zr}">${s}</svg>`;
 }
-/* Zehnerfeld (2 × 5) bzw. Zwanzigerfeld (2 × 10, Fünferstrich): zeilenweise gefüllt – erst die obere Reihe, dann die untere */
-function fieldSvg(n, cap, n2 = 0){
-  const cols = cap === 20 ? 10 : 5, C = 47.2, W = cols*C; let s = `<rect x="10" y="10" width="${W}" height="96" rx="8" fill="#fff" stroke="${INK}" stroke-width="2.5"/><path d="M10 58h${W}" stroke="${INK}" stroke-width="1.4"/>`;
-  for(let c = 1; c < cols; c++) s += c === 5 ? `<path d="M${10 + c*C} 10v96" stroke="${INK}" stroke-width="2.5"/>` : `<path d="M${10 + c*C} 10v96" stroke="${INK}" stroke-width="1" opacity=".35"/>`;
+/* Zehnerfeld (1 × 10) bzw. Zwanzigerfeld (2 × 10, Fünferstrich): zeilenweise gefüllt – erst die obere Reihe, dann die untere */
+function fieldSvg(n, cap, n2 = 0){   /* Zehnerfeld 1 × 10, Zwanzigerfeld 2 × 10 (Backlog S7) */
+  const cols = 10, rows = cap === 20 ? 2 : 1, C = 47.2, W = cols*C, H = rows*48; let s = `<rect x="10" y="10" width="${W}" height="${H}" rx="8" fill="#fff" stroke="${INK}" stroke-width="2.5"/>${rows === 2 ? `<path d="M10 58h${W}" stroke="${INK}" stroke-width="1.4"/>` : ''}`;
+  for(let c = 1; c < cols; c++) s += c === 5 ? `<path d="M${10 + c*C} 10v${H}" stroke="${INK}" stroke-width="2.5"/>` : `<path d="M${10 + c*C} 10v${H}" stroke="${INK}" stroke-width="1" opacity=".35"/>`;
   for(let i = 0; i < n + n2 && i < cap; i++) s += `<circle cx="${10 + C/2 + (i % cols)*C}" cy="${34 + Math.floor(i/cols)*48}" r="17" fill="${i < n ? PLACE.z : '#e8890c'}"/>`;
-  return `<svg viewBox="0 0 ${W + 20} 116" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Punktefeld">${s}</svg>`;
+  return `<svg viewBox="0 0 ${W + 20} ${H + 20}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Punktefeld">${s}</svg>`;
 }
 /* Hunderterplatten, Zehnerstangen, Einer */
 function hzeSvg(h, z, e){
@@ -6042,7 +6041,7 @@ for(const v of Object.values(R_INFO)) v.bp = 'BP GENT 2022, M 2.1.1.3 Rechenoper
 /* Rechnen im Test „mit Material“ (Stefan 24.11.): Klappt eine Stufe ohne Material nicht sicher, kommen Aufgaben derselben Art mit Material
    (Punktefeld, Zehnerstangen und Einer zum Legen, Hunderterplatten, Punktebild beim Einmaleins). Gelingt es damit: „teilweise – mit Material“. */
 function crossFieldSvg(n, k, cap){
-  const cols = cap === 20 ? 10 : 5, C = 47.2; let x = '';
+  const cols = 10, C = 47.2; let x = '';
   for(let i = n - k; i < n; i++){ const cx = 10 + C/2 + (i % cols)*C, cy = 34 + Math.floor(i/cols)*48; x += `<path d="M${cx - 13} ${cy - 13}l26 26M${cx + 13} ${cy - 13}l-26 26" stroke="#c9414a" stroke-width="4" stroke-linecap="round"/>`; }
   return fieldSvg(n, cap).replace('</svg>', x + '</svg>');
 }
@@ -8486,8 +8485,8 @@ function tfEquation(){
   return { txt:left, res };
 }
 function tfSvg(t = app.tf){
-  const cols = t.cap === 20 ? 10 : 5, C = 100, M = 14, W = cols*C, H = 2*C;
-  let s = `<rect x="${M}" y="${M}" width="${W}" height="${H}" rx="16" fill="#fff" stroke="#2b2930" stroke-width="5"/><path d="M${M} ${M + C}h${W}" stroke="#2b2930" stroke-width="2.5"/>`;
+  const cols = 10, C = 100, M = 14, W = cols*C, H = (t.cap === 20 ? 2 : 1)*C;   /* Zehnerfeld 1 × 10 (Backlog S7) */
+  let s = `<rect x="${M}" y="${M}" width="${W}" height="${H}" rx="16" fill="#fff" stroke="#2b2930" stroke-width="5"/>${t.cap === 20 ? `<path d="M${M} ${M + C}h${W}" stroke="#2b2930" stroke-width="2.5"/>` : ''}`;
   for(let c = 1; c < cols; c++) s += `<path d="M${M + c*C} ${M}v${H}" stroke="#2b2930" stroke-width="${c === 5 ? 5 : 1.6}" ${c === 5 ? '' : 'opacity=".45"'}/>`;
   for(let i = 0; i < t.cap; i++){
     const x = M + (i % cols)*C, y = M + Math.floor(i/cols)*C, cx = x + C/2, cy = y + C/2, d = t.dots[i];
@@ -9607,24 +9606,28 @@ function abAst(a, b, op){
 const carries = (a, b, op) => { let c = 0, k = 0; for(let x = a, y = b; x > 0 || y > 0; x = Math.floor(x/10), y = Math.floor(y/10)){ const dx = x % 10, dy = y % 10; if(op === '+'){ k = dx + dy + k >= 10 ? 1 : 0; } else { k = dx - dy - k < 0 ? 1 : 0; } c += k; } return c; };
 const sheetD = g => { if(g.d != null) return g.d; const ns = String(g.a).match(/\d+(?:,\d+)?/g); return ns ? Math.max(...ns.map(n => parseFloat(n.replace(',', '.')))) : String(g.a).length; };
 const box = (w = 16) => `<span class="ab-box" style="width:${w}mm"></span>`;
+/* Sätze nur zwischen den Sätzen umbrechen (Backlog S6: „640“ stand allein am Zeilenende) */
+const abSent = (...xs) => xs.map(x => `<span class="ab-s">${x}</span>`).join(' ');
+/* ab Zahlenraum 1000: Kästchen zum Rechnen neben der Antwort (Backlog S5/S6, Stefan: „Kästchen in jeder Aufgabe“) */
+const abKaro = (zr, inner) => zr >= 1000 ? `<div class="ab-kr"><div class="ab-karo"></div>${inner}</div>` : inner;
 const ans = (w = 18, unit = '') => `<div class="ab-ans">${box(w)}${unit ? ` ${unit}` : ''}</div>`;
 const iconP = (k, mm = 24) => `<span class="ab-ic" style="width:${mm}mm">${iconSvg(k, 100)}</span>`;
 const svgCls = (svg, cls = 'ab-svg') => svg.replace('<svg', `<svg class="${cls}"`);
 const zrMax = zr => zr === 10 ? 10 : zr === 20 ? 20 : zr === 100 ? 100 : 1000;
 /* Materialbilder für Papier */
 function abField(a, b = 0, op = '+', cap = a + (op === '+' ? b : 0) > 10 || a > 10 ? 20 : 10){
-  /* Zehnerfeld 2 × 5 bzw. Zwanzigerfeld 2 × 10 (Fünferstrich in der Mitte).
+  /* Zehnerfeld 1 × 10 (Backlog S7, Stefan 26.11.2026: immer 10 in einer Reihe) bzw. Zwanzigerfeld 2 × 10 (Fünferstrich in der Mitte).
      Gefüllt wird wie üblich zeilenweise: erst die obere Reihe ganz, dann die untere.
      Plus: die zweite Zahl macht in der neuen Farbe dort weiter. Minus: von hinten wegstreichen. */
-  const cols = cap === 20 ? 10 : 5, W = cols*20;
-  let s = `<rect x="2" y="2" width="${W}" height="42" rx="4" fill="#fff" stroke="#222" stroke-width="1.6"/><path d="M2 23h${W}" stroke="#222" stroke-width=".8"/>`;
-  for(let c = 1; c < cols; c++) s += `<path d="M${2 + c*20} 2v42" stroke="#222" stroke-width="${c === 5 ? 1.8 : .6}"/>`;
+  const cols = 10, W = cols*20, H = cap === 20 ? 42 : 21;
+  let s = `<rect x="2" y="2" width="${W}" height="${H}" rx="4" fill="#fff" stroke="#222" stroke-width="1.6"/>${cap === 20 ? `<path d="M2 23h${W}" stroke="#222" stroke-width=".8"/>` : ''}`;
+  for(let c = 1; c < cols; c++) s += `<path d="M${2 + c*20} 2v${H}" stroke="#222" stroke-width="${c === 5 ? 1.8 : .6}"/>`;
   for(let i = 0; i < cap; i++){
     const cx = 2 + 10 + (i % cols)*20, cy = 12.5 + Math.floor(i/cols)*21;
     if(i < a){ s += `<circle cx="${cx}" cy="${cy}" r="7" fill="#2f5ea8"/>`; if(op === '−' && i >= a - b) s += `<path d="M${cx - 8} ${cy - 8}l16 16M${cx + 8} ${cy - 8}l-16 16" stroke="#c9414a" stroke-width="2.4"/>`; }
     else if(op === '+' && i < a + b) s += `<circle cx="${cx}" cy="${cy}" r="7" fill="#e8890c"/>`;
   }
-  return `<svg class="ab-svg" viewBox="0 0 ${W + 4} 46">${s}</svg>`;
+  return `<svg class="ab-svg" viewBox="0 0 ${W + 4} ${H + 4}">${s}</svg>`;
 }
 /* Material für Papier: feste Einheiten (1 Würfel = 10), Hunderter in Fünferreihen. Der Maßstab wird später für das ganze Blatt gleich gesetzt (abScale). sketch = Zeichenweise □ | • */
 function paperHZE(h, z, e, sketch = false, sw = {}){ /* sw.z: so viele Zehner (vorne) kommen aus einem getauschten Hunderter; sw.e: die ersten 10 Einer kommen aus einem getauschten Zehner */
@@ -9713,9 +9716,9 @@ const M_SHEETS = {
   zerlegen: {name:'Mengen erfassen und zerlegen', cols:2, gens:[
     zr => { if(zr <= 20){ const n = rnd(zr === 10 ? 4 : 11, zr); return T_(['zaehle', 'schreibe'], 'Wie viele Punkte?', `${abField(n, 0, '+', zr)}${ans()}`, n); } const n = zr === 100 ? rnd(2, 8)*10 + rnd(1, 9) : rnd(1, 4)*100 + rnd(1, 6)*10 + rnd(1, 7); return T_('schreibe', 'Welche Zahl ist das?', `${abMat(n, zr)}${ans()}`, n); },
     zr => { if(zr <= 20){ const n = rnd(5, zr), a = rnd(1, n - 1); let b = rnd(1, n - 2); if(b >= a) b++; /* zwei verschiedene Zerlegungen */ return T_('schreibe', 'Zerlege.', `<p class="ab-row">${n} = ${a} + ${box(13)}</p><p class="ab-row">${n} = ${b} + ${box(13)}</p>`, `${n - a}; ${n - b}`); } const big = zr === 1000 ? 100 : 10, a = rnd(2, 8)*big, b = rnd(1, 9)*(big/10); return T_('rechne', 'Rechne.', `<p class="ab-row">${a} + ${b} = ${box(18)}</p><p class="ab-row">${a + b + big} = ${a + big} + ${box(13)}</p>`, `${a + b}; ${b}`); }]},
-  ergaenzen: {name:'Ergänzen', cols:2, gens:[
-    zr => { const T = zrMax(zr), n = zr === 1000 ? rnd(2, 8)*100 + rnd(1, 9)*10 : rnd(Math.ceil(T*.3), T - 1); return T_('schreibe', `In den Karton passen ${T}. ${n} sind schon drin. Wie viele fehlen?`, `${app.sheet.mat ? (zr <= 20 ? abMV(abField(n, 0, '+', zr), abEmptyField(zr === 10 ? 10 : 20)) : zr === 100 ? abMV(abMat(n, 100), '<div class="ab-draw"></div>') : '') : ''}${ans()}`, T - n); },
-    zr => { const step = zr === 1000 ? 100 : 10, t = zr === 10 ? 10 : rnd(2, zrMax(zr)/step - 1)*step, a = t - rnd(1, step === 100 ? 9 : 8)*(step/10); return T_('rechne', 'Ergänze.', `${app.sheet.mat && zr <= 20 ? abMV(abField(a, 0, '+', zr), abEmptyField(zr === 10 ? 10 : 20)) : ''}<p class="ab-row">${a} + ${box(13)} = ${t}</p>`, t - a); }]},
+  ergaenzen: {name:'Ergänzen', cols: S => S.zr >= 1000 ? 1 : 2, gens:[   /* ab 1000 eine Aufgabe je Zeile mit Kästchen zum Rechnen (Backlog S6) */
+    zr => { const T = zrMax(zr), n = zr === 1000 ? rnd(2, 8)*100 + rnd(1, 9)*10 : rnd(Math.ceil(T*.3), T - 1); return T_('schreibe', abSent(`In den Karton passen ${T}.`, `${n} sind schon drin.`, 'Wie viele fehlen?'), `${app.sheet.mat ? (zr <= 20 ? abMV(abField(n, 0, '+', zr), abEmptyField(zr === 10 ? 10 : 20)) : zr === 100 ? abMV(abMat(n, 100), '<div class="ab-draw"></div>') : '') : ''}${abKaro(zr, ans())}`, T - n); },
+    zr => { const step = zr === 1000 ? 100 : 10, t = zr === 10 ? 10 : rnd(2, zrMax(zr)/step - 1)*step, a = t - rnd(1, step === 100 ? 9 : 8)*(step/10); return T_('rechne', 'Ergänze.', `${app.sheet.mat && zr <= 20 ? abMV(abField(a, 0, '+', zr), abEmptyField(zr === 10 ? 10 : 20)) : ''}${abKaro(zr, `<p class="ab-row">${a} + ${box(13)} = ${t}</p>`)}`, t - a); }]},
   zehnerpartner: {name:'Zehnerpartner', cols:2, max:24, gens:[
     zr => { const n = rnd(1, 9); return T_('rechne', 'Wie viele fehlen bis 10?', `${app.sheet.mat ? abMV(abField(n, 0, '+', 10), abEmptyField(10)) : ''}<p class="ab-row big">${n} + ${box(13)} = 10</p>`, 10 - n, n); },
     zr => { const ns = []; while(ns.length < 3){ const n = rnd(1, 9); if(!ns.includes(n)) ns.push(n); } const f = [n => [`${box(12)} + ${n} = 10`, 10 - n], n => [`10 = ${n} + ${box(12)}`, 10 - n], n => [`10 − ${n} = ${box(12)}`, 10 - n]]; const rows = ns.map((n, i) => f[i](n)); return T_('rechne', 'Ergänze bis 10.', rows.map(r => `<p class="ab-row">${r[0]}</p>`).join(''), rows.map(r => r[1]).join('; '), 20); },
@@ -9726,9 +9729,9 @@ const M_SHEETS = {
       const selbst = op === '−' && app.sheet.mstrich === 'selbst' && !app.sheet.draw;
       const fld = app.sheet.mat ? (op === '+' ? abMV(abField(a, b, '+', 20), abEmptyField(20)) : abMV(selbst ? abField(a, 0, '+', 20) : abField(a, b, '−', 20), abEmptyField(20))) : '';
       return T_(selbst && app.sheet.mat ? ['streiche', 'rechne'] : 'rechne', `§EK:${op === '+' ? 'p' : 'm'}§` + abEx(`<b>Beispiel:</b> ${selbst && app.sheet.mat ? `Streiche ${b} weg. ` : ''}Rechne über die 10.`, `${selbst && app.sheet.mat ? `Streiche ${b} weg. ` : ''}Rechne über die 10.`), `${fld}${abAst(a, b, op)}`, op === '+' ? `${a} + ${10 - a} + ${b - 10 + a} = ${a + b}` : `${a} − ${a - 10} − ${b - a + 10} = ${a - b}`, op === '+' ? a + b : 30 - a + b); }]},
-  unterschied: {name:'Unterschiede bestimmen', cols:2, gens:[
-    zr => { const T = zrMax(zr), a = rnd(Math.ceil(T*.1), Math.floor(T*.5)), b = a + rnd(Math.max(1, Math.floor(T*.1)), Math.floor(T*.4)); const nm = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']), nm2 = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_('rechne', `${nm} hat ${a} €. ${nm2} hat ${b} €. Wie viel mehr hat ${nm2}?`, `${app.sheet.mat && zr <= 20 ? `<div class="ab-bars"><span>${nm}</span>${abField(a, 0, '+', 20)}<span>${nm2}</span>${abField(b, 0, '+', 20)}</div>` : ''}${ans(18, '€')}`, b - a); },
-    zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return {...T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${ans()}`, b - a), k:`${a}|${b}`}; }]}, /* k: gleiche Lösung ist erlaubt, gleiche Aufgabe nicht */
+  unterschied: {name:'Unterschiede bestimmen', cols: S => S.zr >= 1000 ? 1 : 2, gens:[   /* ab 1000 mit Kästchen zum Rechnen (Backlog S5) */
+    zr => { const T = zrMax(zr), a = rnd(Math.ceil(T*.1), Math.floor(T*.5)), b = a + rnd(Math.max(1, Math.floor(T*.1)), Math.floor(T*.4)); const nm = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']), nm2 = fresh(['Lea','Tom','Ali','Mia','Ben','Sara','Jonas','Nina']); return T_('rechne', abSent(`${nm} hat ${a} €.`, `${nm2} hat ${b} €.`, `Wie viel mehr hat ${nm2}?`), `${app.sheet.mat && zr <= 20 ? `<div class="ab-bars"><span>${nm}</span>${abField(a, 0, '+', 20)}<span>${nm2}</span>${abField(b, 0, '+', 20)}</div>` : ''}${abKaro(zr, ans(18, '€'))}`, b - a); },
+    zr => { const T = zrMax(zr), a = rnd(1, Math.floor(T*.4)), b = a + rnd(Math.max(1, Math.floor(T*.2)), Math.floor(T*.5)); return {...T_('rechne', `Wie weit ist es von ${a} bis ${b}?`, `${abLine(zr)}${abKaro(zr, ans())}`, b - a), k:`${a}|${b}`}; }]}, /* k: gleiche Lösung ist erlaubt, gleiche Aufgabe nicht */
   plus: {name:'Plus', cols: S => S.mat && S.zr >= 1000 ? 1 : 2, gens:[zr => { const [a, b] = abPair('+', zr, app.sheet.ue), D = app.sheet.mat && app.sheet.draw;
     if(D && zr <= 20) return T_(['male', 'rechne'], abEx('Rechne.', 'Male ins Feld und rechne.'), `${abEx(abField(a, b, '+', 20), abEmptyField(20))}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b);
     if(D) return T_(['skizze', 'rechne'], 'Zeichne beide Zahlen. Rechne.', `${abEx(`<div class="ab-matrow">${abSketch(a)}<b>+</b>${abSketch(b)}</div>${abKey(zr)}`, '<div class="ab-draw"></div>')}<p class="ab-row big">${a} + ${b} = ${box(18)}</p>`, a + b, carries(a, b, '+')*1e5 + a + b);
@@ -9887,7 +9890,7 @@ const H_SHEETS = {
    ===================================================================== */
 const LK = {none:'ohne Aufgaben', zahl:'Zahlen legen', plus:'Plus', minus:'Minus'};
 const LEGE = {
-  zehner:   {name:'Zehnerfeld für Wendeplättchen', grp:'M', kts:['none', 'zahl', 'plus', 'minus', 'ergaenz'], ktn:{ergaenz:'Ergänzen bis 10'}, def:'plus'},
+  zehner:   {name:'Zehnerfeld für Wendeplättchen (quer)', grp:'M', kts:['none', 'zahl', 'plus', 'minus', 'ergaenz'], ktn:{ergaenz:'Ergänzen bis 10'}, def:'plus'},
   zwanzig:  {name:'Zwanzigerfeld für Wendeplättchen (quer)', grp:'M', kts:['none', 'zahl', 'plus', 'minus', 'ergaenz'], ktn:{ergaenz:'Ergänzen bis 20'}, def:'plus', ue:true},
   strahl20: {name:'Zahlenstrahl bis 20 (quer)', grp:'M', kts:['none', 'zahl', 'plus', 'minus', 'abstand'], ktn:{zahl:'Zahlen und Nachbarn', plus:'Plus mit Sprüngen', minus:'Minus mit Sprüngen', abstand:'Abstand bestimmen'}, def:'zahl'},
   strahl100:{name:'Zahlenstrahl bis 100 oder 1000 (quer)', grp:'M', kts:['none', 'zahl', 'plus', 'minus'], ktn:{zahl:'Zahlen und Nachbarn', plus:'Plus mit Sprüngen', minus:'Minus mit Sprüngen'}, def:'zahl', zrs:[100, 1000]},
@@ -9910,11 +9913,11 @@ const LEGE = {
 const legeKt = (def, S) => def.kts.includes(S.kt) ? S.kt : def.def;
 const lgBox = (w = 14) => `<span class="lg-box" style="width:${w}mm"></span>`;
 const lgUniq = (n, f) => { const out = [], seen = new Set(); let t = 0; while(out.length < n && t++ < 200){ const g = f(); if(seen.has(g.k)) continue; seen.add(g.k); out.push(g); } return out; };
-/* Zehnerfeld (5 Spalten) bzw. Zwanzigerfeld (10 Spalten), Feld 25 mm, Fünferstrich kräftig */
-function lgField(cols){
-  const c = 25, W = cols*c, H = 2*c; let s = `<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="2" fill="#fff" stroke="#222" stroke-width=".8"/><path d="M0 ${c}h${W}" stroke="#222" stroke-width=".4"/>`;
+/* Zehnerfeld (1 Reihe, Backlog S7) bzw. Zwanzigerfeld (2 Reihen), je 10 Felder, Feld 25 mm, Fünferstrich kräftig */
+function lgField(rows){
+  const c = 25, cols = 10, W = cols*c, H = rows*c; let s = `<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="2" fill="#fff" stroke="#222" stroke-width=".8"/>${rows === 2 ? `<path d="M0 ${c}h${W}" stroke="#222" stroke-width=".4"/>` : ''}`;
   for(let i = 1; i < cols; i++) s += `<path d="M${i*c} 0v${H}" stroke="#222" stroke-width="${i === 5 ? 1.2 : .35}"/>`;
-  for(let i = 0; i < 2*cols; i++) s += `<circle cx="${(i % cols)*c + c/2}" cy="${Math.floor(i/cols)*c + c/2}" r="10" fill="none" stroke="#c8c8c8" stroke-width=".3" stroke-dasharray="1 1.2"/>`;
+  for(let i = 0; i < rows*cols; i++) s += `<circle cx="${(i % cols)*c + c/2}" cy="${Math.floor(i/cols)*c + c/2}" r="10" fill="none" stroke="#c8c8c8" stroke-width=".3" stroke-dasharray="1 1.2"/>`;
   return `<svg class="lg-svg" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}">${s}</svg>`;
 }
 /* Zahlenstrahl: bis 20 mit 12 mm je Schritt, bis 100 mit 2,5 mm je Schritt (bei 1000: ein Strich = 10) */
@@ -9987,10 +9990,10 @@ function legeBuild(key, S){
   const num = (list) => list.forEach(g => g && sols.push(g.a));
   let title = def.name.replace(' (quer)', ''), how = '', body = '', quer = false;
   if(key === 'zehner' || key === 'zwanzig'){
-    const cap = key === 'zehner' ? 10 : 20, n = cap === 10 ? 3 : 2, ts = lgFieldTasks(kt, cap, S.ue, n); num(ts); quer = cap === 20;
+    const cap = key === 'zehner' ? 10 : 20, n = cap === 10 ? 3 : 2, ts = lgFieldTasks(kt, cap, S.ue, n); num(ts); quer = true;
     title = cap === 10 ? 'Zehnerfeld' : 'Zwanzigerfeld'; if(kt !== 'none') title += `: ${(def.ktn?.[kt] || LK[kt])}${cap === 20 && S.ue !== 'egal' && ['plus', 'minus'].includes(kt) ? (S.ue === 'mit' ? ' mit Zehnerübergang' : ' ohne Zehnerübergang') : ''}`;
-    how = 'Lege die Plättchen in die Felder. Fülle immer zuerst die obere Reihe, dann die untere.';
-    body = ts.map((g, i) => `<div class="lg-unit">${lgTaskRow(g, i + 1)}<div class="lg-c">${lgField(cap === 10 ? 5 : 10)}</div></div>`).join('');
+    how = cap === 10 ? 'Lege die Plättchen in die Felder, von links nach rechts.' : 'Lege die Plättchen in die Felder. Fülle immer zuerst die obere Reihe, dann die untere.';
+    body = ts.map((g, i) => `<div class="lg-unit">${lgTaskRow(g, i + 1)}<div class="lg-c">${lgField(cap === 10 ? 1 : 2)}</div></div>`).join('');
   }
   else if(key === 'strahl20' || key === 'strahl100'){
     const max = key === 'strahl20' ? 20 : 100, z = max === 20 ? 20 : zr, ts = lgStrahlTasks(kt, max, z, 3); num(ts); quer = true;
@@ -10170,7 +10173,7 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .ab-col{border-collapse:collapse;font-size:17pt}.ab-col td,.ab-col th{width:9mm;height:10mm;border:1px solid #bbb;text-align:center}.ab-col th{height:6mm;font-size:9pt;color:#666;border:0}.ab-col .ab-res td{border-top:2.5px solid #222}.ab-col .ab-carry td{height:5mm;font-size:9pt}.ab-col tr td:first-child{border:0;width:6mm}
 .ab-ic svg[aria-label^="Uhr"]{width:100%;height:auto}
 .ab-svg.matp{display:block;flex:none;max-width:none;max-height:none;margin:0 auto}.ab-matrow{flex-wrap:wrap;row-gap:2mm}.ab-matrow .ab-svg.matp{max-width:none;max-height:none;margin:0}.ab-matrow:has(.matp){align-items:flex-start}.ab-matrow b{margin:0 2mm;align-self:center}
-.ab-draw{align-self:stretch;min-height:34mm;border:1.2px dashed #999;border-radius:2mm}
+.ab-draw{align-self:stretch;min-height:34mm;border:1.2px dashed #999;border-radius:2mm}.ab-s{display:inline-block}.ab-kr{align-self:stretch;display:flex;align-items:flex-end;gap:5mm}.ab-kr>.ab-karo{flex:1;height:25mm;border:.3mm solid #aaa;background-image:linear-gradient(#c4c4c4 .25mm,transparent .25mm),linear-gradient(90deg,#c4c4c4 .25mm,transparent .25mm);background-size:5mm 5mm;background-position:-.25mm -.25mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}.ab-kr>.ab-row,.ab-kr>.ab-ans{flex:none;margin:0}
 .ab-key{font-size:9.5pt;color:#555;margin:0;display:flex;align-items:center;gap:1.5mm;flex-wrap:wrap;justify-content:center}.ab-key span{display:inline-block}.k-h{width:3.2mm;height:3.2mm;border:1.6px solid #333}.k-z{width:1.6px;height:4mm;background:#333;margin:0 1mm}.k-e{width:1.8mm;height:1.8mm;border-radius:50%;background:#333}
 .ab-foot{font-size:8pt;color:#888;margin-top:2.5mm;margin-bottom:0}.ab-lic{margin-top:.5mm}
 .sol{font-size:12pt}.sol ol{columns:2;column-gap:10mm;padding-left:6mm}.sol li{margin:1mm 0;break-inside:avoid}
@@ -10272,14 +10275,18 @@ const B_BW_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidd
 /* Schwarz-Weiß für alle Blätter (Backlog M, Stefan 26.11.2026): Plättchen und Material blau → schwarz, orange → schraffiert,
    Einer grün → Gitter, Hunderter rot → Punkte; alle übrigen Farben (Bilder, Uhren, Markierungen) werden Grau gleicher Helligkeit.
    Basis-Blätter haben eigene Muster (B_BW), Legeblätter bleiben, wie sie sind. */
-const SW_MAP = {'#2f5ea8':'#222', '#346bc3':'#222', '#1f4f9a':'#222', '#e8890c':'url(#sw-or)', '#f0a020':'url(#sw-or)', '#27834b':'url(#sw-gr)', '#c9414a':'url(#sw-rot)'};
+const SW_MAP = {'#2f5ea8':'#222', '#346bc3':'#222', '#1f4f9a':'#222', '#e8890c':'url(#sw-or)', '#f0a020':'url(#sw-or)', '#27834b':'url(#sw-gr)', '#c9414a':'#222'};
 function swGray(c){
   let h = c.slice(1); if(h.length <= 4) h = [...h].map(x => x + x).join('');
   const v = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)), L = Math.round(.299*v[0] + .587*v[1] + .114*v[2]).toString(16).padStart(2, '0');
   return '#' + L + L + L + h.slice(6);
 }
-const swHtml = h => h.replace(/(fill="|fill:\s*)(#[0-9a-f]{3,8})(?![\w-])/gi, (m, p, c) => p + (SW_MAP[c.toLowerCase()] || swGray(c)))
-  .replace(/(?<=[=:"'\s,])#[0-9a-f]{3,8}(?![\w-])/gi, c => swGray(c));
+/* Backlog S3/S4 (Stefan 26.11.2026: „wie in Farbe, nur ohne farbige Füllung“): Material (Hunderterplatten, Zehnerstangen, Einer – Rechtecke
+   in den Stellenwertfarben) wird hellgrau mit Umriss und Kästchenlinien; Pfeile und Markierungen in Rot werden schwarz. Plättchen (Kreise) bleiben schwarz bzw. schraffiert. */
+const SW_MAT = /^#(c9414a|346bc3|27834b|2f5ea8|1f4f9a)$/i, SW_MATFILL = '#dedede';
+const swHtml = h => h.replace(/<rect\b[^>]*>/gi, t => t.replace(/fill="(#[0-9a-f]{6})"/i, (m, c) => SW_MAT.test(c) ? `fill="${SW_MATFILL}"` : m))
+  .replace(/(fill="|fill:\s*)(#[0-9a-f]{3,8})(?![\w-])/gi, (m, p, c) => p + (SW_MAP[c.toLowerCase()] || swGray(c)))
+  .replace(/(?<=[=:"'\s,])#[0-9a-f]{3,8}(?![\w-])/gi, c => c.toLowerCase() === '#c9414a' ? '#222' : swGray(c));
 const bFill = col => B_BW ? `url(#bw-${col})` : B_COL[col];
 /* Gegenstand im Blatt (Farbe oder Muster); s = Größe im Bild */
 const bbObj = (kind, col, s = 1) => { const o = B_OBJ[kind], c = col || o.col; return bObj(kind, B_BW ? bFill(c) : c, 64, s); };
