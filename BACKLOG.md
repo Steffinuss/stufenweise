@@ -245,7 +245,7 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 
 ## L: Lineatur zum freien Schreiben wählbar (Wunsch Stefan, 26.11.2026)
 
-**Status:** nur dokumentiert, nicht begonnen.
+**Status:** entschieden (26.11.2026), kommt nach M.
 **Wunsch (Stefan):** „Beim freien Schreiben Arten von Lineatur aussuchen. Standard (dreiteilig → Dach/Erdgeschoss/Keller) Standard für 1./2. Klasse. Dann 2 Linien (3. Klasse) und 1 Linie (Standard 4. Klasse).“
 **Idee:** Auswahl „Lineatur“ mit drei Arten:
 - **Haus mit drei Stockwerken:** Dach, Erdgeschoss, Keller (Oberlänge, Mittelband, Unterlänge). Standard für Klasse 1/2.
@@ -253,12 +253,13 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 - **Eine Linie:** Standard für Klasse 4.
 
 Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerkt (`app.sheet`, `SHEET_KEEP`) und gilt auch im Heft.
+**Entschieden (Stefan, 26.11.2026):** Die App kennt keine Klasse, nur die Themenwelt. Standard: **Grundstufe → Haus mit drei Stockwerken (3 Linien), Hauptstufe und Berufsschulstufe → eine Linie.** Zwei Linien bleibt zur Auswahl. Reihenfolge: erst M, dann L (die Schreibzeilen sitzen in den neuen Kästen).
 **Betrifft:** nur Arbeitsblätter und Arbeitshefte (Stefan, 26.11.2026), also die Schreibzeilen `.ab-wline` und `.hf-lines` (W6 „Satz zum Bild“, „Satz abschreiben“, Aufgabenseiten der Fortsetzungsgeschichte). Nicht der Stift an der Tafel.
 **Größe:** klein bis mittel. Schreibzeilen mit fester Höhe je Lineatur; prüfen mit `heft_seiten_passen.py` (Seiten dürfen nicht überlaufen).
 
 ## M: Arbeitsblätter im Design der Arbeitshefte (Wunsch Stefan, 26.11.2026)
 
-**Status:** nur dokumentiert, nicht begonnen.
+**Status:** entschieden (26.11.2026), wartet auf Stefans OK zum Bauen. Danach L.
 **Wunsch (Stefan):** „Passend zu den Arbeitsheften auch Arbeitsblätter im Design anpassen/aktualisieren.“
 **Idee:** Einzelne Arbeitsblätter („Material drucken“) bekommen das Aussehen der Heftseiten, wie in 0.38.0 eingeführt:
 - Kopfzeile wie im Heft, z. B. Fach und Stufe; Name und Datum bleiben.
@@ -269,7 +270,10 @@ Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerk
 - **Lösungsblätter** bleiben im Aufbau, passen sich aber im Grundsatz an (Schrift, Fußzeile) (Stefan).
 
 Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) wäre sinnvoll, damit beide gleich bleiben.
-**Entschieden (Stefan, 26.11.2026):** kein Farbrand; Schwarz-Weiß für alle Blätter; Lösungsblätter bleiben, nur angepasst. Noch offen: Legeblätter sind genau bemaßt und bleiben vermutlich, wie sie sind. Vor dem Bauen wieder Vorschläge als Bilder zeigen.
+**Entschieden (Stefan, 26.11.2026):** kein Farbrand; Schwarz-Weiß für alle Blätter; Lösungsblätter bleiben, nur angepasst. Bild-Vorschläge (zwei echte Blätter, heute und A/B/C) am 26.11. gezeigt:
+- **Layout A „wie im Heft“:** schmale Kopfzeile mit Fach und Bereich („Mathe · Rechnen“), darunter Titel und Name/Datum wie heute; Kästen bis zur Fußzeile (Layout B des Hefts); Fußzeile auf fester Höhe mit Bildungsplan und Lizenz links, Fach rechts; keine Seitenzahl. Umsetzung über `heftFrame` (Blatt-Fassung ohne Seitenzahl).
+- **Schwarz-Weiß wie gezeigt:** Blau wird schwarz, Orange schraffiert; Häkchen „Schwarz-Weiß-Drucker“ bei allen Blättern (bisher nur Basis, `B_BW`).
+- **Legeblätter bleiben**, wie sie sind (genau bemaßt); höchstens die Fußzeile wird angeglichen.
 **Größe:** mittel. Prüfen: `arbeitsblaetter.py`, `druck_seiten.py`, `grosse_aufgaben.py`, Anleitungsbilder neu.
 
 ## N: „Große Aufgaben“ auch im Heft-Assistenten (Wunsch Stefan, 26.11.2026)
