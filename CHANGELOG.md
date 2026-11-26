@@ -5,6 +5,8 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+- **Werkzeug: Tests laufen gleichzeitig** (Backlog R, Wunsch Stefan 26.11.2026; betrifft nur `tests/`, keine App-Änderung): `sh tests/run_all.sh` startet bis zu 4 Tests gleichzeitig (`STUFENWEISE_JOBS`), mit gemeinsamem Server und eigenem Ausgabeordner je Test; `sh tests/run_all.sh nur NAME …` für einzelne Tests; `tests/README.md` mit „Gezielt testen“. Gemessen auf 2 Kernen: schnell 3:33 statt 10:30 min, lang 6:37 statt 18:57 min, gleiche Ergebnisse. `mehrere_fenster.py` wartet, bis das andere Fenster den Stand sieht (unter Last sonst unzuverlässig), `frei_stift.py` ohne festen Pfad.
+
 ## 0.40.0 – 26.11.2026
 
 Freigegeben von Stefan am 26.11.2026 nach Durchsicht der Testversion („Perfekt, kannst du freigeben.“).

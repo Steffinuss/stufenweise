@@ -46,7 +46,7 @@ async def main():
         chk('Legen geht wieder, Schrift bleibt', await pg.evaluate("board().pieces.length") == 3 and await n() == 1)
         await pg.click('#f-all'); await pg.wait_for_timeout(200)
         chk('Alles weg löscht auch Schrift', await n() == 0)
-        await pg.screenshot(path='/home/claude/stufenweise/tests/out/frei_stift.png')
+        await pg.screenshot(path='frei_stift.png')
         # Geld
         await pg.click('#ink-pen'); await stroke(pg, [(x0, y0), (x0 + 60, y0 + 20)]); await pg.click('#ink-pen')
         if await pg.locator("[data-fmat='money']").count():
