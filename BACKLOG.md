@@ -19,6 +19,7 @@ Stand: 24.11.2026 (0.34.0)
 | 6 | ~~**G** Hundertertafel-Blätter: Bezug zur Tafel sichtbar (+ Heft zur Förderzone)~~ | klein | freigegeben in 0.32.0 (23.11.2026), siehe `CHANGELOG.md` |
 | 7 | ~~**H** Konzentrationsmodus für Kinder (+ Usability-Review)~~ | klein bis mittel | freigegeben in 0.33.0 (24.11.2026), siehe `CHANGELOG.md` |
 | 8 | ~~**I** Optimierung Deutsch (Bilder beim Schreiben, Anhören, Ausbau) + Hundertertafel verdeckt, Mathe mit Material~~ | groß | freigegeben in 0.34.0 (24.11.2026), siehe `CHANGELOG.md` |
+| 9 | ~~**J** Arbeitshefte, die aufeinander aufbauen + **K** Fußzeile ohne Namen~~ | groß | freigegeben in 0.38.0 (26.11.2026), siehe `CHANGELOG.md` |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -218,7 +219,9 @@ Beispiel „Was passt nicht?“:
 
 **Vor der Umsetzung zu klären (Stefan):** Welche Stufen zuerst (Vorschlag: V1 Gleiches, V2 Was passt nicht?, V3 Sortieren – dort wirkt Ähnlichkeit am stärksten)? Welche Gegenstände und Varianten? Soll „mittel“ eine eigene Aufgabenart werden oder eine weitere Schwierigkeit `st` innerhalb der Art? Gilt die neue Progression auch für die Arbeitsblätter?
 
-## J. Arbeitshefte, die aufeinander aufbauen (Wunsch Stefan, 25.11.2026) – Schritte 1–5 gebaut (Testversion), Durchsicht der Texte offen
+## J. Arbeitshefte, die aufeinander aufbauen (Wunsch Stefan, 25.11.2026) – erledigt, freigegeben in 0.38.0
+
+**Status:** erledigt, freigegeben in 0.38.0 (26.11.2026), siehe `CHANGELOG.md`. Mit Heft-Layout B, Deckblatt C4 und Rückseite als Nachguckseite.
 
 Stefan: „Test machen → Arbeitsheft drucken → Schüler üben lassen.“ Heute ist das Heft oft an einem Tag durch (nur Förderzone, 1–2 Seiten je Stufe). Gewünscht: kommende Stufen vorwegnehmen, Heft nur für Mathe oder nur für Deutsch, für Deutsch mehr Texte und Aufgaben, zwischendurch längere Texte; Umfang wie ein Verlagsheft (Westermann „Fördern Inklusiv“, rund 48–64 Seiten).
 
@@ -232,7 +235,7 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 
 ## K: Name auf Arbeitsblättern durch Projektnamen ersetzen (Wunsch Stefan, 25.11.2026)
 
-**Status:** gebaut in `entwicklung` (26.11.2026, Stefan: „mach das noch“), wartet mit Backlog J auf die Freigabe. Alle 6 Fußzeilen (`tafHelp`, Arbeitsblätter, Legeblätter, Heft-Deckblatt, `HEFT_LIC`) zeigen „Stufenweise · stufenweise.app · CC BY-SA 4.0“; Impressum, Lizenzseite, Kopfkommentar und `docs/anleitung.md` (Lizenzabschnitt) unverändert. Test in `tests/heft_assistent.py`.
+**Status:** erledigt, freigegeben in 0.38.0 (26.11.2026; gebaut 26.11., Stefan: „mach das noch“). Alle 6 Fußzeilen (`tafHelp`, Arbeitsblätter, Legeblätter, Heft-Deckblatt, `HEFT_LIC`) zeigen „Stufenweise · stufenweise.app · CC BY-SA 4.0“; Impressum, Lizenzseite, Kopfkommentar und `docs/anleitung.md` (Lizenzabschnitt) unverändert. Test in `tests/heft_assistent.py`.
 **Anlass:** Unten auf Arbeitsblättern, Legeblättern und Hilfeseiten steht „© Stefan Hackl“ (5 Stellen in `index.html`, Klasse `ab-lic`, z. B. `tafHelp`, Legeblätter; dazu seit Backlog J `HEFT_LIC` für Heftseiten und Deckblatt in `buildHeft`). Blätter anderer Lehrkräfte tragen so Stefans Namen; der Name gehört nicht in Hefte und zu Eltern.
 **Vorschlag:** Fußzeile „Stufenweise · stufenweise.app · CC BY-SA 4.0“. Das genügt der Namensnennung der Lizenz; Stefan bleibt als Urheber im Impressum, in `LICENSE`/`LIZENZ-INHALTE.md` und auf GitHub genannt. Impressum und Kopfkommentar in `index.html` unverändert lassen.
 **Größe:** klein. Prüfen: `arbeitsblaetter.py`, `legeblaetter.py` (Fußzeile darf keine Seite verlängern).

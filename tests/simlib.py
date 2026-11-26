@@ -37,7 +37,8 @@ async def answer(pg, correct):
         vals = it['fields'] if correct else [f+1 for f in it['fields']]
         ins = pg.locator('#stage .dg-in, #controls .dg-in')
         n = await ins.count(); assert n==len(vals), (n, vals, it)
-        for i,v in enumerate(vals): await ins.nth(i).fill(str(v))
+        # seit 0.35.1 sind Ziffernfelder bei offener Zifferntastatur readOnly → Wert per JS setzen (wie in antwortfeld.py)
+        for i,v in enumerate(vals): await ins.nth(i).evaluate("(e,v)=>{e.focus(); e.value=v; e.dispatchEvent(new Event('input',{bubbles:true}))}", str(v))
         await ins.nth(n-1).press('Enter')
     elif t=='clockset':
         await pg.evaluate("(c)=>{const it=app.diag.items[app.diag.idx];app.diag.resp={h:c?it.target.h:(it.target.h+3)%12,m:it.target.m,moved:true}}", correct); await pg.click('#d-next')

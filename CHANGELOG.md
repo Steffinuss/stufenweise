@@ -5,6 +5,8 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+## 0.38.0 – 26.11.2026
+
 - **Heft-Assistent** (Backlog J, Schritt 1; Wunsch Stefan, 25.11.2026): Das „Heft zur Förderzone“ wird zum Heft-Assistenten. Wählbar sind Fach (Mathe, Deutsch, Basis oder gemischt), Umfang (12, 24, 36 oder 48 Seiten, 24 vorausgewählt; Deckblatt und Inhalt zählen mit, das gedruckte Heft hat genau so viele Seiten) und wie weit das Heft vorgreift (nur Förderzone, je eine Stufe weiter, bis das Heft voll ist – Standard). Jede Stufe ist ein Kapitel, zuerst die Förderzone mit den meisten Seiten, dann die nächsten noch nicht erreichten Stufen in Lernreihenfolge (`heftRow`). Jede Seite hat neue Aufgaben. Kapitel lassen sich abwählen, kürzer oder länger machen. Deckblatt mit Fach, Inhalt mit Kapiteln und Seitenzahl, unten „Seite n · Kapitel k“ (Seiten wie gedruckt gezählt). Bisher „Blätter je Stufe 1/2“ entfällt. Funktionen `heftPlan`, `heftMake`, `heftPages`, `heftAssistHtml`; Test `tests/heft_assistent.py`.
 - **Kapitelaufbau** (Backlog J, Schritt 2): Jedes Kapitel hat eine Einstiegsseite (große Aufgaben, die erste als Beispiel mit Lösung), Übungsseiten und zum Schluss „Das kann ich schon“ (gemischte Aufgaben, Selbsteinschätzung in drei Stufen mit Worten und Zeichen ●/◐/○ zum Ankreuzen). Nach je zwei Kapiteln eine Wiederholung. Hilfen hinten je nach Inhalt: Hundertertafel, Anlauttabelle (neu als Druckseite), Einmaleins-Tafel (neu). Lösungsheft für die Lehrkraft (drucken oder speichern), mit denselben Seitenzahlen.
 - **Mathe-Feinstufen** (Schritt 3): Die Übungsseiten eines Kapitels werden schwerer – mit Bild → Bild selbst zeichnen (bzw. Minus selbst wegstreichen) → im Kopf; dazu wählt `app.sheet.stufe` (0…1, nur im Heft) Aufgaben von leicht nach schwer. Basis V1–V3: Ähnlichkeit deutlich → ähnlich → fein.
@@ -23,6 +25,7 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 - **Weitere Unstimmigkeiten behoben:** „Stimmt das?“-Sätze, die als falsch galten, aber stimmen („Mit dem Messer kann man Papier schneiden“, „Mit dem Handy kann man Fotos machen“, „Die Mütze ist nass“, „Die Pizza ist eckig“, „Die Kerze ist hell“); Kerze, Tasse, Glas „stehen unter dem Tisch“; Sachaufgaben mit unrealistischen Preisen (Helm und Schloss bis 390 €, Strom und Internet bis 390 €); drei neue Texte mit Klassen 7–9 nur noch für Haupt-/Berufsschulstufe. Test `tests/plaene_sinnvoll.py`.
 - **Menü „Material drucken“** statt „Arbeitsblätter“ (Wunsch Stefan, 26.11.2026), ebenso die Überschrift des Fensters.
 - **Fußzeile ohne Namen** (Backlog K, Wunsch Stefan): Arbeitsblätter, Legeblätter, Hilfeseiten, Heft und Lösungsheft tragen unten „Stufenweise · stufenweise.app · CC BY-SA 4.0“ statt „© Stefan Hackl“. Stefan bleibt im Impressum, in der Lizenz und auf GitHub als Urheber genannt.
+- Anleitungsbilder neu aufgenommen (neue Fußzeile, Menü „Material drucken“, Zifferntastatur mit 1 2 3 oben). Testhilfe `tests/simlib.py` setzt Ziffern per JS (Felder sind seit 0.35.1 bei offener Zifferntastatur schreibgeschützt).
 
 ## 0.37.0 – 25.11.2026
 
