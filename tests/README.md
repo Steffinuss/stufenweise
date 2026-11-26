@@ -11,15 +11,36 @@ Automatische Tests, die die App in einem echten Chrome-Browser bedienen (mit [Pl
 ## Alles auf einmal
 
 ```sh
-sh tests/run_all.sh        # schnelle Tests, etwa 10 Minuten
-sh tests/run_all.sh lang   # dazu alle Arbeitsblätter, simulierte Kinder, Zufallsklicks (etwa 25 Minuten)
+sh tests/run_all.sh                        # schnelle Tests (etwa 4 Minuten; nacheinander waren es 10½)
+sh tests/run_all.sh lang                   # dazu alle Arbeitsblätter, simulierte Kinder, Zufallsklicks (etwa 7 Minuten; nacheinander 19)
+sh tests/run_all.sh nur blatt_layout heft_gross   # nur diese Tests (Namen ohne „.py“; Zwanzigerfeld: zwanzigerfeld:1180x820)
+STUFENWEISE_JOBS=1 sh tests/run_all.sh lang    # nacheinander wie früher
 ```
 
-Das Skript startet selbst einen Webserver auf Port 8766. „ok“ heißt: keine JavaScript-Fehler und kein Absturz. Viele Tests geben zusätzlich Messwerte aus; die stehen in der Beschreibung unten.
+Die Tests laufen **gleichzeitig** (Standard: so viele wie Prozessorkerne, mindestens 2, höchstens 4; einstellbar mit `STUFENWEISE_JOBS`). Lange Tests starten zuerst. Das Skript startet selbst einen gemeinsamen Webserver auf Port 8766 (`STUFENWEISE_PORT`) und wartet, bis er antwortet; läuft dort schon einer, wird er benutzt. Jeder Test schreibt Bilder und PDFs in einen eigenen Ordner `tests/out/lauf/<Test>/` und seine Ausgabe nach `tests/out/lauf/<Test>.log`, so überschreibt kein Test die Dateien eines anderen. Während der Runde erscheint je fertigem Test eine Zeile mit der Dauer, am Ende die Liste in fester Reihenfolge: „ok“ heißt keine JavaScript-Fehler, kein Absturz und keine Zeile „ERR [...]“; bei „FEHLER“ stehen die letzten Zeilen der Ausgabe darunter. Viele Tests geben zusätzlich Messwerte aus; die stehen in der Logdatei.
 
-## Einzelne Tests
+## Gezielt testen
 
-Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. Dann zum Beispiel `python3 tests/legeblaetter.py`.
+Bei kleinen Änderungen reicht oft ein Teil der Tests (`sh tests/run_all.sh nur …`). Vor einer Freigabe immer `lang`.
+
+| Bereich der App | Tests |
+| --- | --- |
+| Start, Fehler allgemein | `fehler smoke einstellungen konzentrationsmodus handy` |
+| Üben Mathe (Plus/Minus, Zwanzigerfeld, Zehnerpartner, Material) | `plusminus_ueben feld_ueben antwortfeld springen zehnerpartner_ueben mathe_material runden ueberspringen hinweis_neu gefuehrt` |
+| Üben Deutsch (Lesen, Schreiben, Hören, Satz-Baukasten) | `deutsch_optimierung satz_ziehen tafel_rueckmeldung` |
+| Basis | `basis_grundlagen basis_ueben basis_test basis_blaetter` |
+| Test und Auswertung (Einstufung, Förderzone, Raten) | `test_fortschritt test_nie_haengen test_passt raten basis_test durchsicht_0_21` |
+| Unterricht an der Tafel | `zwanzigerfeld:1180x820 zwanzigerfeld:390x844 zwanzigerfeld_zahl frei_stift satz_ziehen tafel_rueckmeldung` |
+| Materialkiste | `materialkiste` |
+| Arbeitsblätter (Layout, Optionen, Lineatur, Schwarz-Weiß) | `blatt_layout blatt_auswahl arbeitsblatt_optionen grosse_aufgaben hundertertafel_blaetter lineatur druck_seiten legeblaetter tausenderbuch_nachspuren` (lang: `arbeitsblaetter`) |
+| Arbeitshefte, Heft-Assistent | `heft_assistent heft_gross heft_zone_optionen heft_scroll arbeitsheft lineatur plaene_sinnvoll` (lang: `heft_seiten_passen heft_seiten_gross`) |
+| Lernstand, Berichte, Wochenübersicht | `lernort_material wochenuebersicht drittes_fach` |
+| Daten: Speichern, Fenster, Sicherung, Umzug, Safari | `mehrere_fenster speicher_voll qr_umzug safari_tab update_hinweis` |
+| Alle Aufgabentypen, Robustheit | (lang) `sweep zufallsklicks kinder_sim` |
+
+## Einzelne Tests von Hand
+
+Zuerst den Server starten: `python3 -m http.server 8766 --bind 127.0.0.1` im Repository-Ordner. Dann zum Beispiel `python3 tests/legeblaetter.py`.
 
 | Test | Prüft |
 | --- | --- |
@@ -62,6 +83,26 @@ Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. D
 | `materialkiste.py` | Materialkiste: Ablauf, alle Werkzeuge, Zählen, Taschenrechner, Lernstand/ILEB |
 | `mehrere_fenster.py` | Zwei Fenster derselben App: nichts geht verloren, Löschen gilt weiter |
 | `wochenuebersicht.py`, `update_hinweis.py` | Wochenübersicht; Update-Hinweis nur auf der Startseite |
+| `blatt_layout.py` | Arbeitsblätter im Heft-Design (Backlog M): Kopf- und Fußzeile, Kästen bis zur Fußzeile, alle Blätter passen auf ihre Seiten, Schwarz-Weiß ohne bunte Farben, Legeblätter unverändert, Heft mit genau einem Rahmen |
+| `lineatur.py` | Lineatur (Backlog L): Haus, zwei Linien, eine Linie; Standard nach Themenwelt; Auswahl bei Blättern mit Schreibzeilen und im Heft; Deckblatt-Zwanzigerfeld zeilenweise |
+| `heft_gross.py` | „Große Aufgaben“ im Heft-Assistenten (Backlog N); Heft nimmt Grundeinstellungen statt der des letzten Einzelblatts |
+| `heft_scroll.py` | Heft-Assistent: „+“ und „−“ springen nicht nach oben (iPad und Handy) |
+| `heft_seiten_gross.py` | (lang) wie `heft_seiten_passen.py`, mit großen Aufgaben |
+| `heft_zone_optionen.py` | Heft zur Förderzone: Schwarz-Weiß, Hundertertafel als Extraseite |
+| `hundertertafel_blaetter.py` | Hundertertafel-Blätter H1–H6: Tafel im Titel, Extraseite auf Wunsch |
+| `druck_seiten.py` | Druck = Vorschau: jedes Blatt im Heft und als Arbeitsblatt genau eine A4-Seite |
+| `deutsch_optimierung.py` | Deutsch (Backlog I): eindeutige Bilder, „Kenne ich nicht“, Anhören, Silben, Hören P1–P4, Materialkiste und Unterricht Deutsch |
+| `satz_ziehen.py` | Sätze legen mit Ziehen (Satz-Baukasten, Schüttelsätze) |
+| `tafel_rueckmeldung.py` | Rückmeldungen aus dem Einsatz an der Tafel (vertauschte Satzteile, Zifferntastatur am Smartboard) |
+| `frei_stift.py` | Stift beim „Frei legen“ an der Tafel |
+| `zwanzigerfeld_zahl.py` | Unterricht → Zwanzigerfeld: Zahl vorgeben, Zufallszahl, verdecken |
+| `plusminus_ueben.py` | Üben Plus und Minus (Backlog A): Zufallsaufgabe, Darstellung nacheinander |
+| `mathe_material.py` | Test „mit Material“ (R1–R7), Üben bis „im Kopf“, Geld ziehen |
+| `konzentrationsmodus.py` | Konzentrationsmodus (Backlog H) und Usability-Review |
+| `qr_umzug.py` | Geräteumzug per QR-Code (große und kleine Codes, alte Formate) |
+| `raten.py` | Raten im Test (Backlog Q1): Auswahlstufen erst bei 3 von 3; Simulation eines ratenden Kindes |
+| `safari_tab.py` | Hinweis im Safari-Tab auf iPad/iPhone (Backlog P1) |
+| `speicher_voll.py` | Voller Speicher wird gemeldet (Backlog O1), Sicherung mit ungespeichertem Stand |
 | `shot.py BILD.png "js" "CLICK selektor" …` | Hilfsprogramm: Schritte ausführen und Bildschirmfoto speichern |
 
 ## Bilder für die Anleitung
