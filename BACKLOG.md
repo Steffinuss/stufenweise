@@ -232,7 +232,7 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 
 ## K: Name auf Arbeitsblättern durch Projektnamen ersetzen (Wunsch Stefan, 25.11.2026)
 
-**Status:** offen, nur dokumentiert.
+**Status:** gebaut in `entwicklung` (26.11.2026, Stefan: „mach das noch“), wartet mit Backlog J auf die Freigabe. Alle 6 Fußzeilen (`tafHelp`, Arbeitsblätter, Legeblätter, Heft-Deckblatt, `HEFT_LIC`) zeigen „Stufenweise · stufenweise.app · CC BY-SA 4.0“; Impressum, Lizenzseite, Kopfkommentar und `docs/anleitung.md` (Lizenzabschnitt) unverändert. Test in `tests/heft_assistent.py`.
 **Anlass:** Unten auf Arbeitsblättern, Legeblättern und Hilfeseiten steht „© Stefan Hackl“ (5 Stellen in `index.html`, Klasse `ab-lic`, z. B. `tafHelp`, Legeblätter; dazu seit Backlog J `HEFT_LIC` für Heftseiten und Deckblatt in `buildHeft`). Blätter anderer Lehrkräfte tragen so Stefans Namen; der Name gehört nicht in Hefte und zu Eltern.
 **Vorschlag:** Fußzeile „Stufenweise · stufenweise.app · CC BY-SA 4.0“. Das genügt der Namensnennung der Lizenz; Stefan bleibt als Urheber im Impressum, in `LICENSE`/`LIZENZ-INHALTE.md` und auf GitHub genannt. Impressum und Kopfkommentar in `index.html` unverändert lassen.
 **Größe:** klein. Prüfen: `arbeitsblaetter.py`, `legeblaetter.py` (Fußzeile darf keine Seite verlängern).

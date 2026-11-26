@@ -299,7 +299,7 @@ In den Einstellungen unter **Allgemein → Beim Start** kannst du festlegen, das
 
 Unter „Hundertertafel und Tausenderbuch“ gibt es Blätter zu allen sieben Stufen und drei Material-Blätter. Auf den Blättern zur Hundertertafel steht oben ein kleines Tafel-Bild mit „Hundertertafel“. Mit dem Häkchen „Ausgefüllte Hundertertafel als Extraseite zum Nachschauen“ kommt eine Seite mit der Tafel 1 bis 100 dazu. Die Material-Blätter sind eine ausgefüllte Hundertertafel, eine leere Tafel zum Eintragen und das Tausenderbuch: Unter „Seite“ wählst du eine bestimmte Seite (zum Beispiel 701–800) oder „ganzes Tausenderbuch“. Dann kommen alle 10 Seiten von 1–100 bis 901–1000 zum Ausdrucken und Binden; mit „Ins Arbeitsheft“ werden es 10 Heftseiten.
 
-Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0“, du darfst es also kopieren und weitergeben.
+Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufenweise · stufenweise.app · CC BY-SA 4.0“, du darfst es also kopieren und weitergeben.
 
 Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in Fünferreihen. Neu ist das Thema **Zahlen mit Material zeichnen**: Die Kinder zeichnen Zahlen in der Kurzschreibweise □ Hunderter, | Zehner, • Einer und lesen gezeichnete Zahlen ab. Wählst du eine Förderzone aus dem Rechnen, passt das Blatt genau dazu, zum Beispiel „Plus bis 20, mit Zehnerübergang“ für R3.
 

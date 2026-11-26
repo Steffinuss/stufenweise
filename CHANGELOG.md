@@ -11,6 +11,7 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 - **Deutsch-Stoff** (Schritt 4, Texte als Entwurf, Durchsicht Stefan offen): 42 neue Kurztexte (zusammen 79), 39 mittlere Texte (auf den schwereren Seiten von „Texte lesen und verstehen“), 14 neue längere Texte (zusammen 40), drei Fortsetzungsgeschichten mit je 6 Teilen (Praktikum im Supermarkt, Klassenausflug, Trainingswohnung) – im Deutsch-Heft je Teil eine Seite Text und eine Seite Aufgaben, wenn die Förderzone ab L6 bzw. W5 liegt. Neue Papier-Formate: Lesen und malen (L4, L6), Wörter im Text unterstreichen und Sätze ordnen (L7), Lückenwort (W3), Silben zusammensetzen (W4), Satz zum Bild und Satz abschreiben (W6), Anlaut ankreuzen (P4).
 - **Broschürendruck** (Schritt 5): „Drucken als“ A4 einseitig, A5-Heft aus A4-Bögen oder A4-Heft aus A3-Bögen; Seiten in Falt-Reihenfolge, leere Seiten bis zur durch 4 teilbaren Zahl, Hinweis zum beidseitigen Druck.
 - Behoben: Merkstellen-Blatt (W5) zeigte bei Puppe, Löffel u. ä. keine Lücke (pp, ff, rr fehlten).
+- **Fußzeile ohne Namen** (Backlog K, Wunsch Stefan): Arbeitsblätter, Legeblätter, Hilfeseiten, Heft und Lösungsheft tragen unten „Stufenweise · stufenweise.app · CC BY-SA 4.0“ statt „© Stefan Hackl“. Stefan bleibt im Impressum, in der Lizenz und auf GitHub als Urheber genannt.
 
 ## 0.37.0 – 25.11.2026
 

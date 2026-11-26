@@ -9741,7 +9741,7 @@ const W_SHEETS = {
 };
 /* Arbeitsblätter zur Hundertertafel und zum Tausenderbuch */
 /* Extraseite „Hundertertafel zum Nachschauen“ (Inhalt einer .page.hilfe; Arbeitsblatt und Heft zur Förderzone) */
-const tafHelp = () => `<div class="ab-top"><h1>Hundertertafel zum Nachschauen</h1></div>${hbP({}, 16.2)}<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
+const tafHelp = () => `<div class="ab-top"><h1>Hundertertafel zum Nachschauen</h1></div>${hbP({}, 16.2)}<p class="ab-foot ab-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p>`;
 /* kleines Tafel-Bild für den Hinweis „Hundertertafel“ auf den Blättern H1–H6 */
 const TAF_ICON = `<svg class="ab-op" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="1" fill="#fff" stroke="#222" stroke-width="1.6"/><path d="M6 2v20M10 2v20M14 2v20M18 2v20M2 6h20M2 10h20M2 14h20M2 18h20" stroke="#222" stroke-width=".7"/><rect x="2.8" y="2.8" width="3.2" height="3.2" fill="#346bc3"/></svg>`;
 const hbP = (bd, mm = 6.5) => `<div class="hbp" style="--hs:${mm}mm">${boardHtml(bd, {print:true})}</div>`;
@@ -10012,7 +10012,7 @@ function legeBuild(key, S){
 function legeSheet(key){
   const S = app.sheet; B_BW = LEGE[key].grp === 'B' && !!S.bw; const b = legeBuild(key, S), kid = S.pid && S.pid !== 'none' ? kids().find(p => p.id === S.pid) : null;
   const head = b.compact ? `<div class="ab-top lg-top cmp"><h1>${escHtml(b.title)}</h1><p class="lg-how">${b.how}</p></div>` : `<div class="ab-top lg-top"><h1>${escHtml(b.title)}</h1><div class="ab-meta"><div>Name: <span>${kid ? escHtml(kid.name) : ''}</span></div><div>Datum: <span></span></div></div></div><p class="lg-how">${b.how}</p>`;
-  const foot = `<div class="lg-foot"><span class="lg-cal"></span><span>Kontrolle: Dieser Strich ist genau 5 cm lang. Sonst beim Drucken „Tatsächliche Größe“ oder 100 % wählen (nicht „An Seite anpassen“).</span></div><p class="ab-foot ab-lic">Stufenweise · Legeblatt für echtes Material · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
+  const foot = `<div class="lg-foot"><span class="lg-cal"></span><span>Kontrolle: Dieser Strich ist genau 5 cm lang. Sonst beim Drucken „Tatsächliche Größe“ oder 100 % wählen (nicht „An Seite anpassen“).</span></div><p class="ab-foot ab-lic">Stufenweise · Legeblatt für echtes Material · stufenweise.app · CC BY-SA 4.0</p>`;
   const page = `<div class="page lg${b.quer ? ' quer' : ''}"><div class="q">${head}<div class="lg-body">${b.body}</div>${foot}</div></div>`;
   const sol = S.sol && b.sols.length ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(b.title)}</h1></div><ol>${b.sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
   app.sheetGen = null;
@@ -10393,7 +10393,7 @@ function buildSheet0(limit){
   const legend = `<div class="ab-legend">${def.taf ? `<span class="ab-taf">${TAF_ICON} Hundertertafel</span>` : ''}${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
   const info = ({L:L_INFO, W:W_INFO, U:U_INFO, G:G_INFO, H:H_INFO, ...SHEET_INFO})[sj]?.[key] || null;
-  const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>`;
+  const foot = (info ? `<p class="ab-foot">${escHtml(info.bp)}</p>` : '') + `<p class="ab-foot ab-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p>`;
   const sol = S.sol && !def.mat ? `<div class="page sol"><div class="ab-top"><h1>Lösungen: ${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div></div></div></div><ol>${sols.map(x => `<li>${escHtml(String(x))}</li>`).join('')}</ol></div>` : '';
   /* Hundertertafel zum Nachschauen als eigene Seite (Stefan, 23.11.; nur auf Wunsch) */
   const help = def.taf && S.taf ? `<div class="page hilfe">${tafHelp()}</div>` : '';
@@ -10458,7 +10458,7 @@ function buildHeft(){
   const pages = H.items.map((it, i) => `<div class="page ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + first}${it.ch !== undefined && chs[it.ch] ? ` · Kapitel ${it.ch + 1}` : ''} · `)}</div>`).join('');
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li><span>${escHtml(e.title)}</span><span class="cv-dots"></span><span>${e.i + first}</span></li>`).join('')}</ol></div>` : '';
   const fach = H.book && SUBJECTS[H.book.fach] && !(H.title || '').includes(SUBJECTS[H.book.fach].name) ? `<div class="cv-fach">${escHtml(SUBJECTS[H.book.fach].name)}</div>` : '';
-  const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1>${fach}<div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p></div>`;
+  const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1>${fach}<div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p></div>`;
   const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
   const all = cover + (tocOwn && toc ? `<div class="page tocp">${toc}</div>` : '') + pages, druck = HEFT_DRUCK[H.druck] ? H.druck : 'a4';
   const head = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}${css}`;
@@ -10501,7 +10501,7 @@ const HEFT_CSS = `.hf-band{display:flex;align-items:center;gap:3mm;font-size:11p
 .hf-story{font-size:15pt;line-height:1.75;margin:0 0 5mm}.hf-rf{border-collapse:collapse;width:100%;font-size:13pt;margin:1mm 0 3mm}.hf-rf td,.hf-rf th{border:1.2px solid #222;padding:2mm 3mm}.hf-rf th{font-size:11pt;background:#f1ece1}.hf-rf td:nth-child(n+2),.hf-rf th:nth-child(n+2){width:22mm;text-align:center;font-size:16pt}
 .abc-p{display:grid;grid-template-columns:repeat(6,1fr);gap:2.5mm}.abc-p div{border:1.4px solid #222;border-radius:2mm;padding:1.5mm;text-align:center;min-height:37mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between}.abc-p b{font-size:22pt;display:block;line-height:1.1}.abc-p b small{font-size:17pt;margin-left:1.5mm;font-weight:600}.abc-p svg{width:20mm;height:20mm}.abc-p .two svg{width:13mm;height:13mm}.abc-p .two span{display:flex;gap:1mm}
 .ein-p{border-collapse:collapse;margin:6mm auto;font-size:15pt}.ein-p td,.ein-p th{border:1.2px solid #222;width:15.5mm;height:13mm;text-align:center}.ein-p th{background:#f1ece1}.ein-p td.q{font-weight:700;background:#faf6ee}`;
-const HEFT_LIC = '<p class="ab-foot ab-lic">Stufenweise · © Stefan Hackl · frei nutzbar unter CC BY-SA 4.0</p>';
+const HEFT_LIC = '<p class="ab-foot ab-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p>';
 const kisSym = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#222" stroke-width="2"/>${k === 2 ? '<circle cx="12" cy="12" r="10" fill="#222"/>' : k === 1 ? '<path d="M12 2a10 10 0 0 1 0 20z" fill="#222"/>' : ''}</svg>`;
 const KIS_HTML = `<div class="hf-kis"><h2>Wie gut kannst du das? Kreuze an.</h2>${[[2, 'Das kann ich.'], [1, 'Das kann ich fast.'], [0, 'Das übe ich noch.']].map(([k, t]) => `<div class="hf-kis-row"><span class="kb"></span>${kisSym(k)}<span>${t}</span></div>`).join('')}</div>`;
 /* Hilfen hinten im Heft (Backlog J, Schritt 2) */

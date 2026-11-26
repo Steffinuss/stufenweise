@@ -115,6 +115,8 @@ async def main():
         check('„Das kann ich schon“ mit drei Stufen zum Ankreuzen', html.count('class="hf-kis"') == 3 and all(t in html for t in ['Das kann ich.', 'Das kann ich fast.', 'Das übe ich noch.']))
         loes = await pg.evaluate("buildLoesung().html")
         check('Lösungsheft mit Seitenzahlen', 'Seite 2 · Einstieg' in loes and loes.count('<section class="ls">') >= 30, str(loes.count('<section class="ls">')))
+        nm = await pg.evaluate("""() => { const keep = {...app.sheet}, out = []; for(const t of ['M:plus', 'H:H3', 'K:hundert', 'L:L7']){ Object.assign(app.sheet, {topic:t, n:6}); out.push(buildSheet().html.includes('Stefan Hackl')); } Object.assign(app.sheet, keep); return [out, tafHelp().includes('Stefan Hackl'), buildLoesung().html.includes('Stefan Hackl')]; }""")
+        check('Backlog K: kein Name in Heft, Blättern, Hilfen, Lösungsheft', 'Stefan Hackl' not in html and not any(nm[0]) and not nm[1] and not nm[2] and 'stufenweise.app · CC BY-SA 4.0' in html, str(nm))
         check('Lösungsheft-Knöpfe', await pg.locator('#hf-sol-print').count() == 1 and await pg.locator('#hf-sol-save').count() == 1)
         lst = await pg.evaluate("[...document.querySelectorAll('.hf-list li.hf-ch')].map(l => l.textContent)")
         check('Seitenliste mit Kapitelüberschriften', len(lst) == 3, str(lst))
