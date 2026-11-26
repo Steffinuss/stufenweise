@@ -412,6 +412,8 @@ iPadOS lädt eine solche App beim Öffnen oft nicht neu. Deshalb prüft Stufenwe
 
 Alle Namen und Ergebnisse liegen nur auf diesem Gerät, und zwar getrennt für jede Adresse und für die App auf dem Home-Bildschirm. Wer das Symbol vom Home-Bildschirm löscht oder in Safari die Websitedaten löscht, löscht auch die Ergebnisse. Deshalb: Einstellungen → „Daten sichern“ → **Sicherung speichern**. Die Datei landet in der Dateien-App und kann mit „Sicherung laden“ zurückgeholt oder auf ein anderes Gerät gebracht werden. Ist die letzte Sicherung 14 Tage oder länger her, erinnert der Lernstand mit einem Hinweis „Jetzt sichern“. Die App bittet das iPad außerdem, ihre Daten dauerhaft aufzubewahren.
 
+**Speicher voll:** Jede Adresse hat im Browser nur wenige Megabyte Platz. Wird er knapp, erscheint oben eine rote Leiste „Der Speicher ist voll. Neue Ergebnisse werden gerade nicht gespeichert.“ Dann sofort **Jetzt sichern** tippen: Die Sicherung enthält auch die Ergebnisse, die nicht mehr gespeichert werden konnten. Platz schafft man so: das gemerkte Arbeitsheft leeren (ein Heft mit 48 Seiten braucht viel Platz und lässt sich mit dem Heft-Assistenten jederzeit neu machen), Kinder, die nicht mehr üben, löschen, oder im Lernstand alte Daten löschen. Sobald wieder gespeichert wird, verschwindet die Leiste.
+
 ### Geräteumzug per QR-Code
 
 So kommen Kinder ohne Datei und ohne Internet auf ein anderes Gerät, zum Beispiel vom Lehrer-iPad auf ein Schüler-iPad:

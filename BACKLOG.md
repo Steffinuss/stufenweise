@@ -20,7 +20,7 @@ Stand: 26.11.2026 (0.38.0; O, P, Q aus der Prüfung vom 22.11. dokumentiert, war
 | 7 | ~~**H** Konzentrationsmodus für Kinder (+ Usability-Review)~~ | klein bis mittel | freigegeben in 0.33.0 (24.11.2026), siehe `CHANGELOG.md` |
 | 8 | ~~**I** Optimierung Deutsch (Bilder beim Schreiben, Anhören, Ausbau) + Hundertertafel verdeckt, Mathe mit Material~~ | groß | freigegeben in 0.34.0 (24.11.2026), siehe `CHANGELOG.md` |
 | 9 | ~~**J** Arbeitshefte, die aufeinander aufbauen + **K** Fußzeile ohne Namen~~ | groß | freigegeben in 0.38.0 (26.11.2026), siehe `CHANGELOG.md` |
-| 10 | **O** Voller Speicher melden, **P** Safari-Tab auf dem iPad, **Q** Raten im Test | klein bis mittel | Datensicherheit aus der Prüfung vom 22.11.; Stefan 26.11.: zuerst |
+| 10 | ~~**O1** Voller Speicher melden~~, **P1** Safari-Tab auf dem iPad, **Q1** Raten im Test | klein | Datensicherheit aus der Prüfung vom 22.11.; O1 freigegeben in 0.38.1, P1 und Q1 in der Testversion |
 | 11 | **N** Große Aufgaben im Heft-Assistenten | klein | Stefan 26.11.: nach der Datensicherheit |
 | 12 | **L** Lineatur, **M** Blätter im Heft-Design | klein bis mittel | danach |
 
@@ -290,7 +290,7 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 
 ## O: Voller Speicher wird nicht gemeldet (Prüfung vom 22.11.2026, Empfehlung „Speicher volllaufen lassen verhindern“)
 
-**Status:** dokumentiert 26.11.2026. **Entschieden (Stefan, 26.11.):** nur **O1 Melden**, als Fehlerbehebung direkt in `main` (0.38.1). O2, O3, O4 nicht (vorerst).
+**Status:** O1 erledigt, freigegeben in 0.38.1 (26.11.2026). **Entschieden (Stefan, 26.11.):** nur **O1 Melden**, als Fehlerbehebung direkt in `main`. O2, O3, O4 nicht (vorerst).
 **Ist-Stand (geprüft 26.11. im Code und in Chrome gemessen):**
 - Alles liegt in `localStorage` unter `stufenweise.data` (Kinder, Protokoll, Lernstand), dazu `stufenweise.settings`, `stufenweise.blatt` und `stufenweise.heft`.
 - `saveData()` hat außen `try { … } catch {}`. Schlägt `localStorage.setItem` fehl, passiert nichts Sichtbares. Die App arbeitet mit dem Stand im Arbeitsspeicher weiter. Nach dem nächsten Neustart fehlt alles seit dem letzten gelungenen Speichern. Gemessen: Speicher aufgefüllt, dann 2000 neue Protokolleinträge und ein umbenanntes Kind → gespeichert blieb der alte Stand (2 712 Zeichen statt 178 767), ohne Meldung. `saveSettings()` und `sheetSave()` schweigen genauso; nur `saveHeft()` meldet „Das Heft ist zu groß zum Merken“.

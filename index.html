@@ -874,6 +874,9 @@ svg{-webkit-touch-callout:none}
 a.icon-btn{text-decoration:none}a.icon-btn:not(.primary){background:#fff;color:var(--ink,#2b2930);border-radius:14px}a.icon-btn.disabled{opacity:.4}
 .help-ver{font-size:13px;color:#6b6672;margin-left:auto;margin-right:10px}
 .link-btn{background:none;border:0;padding:0;min-height:0;font:inherit;color:#346bc3;text-decoration:underline;cursor:pointer;box-shadow:none}
+.store-bar{position:fixed;top:10px;left:50%;transform:translateX(-50%);box-sizing:border-box;width:min(760px,calc(100vw - 20px));z-index:3100;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;background:#fdecea;color:#7a1d14;border:2px solid #b23a2e;border-radius:14px;padding:8px 10px 8px 16px;box-shadow:0 6px 24px #2b293033;max-width:calc(100vw - 20px);font-size:15px;font-weight:600}
+.store-bar span{flex:1 1 300px}
+@media print{.store-bar{display:none}}
 .upd-bar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;background:#fffdf8;border:2px solid #e8890c;border-radius:14px;padding:8px 10px 8px 16px;box-shadow:0 6px 24px #2b293033;max-width:calc(100vw - 20px);font-size:15px}
 .rail-guide{margin-top:auto;font-size:11px !important;opacity:.75;border:1.5px dashed #c9bfae !important;background:transparent !important}
 .rail-guide svg{width:18px;height:18px}
@@ -1314,7 +1317,7 @@ try { for(const [n, o] of [['stufenweise.settings', 'zahlenraum-werkstatt.v2'], 
 const settings = (() => { try { const st = JSON.parse(localStorage.getItem(STORE) || '{}'); if(!st.v3){ delete st.colors; st.v3 = true; } if(!st.v4){ delete st.speech; st.v4 = true; } if(!st.v5){ if(String(st.fbMail || '').includes('posteo.de')) st.fbMail = ''; st.v5 = true; } return {...DEFAULTS, ...st}; } catch { return {...DEFAULTS}; } })();
 settings.v3 = true; settings.v4 = true;
 if(!['0.7', '0.85', '1'].includes(String(settings.rate))) settings.rate = '0.85';
-const saveSettings = () => { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {} };
+const saveSettings = () => { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch(e){ storeHint(e); } };
 
 /* ---------- Icons ---------- */
 const PATHS = {
@@ -3672,8 +3675,28 @@ const saveData = opt => { try {
   if(cur != null && cur !== dataBase) adoptStore(cur);
   if(!data.profiles.length && !opt?.empty && cur){ let t = null; try { t = JSON.parse(cur); } catch {}
     if(t?.profiles?.length){ dataBase = null; adoptStore(cur); dataBase = cur; console.warn('Stufenweise: Stand ohne Kinder nicht gespeichert, gespeicherter Stand übernommen.'); return; } }
-  const s = JSON.stringify(data); localStorage.setItem(DATA_KEY, s); dataBase = s;
+  const s = JSON.stringify(data);
+  try { localStorage.setItem(DATA_KEY, s); } catch(e){ storeFail(e); return; }
+  dataBase = s; storeOk();
 } catch {} };
+/* Voller Speicher (Backlog O1, Stefan 26.11.2026): Schlägt das Schreiben fehl, arbeitet die App mit dem Stand im Arbeitsspeicher
+   weiter. Bisher geschah das still, nach einem Neustart fehlte dann alles Neue. Jetzt erscheint oben eine Leiste für die Lehrkraft.
+   „Jetzt sichern“ speichert den Stand aus dem Arbeitsspeicher, also auch das noch nicht Gespeicherte. Die Leiste verschwindet,
+   sobald das Speichern wieder klappt. */
+/* var und function: saveSettings() kann schon weiter oben laufen */
+function isQuota(e){ return !!e && (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.code === 22 || e.code === 1014); }
+var storeErr = null, storeHintShown = false;
+function storeBarSync(){
+  if(!document.body){ addEventListener('DOMContentLoaded', storeBarSync, {once:true}); return; }
+  const bar = document.querySelector('.store-bar');
+  if(!storeErr) return bar?.remove();
+  if(bar) return;
+  document.body.insertAdjacentHTML('beforeend', `<div class="store-bar" role="alert"><span>${storeErr === 'voll' ? 'Der Speicher ist voll. Neue Ergebnisse werden gerade nicht gespeichert. Bitte jetzt sichern.' : 'Der Browser speichert gerade nicht. Neue Ergebnisse gehen beim Schließen verloren. Bitte jetzt sichern.'}</span><button type="button" class="icon-btn primary" data-backup-now>Jetzt sichern</button></div>`);
+}
+function storeFail(e){ const k = isQuota(e) ? 'voll' : 'fehler'; if(storeErr !== k){ storeErr = k; console.warn('Stufenweise: Speichern fehlgeschlagen', e); document.querySelector('.store-bar')?.remove(); } storeBarSync(); }
+function storeOk(){ if(storeErr){ storeErr = null; storeBarSync(); } }
+/* Einstellungen und Blatt-Einstellungen: nur ein kurzer Hinweis, einmal je Sitzung */
+function storeHint(e){ if(storeHintShown) return; storeHintShown = true; try { toast(isQuota(e) ? 'Die Einstellung konnte nicht gespeichert werden: Der Speicher ist voll.' : 'Die Einstellung konnte nicht gespeichert werden.'); } catch {} }
 /* Ein anderes Fenster hat gespeichert: Stand übernehmen. Auf der Startseite gleich neu zeichnen, beim Üben ruhig weiter
    (die Anzeige folgt beim nächsten Wechsel). Die Testversion speichert mit Vorsatz „test:“ und reagiert nur darauf. */
 addEventListener('storage', e => { try {
@@ -10168,7 +10191,7 @@ app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:tr
 const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'taf', 'recent'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
-function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch {} }
+function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch(e){ storeHint(e); } }
 const AB_GROSS = 1.35; /* „Große Aufgaben“: alles in der Aufgabe so viel größer */
 function buildSheet(limit){
   const S0 = app.sheet;
@@ -11455,7 +11478,7 @@ document.addEventListener('change', e => { const c = e.target.closest('[data-sub
 document.addEventListener('change', e => { const s = e.target.closest('[data-guide-pid]'); if(!s) return; const p = data.profiles.find(x => x.id === s.dataset.guidePid); if(p){ p.guide = s.value || undefined; saveData(); render(); } });
 
 /* ---------- Rückmeldung (Testphase): Art, Schwere, Text + automatischer Kontext → E-Mail ---------- */
-const APP_VERSION = '0.38.0 · 26.11.2026';
+const APP_VERSION = '0.38.1 · 26.11.2026';
 /* Danke-Seite: Namen nur mit Einverständnis eintragen, z. B. 'Vorname Nachname (Schule)' */
 const THANKS = [];
 const FB_REPO = 'https://github.com/Steffinuss/stufenweise';

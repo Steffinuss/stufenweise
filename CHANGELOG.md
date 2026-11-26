@@ -5,6 +5,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+## 0.38.1 – 26.11.2026
+
+- **Voller Speicher wird gemeldet** (Backlog O1, aus der Prüfung vom 22.11.2026; Stefan 26.11.2026): Bisher fing `saveData()` einen Fehler beim Schreiben still ab. Die App arbeitete mit dem Stand im Arbeitsspeicher weiter, und nach einem Neustart fehlte alles Neue. Jetzt erscheint oben eine rote Leiste für die Lehrkraft: „Der Speicher ist voll. Neue Ergebnisse werden gerade nicht gespeichert. Bitte jetzt sichern.“ mit Knopf „Jetzt sichern“. Die Sicherung enthält den Stand aus dem Arbeitsspeicher, also auch das noch nicht Gespeicherte. Die Leiste verschwindet, sobald wieder gespeichert wird. Speichert der Browser aus einem anderen Grund nicht, steht dort „Der Browser speichert gerade nicht …“. Einstellungen und Blatt-Einstellungen melden einen Fehler einmal je Sitzung kurz. Anleitung: wie man Platz schafft (gemerktes Arbeitsheft leeren, Kinder löschen, alte Daten löschen). Test `tests/speicher_voll.py`.
+
 ## 0.38.0 – 26.11.2026
 
 - **Heft-Assistent** (Backlog J, Schritt 1; Wunsch Stefan, 25.11.2026): Das „Heft zur Förderzone“ wird zum Heft-Assistenten. Wählbar sind Fach (Mathe, Deutsch, Basis oder gemischt), Umfang (12, 24, 36 oder 48 Seiten, 24 vorausgewählt; Deckblatt und Inhalt zählen mit, das gedruckte Heft hat genau so viele Seiten) und wie weit das Heft vorgreift (nur Förderzone, je eine Stufe weiter, bis das Heft voll ist – Standard). Jede Stufe ist ein Kapitel, zuerst die Förderzone mit den meisten Seiten, dann die nächsten noch nicht erreichten Stufen in Lernreihenfolge (`heftRow`). Jede Seite hat neue Aufgaben. Kapitel lassen sich abwählen, kürzer oder länger machen. Deckblatt mit Fach, Inhalt mit Kapiteln und Seitenzahl, unten „Seite n · Kapitel k“ (Seiten wie gedruckt gezählt). Bisher „Blätter je Stufe 1/2“ entfällt. Funktionen `heftPlan`, `heftMake`, `heftPages`, `heftAssistHtml`; Test `tests/heft_assistent.py`.
