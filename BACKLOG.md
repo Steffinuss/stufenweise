@@ -397,7 +397,7 @@ Nebenbei gefunden (26.11., Testlauf): Im Lese-Test L8 „Stundenplan“ steht im
 
 ## T: Basis-Arbeitsblätter didaktisch überarbeiten (Stefan, 26.11.2026)
 
-**Status:** dokumentiert. Stefan: „Bei den Basis-Arbeitsblättern scheint mir didaktisch noch am meisten der Wurm drin zu sein … Vielleicht müssen wir uns extra nochmal darum kümmern.“
+**Status:** Konzept mit Bildern und 7 Fragen steht (27.11.2026, Claude-Doc „Konzept: Basis-Arbeitsblätter überarbeiten (Backlog T)“, https://claude.ai/artifact/MUbTKabSxyXh9fofA3No2U); wartet auf Stefans Antworten, gebaut wird erst nach OK. Kern: eine Aufgabenart je Blatt (Auswahl „Aufgabe“), eine Bildreihe je Kasten, Beispiel ganz vorgemacht, nichts zum Lesen ankreuzen; neuer Aufbau für V2, V4, V5, V6. Stefan: „Bei den Basis-Arbeitsblättern scheint mir didaktisch noch am meisten der Wurm drin zu sein … Vielleicht müssen wir uns extra nochmal darum kümmern.“
 Rückmeldungen:
 - **T1 V2 Was passt nicht?** Lieber nur eine Bildreihe je eingerahmter Aufgabe (heute zwei Reihen in einem Kasten).
 - **T2 V4 Eins zu eins zuordnen:** Das Beispiel verbindet quer (erster Teller mit dritter Gabel); der Sinn fehlt. Gabeln stehen schon unter den Tellern.
