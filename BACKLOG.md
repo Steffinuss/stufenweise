@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 26.11.2026 (0.38.0; O, P, Q aus der Prüfung vom 22.11. dokumentiert, warten auf Stefans Entscheidung)
+Stand: 26.11.2026 (0.39.0; als Nächstes L und M)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -20,8 +20,8 @@ Stand: 26.11.2026 (0.38.0; O, P, Q aus der Prüfung vom 22.11. dokumentiert, war
 | 7 | ~~**H** Konzentrationsmodus für Kinder (+ Usability-Review)~~ | klein bis mittel | freigegeben in 0.33.0 (24.11.2026), siehe `CHANGELOG.md` |
 | 8 | ~~**I** Optimierung Deutsch (Bilder beim Schreiben, Anhören, Ausbau) + Hundertertafel verdeckt, Mathe mit Material~~ | groß | freigegeben in 0.34.0 (24.11.2026), siehe `CHANGELOG.md` |
 | 9 | ~~**J** Arbeitshefte, die aufeinander aufbauen + **K** Fußzeile ohne Namen~~ | groß | freigegeben in 0.38.0 (26.11.2026), siehe `CHANGELOG.md` |
-| 10 | ~~**O1** Voller Speicher melden~~, **P1** Safari-Tab auf dem iPad, **Q1** Raten im Test | klein | Datensicherheit aus der Prüfung vom 22.11.; O1 freigegeben in 0.38.1, P1 und Q1 gebaut, in der Testversion |
-| 11 | **N** Große Aufgaben im Heft-Assistenten | klein | gebaut, in der Testversion (26.11.) |
+| 10 | ~~**O1** Voller Speicher melden, **P1** Safari-Tab auf dem iPad, **Q1** Raten im Test~~ | klein | Datensicherheit aus der Prüfung vom 22.11.; O1 freigegeben in 0.38.1, P1 und Q1 in 0.39.0 |
+| 11 | ~~**N** Große Aufgaben im Heft-Assistenten~~ | klein | freigegeben in 0.39.0 (26.11.2026) |
 | 12 | **L** Lineatur, **M** Blätter im Heft-Design | klein bis mittel | danach |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
@@ -274,7 +274,7 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 
 ## N: „Große Aufgaben“ auch im Heft-Assistenten (Wunsch Stefan, 26.11.2026)
 
-**Status:** gebaut in `entwicklung`, in der Testversion (26.11.2026), wartet auf Stefans Freigabe. **Entschieden (Stefan, 26.11.):** Häkchen anfangs aus; das Heft nimmt feste Grundeinstellungen statt der Einstellungen des letzten Einzelblatts; passt groß nicht, wird nur diese Seite normal groß.
+**Status:** erledigt, freigegeben in 0.39.0 (26.11.2026). **Entschieden (Stefan, 26.11.):** Häkchen anfangs aus; das Heft nimmt feste Grundeinstellungen statt der Einstellungen des letzten Einzelblatts; passt groß nicht, wird nur diese Seite normal groß.
 **Wunsch (Stefan):** „‚Große Aufgaben (mehr Platz zum Schreiben und Streichen)‘ auch bei Arbeitsheften anbieten als Option.“
 **Ist-Stand:** Bei einzelnen Arbeitsblättern gibt es das Häkchen (`app.sheet.gross`, Zoom 1,35). Im Heft bekommen nur die Einstiegsseiten große Aufgaben, und nur wenn die Seite damit zu drei Vierteln voll wird (`fixed()`). Übungsseiten übernehmen sonst zufällig die Einstellung des letzten Einzelblatts (siehe Übergabe, offene Punkte).
 **Idee:**
@@ -309,7 +309,7 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 
 ## P: Safari-Tab auf dem iPad löscht Daten nach 7 Tagen (Prüfung vom 22.11.2026, Empfehlung „iPad nur als App vom Home-Bildschirm nutzen“)
 
-**Status:** P1 gebaut in `entwicklung`, in der Testversion (26.11.2026), wartet auf Stefans Freigabe. **Entschieden (Stefan, 26.11.):** nur **P1 Hinweis im Safari-Tab**, über `entwicklung`/Testversion (auf dem iPad im Safari-Tab ansehen). P2 und P3 nicht (vorerst).
+**Status:** P1 erledigt, freigegeben in 0.39.0 (26.11.2026). **Entschieden (Stefan, 26.11.):** nur **P1 Hinweis im Safari-Tab**, über `entwicklung`/Testversion (auf dem iPad im Safari-Tab ansehen). P2 und P3 nicht (vorerst).
 **Ist-Stand (geprüft 26.11.):**
 - Safari löscht allen Speicher, den eine Website per Skript schreibt (auch `localStorage`), wenn die Website an 7 Tagen, an denen Safari benutzt wird, nicht angetippt wurde (Tracking-Schutz ITP, WebKit 2020). Apps vom Home-Bildschirm sind davon ausgenommen (WebKit, „Home Screen Web Application Domain Exempt From ITP“). Laut WebKit-Entwickler*innen (2024) gilt die Regel für alle Speicherarten. `navigator.storage.persist()` schützt vor dem Aufräumen bei Platzmangel, nach heutigem Wissen aber nicht vor dieser 7-Tage-Regel.
 - Die App ruft `navigator.storage.persist()` beim Start schon auf (still, ohne Ergebnis anzuzeigen).
@@ -329,7 +329,7 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 
 ## Q: Raten bei Auswahlaufgaben im Test (Prüfung vom 22.11.2026, Empfehlung „Raten im Test begrenzen“)
 
-**Status:** Q1 gebaut in `entwicklung`, in der Testversion (26.11.2026), wartet auf Stefans Freigabe. **Entschieden (Stefan, 26.11.):** nur **Q1** (3 von 3 bei Stufen, die nur aus Auswahlaufgaben bestehen), über `entwicklung`/Testversion. Q2, Q3, Q4 nicht; Basis-Test bleibt bei 2 von 2 oder 2 von 3 je Block.
+**Status:** Q1 erledigt, freigegeben in 0.39.0 (26.11.2026). **Entschieden (Stefan, 26.11.):** nur **Q1** (3 von 3 bei Stufen, die nur aus Auswahlaufgaben bestehen), über `entwicklung`/Testversion. Q2, Q3, Q4 nicht; Basis-Test bleibt bei 2 von 2 oder 2 von 3 je Block.
 **Ist-Stand (geprüft 26.11.; Simulation mit einem Kind, das nur rät, je 600–3 000 Durchläufe):**
 - `cellDecision`: erreicht bei 2 von 2 oder 2 von 3, aber nicht, wenn die Kernaufgabe (die erste Aufgabe, `kern:true`) falsch ist. Wegen dieser Regel liegt der Wert je Stufe bei 3 Bildern bei etwa **19 %** und nicht bei 26 %. Bei 2 Antworten (z. B. „Stimmt das?“ in L6) sind es etwa 26 %.
 - Betroffen sind fast alle Stufen in **Lesen L1–L9**, **Hören P1–P4**, **Uhr U1–U6** und **Größen G1–G4** (3 Antworten, je Stufe 11–26 % „erreicht“, 32–50 % mindestens „teilweise“). Zahlen, Rechnen, Stellenwert und Schreiben fast nicht (Zahlen eintippen).
