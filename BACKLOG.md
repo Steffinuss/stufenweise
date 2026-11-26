@@ -226,7 +226,7 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 
 **Stefans Antworten (25.11.2026, im Dokument):** alle 9 „wie vorgeschlagen“, also: 24 Seiten vorausgewählt, 48 wählbar; Vorgriff „bis das Heft voll ist“, Förderzone mit den meisten Seiten; gemischtes Heft als dritte Wahl; „Das kann ich schon“ mit drei Stufen in Worten und einfachem Zeichen; Lösungen als eigenes Heft; Fortsetzungsgeschichte (Praktikum, Klassenausflug, Wohnen); Folgeheft später; anfangen mit Schritt 1 (Heft-Assistent). Zu Frage 7 (Druck) zusätzlich: **auch A4-Broschüre aus A3-Blättern** (also A4-Seiten, zwei je A3-Bogen, in der Mitte geheftet) neben A5-Broschüre und A4 einseitig.
 
-**Stand 25.11.2026 nachts:** Schritte 1–5 in `entwicklung` gebaut (Stefan: erst alle Schritte, dann freigeben), siehe `IN_PROGRESS.md`. Neue Texte als Entwurf; Durchsicht durch Stefan auf der Seite „Neue Texte zum Durchsehen“ (claude.ai/artifact/VWhQbsUtqM9JendPLR8JKs). Später: Folgeheft vorschlagen (Frage 8).
+**Stand 25.11.2026 nachts:** Schritte 1–5 in `entwicklung` gebaut (Stefan: erst alle Schritte, dann freigeben), siehe `IN_PROGRESS.md`. Neue Texte von Stefan freigegeben (26.11.: „Die Texte sind gut. Bei den Fragen folge ich deinen Vorschlägen.“): Geschichte nur, wenn die Förderzone ab L6 bzw. W5 liegt; neue Kurz- und Langtexte auch beim Üben in der App (ist so gebaut); Themen und Namen bleiben. Prüfseite: claude.ai/artifact/VWhQbsUtqM9JendPLR8JKs. Später: Folgeheft vorschlagen (Frage 8).
 
 ---
 

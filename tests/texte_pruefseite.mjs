@@ -38,7 +38,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px
 @media(max-width:600px){.k{grid-template-columns:1fr}.k .nr{grid-row:auto}}
 </style></head><body><main>
 <h1>Neue Texte für die Arbeitshefte</h1>
-<p class="lead"><b>Für Backlog J, Schritt 4.</b> ${nStory} Teile Fortsetzungsgeschichte, ${TEXTS_NEU.length} neue Kurztexte, ${TEXTS_MID.length} mittlere Texte und ${LONG_NEU.length} neue längere Texte, jeweils mit Fragen. Die richtige Antwort ist grün mit ✓ markiert. Alles steht schon als Entwurf in der Testversion. In die richtige App kommt es erst nach deinem OK.</p>
+<p class="lead"><b>Für Backlog J, Schritt 4.</b> ${nStory} Teile Fortsetzungsgeschichte, ${TEXTS_NEU.length} neue Kurztexte, ${TEXTS_MID.length} mittlere Texte und ${LONG_NEU.length} neue längere Texte, jeweils mit Fragen. Die richtige Antwort ist grün mit ✓ markiert. Von Stefan durchgesehen und freigegeben am 26.11.2026.</p>
 <p>So kannst du antworten: Kommentare direkt hier auf der Seite, oder im Chat zum Beispiel „K12: Satz 2 ändern in …“. Ein „Passt“ genügt auch.</p>
 <nav class="nav"><a href="#geschichten">Geschichten</a><a href="#kurz">Kurztexte</a><a href="#mittel">Mittlere Texte</a><a href="#lang">Längere Texte</a><a href="#fragen">Fragen an dich</a></nav>
 <h2 id="geschichten">Fortsetzungsgeschichten</h2><p>Im Deutsch-Heft (und im gemischten Heft) kommt etwa alle 6–8 Seiten ein Teil: eine Seite Text, eine Seite Aufgaben (Fragen, richtig/falsch, ein Satz schreiben). Bei 24 Seiten sind es 3 Teile, bei 48 Seiten alle 6. Die Lehrkraft wählt die Geschichte im Heft-Assistenten.</p>${stories}
@@ -47,11 +47,11 @@ table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px
 <h2 id="lang">Längere Texte</h2><p>Für „Längere Texte verstehen“ (L9), zusätzlich zu den 26 vorhandenen. Hinter jeder Frage steht die Frageart (Information finden, Warum, Schlussfolgern, Thema) und der Absatz.</p>${lang}
 <h2 id="fragen">Fragen an dich</h2>
 <table><tr><th>#</th><th>Frage</th><th>Mein Vorschlag</th><th>Deine Antwort</th></tr>
-<tr><td>1</td><td>Ab welcher Stufe soll die Fortsetzungsgeschichte ins Heft?</td><td>nur wenn die Förderzone bei Lesen L6 (Sätze verstehen) oder höher bzw. Schreiben W5/W6 liegt; darunter keine Geschichte</td><td class="ans"></td></tr>
-<tr><td>2</td><td>Sollen die neuen Texte auch beim Üben in der App vorkommen (nicht nur im Heft)?</td><td>ja, Kurztexte und längere Texte auch in der App</td><td class="ans"></td></tr>
-<tr><td>3</td><td>Passen Themen und Namen zu deiner Lerngruppe? Gibt es Themen, die fehlen oder nicht passen?</td><td>–</td><td class="ans"></td></tr>
+<tr><td>1</td><td>Ab welcher Stufe soll die Fortsetzungsgeschichte ins Heft?</td><td>nur wenn die Förderzone bei Lesen L6 (Sätze verstehen) oder höher bzw. Schreiben W5/W6 liegt; darunter keine Geschichte</td><td class="ans">wie vorgeschlagen</td></tr>
+<tr><td>2</td><td>Sollen die neuen Texte auch beim Üben in der App vorkommen (nicht nur im Heft)?</td><td>ja, Kurztexte und längere Texte auch in der App</td><td class="ans">wie vorgeschlagen</td></tr>
+<tr><td>3</td><td>Passen Themen und Namen zu deiner Lerngruppe? Gibt es Themen, die fehlen oder nicht passen?</td><td>–</td><td class="ans">Die Texte sind gut.</td></tr>
 </table>
-<p><small>Stufenweise · Entwurf vom 25.11.2026</small></p>
+<p><small>Stufenweise · Entwurf vom 25.11.2026, freigegeben von Stefan am 26.11.2026</small></p>
 </main></body></html>`;
 fs.writeFileSync(process.argv[2] || 'texte_pruefseite.html', html);
 console.log(html.length, TEXTS_NEU.length, TEXTS_MID.length, LONG_NEU.length, nStory);

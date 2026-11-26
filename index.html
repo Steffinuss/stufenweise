@@ -5036,7 +5036,7 @@ const TEXTS = [
   {w:["HS", "BSS"], text:"In der Werkstatt trägt Anna immer eine Schutzbrille. Beim Sägen trägt sie auch Handschuhe. Nach der Arbeit fegt sie den Boden mit dem Besen.", qs:[["Was trägt Anna immer?", ["eine Schutzbrille", "eine Mütze", "einen Helm"]], ["Was trägt Anna beim Sägen?", ["Handschuhe", "eine Schürze", "Stiefel"]], ["Womit fegt Anna den Boden?", ["mit dem Besen", "mit dem Lappen", "mit dem Staubsauger"]]]},
   {text:"Am Samstag ist Markt. Herr Kaya verkauft Obst und Gemüse. Ein Kilo Äpfel kostet 2 Euro. Frau Neumann kauft Äpfel und einen Salat.", qs:[["Wann ist Markt?", ["am Samstag", "am Montag", "jeden Tag"]], ["Was verkauft Herr Kaya?", ["Obst und Gemüse", "Brot und Kuchen", "Blumen"]], ["Was kauft Frau Neumann?", ["Äpfel und einen Salat", "nur Tomaten", "Bananen"]]]},
 ];
-/* Neue Kurztexte (Backlog J, Schritt 4; Entwurf 25.11.2026, wartet auf Stefans Durchsicht). Format wie TEXTS: richtige Antwort zuerst. */
+/* Neue Kurztexte (Backlog J, Schritt 4; von Stefan durchgesehen und freigegeben am 26.11.2026). Format wie TEXTS: richtige Antwort zuerst. */
 const TEXTS_NEU = [
   {text:'Nina kocht heute Nudeln. Sie stellt einen Topf mit Wasser auf den Herd. Nach zehn Minuten sind die Nudeln fertig.', qs:[['Was kocht Nina?', ['Nudeln', 'Reis', 'Suppe']], ['Was stellt Nina auf den Herd?', ['einen Topf mit Wasser', 'eine Pfanne', 'einen Teller']], ['Wann sind die Nudeln fertig?', ['nach zehn Minuten', 'nach einer Stunde', 'sofort']]]},
   {text:'Jonas geht zum Arzt. Er hat Halsschmerzen. Der Arzt gibt ihm Tabletten. Jonas bleibt zwei Tage zu Hause.', qs:[['Warum geht Jonas zum Arzt?', ['Er hat Halsschmerzen.', 'Er hat Bauchweh.', 'Er hat sich das Bein gebrochen.']], ['Was gibt der Arzt Jonas?', ['Tabletten', 'ein Pflaster', 'eine Brille']], ['Wie lange bleibt Jonas zu Hause?', ['zwei Tage', 'eine Woche', 'einen Tag']]]},
@@ -5082,7 +5082,7 @@ const TEXTS_NEU = [
   {text:'Jonas und Paul gehen angeln. Sie sitzen am Fluss und warten lange. Nach zwei Stunden fängt Paul einen kleinen Fisch. Sie lassen ihn wieder schwimmen.', qs:[['Wo sitzen Jonas und Paul?', ['am Fluss', 'am Meer', 'im Boot']], ['Wer fängt einen Fisch?', ['Paul', 'Jonas', 'keiner']], ['Was machen sie mit dem Fisch?', ['Sie lassen ihn schwimmen.', 'Sie essen ihn.', 'Sie verkaufen ihn.']]]}
 ];
 TEXTS.push(...TEXTS_NEU);
-/* Neue mittlere Texte, 5–8 Sätze (Backlog J, Schritt 4; Entwurf 25.11.2026). Format: {t, text, qs} wie TEXTS, richtige Antwort zuerst. */
+/* Neue mittlere Texte, 5–8 Sätze (Backlog J, Schritt 4; von Stefan freigegeben 26.11.2026). Format: {t, text, qs} wie TEXTS, richtige Antwort zuerst. */
 const TEXTS_MID = [
   {t:'Der Einkaufszettel', text:'Lea soll für das Wochenende einkaufen. Auf ihrem Zettel stehen Brot, Milch, Käse und Äpfel. Im Supermarkt findet sie alles schnell. Nur die Äpfel sind ausverkauft. Deshalb kauft sie Birnen. An der Kasse bezahlt sie 12 Euro. Zu Hause räumt sie alles in den Kühlschrank.', qs:[['Was ist im Supermarkt ausverkauft?', ['die Äpfel', 'die Milch', 'das Brot']], ['Was kauft Lea stattdessen?', ['Birnen', 'Bananen', 'Orangen']], ['Wie viel bezahlt Lea?', ['12 Euro', '20 Euro', '2 Euro']], ['Wohin räumt Lea die Sachen?', ['in den Kühlschrank', 'in den Schrank', 'in den Keller']]]},
   {w:['HS','BSS'], t:'Mein Wochenplan', text:'Am Montag habe ich Sport. Am Dienstag gehe ich in die Werkstatt. Am Mittwoch kocht unsere Klasse zusammen. Am Donnerstag haben wir Schwimmen. Am Freitag ist Klassenrat. Danach beginnt das Wochenende. Am liebsten mag ich den Mittwoch.', qs:[['Was ist am Dienstag?', ['Werkstatt', 'Sport', 'Schwimmen']], ['Wann kocht die Klasse?', ['am Mittwoch', 'am Montag', 'am Freitag']], ['Was ist am Freitag?', ['Klassenrat', 'Schwimmen', 'Kochen']], ['Welchen Tag mag ich am liebsten?', ['den Mittwoch', 'den Montag', 'den Freitag']]]},
@@ -5347,7 +5347,7 @@ const LONG = [
   {w:["BSS"], g:"Erzählung", t:"Die erste eigene Wohnung", p:["Marco ist 20 Jahre alt. Bald zieht er in seine erste eigene Wohnung. Sie hat ein Zimmer, eine kleine Küche und ein Bad. Die Miete kostet 380 Euro im Monat.", "Vor dem Umzug schreibt Marco eine Liste. Er braucht ein Bett, einen Tisch, zwei Stühle und Geschirr. Den Tisch schenkt ihm seine Tante. Das Bett kauft er gebraucht für 60 Euro.", "Am Samstag helfen ihm zwei Freunde beim Tragen. Am Abend sitzen alle zusammen auf dem Boden und essen Pizza. Marco sagt: „Morgen kaufe ich noch Vorhänge.“"],
    q:[["info", 1, "Wie viele Zimmer hat die Wohnung?", "ein Zimmer", "zwei Zimmer", "drei Zimmer"], ["info", 1, "Wie viel kostet die Miete?", "380 Euro im Monat", "60 Euro im Monat", "380 Euro im Jahr"], ["info", 2, "Woher hat Marco den Tisch?", "von seiner Tante", "aus dem Möbelhaus", "von seinen Freunden"], ["schluss", 3, "Warum sitzen am Abend alle auf dem Boden?", "Es sind mehr Leute da als Stühle.", "Der Boden ist warm.", "Sie spielen ein Spiel."], ["thema", 0, "Worum geht es in dem Text?", "um Marcos Umzug in seine erste Wohnung", "um einen Pizza-Lieferdienst", "um Marcos Tante"]]},
 ];
-/* Neue längere Texte (L9) im Format von LONG (Backlog J, Schritt 4; Entwurf 25.11.2026).
+/* Neue längere Texte (L9) im Format von LONG (Backlog J, Schritt 4; von Stefan freigegeben 26.11.2026).
    q: [Art, Absatz (0 = ganzer Text), Frage, richtige Antwort, falsch, falsch] */
 const LONG_NEU = [
   {w:['HS','BSS'], g:'Sachtext', t:'Die Feuerwehr', p:['Die Feuerwehr hilft, wenn es brennt. Sie hilft aber auch bei Unfällen, bei Hochwasser oder wenn eine Katze nicht mehr vom Baum kommt. Die Notrufnummer der Feuerwehr ist 112. Diese Nummer kann man immer anrufen, auch ohne Guthaben auf dem Handy.', 'In vielen Dörfern arbeiten die Feuerwehrleute freiwillig. Sie haben einen anderen Beruf und kommen, wenn ihr Melder piept. In großen Städten gibt es eine Berufsfeuerwehr. Dort warten die Feuerwehrleute Tag und Nacht in der Feuerwache.', 'Wer bei der Feuerwehr mitmachen will, kann schon mit zehn Jahren zur Jugendfeuerwehr gehen. Dort lernt man, wie man Schläuche verlegt und Knoten macht.'],
@@ -5380,7 +5380,7 @@ const LONG_NEU = [
    q:[['info', 1, 'Wann gehen Igel auf Futtersuche?', 'in der Dämmerung', 'am Mittag', 'am frühen Morgen'], ['info', 1, 'Was fressen Igel?', 'Käfer, Würmer und Schnecken', 'Äpfel und Nüsse', 'Gras'], ['warum', 2, 'Warum fressen Igel im Herbst so viel?', 'Sie brauchen ein Fettpolster für den Winterschlaf.', 'Im Herbst gibt es keine Schnecken.', 'Sie wollen schneller laufen.'], ['schluss', 3, 'Wie kann man Igeln helfen?', 'einen Laubhaufen im Garten lassen', 'ihnen Milch geben', 'sie ins Haus holen'], ['warum', 3, 'Warum darf man Igeln keine Milch geben?', 'Sie bekommen davon Bauchschmerzen.', 'Sie mögen keine Milch.', 'Milch ist zu teuer.']]}
 ];
 LONG.push(...LONG_NEU);
-/* Fortsetzungsgeschichten fürs Deutsch-Heft (Backlog J, Schritt 4; Entwurf 25.11.2026).
+/* Fortsetzungsgeschichten fürs Deutsch-Heft (Backlog J, Schritt 4; von Stefan freigegeben 26.11.2026).
    Je Teil eine Seite Text und eine Seite Aufgaben: Fragen (richtige Antwort zuerst), richtig/falsch, ein Schreibauftrag. */
 const STORIES = {
   praktikum: {t:'Linas Praktikum im Supermarkt', parts:[
