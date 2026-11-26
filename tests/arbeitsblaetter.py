@@ -16,7 +16,7 @@ async def main():
                     try:
                         await pg.evaluate(f"Object.assign(app.sheet, {{topic:'{t}', zr:{zr or 20}, n:'fill', mat:{str(mat).lower()}}}); openSheets()")
                         await pg.wait_for_timeout(700)
-                        info = await pg.evaluate("({n: app.sheetDoc.n, cols: app.sheetGen.cols, title: app.sheetDoc.title})")
+                        info = await pg.evaluate("({n: app.sheetDoc.n, cols: app.sheetGen?.cols, title: app.sheetDoc.title})")
                         html = await pg.evaluate("app.sheetDoc.html")
                         await p2.emulate_media(media='print'); await p2.set_content(html); await p2.wait_for_timeout(50)
                         r = await p2.evaluate("""(()=>{const pg=document.querySelector('.page'); const mm=pg.getBoundingClientRect().width/186; const h=pg.scrollHeight/mm;

@@ -32,7 +32,7 @@ Bei kleinen Änderungen reicht oft ein Teil der Tests (`sh tests/run_all.sh nur 
 | Test und Auswertung (Einstufung, Förderzone, Raten) | `test_fortschritt test_nie_haengen test_passt raten basis_test durchsicht_0_21` |
 | Unterricht an der Tafel | `zwanzigerfeld:1180x820 zwanzigerfeld:390x844 zwanzigerfeld_zahl frei_stift satz_ziehen tafel_rueckmeldung` |
 | Materialkiste | `materialkiste` |
-| Arbeitsblätter (Layout, Optionen, Lineatur, Schwarz-Weiß) | `blatt_layout blatt_auswahl arbeitsblatt_optionen grosse_aufgaben hundertertafel_blaetter lineatur druck_seiten legeblaetter tausenderbuch_nachspuren` (lang: `arbeitsblaetter`) |
+| Arbeitsblätter (Layout, Optionen, Lineatur, Schwarz-Weiß, keine doppelten Aufgaben) | `blatt_layout keine_doppelten blatt_auswahl arbeitsblatt_optionen grosse_aufgaben hundertertafel_blaetter lineatur druck_seiten legeblaetter tausenderbuch_nachspuren` (lang: `arbeitsblaetter`) |
 | Arbeitshefte, Heft-Assistent | `heft_assistent heft_gross heft_zone_optionen heft_scroll arbeitsheft lineatur plaene_sinnvoll` (lang: `heft_seiten_passen heft_seiten_gross`) |
 | Lernstand, Berichte, Wochenübersicht | `lernort_material wochenuebersicht drittes_fach` |
 | Daten: Speichern, Fenster, Sicherung, Umzug, Safari | `mehrere_fenster speicher_voll qr_umzug safari_tab update_hinweis` |
@@ -83,7 +83,8 @@ Zuerst den Server starten: `python3 -m http.server 8766 --bind 127.0.0.1` im Rep
 | `materialkiste.py` | Materialkiste: Ablauf, alle Werkzeuge, Zählen, Taschenrechner, Lernstand/ILEB |
 | `mehrere_fenster.py` | Zwei Fenster derselben App: nichts geht verloren, Löschen gilt weiter |
 | `wochenuebersicht.py`, `update_hinweis.py` | Wochenübersicht; Update-Hinweis nur auf der Startseite |
-| `blatt_layout.py` | Arbeitsblätter im Heft-Design (Backlog M): Kopf- und Fußzeile, Kästen bis zur Fußzeile, alle Blätter passen auf ihre Seiten, Schwarz-Weiß ohne bunte Farben, Legeblätter unverändert, Heft mit genau einem Rahmen |
+| `blatt_layout.py` | Arbeitsblätter im Heft-Design (Backlog M): Kopf- und Fußzeile, Kästen bis zur Fußzeile, alle Blätter passen auf ihre Seiten, Schwarz-Weiß ohne bunte Farben, keine Aufgabe breiter als die Seite (auch große Aufgaben), Lochrand links 20 mm (Backlog S1/S8), Legeblätter unverändert, Heft mit genau einem Rahmen |
+| `keine_doppelten.py` | Keine Aufgabe zweimal auf einer Seite (Backlog S9): alle Blätter mit „Seite füllen“, auch im Heft und in der Wiederholung |
 | `lineatur.py` | Lineatur (Backlog L): Haus, zwei Linien, eine Linie; Standard nach Themenwelt; Auswahl bei Blättern mit Schreibzeilen und im Heft; Deckblatt-Zwanzigerfeld zeilenweise |
 | `heft_gross.py` | „Große Aufgaben“ im Heft-Assistenten (Backlog N); Heft nimmt Grundeinstellungen statt der des letzten Einzelblatts |
 | `heft_scroll.py` | Heft-Assistent: „+“ und „−“ springen nicht nach oben (iPad und Handy) |

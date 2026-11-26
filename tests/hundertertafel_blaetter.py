@@ -26,7 +26,7 @@ async def main():
             if 'Hundertertafel' not in r[k]['title']: errs.append(f'{k}: Titel ohne Hundertertafel: {r[k]["title"]}')
             if not r[k]['hint']: errs.append(f'{k}: kein Hinweis')
             if any('hilfe' in c for c in r[k]['pages']): errs.append(f'{k}: Extraseite ohne Häkchen')
-            if r[k + '+']['pages'] != ['page', 'page hilfe', 'page sol']: errs.append(f'{k}: Seiten {r[k + "+"]["pages"]}')
+            if r[k + '+']['pages'] != ['page hf-p', 'page hf-p hilfe', 'page hf-p sol']: errs.append(f'{k}: Seiten {r[k + "+"]["pages"]}')
             if r[k + '+']['help'] < 100: errs.append(f'{k}: Tafel unvollständig ({r[k + "+"]["help"]})')
         for k in ['H7', 'H7+', 'HM+']:
             if r[k]['hint'] or any('hilfe' in c for c in r[k]['pages']): errs.append(f'{k}: Hinweis/Extraseite, soll nicht')
@@ -39,7 +39,7 @@ async def main():
         if saved is not True: errs.append(f'Häkchen nicht gemerkt: {saved}')
         pages = await pg.evaluate("[...document.querySelector('#sh-frame').contentDocument.querySelectorAll('.page')].map(x=>x.className)")
         print('Vorschau', pages)
-        if 'page hilfe' not in pages: errs.append('Vorschau ohne Extraseite')
+        if 'page hf-p hilfe' not in pages: errs.append('Vorschau ohne Extraseite')
         for t in ['H:H7', 'M:plus', 'H:HM']:
             await pg.evaluate(f"app.sheet.topic='{t}'; renderSheets()"); await pg.wait_for_timeout(200)
             if await pg.locator('#sh-taf').count(): errs.append(f'Häkchen bei {t}')

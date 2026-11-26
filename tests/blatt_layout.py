@@ -56,12 +56,15 @@ async def main():
 
         # alle Themen: passen genau auf ihre Seiten, auch in Schwarz-Weiß und groß
         topics = await pg.evaluate("sheetTopics().flatMap(([, o]) => o).map(x => x[0]).filter(t => !t.startsWith('K:'))")
-        bad, badc, n = [], [], 0
+        bad, badc, badw, n = [], [], [], 0
         for i, t in enumerate(topics):
             opt = {'bw': i % 2 == 0, 'gross': i % 3 == 0}
             html = await pg.evaluate(BUILD, [t, 100 if t in ('M:stellenwert', 'M:schriftlich') else 20, opt])
             doc = await br.new_page(); await doc.set_content(html); await doc.wait_for_timeout(250)
             k = await doc.evaluate("[document.querySelectorAll('.page').length, [...document.querySelectorAll('.page')].filter(p => p.dataset.over).length, document.querySelectorAll('.page .hf-foot').length]")
+            wide = await doc.evaluate("""(() => { const p = document.querySelector('.page'), r = p.getBoundingClientRect(), right = r.right - parseFloat(getComputedStyle(p).paddingRight) + 2;
+              return [...p.querySelectorAll('.ab-task')].filter(t => t.getBoundingClientRect().right > right).length; })()""")
+            if wide: badw.append(f'{t} {opt}: {wide} Aufgaben zu breit')
             pdf = await doc.pdf(prefer_css_page_size=True, print_background=True); await doc.close()
             pp = len(re.findall(rb'/Type\s*/Page[^s]', pdf)); n += 1
             known = opt['gross'] and t in ('L:L8', 'L:L9', 'H:HL')   # schon vor Backlog M: große Aufgaben mit langen Texten passen nicht (werden nie verkleinert)
@@ -72,6 +75,20 @@ async def main():
                 if c: badc.append(f'{t}: {sorted(c)[:4]}')
         check(f'{n} Blätter: jede Seite passt, jede hat eine Fußzeile', not bad, '; '.join(bad[:5]))
         check('Schwarz-Weiß: keine bunten Farben im Blatt', not badc, '; '.join(badc[:5]))
+        check('keine Aufgabe breiter als die Seite (auch große Aufgaben, Backlog S1)', not badw, '; '.join(badw[:5]))
+        # große Aufgaben bei allen Blättern mit 3 Spalten und Zahlenraum 1000 (Stefan: Schriftlich bis 1000 lief über)
+        badg = []
+        for t in topics:
+            html = await pg.evaluate(BUILD, [t, 1000 if t.startswith('M:') else 20, {'gross': True}])
+            doc = await br.new_page(); await doc.set_content(html); await doc.wait_for_timeout(200)
+            w = await doc.evaluate("""(() => { const p = document.querySelector('.page'), r = p.getBoundingClientRect(), right = r.right - parseFloat(getComputedStyle(p).paddingRight) + 2;
+              return [...p.querySelectorAll('.ab-task')].filter(t => t.getBoundingClientRect().right > right).length; })()""")
+            await doc.close()
+            if w: badg.append(f'{t}: {w}')
+        check('große Aufgaben bis 1000: nichts zu breit', not badg, '; '.join(badg[:6]))
+        pad = await pg.evaluate("""(() => { const d = document.createElement('div'); d.innerHTML = `<style>${SHEET_CSS}${HEFT_CSS}${SHEET_FRAME_CSS}</style><div class="page hf-p"></div>`; document.body.append(d);
+          const cs = getComputedStyle(d.querySelector('.page')), r = [cs.paddingLeft, cs.paddingRight].map(x => Math.round(parseFloat(x)/3.7795)); d.remove(); return r; })()""")
+        check('Lochrand: links 20 mm, rechts 12 mm (Backlog S8)', pad == [20, 12], str(pad))
 
         # Plättchen in Schwarz-Weiß
         html = await pg.evaluate(BUILD, ['M:plus', 20, {'bw': True}])

@@ -6183,7 +6183,7 @@ const G_INFO = {
 };
 for(const [k, v] of Object.entries(G_INFO)){ v.offer = {text:`Größen: ${v.name}`, set:{mode:'read', lvl:k}}; v.bp = 'BP GENT 2022, M 2.1.3 Größen (Geld, Längen, Gewichte) und Sachrechnen'; }
 const G_SHEETS = {
-  G1: {name:'Länge messen (Lineal)', cols:1, gens:[() => { const [k] = pick(RULER_OBJ), st = Math.random() < .5 ? 0 : rnd(1, 3), n = rulerLen(k, 3, 11); return T_(['lies', 'schreibe'], `Wie lang ist das? Schreibe die Länge auf.`, `<span class="ab-ic" style="width:150mm">${rulerSvg(n, st, k)}</span><p class="ab-row big">${box(14)} cm</p>`, `${n} cm`); }]},
+  G1: {name:'Länge messen (Lineal)', cols:1, gens:[() => { const [k] = pick(RULER_OBJ), st = Math.random() < .5 ? 0 : rnd(1, 3), n = rulerLen(k, 3, 11); return T_(['lies', 'schreibe'], `Wie lang ist das? Schreibe die Länge auf.`, `<span class="ab-ic ab-real" style="width:150mm">${rulerSvg(n, st, k)}</span><p class="ab-row big">${box(14)} cm</p>`, `${n} cm`); }]},
   G2: {name:'Längen im Alltag', cols:2, gens:[() => { const [thing, v, u] = pick([['Bus', 12, 'm'], ['Bleistift', 18, 'cm'], ['Tür', 2, 'm'], ['Handy', 15, 'cm'], ['Weg nach Stuttgart', 90, 'km'], ['Klassenzimmer', 8, 'm'], ['Daumen', 5, 'cm']]); return T_(['kreuze'], `${thing}: Wie lang ungefähr?`, `<p class="ab-row">${['cm', 'm', 'km'].map(x => `☐ ${v} ${x}`).join('&nbsp;&nbsp;&nbsp;')}</p>`, `${v} ${u}`); }, () => { const m = rnd(1, 6); return T_('rechne', `${m} m = ? cm`, `<p class="ab-row big">${m} m = ${box(16)} cm</p>`, `${m*100} cm`); }]},
   G3: {name:'Gewichte (Waage)', cols:2, gens:[() => { const g = rnd(1, 19)*50, it = pick(SCALE_GOODS); return T_(['lies', 'schreibe'], 'Wie viel zeigt die Waage?', `<span class="ab-ic" style="width:55mm">${scaleSvg(g, it)}</span><p class="ab-row big">${box(16)} g</p>`, `${g} g`); }, () => { const k = pick([1, 2, 3, 5]); return T_('rechne', `${k} kg = ? g`, `<p class="ab-row big">${k} kg = ${box(16)} g</p>`, `${k*1000} g`); }]},
   G4: {name:'Einkaufen: lesen und rechnen', cols:1, max:3, gens:[() => { const d = GOODS_DOCS[fresh(Object.keys(GOODS_DOCS))](); return T_(['lies', 'rechne'], 'Lies genau. Rechne und schreibe die Antwort auf.', `<div class="ab-doc">${d.html}</div>${d.qs.map(([k, q]) => `<div class="ab-q"><b>${q}</b>${lineW()}</div>`).join('')}`, `${d.title}: ` + d.qs.map(q => q[2][0]).join(' · ')); }]}
@@ -9678,12 +9678,12 @@ function abMatTausch(a, b){
   return `${paperHZE(h, z, e, false, {z: swZ, e: swE})}<p class="ab-tausch"><span class="tz"></span> ${txt}</p>`;
 }
 /* Gleicher Maßstab für alle Materialbilder eines Blatts, passend zur Kartenbreite */
-function abScale(body, cols, z = 1){
+function abScale(body, cols, z = 1, W = 186){   /* W: Breite des Blatts ohne Rand (Heft 186 mm, einzelnes Blatt 178 mm wegen Lochrand) */
   const ms = [...body.matchAll(/data-uw="([\d.]+)" data-uh="([\d.]+)"/g)].map(m => [+m[1], +m[2]]);
   if(!ms.length) return body;
   /* Paare (a + b) nebeneinander: Breite beider Bilder plus Rechenzeichen */
   const pairs = [...body.matchAll(/<div class="ab-matrow">(.*?)<\/div>/g)].map(m => [...m[1].matchAll(/data-uw="([\d.]+)"/g)].reduce((a, x) => a + +x[1], 0) + 70);
-  const inner = ((186 - (cols - 1)*4)/cols)/z - 9.5, maxW = Math.max(...ms.map(m => m[0]), ...pairs), maxH = Math.max(...ms.map(m => m[1]));
+  const inner = ((W - (cols - 1)*4)/cols)/z - 9.5, maxW = Math.max(...ms.map(m => m[0]), ...pairs), maxH = Math.max(...ms.map(m => m[1]));
   const k = Math.min(.27, inner/maxW, 27/maxH);
   return body.replace(/data-uw="([\d.]+)" data-uh="([\d.]+)"/g, (m, w, h) => `${m} style="width:${(w*k).toFixed(1)}mm;height:${(h*k).toFixed(1)}mm"`);
 }
@@ -10145,7 +10145,7 @@ const SHEET_CSS = document.getElementById('font-css').textContent + `@page{size:
 .ab-top{border-bottom:2.5px solid #222;padding-bottom:2.5mm;margin-bottom:3mm}.ab-top h1{font-size:20pt;margin:0 0 3mm;line-height:1.15}
 .ab-meta{display:grid;grid-template-columns:2fr 1fr;gap:8mm;font-size:11pt}.ab-meta div{display:flex;gap:2mm;align-items:flex-end}.ab-meta span{flex:1;border-bottom:1.2px solid #444;min-height:6mm;font-weight:700;padding-left:1mm}
 .ab-legend{display:flex;flex-wrap:wrap;gap:2mm 6mm;font-size:9.5pt;color:#444;margin:0 0 4mm}.ab-legend span{display:flex;align-items:center;gap:1.5mm}.ab-legend .ab-op{width:5mm;height:5mm}.ab-legend .ab-taf{font-weight:700;color:#222}
-.ab-grid{display:grid;gap:4mm}.ab-grid.gross>.ab-task{zoom:1.35}.ab-tausch{font-size:10pt;color:#444;text-align:center;margin:0;white-space:nowrap}.ab-tausch .tz{display:inline-block;width:5mm;height:3mm;border:1.2px dashed #222;border-radius:1mm;vertical-align:middle;margin-right:1mm}
+.ab-grid{display:grid;gap:4mm}.ab-grid.gross>.ab-task{zoom:1.35}.ab-grid.gross .ab-real{zoom:.7407}.ab-grid.gross .dc-t{zoom:.8}/* Lineal bleibt in echter Größe (1 cm = 1 cm), Tabellen (Stundenplan) passen in die Breite */.ab-tausch{font-size:10pt;color:#444;text-align:center;margin:0;white-space:nowrap}.ab-tausch .tz{display:inline-block;width:5mm;height:3mm;border:1.2px dashed #222;border-radius:1mm;vertical-align:middle;margin-right:1mm}
 .ab-task{border:1.2px solid #c8c8c8;border-radius:3mm;padding:3mm 4mm 3.5mm 4mm;display:flex;flex-direction:column;gap:2mm;break-inside:avoid;min-height:30mm}
 .ab-ins{display:flex;align-items:center;gap:2mm;font-size:11.5pt;line-height:1.3;color:#222}.ab-ins .nr{width:6.5mm;height:6.5mm;border-radius:50%;background:#222;color:#fff;font-size:9.5pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
 .ab-op{width:6.5mm;height:6.5mm;flex:none}.ab-ins .ops{display:flex;gap:1mm;flex:none;padding-right:1mm;border-right:1px solid #ddd;margin-right:1mm}
@@ -10452,7 +10452,7 @@ const BB_CSS = `.lg-sort{display:grid;grid-template-columns:1fr 1fr;gap:6mm;flex
 .bb-it.ring::after{content:'';position:absolute;inset:-2mm;border:.6mm dashed #888;border-radius:50%}
 .bb-it.weg::after{content:'';position:absolute;left:-2mm;right:-2mm;top:50%;border-top:.7mm dashed #888;transform:rotate(-35deg)}
 .bb-it.grau{opacity:.45}.bb-row{display:flex;justify-content:center;align-items:center;gap:5mm;flex-wrap:wrap;width:100%;margin:1mm 0}
-.bb-row.wide{gap:3.5mm 6mm}.bb-row.base{align-items:flex-end}.bb-row.even{justify-content:space-around;flex-wrap:nowrap}.bb-row.pat{gap:2.5mm}.bb-row.pat svg{width:11mm;height:11mm}.bb-row.shapes svg{width:12mm;height:12mm}
+.bb-row.wide{gap:3.5mm 6mm}.bb-row.base{align-items:flex-end}.bb-row.even{justify-content:space-around;flex-wrap:nowrap;gap:2mm}.bb-row.pat{gap:2.5mm}.bb-row.pat svg{width:11mm;height:11mm}.bb-row.shapes svg{width:12mm;height:12mm}
 .bb-row.opts{gap:8mm;margin-top:3mm;padding-top:2.5mm;border-top:1px dashed #bbb}
 .bb-empty{width:11mm;height:11mm;border:.4mm dashed #999;border-radius:1.5mm;display:inline-block}.bb-q{font-size:20pt;font-weight:700;width:11mm;text-align:center}
 .bb-target{display:flex;justify-content:center;padding:1.5mm 4mm;border:.5mm solid #222;border-radius:2mm;margin:0 auto}.bb-target svg{width:15mm;height:15mm}
@@ -10462,12 +10462,12 @@ const BB_CSS = `.lg-sort{display:grid;grid-template-columns:1fr 1fr;gap:6mm;flex
 .bb-two{display:grid;grid-template-columns:1fr 1fr;gap:8mm;width:100%}.bb-box{position:relative;border:.5mm solid #222;border-radius:3mm;padding:2mm}.bb-box.ring::after{content:'';position:absolute;inset:-2.5mm;border:.6mm dashed #888;border-radius:6mm}.bb-scatter{width:100%;height:30mm;display:block}
 .bb-cb{display:inline-block;width:6mm;height:6mm;border:.45mm solid #222;border-radius:1mm;margin:0 1.5mm 0 4mm;vertical-align:middle;position:relative}.bb-cb.x::after{content:'✕';position:absolute;inset:0;color:#888;font-size:13pt;line-height:6mm;text-align:center}
 .bb-sw{width:8mm;height:5.5mm;vertical-align:middle;margin-left:1mm}.ab-ins svg.b-shape,.ab-ins svg.b-arrow{width:6mm;height:6mm;vertical-align:middle;margin-left:1mm}`;
-/* Arbeitsblätter im Design der Hefte (Backlog M, Stefan 26.11.2026: Layout A „wie im Heft“): schmale Kopfzeile mit Fach und Bereich,
+/* Arbeitsblätter im Design der Hefte (Backlog M, Stefan 26.11.2026: Layout A „wie im Heft“; links 20 mm Rand zum Lochen, Backlog S8): schmale Kopfzeile mit Fach und Bereich,
    Titel mit Name und Datum wie bisher, Aufgabenkästen bis zur Fußzeile, Fußzeile auf fester Höhe (Bildungsplan und Lizenz links,
    Fach rechts), keine Seitenzahl, kein Farbrand. Lösungsblatt und Hilfeseite bekommen Kopf- und Fußzeile, behalten aber ihren Aufbau.
    sheetRaw: ohne Rahmen bauen – für Heftseiten (heftPages, heftAdd), die buildHeft selbst einrahmt. */
 let sheetRaw = false;
-const SHEET_FRAME_CSS = `.page.hf-p{display:flex;flex-direction:column;min-height:296mm;overflow-x:clip}.hf-main{flex:1 1 auto}.hf-main>.ab-grid{flex:1 1 auto;align-content:stretch}.page.sol .hf-main ol{margin-top:0}.ab-measure .page.hf-p{min-height:0}.ab-measure .hf-main>.ab-grid{flex:none}`;
+const SHEET_FRAME_CSS = `.page.hf-p{display:flex;flex-direction:column;min-height:296mm;overflow-x:clip;padding-left:20mm}.hf-main{flex:1 1 auto}.hf-main>.ab-grid{flex:1 1 auto;align-content:stretch}.page.sol .hf-main ol{margin-top:0}.ab-measure .page.hf-p{min-height:0}.ab-measure .hf-main>.ab-grid{flex:none}`;
 function sheetFramed(inner, help, sol, topic){
   const pl = sheetPlace(topic), fach = pl ? pl.f.name : '', label = pl ? `${pl.f.name} · ${pl.a.name}` : '';
   const pg = (h, cls, lab) => { const m = /^<div class="page([^"]*)">([^]*)<\/div>$/.exec(h); return m ? `<div class="page hf-p${m[1]}">${heftFrame(m[2], undefined, null, lab, fach)}</div>` : h; };
@@ -10481,7 +10481,9 @@ function buildSheet0(limit){
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : key === 'einmaleins' ? `: ${sheetRows().length === 10 ? 'alle Reihen' : sheetRows().length === 1 ? sheetRows()[0] + 'er-Reihe' : sheetRows().slice(0, -1).join('er-, ') + 'er- und ' + sheetRows().at(-1) + 'er-Reihe'}` : ['stellenwert', 'zehnerpartner', 'ueber10'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
   const title = sj === 'H' && key === 'HT' && /^\d$/.test(S.htp) ? `Tausenderbuch: Seite ${hPageName(+S.htp)}` : (key === 'schriftlich' ? (S.wop === 'add' ? 'Schriftlich plus' : S.wop === 'sub' ? 'Schriftlich minus' : def.name) : def.name) + sub;
-  const fill = S.n === 'fill', cols = def.match ? 1 : (typeof def.cols === 'function' ? def.cols(S) : def.cols || 2);
+  const fill = S.n === 'fill', cols0 = def.match ? 1 : (typeof def.cols === 'function' ? def.cols(S) : def.cols || 2);
+  /* große Aufgaben (135 %): höchstens 2 Spalten, sonst zu breit (Stefan, 26.11.2026: Schriftlich bis 1000); Hundertertafel groß nur einspaltig; Materialblätter bleiben normal groß */
+  const gross = S.gross && !def.mat, cols = !gross ? cols0 : (def.taf || sj === 'B') && cols0 <= 2 ? 1 : Math.min(cols0, 2);
   if(limit == null){
     FRESH.used = new Set();
     const G = app.sheetGen = {tasks: [], sols: [], ops: [], d: [], gi: [], match: !!def.match, fill, cols};
@@ -10496,7 +10498,10 @@ function buildSheet0(limit){
         let g, t = 0; do { g = gen(); t++; } while(seen.has(K(g)) && t < 12);
         /* Blatt füllen: erst lauter verschiedene Ergebnisse; ist der Vorrat erschöpft, auch gleiche Ergebnisse mit anderer Aufgabe (z. B. 7 + 5 und 8 + 4).
            Bis 0.37 war dann Schluss: „Plus bis 20 mit Zehnerübergang“ hatte oft nur 4 bis 8 Aufgaben, die Heftseite blieb halb leer (Stefan, 26.11.2026). */
-        if(fill && seen.has(K(g))){ for(t = 0; seenT.has(KT(g)) && t < 12; t++) g = gen(); if(seenT.has(KT(g)) && i >= def.gens.length*2) break; }
+        if(seen.has(K(g))){ for(t = 0; seenT.has(KT(g)) && t < 20; t++) g = gen();
+          /* Nie zweimal dieselbe Aufgabe auf einer Seite (Stefan, 26.11.2026: Heft-Einstieg „Ergänzen bis 10“ viermal „9 sind schon drin“).
+             Blatt füllen: ist der Vorrat erschöpft, Schluss; feste Zahl oder Feinstufe im Heft: diese Aufgabe auslassen (es gibt genug andere). */
+          if(seenT.has(KT(g))){ if(fill && i >= def.gens.length*2) break; continue; } }
         seen.add(K(g)); seenT.add(KT(g)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
         G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${g.ops.map(abOp).join('')}</span><span>${g.text}</span></div><div class="ab-body">${g.body}</div></div>`);
       }
@@ -10514,7 +10519,7 @@ function buildSheet0(limit){
   /* gleiche Aufgabenart zusammen, innerhalb davon von leicht nach schwer */
   const ord = [...Array(n).keys()].sort((x, y) => G.gi[x] - G.gi[y] || G.d[x] - G.d[y] || x - y);
   const exSeen = new Set(), tasks = ord.map((j, i) => { let h = G.tasks[j].replace('§NR§', i + 1); const ek = G.gi[j] + '|' + (h.match(/§EK:(\w+)§/)?.[1] || ''); h = h.replace(/§EK:\w+§/g, ''); if(!h.includes('§V§')) return h; const ex = !exSeen.has(ek); exSeen.add(ek); return abPick(h, ex); }), sols = ord.map(j => G.sols[j]), used = new Set(G.ops.slice(0, n).flat());
-  const body = abScale(`<div class="ab-grid${S.gross ? ' gross' : ''}" style="grid-template-columns:repeat(${G.cols},1fr)">${tasks.join('')}</div>`, G.cols, S.gross ? AB_GROSS : 1);
+  const body = abScale(`<div class="ab-grid${gross ? ' gross' : ''}" style="grid-template-columns:repeat(${G.cols},minmax(0,1fr))">${tasks.join('')}</div>`, G.cols, gross ? AB_GROSS : 1, sheetRaw ? 186 : 178);
   const legend = `<div class="ab-legend">${def.taf ? `<span class="ab-taf">${TAF_ICON} Hundertertafel</span>` : ''}${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
   const info = ({L:L_INFO, W:W_INFO, U:U_INFO, G:G_INFO, H:H_INFO, ...SHEET_INFO})[sj]?.[key] || null;

@@ -33,7 +33,7 @@ async def main():
                     await pp.set_content(h); await pp.wait_for_timeout(30)
                     r = await pp.evaluate("""()=>{let o=0;for(const task of document.querySelectorAll('.ab-task')){const tb=task.getBoundingClientRect();
                         for(const e of task.querySelectorAll('*')){const b=e.getBoundingClientRect();if(b.width&&(b.right>tb.right+1||b.left<tb.left-1)){o++;break}}}
-                        const f=document.querySelector('.ab-task .ab-ins'); return {o, fs: f ? f.getBoundingClientRect().height : 0}}""")
+                        const f=document.querySelector('.ab-task .ab-ins .nr'); return {o, fs: f ? f.getBoundingClientRect().height : 0}}""")
                     if r['o']: over.append(f'{t} bis {zr} groß={g}: {r["o"]} Aufgaben zu breit')
                     sizes.append(r['fs'])
                 if sizes[1] < sizes[0]*1.2: small.append(f'{t} bis {zr}: nicht größer ({sizes})')

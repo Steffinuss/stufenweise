@@ -23,14 +23,14 @@ if [ "$1" = "__eins" ]; then
   STUFENWEISE_OUT="$PWD/$LAUF/$name" $TO python3 "tests/$file.py" $args > "$LAUF/$name.log" 2>&1; rc=$?
   b=$(date +%s)
   if [ $rc -eq 124 ]; then echo "Zeitlimit überschritten" >> "$LAUF/$name.log"; st=FEHLER
-  elif grep -q "Traceback\|ERR \[.\+\]" "$LAUF/$name.log"; then st=FEHLER; else st=ok; fi
+  elif [ $rc -ne 0 ] || grep -q "Traceback\|Error:\|ERR \[.\+\]" "$LAUF/$name.log"; then st=FEHLER; else st=ok; fi   # Rückgabewert ≠ 0: z. B. Syntaxfehler (ohne „Traceback“)
   echo "$st $((b-a))" > "$LAUF/$name.st"
   printf '%-7s %-26s %4s s\n' "$st" "$name" "$((b-a))"
   exit 0
 fi
 
 # ---- Testlisten ----
-FAST="fehler smoke einstellungen runden gefuehrt hinweis_neu springen antwortfeld feld_ueben ueberspringen update_hinweis wochenuebersicht lernort_material legeblaetter tausenderbuch_nachspuren arbeitsheft doppelte_zeilen grosse_aufgaben arbeitsblatt_optionen zehnerpartner_ueben durchsicht_0_21 oberflaeche_details test_fortschritt test_nie_haengen test_passt handy drittes_fach basis_grundlagen basis_blaetter basis_ueben basis_test zwanzigerfeld_zahl plusminus_ueben blatt_auswahl mehrere_fenster materialkiste qr_umzug druck_seiten hundertertafel_blaetter heft_zone_optionen konzentrationsmodus deutsch_optimierung mathe_material tafel_rueckmeldung satz_ziehen frei_stift heft_assistent plaene_sinnvoll speicher_voll raten safari_tab heft_gross blatt_layout lineatur heft_scroll zwanzigerfeld:1180x820 zwanzigerfeld:390x844"
+FAST="fehler smoke einstellungen runden gefuehrt hinweis_neu springen antwortfeld feld_ueben ueberspringen update_hinweis wochenuebersicht lernort_material legeblaetter tausenderbuch_nachspuren arbeitsheft doppelte_zeilen grosse_aufgaben arbeitsblatt_optionen zehnerpartner_ueben durchsicht_0_21 oberflaeche_details test_fortschritt test_nie_haengen test_passt handy drittes_fach basis_grundlagen basis_blaetter basis_ueben basis_test zwanzigerfeld_zahl plusminus_ueben blatt_auswahl mehrere_fenster materialkiste qr_umzug druck_seiten hundertertafel_blaetter heft_zone_optionen konzentrationsmodus deutsch_optimierung mathe_material tafel_rueckmeldung satz_ziehen frei_stift heft_assistent plaene_sinnvoll speicher_voll raten safari_tab heft_gross blatt_layout lineatur heft_scroll zwanzigerfeld:1180x820 zwanzigerfeld:390x844 keine_doppelten"
 SLOW="sweep zufallsklicks kinder_sim arbeitsblaetter heft_seiten_passen heft_seiten_gross"
 # Lange Tests zuerst starten, dann laufen die kurzen nebenher und die Runde endet früher
 LANGE="heft_seiten_passen heft_seiten_gross kinder_sim arbeitsblaetter sweep zufallsklicks heft_assistent test_nie_haengen blatt_layout basis_ueben druck_seiten"
