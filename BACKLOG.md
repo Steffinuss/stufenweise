@@ -258,12 +258,10 @@ Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerk
 - Kopfzeile wie im Heft, z. B. Fach und Stufe; Name und Datum bleiben.
 - Fußzeile immer auf gleicher Höhe, mit Bildungsplan und Lizenz.
 - Aufgabenkästen reichen bis zur Fußzeile (Layout B), keine großen Lücken.
-- Evtl. schmaler Farbrand je Fach wie auf dem Deckblatt.
+- **Kein Farbrand** auf einzelnen Blättern (Stefan).
+- **Schwarz-Weiß-Version für alle Blätter** anbieten (Stefan); bisher gibt es sie nur bei Basis-Blättern (`B_BW`). Farben durch Muster bzw. Graustufen ersetzen, z. B. bei Plättchen, Zwanzigerfeld, Bildern und Uhrzeigern.
+- **Lösungsblätter** bleiben im Aufbau, passen sich aber im Grundsatz an (Schrift, Fußzeile) (Stefan).
 
 Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) wäre sinnvoll, damit beide gleich bleiben.
-**Zu klären mit Stefan:**
-- Farbrand auch auf einzelnen Blättern?
-- Gilt das auch für Lösungsblätter und Legeblätter? Legeblätter sind genau bemaßt und bleiben vermutlich wie sie sind.
-- Am besten vorher wieder Vorschläge als Bilder zeigen.
-
+**Entschieden (Stefan, 26.11.2026):** kein Farbrand; Schwarz-Weiß für alle Blätter; Lösungsblätter bleiben, nur angepasst. Noch offen: Legeblätter sind genau bemaßt und bleiben vermutlich, wie sie sind. Vor dem Bauen wieder Vorschläge als Bilder zeigen.
 **Größe:** mittel. Prüfen: `arbeitsblaetter.py`, `druck_seiten.py`, `grosse_aufgaben.py`, Anleitungsbilder neu.
