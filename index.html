@@ -853,6 +853,10 @@ svg{-webkit-touch-callout:none}
 .legal{max-width:720px;line-height:1.55;font-size:15.5px}.legal h3{font-size:19px;margin:18px 0 6px}.legal p{margin:0 0 10px}.legal .legal-addr{display:inline-block;background:#f2ede3;border-radius:10px;padding:8px 14px}.legal .legal-stand{color:var(--muted);font-size:13.5px}
 .home-legal{display:block;margin:28px auto 0;font-size:13px;color:var(--muted)}
 .privacy-box{margin-top:12px;background:#fff;border:1.5px solid var(--line);border-left:5px solid #346bc3;border-radius:12px;padding:12px 16px}.privacy-box h3{margin:0 0 6px;font-size:17px}.privacy-box ul{margin:0 0 10px;padding-left:20px;font-size:14.5px;line-height:1.45}.privacy-box li{margin:3px 0}
+.safari-note{background:#fff4e0;border:2px solid #e8890c;border-radius:14px;padding:10px 14px;margin:10px 0;text-align:left;font-size:15px;line-height:1.4;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.safari-note p{margin:0;flex:1 1 320px}
+.home .safari-note{max-width:760px;margin:6px auto 0;padding:6px 8px 6px 14px;font-size:14px;flex-shrink:0}
+.home .safari-note + .home-legal{flex-shrink:0}
 .backup-state.due{color:#9a5a10;font-weight:700}
 #modes .rail-fold{min-height:52px;flex-direction:column;gap:2px;background:transparent;border:1.5px dashed #c9bfae;color:var(--muted);box-shadow:none}
 #modes .rail-fold span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
@@ -1235,6 +1239,7 @@ button.tb-jump{font-size:22px;font-weight:800;min-width:66px}
   <fieldset><legend>Daten sichern</legend>
     <p class="note">Alle Kinder, Ergebnisse und Einstellungen liegen nur in diesem Browser. Eine Sicherung schützt vor Verlust und bringt die Daten auf ein anderes Gerät. Die PIN wird nicht mitgesichert.</p>
     <p class="note backup-state"></p>
+    <div id="safari-note-set"></div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button type="button" id="data-export" class="icon-btn primary">Sicherung speichern</button><label class="icon-btn file-btn">Sicherung laden<input type="file" id="data-import" accept=".json,application/json" hidden></label></div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" id="qr-send" class="icon-btn">Per QR-Code senden</button><button type="button" id="qr-recv" class="icon-btn">Per QR-Code empfangen</button></div>
     <p class="note">Geräteumzug ohne Internet: Ein Gerät zeigt QR-Codes, das andere liest sie mit der Kamera. Die Daten gehen direkt von Gerät zu Gerät.</p>
@@ -3727,8 +3732,22 @@ const BACKUP_DAYS = 14;
 const backupAge = () => Math.floor((Date.now() - (data.lastBackup || data.firstUse || Date.now()))/864e5);
 const backupDue = () => data.profiles.length > 0 && backupAge() >= BACKUP_DAYS;
 const backupText = () => data.lastBackup ? `Letzte Sicherung: ${backupAge() === 0 ? 'heute' : backupAge() === 1 ? 'gestern' : `vor ${backupAge()} Tagen`} (${new Date(data.lastBackup).toLocaleDateString('de-DE')}).` : 'Noch keine Sicherung gespeichert.';
-function backupStateUpdate(){ document.querySelectorAll('.backup-state').forEach(e => { e.textContent = backupText() + (backupDue() ? ' Bitte jetzt sichern.' : ''); e.classList.toggle('due', backupDue()); }); }
-const backupBox = () => backupDue() ? `<div class="backup-due" role="status"><span>${backupText()} Die Ergebnisse liegen nur auf diesem Gerät. Bitte sichere sie regelmäßig.</span><button type="button" class="icon-btn primary" data-backup-now>Jetzt sichern</button></div>` : '';
+function backupStateUpdate(){ const sn = document.getElementById('safari-note-set'); if(sn) sn.innerHTML = safariNoteHtml(false); document.querySelectorAll('.backup-state').forEach(e => { e.textContent = backupText() + (backupDue() ? ' Bitte jetzt sichern.' : ''); e.classList.toggle('due', backupDue()); }); }
+/* Safari-Tab auf iPad und iPhone (Backlog P1, Prüfung vom 22.11.2026, Stefan 26.11.2026): Safari löscht allen Speicher einer
+   Website, die an 7 Tagen mit Safari-Nutzung nicht geöffnet wurde (Tracking-Schutz). Apps vom Home-Bildschirm sind davon
+   ausgenommen, `navigator.storage.persist()` hilft dagegen nicht. Erkennen: `navigator.standalone` gibt es nur in Safari auf
+   iOS/iPadOS (false = Tab, true = Home-Bildschirm); iPadOS meldet sich oft als „Macintosh“ mit Touch. */
+function safariTab(){ try { const ua = navigator.userAgent || '', ios = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  return ios && navigator.standalone === false && !matchMedia('(display-mode: standalone)').matches; } catch { return false; } }
+function safariNoteHtml(home){
+  if(!safariTab()) return '';
+  const move = data.profiles.length ? ' Die App vom Home-Bildschirm hat einen eigenen Speicher. So ziehen die Kinder mit um: hier unter Einstellungen → Daten sichern „Sicherung speichern“, in der App „Sicherung laden“.' : '';
+  if(home) return `<div class="safari-note" role="note"><p><b>Achtung im Safari-Tab:</b> Safari löscht die Daten, wenn Stufenweise 7 Tage lang nicht geöffnet wurde (z. B. in den Ferien). Besser als App auf den Home-Bildschirm legen. Mehr unter Einstellungen → Daten sichern.</p><button type="button" class="icon-btn" data-safari-hide>Ausblenden (30 Tage)</button></div>`;
+  return `<div class="safari-note" role="note"><p><b>Achtung im Safari-Tab:</b> Safari löscht die Daten von Stufenweise, wenn die Seite 7 Tage lang nicht geöffnet wurde, zum Beispiel in den Ferien. Lege Stufenweise als App auf den Home-Bildschirm: in Safari auf „Teilen“ tippen, dann „Zum Home-Bildschirm“.${move}</p></div>`;
+}
+/* Startbildschirm: nur, wenn schon Kinder angelegt sind, und ausblendbar für 30 Tage */
+const safariHome = () => data.profiles.length && !(Number(settings.safariHide) > Date.now()) ? safariNoteHtml(true) : '';
+const backupBox = () => safariNoteHtml(false) + (backupDue() ? `<div class="backup-due" role="status"><span>${backupText()} Die Ergebnisse liegen nur auf diesem Gerät. Bitte sichere sie regelmäßig.</span><button type="button" class="icon-btn primary" data-backup-now>Jetzt sichern</button></div>` : '');
 (async () => { try{ if(navigator.storage?.persist && !(await navigator.storage.persisted())) await navigator.storage.persist(); }catch{} })();
 const curName = () => curProfile()?.name || 'Gast';
 const rnd = (lo, hi) => lo + Math.floor(Math.random()*(hi - lo + 1));
@@ -6460,8 +6479,18 @@ function setCell(pid, key, rec){
 })();
 const isOk = s => s === 'erreicht';
 /* Entscheidung innerhalb einer Zelle: nach 2 Aufgaben bei klarem Bild, sonst nach 3 */
+const DIAG_CHOICE = it => it.type === 'choice' || (it.type === 'pick' && it.single);   /* Antwort durch Antippen einer Auswahl: Raten möglich */
 function cellDecision(ans){
   const ok = ans.filter(a => a.ok).length, kern = ans.find(a => a.kern)?.ok;
+  /* Raten begrenzen (Backlog Q1, Stefan 26.11.2026): Sind die ersten beiden Aufgaben Auswahlaufgaben, gilt die Stufe erst bei
+     3 von 3 als erreicht. Nach 2 von 2 kommt eine dritte Aufgabe, 2 von 3 ist „teilweise“. Bei 3 Antworten kommt ein Kind,
+     das nur rät, so in etwa 4 % statt 19 % der Fälle auf „erreicht“. */
+  if(ans.length >= 2 && ans[0].ch && ans[1].ch){
+    if(ans.length === 2) return ok === 0 ? 'nicht' : null;
+    if(ok === ans.length && kern !== false) return 'erreicht';
+    if(ok >= 2 || (ok === 1 && kern)) return 'teilweise';
+    return 'nicht';
+  }
   if(ans.length === 2){ if(ok === 2) return kern === false ? 'teilweise' : 'erreicht'; if(ok === 0) return 'nicht'; return null; }
   if(ans.length >= 3){ if(ok >= 2 && kern !== false) return 'erreicht'; if(ok >= 2 || (ok === 1 && kern)) return 'teilweise'; return 'nicht'; }
   return null;
@@ -6660,7 +6689,7 @@ function diagAnswer(skip){
   let res;
   if(skip) res = {ok:false, given:'–', obs:['„Weiß ich nicht“']};
   else { res = evalItem(it, d.resp || {}, readFields()); if(!res) return focusEmpty(); }
-  d.answers.push({label: it.label, ok: res.ok, kern: !!it.kern, given: res.given, obs: res.obs || [], ms: Math.round(performance.now() - d.t0), ...(it.blk ? {blk: it.blk} : {}), ...(it.unkFrom ? {unk: it.unkFrom} : {})});
+  d.answers.push({label: it.label, ok: res.ok, kern: !!it.kern, ...(DIAG_CHOICE(it) ? {ch: true} : {}), given: res.given, obs: res.obs || [], ms: Math.round(performance.now() - d.t0), ...(it.blk ? {blk: it.blk} : {}), ...(it.unkFrom ? {unk: it.unkFrom} : {})});
   logAttempt({mode:'diag', task: it.label, ok: res.ok, tries:1, cell: d.key, ...(it.unkFrom ? {unk: it.unkFrom.join('|')} : {})});
   d.nItems++;
   let st = TESTS[d.subj]?.decide ? TESTS[d.subj].decide(d) : cellDecision(d.answers);
@@ -8097,7 +8126,7 @@ function renderCtx(){
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Schritt für Schritt lernen</span></div></header>`;
   $('#stage').innerHTML = `<div class="home wz"><div class="wz-top">${hero}</div><section class="wz-body"><h2>Was machen wir?</h2>
     <div class="ctx-tiles"><button class="ctx-tile practice" data-ctx="practice">${CTX_ILL.practice}<b>Üben</b><span>mit deinem Namen</span></button><button class="ctx-tile class" data-ctx="class">${CTX_ILL.class}<b>Unterricht</b><span>an der Tafel zeigen</span></button><button class="ctx-tile test" data-ctx-test>${CTX_ILL.test}<b>Testen</b><span>mit der Lehrkraft</span></button><button class="ctx-tile kiste" data-ctx-kiste>${CTX_ILL.kiste}<b>Material&shy;kiste</b><span>rechnen und legen</span></button></div></section>
-    <button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
+    ${safariHome()}<button class="linkish home-legal" data-legal>Impressum und Datenschutz</button></div>`;
 }
 function renderClassHome(){
   const hero = `<header class="wz-hero"><span class="wz-logo">${LOGO_SVG}</span><div class="wz-brand"><b>Stufenweise</b><span>Unterricht an der Tafel</span></div></header>`;
@@ -10188,6 +10217,8 @@ function zoneToSheet(key){
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
 app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, taf:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[], stufe:null};   /* stufe: nur im Heft (0 leicht … 1 schwer), nicht gemerkt */
+/* Grundeinstellungen der Blätter: Das Heft baut damit, nicht mit den Einstellungen des letzten Einzelblatts (Backlog N, Stefan 26.11.2026) */
+const SHEET_BASE = Object.freeze({...app.sheet, recent:undefined});
 const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'taf', 'recent'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
@@ -10677,7 +10708,10 @@ async function heftPages(pid, specs, prog = () => {}){
   const keep = {...app.sheet}, H = app.heft, items = [];
   const fr = document.createElement('iframe'); fr.setAttribute('aria-hidden', 'true'); fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:820px;height:1200px;visibility:hidden'; document.body.append(fr);
   const load = html => new Promise(r => { fr.onload = () => setTimeout(r, 30); fr.srcdoc = html; });
-  const set = (t, {label, ...o} = {}) => Object.assign(app.sheet, {pid, topic:t.topic, zr:t.zr || keep.zr, ue:t.ue || 'egal', n:'fill', sol:true, taf:false, bw:!!H.bw, stufe:null, mat:keep.mat, draw:keep.draw, mstrich:keep.mstrich, bsim:keep.bsim, gross:keep.gross}, o);
+  /* Grundeinstellungen statt der Einstellungen des letzten Einzelblatts (Backlog N); große Aufgaben nur über das Häkchen im Heft-Assistenten */
+  const G0 = !!H.gross;
+  const set = (t, {label, ...o} = {}) => { for(const k of ['kt', 'bcase']) delete app.sheet[k];
+    return Object.assign(app.sheet, {...SHEET_BASE, recent: keep.recent, pid, topic:t.topic, zr:t.zr || SHEET_BASE.zr, ue:t.ue || 'egal', n:'fill', sol:true, taf:false, bw:!!H.bw, stufe:null, gross:G0}, o); };
   const parse = (html, title = app.sheetDoc.title) => { const d = new DOMParser().parseFromString(html, 'text/html'), pg = d.querySelector('.page'); pg.querySelector('.ab-meta')?.remove(); return {pg, title, sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())}; };
   /* Seiten gleichmäßig füllen (Stefan, 26.11.2026): ein Blatt einmal mit vielen Aufgaben bauen, dann hinten kürzen – nur ganze Reihen */
   const tasksOf = r => [...r.pg.querySelectorAll('.ab-grid > .ab-task')];
@@ -10695,12 +10729,13 @@ async function heftPages(pid, specs, prog = () => {}){
     const mm = 96/25.4, top = p.getBoundingClientRect().top + 12*mm, ft = p.querySelector('.hf-foot'), last = [...p.querySelectorAll(':scope > *, :scope > .fitz > *')].filter(e => !e.matches('.hf-pn,.hf-foot,.fitz')).pop();
     return {over: !!p.dataset.over, z: +p.dataset.fit || 1, fill: p.dataset.fit ? 1 : last ? (last.getBoundingClientRect().bottom - top)/(276*mm - (ft ? ft.getBoundingClientRect().height : 0)) : 0}; };
   const band = (txt, ch) => `<div class="hf-band">${ch !== undefined ? `<span>Kapitel ${ch + 1}</span>` : ''}${txt}</div>`;
-  async function full(t, o){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen (mit Platz für Kopf- und Fußzeile) */
+  async function full(t, o = {}){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen (mit Platz für Kopf- und Fußzeile) */
     set(t, o); app.sheetDoc = buildSheet(); if(app.sheetGen) app.sheetGen.reserve = HEFT_RESERVE;
     for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G || !G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
     const r0 = parse(app.sheetDoc.html);
     if(!(await tooTight(r0.pg.innerHTML))) return r0;
     for(const m of counts(tasksOf(r0).length, colsOf(r0)).slice(1)){ const r = trim(parse(app.sheetDoc.html), m); if(!(await tooTight(r.pg.innerHTML))) return r; }   /* notfalls eine Reihe weniger */
+    if(app.sheet.gross) return full(t, {...o, gross:false});   /* passt groß nicht einmal eine Aufgabe (z. B. lange Texte): diese Seite normal groß (Stefan 26.11.) */
     return r0;
   }
   async function fixed(t, o, n, deco){   /* bis n Aufgaben, so viele ganze Reihen, wie auf die Seite passen.
@@ -10713,7 +10748,7 @@ async function heftPages(pid, specs, prog = () => {}){
         if(!ms.over && !loose) loose = {r, fill: ms.fill};
         if(!tight(ms)){ loose = {r, fill: ms.fill}; break; } }
       if(loose && (!best || loose.fill > best.fill + .1)) best = loose;
-      if(best && best.fill >= .75) break;
+      if(best && (best.fill >= .75 || (G0 && oo.gross && !tight(await measure(best.r.pg.innerHTML))))) break;   /* Häkchen „Große Aufgaben“: groß bleibt groß, wenn es passt */
     }
     return best ? best.r : last;
   }
@@ -10733,7 +10768,7 @@ async function heftPages(pid, specs, prog = () => {}){
       }
       if(s.kind === 'einstieg'){
         const demo = s.t.topic.startsWith('B:');   /* Basis-Blätter haben schon ein vorgemachtes Beispiel */
-        const r = await fixed(s.t, {gross:true, stufe:0, mat: s.t.topic.startsWith('M:') ? true : keep.mat, draw:false, mstrich:'gezeigt'}, 8, r => {
+        const r = await fixed(s.t, {gross:true, stufe:0, mat:true, draw:false, mstrich:'gezeigt'}, 8, r => {
           const top = r.pg.querySelector('.ab-top'), t1 = r.pg.querySelector('.ab-task');
           top.insertAdjacentHTML('beforebegin', band('Einstieg', ch));
           r.pg.querySelector('.ab-legend')?.insertAdjacentHTML('afterend', `<p class="hf-intro"><b>Das übst du in diesem Kapitel.</b> ${demo ? 'Die erste Aufgabe ist grau vorgemacht.' : 'Die erste Aufgabe ist ein Beispiel. Schaut sie zusammen an.'}</p>`);
@@ -10741,7 +10776,7 @@ async function heftPages(pid, specs, prog = () => {}){
         });
         items.push({title:`Einstieg: ${r.title}`, base: r.title, kind:'einstieg', html: r.pg.innerHTML, sol: r.sol, ...at});
       } else if(s.kind === 'kann'){
-        const r = await fixed(s.t, {gross:false, draw:false, mstrich:'gezeigt'}, 12, r => {
+        const r = await fixed(s.t, {gross:G0, draw:false, mstrich:'gezeigt'}, 12, r => {
           const top = r.pg.querySelector('.ab-top'), h1 = r.pg.querySelector('h1');
           top.insertAdjacentHTML('beforebegin', band('Das kann ich schon', ch));
           h1.textContent = `Das kann ich schon: ${r.title}`;
@@ -10751,7 +10786,8 @@ async function heftPages(pid, specs, prog = () => {}){
       } else if(s.kind === 'wdh'){
         /* Aufgaben aus beiden Kapiteln: je Kapitel einmal viele Aufgaben bauen, dann reihum ganze Reihen dazunehmen, solange die Seite reicht;
            passt nicht einmal je eine Reihe, nur das neuere Kapitel (sehr große Aufgaben, z. B. lange Texte) */
-        const B = s.parts.map(p => { const b = build(p.t, {...heftStufe(p.t, .5), gross:false}, 8), r0 = parse(b.html, b.title), cs = counts(tasksOf(r0).length, colsOf(r0)).reverse(); return {p, b, cs}; });
+        const mkB = g => s.parts.map(p => { const b = build(p.t, {...heftStufe(p.t, .5), gross:g}, 8), r0 = parse(b.html, b.title), cs = counts(tasksOf(r0).length, colsOf(r0)).reverse(); return {p, b, cs}; });
+        let B = mkB(G0);
         const compose = (L, idx) => { let h = band('Wiederholung') + `<div class="ab-top"><h1>Wiederholung</h1></div>`; const so = [];
           L.forEach((x, j) => { const r = trim(parse(x.b.html, x.b.title), x.cs[idx[j]]);
             h += `<h2 class="hf-sub">Kapitel ${x.p.ch + 1}: ${escHtml(r.title)}</h2>` + [...r.pg.children].filter(e => !e.matches('.ab-top,.ab-foot,.hf-band')).map(e => e.outerHTML).join('');
@@ -10759,6 +10795,7 @@ async function heftPages(pid, specs, prog = () => {}){
           return {h: h + HEFT_LIC, so}; };
         let L = B, idx = B.map(() => 0), c = compose(L, idx);
         if(await tooTight(c.h)){ L = B.slice(-1); idx = [0]; c = compose(L, idx); }
+        if(G0 && await tooTight(c.h)){ B = mkB(false); L = B; idx = B.map(() => 0); c = compose(L, idx); if(await tooTight(c.h)){ L = B.slice(-1); idx = [0]; c = compose(L, idx); } }   /* groß passt nicht: normal groß */
         for(let grew = true; grew; ){ grew = false;
           for(const j of L.map((_, j) => j).sort((a, b) => L[a].cs[idx[a]] - L[b].cs[idx[b]])){
             if(idx[j] + 1 >= L[j].cs.length) continue;
@@ -10889,7 +10926,7 @@ function heftAssistHtml(kid){
     <span class="sh-lab">Kapitel</span><ol class="hf-plan">${plan}</ol>
     ${P.storyAvail ? `<label class="row">Fortsetzungsgeschichte <select id="hf-story">${[...Object.entries(STORIES).map(([k, g]) => [k, g.t]), ['aus', 'keine']].map(([k, n]) => `<option value="${k}" ${k === (H.story === 'aus' ? 'aus' : P.storyKey) ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` : ''}
     <span class="note">Jede Stufe ist ein Kapitel: Einstieg mit Beispiel, Übungsseiten (Seite für Seite etwas schwerer), zum Schluss „Das kann ich schon“. Jede Seite hat neue Aufgaben. Dazu kommen Deckblatt${P.tocOwn ? ', eine Seite Inhalt' : ' mit Inhalt'}${P.wdh ? `, ${P.wdh === 1 ? 'eine Wiederholung' : `${P.wdh} Wiederholungen`} (nach je zwei Kapiteln)` : ''}${P.story ? `, ${P.story} Teile der Geschichte (je eine Seite Text und Aufgaben)` : ''}${P.helps.length ? `, hinten ${P.helps.map(k => HEFT_HELP[k].label).join(', ')}` : ''}${P.back ? ` und als Rückseite zum Nachschauen: ${HEFT_HELP[P.back].name.replace(' zum Nachschauen', '')}` : ''} – zusammen ${P.N} Seiten. Die Lösungen gibt es als eigenes Heft.${P.chapters.some(c => c.cut) ? ' Für einige Kapitel ist kein Platz mehr: mehr Seiten wählen oder Kapitel abwählen.' : ''}</span>
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${P.bw ? `<label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${P.helpAvail.map(k => `<label class="row cb"><input type="checkbox" id="hf-${k}" ${HEFT_HELP[k].on(H) ? 'checked' : ''}> Hinten im Heft: ${HEFT_HELP[k].label}</label>`).join('')}</div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><label class="row cb"><input type="checkbox" id="hf-gross" ${H.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label>${P.bw ? `<label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${P.helpAvail.map(k => `<label class="row cb"><input type="checkbox" id="hf-${k}" ${HEFT_HELP[k].on(H) ? 'checked' : ''}> Hinten im Heft: ${HEFT_HELP[k].label}</label>`).join('')}</div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-zone" ${P.chapters.some(c => c.pages) ? '' : 'disabled'}>${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'} (${P.N} Seiten)</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>`;
 }
 function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.sheet.pid = pid; $('#dlg-sheet').showModal(); renderSheets(); }
@@ -10984,7 +11021,7 @@ function sheetEvents(e){
 }
 function sheetChange(e){
   const S = app.sheet, t = e.target;
-  if((t.id && t.id.startsWith('hf-')) || t.dataset.hfoff){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid'){ H.pid = t.value; H.off = {}; H.adj = {}; } if(t.id === 'hf-vor') H.vor = t.value; if(t.dataset.hfoff){ H.off ||= {}; if(t.checked) delete H.off[t.dataset.hfoff]; else H.off[t.dataset.hfoff] = true; } if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; if(t.id === 'hf-bw') H.bw = t.checked; if(t.id === 'hf-taf') H.taf = t.checked; if(t.id === 'hf-abc') H.abc = t.checked; if(t.id === 'hf-druck') H.druck = t.value; if(t.id === 'hf-story') H.story = t.value; if(t.id === 'hf-ein') H.ein = t.checked; saveHeft(); return renderHeft(); }
+  if((t.id && t.id.startsWith('hf-')) || t.dataset.hfoff){ const H = app.heft; if(t.id === 'hf-title') H.title = t.value.trim(); if(t.id === 'hf-kid'){ H.pid = t.value; H.off = {}; H.adj = {}; } if(t.id === 'hf-vor') H.vor = t.value; if(t.dataset.hfoff){ H.off ||= {}; if(t.checked) delete H.off[t.dataset.hfoff]; else H.off[t.dataset.hfoff] = true; } if(t.id === 'hf-toc') H.toc = t.checked; if(t.id === 'hf-per') H.per = +t.value; if(t.id === 'hf-bw') H.bw = t.checked; if(t.id === 'hf-gross') H.gross = t.checked; if(t.id === 'hf-taf') H.taf = t.checked; if(t.id === 'hf-abc') H.abc = t.checked; if(t.id === 'hf-druck') H.druck = t.value; if(t.id === 'hf-story') H.story = t.value; if(t.id === 'hf-ein') H.ein = t.checked; saveHeft(); return renderHeft(); }
   if(t.id === 'sh-kid'){ S.pid = t.value; const zs = TEST_IDS.flatMap(sj => S.pid !== 'none' ? zoneReport(S.pid, sj).zones : []).map(z => zoneToSheet(z.key)).filter(z => z && sheetPlace(z.topic)); /* Fach mit Förderzone voreinstellen */
     if(zs.length && !zs.some(z => sheetPlace(z.topic).fach === sheetPlace(S.topic)?.fach)){ S.topic = zs[0].topic; if(zs[0].zr) S.zr = zs[0].zr; } }
   if(t.id === 'sh-topic') S.topic = t.value;
@@ -11608,6 +11645,7 @@ $('#pin-lock').addEventListener('click', () => { app.teacherUntil = 0; dlgSet.cl
 $('#data-export').addEventListener('click', exportData);
 document.addEventListener('click', e => { if(e.target.closest('[data-legal]')){ e.preventDefault(); openLegal(); } });
 document.addEventListener('click', e => { if(e.target.closest('#privacy-ok')){ settings.privacyAck = Date.now(); saveSettings(); renderProfiles(); setTimeout(() => $('#pname')?.focus(), 50); } });
+document.addEventListener('click', e => { if(e.target.closest('[data-safari-hide]')){ settings.safariHide = Date.now() + 30*864e5; saveSettings(); e.target.closest('.safari-note')?.remove(); } });
 document.addEventListener('click', e => { if(e.target.closest('[data-backup-now]')){ exportData(); e.target.closest('.backup-due')?.remove(); toast('Sicherung gespeichert. Auf dem iPad liegt sie in der Dateien-App.'); } });
 $('#data-import').addEventListener('change', e => { const f = e.target.files[0]; if(f) importFile(f); e.target.value = ''; });
 $('#import-merge').addEventListener('click', () => applyImport('merge'));

@@ -24,7 +24,10 @@ async def main():
             mono = all(b2 >= a2 for a2, b2 in zip(progs, progs[1:]))
             print(subj, 'Schritte', len(progs), 'Abschnitte', chips, 'monoton', mono, 'Ende', round(progs[-1]*100) if progs else None)
             if not mono: errs.append(f'{subj}: Balken läuft zurück')
-            if want is not None and chips != want: errs.append(f'{subj}: Abschnitte {chips} statt {want}')
+            # Lese-Test: Erreicht das Kind L4 nicht, folgt der Teil „Hören“ (Backlog I); dann zeigt die Leiste „Lesen · Hören“.
+            # Seit Q1 (3 von 3 bei Auswahlstufen) kommt dieser Ablauf mit den abwechselnden Antworten hier vor.
+            if subj == 'L' and chips == ['Lesen', 'Hören']: pass
+            elif want is not None and chips != want: errs.append(f'{subj}: Abschnitte {chips} statt {want}')
             await pg.close()
         # Abbrechen im laufenden Test braucht zwei Tipps; „Prüfen“ heißt im Test „Weiter“
         pg = await b.new_page(viewport={'width': 1180, 'height': 820}); pg.on('pageerror', lambda e: errs.append(str(e)))
