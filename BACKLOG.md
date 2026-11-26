@@ -247,6 +247,5 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 - **Eine Linie:** Standard für Klasse 4.
 
 Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerkt (`app.sheet`, `SHEET_KEEP`) und gilt auch im Heft.
-**Betrifft (zu klären):** Schreibzeilen auf Arbeitsblättern und im Heft (`.ab-wline`, `.hf-lines`: W6 „Satz zum Bild“, „Satz abschreiben“, Aufgabenseiten der Fortsetzungsgeschichte), evtl. auch Schreiben mit dem Stift an der Tafel.
-**Offene Frage an Stefan:** Welche Stellen meinst du mit „freiem Schreiben“: Blätter und Heft, die Tafel oder beides?
+**Betrifft:** nur Arbeitsblätter und Arbeitshefte (Stefan, 26.11.2026), also die Schreibzeilen `.ab-wline` und `.hf-lines` (W6 „Satz zum Bild“, „Satz abschreiben“, Aufgabenseiten der Fortsetzungsgeschichte). Nicht der Stift an der Tafel.
 **Größe:** klein bis mittel. Schreibzeilen mit fester Höhe je Lineatur; prüfen mit `heft_seiten_passen.py` (Seiten dürfen nicht überlaufen).
