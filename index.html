@@ -10059,8 +10059,9 @@ const PAGE_FIT_JS = `<script>(function(){
       if(h > max && p.querySelector('.gross')){ p.dataset.over = Math.ceil((h - pad)/(max - pad)); h = 0; }   /* „Große Aufgaben“ nie verkleinern */
       if(h > max){
         box = document.createElement('div'); box.className = 'fitz';
-        box.style.cssText = 'display:' + cs.display + ';flex-direction:' + cs.flexDirection + ';align-items:' + cs.alignItems + ';gap:' + cs.gap;
-        [].slice.call(p.childNodes).forEach(function(n){ if(!(n.classList && n.classList.contains('hf-pn'))) box.appendChild(n); }); p.insertBefore(box, p.firstChild);   /* Seitenzahl im Heft bleibt unverkleinert unten */
+        box.style.cssText = 'display:' + cs.display + ';flex-direction:' + cs.flexDirection + ';align-items:' + cs.alignItems + ';gap:' + cs.gap + ';flex:1 1 auto';
+        var head = p.querySelector(':scope > .hf-head');
+        [].slice.call(p.childNodes).forEach(function(n){ if(!(n.classList && (n.classList.contains('hf-pn') || n.classList.contains('hf-head') || n.classList.contains('hf-foot')))) box.appendChild(n); }); p.insertBefore(box, head ? head.nextSibling : p.firstChild);   /* Kopf- und Fußzeile im Heft bleiben unverkleinert */
         for(var i = 0; i < 6 && h > max; i++){ z = z*(max - pad)/(h - pad)*0.99; box.style.zoom = z; h = p.getBoundingClientRect().height; }
         if(z < (p.classList.contains('fitlow') ? 0.6 : 0.8)){ while(box.firstChild) p.insertBefore(box.firstChild, box); box.remove(); z = 1; p.dataset.over = Math.ceil((p.getBoundingClientRect().height - pad)/(max - pad)); }
       }
@@ -10391,10 +10392,14 @@ function buildSheet0(limit){
       for(let i = 0; i < nb; i++){ const g = def.gen(); G.sols.push(g.a); G.ops.push(['verbinde']); G.d.push(0); G.gi.push(0); G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${abOp('verbinde')}</span>Verbinde, was zusammengehört.</div><div class="ab-body"><div class="ab-match">${g.left.map((l, j) => `<div class="l">${l}<span class="ab-dot"></span></div><div></div><div class="r"><span class="ab-dot"></span>${g.right[j]}</div>`).join('')}</div></div></div>`); }
     } else {
       const lvl = typeof S.stufe === 'number', want = fill ? (def.max || 30) : lvl ? Math.max(Math.min(S.n, def.max || S.n), Math.min(def.max || 30, S.n*3)) : Math.min(S.n, def.max || S.n), seen = new Set();
+      const K = g => String(g.k ?? g.a), KT = g => g.text + '|' + g.body.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' '), seenT = new Set();
       for(let i = 0; i < want; i++){
-        let g, t = 0; do { g = def.gens[i % def.gens.length](sj === 'M' ? S.zr : null); t++; } while(seen.has(String(g.k ?? g.a)) && t < 12);
-        if(fill && seen.has(String(g.k ?? g.a)) && i >= def.gens.length*2) break; /* Blatt füllen: keine Wiederholungen, wenn der Vorrat erschöpft ist */
-        seen.add(String(g.k ?? g.a)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
+        const gen = () => def.gens[i % def.gens.length](sj === 'M' ? S.zr : null);
+        let g, t = 0; do { g = gen(); t++; } while(seen.has(K(g)) && t < 12);
+        /* Blatt füllen: erst lauter verschiedene Ergebnisse; ist der Vorrat erschöpft, auch gleiche Ergebnisse mit anderer Aufgabe (z. B. 7 + 5 und 8 + 4).
+           Bis 0.37 war dann Schluss: „Plus bis 20 mit Zehnerübergang“ hatte oft nur 4 bis 8 Aufgaben, die Heftseite blieb halb leer (Stefan, 26.11.2026). */
+        if(fill && seen.has(K(g))){ for(t = 0; seenT.has(KT(g)) && t < 12; t++) g = gen(); if(seenT.has(KT(g)) && i >= def.gens.length*2) break; }
+        seen.add(K(g)); seenT.add(KT(g)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
         G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${g.ops.map(abOp).join('')}</span><span>${g.text}</span></div><div class="ab-body">${g.body}</div></div>`);
       }
       /* Heft (Mathe-Feinstufen): Aufgaben passender Schwierigkeit zuerst; S.stufe 0 = die leichtesten, 1 = die schwersten je Aufgabenart */
@@ -10429,7 +10434,7 @@ function sheetFit(fr, show = sheetShow){
   const refit = () => { try { d.defaultView.__fitPages?.(); } catch {} };
   const page = d.querySelector('.page'), tasks = [...d.querySelectorAll('.ab-grid > .ab-task')], foot = d.querySelector('.ab-lic'); if(!page || !tasks.length) return;
   const mm = (() => { const t = d.createElement('div'); t.style.cssText = 'position:absolute;width:100mm;height:0'; d.body.append(t); const w = t.getBoundingClientRect().width/100; t.remove(); return w; })();
-  const pr = page.getBoundingClientRect(), limit = pr.top + (12 + 273 - 5)*mm - (foot ? foot.getBoundingClientRect().height + 6*mm : 10*mm); /* 5 mm Sicherheit: Druck misst minimal anders als die Vorschau */
+  const pr = page.getBoundingClientRect(), limit = pr.top + (12 + 273 - 5 - (G.reserve || 0))*mm - (foot ? foot.getBoundingClientRect().height + 6*mm : 10*mm);   /* G.reserve: Heft (Kopf- und Fußzeile) */ /* 5 mm Sicherheit: Druck misst minimal anders als die Vorschau */
   const raw = tasks.filter(t => t.getBoundingClientRect().bottom <= limit + 1).length;
   let fit = raw === tasks.length ? raw : Math.max(G.cols, raw - raw % G.cols); /* alles passt: auch eine angefangene letzte Reihe behalten (kleiner Aufgabenvorrat) */
   if(G.checking){ /* Prüfrunde: die ausgewählten Aufgaben sind sortiert anders hoch – notfalls eine Reihe weniger, bei viel Platz eine Reihe mehr */
@@ -10477,12 +10482,12 @@ function buildHeft(){
   const chs = H.chapters || [], entries = heftEntries(H);
   const tocOwn = entries.length > 8;   /* langes Inhaltsverzeichnis: eigene Seite nach dem Deckblatt */
   const first = heftFirst(H);   /* Heft-Assistent: Seiten wie gedruckt gezählt, Deckblatt = Seite 1 */
-  /* Seitenzahl fest unten in der Mitte jeder Seite (Stefan, 26.11.2026: stand sonst je nach Inhalt unterschiedlich hoch) */
-  const pages = H.items.map((it, i) => `<div class="page hf-p ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">${it.ch !== undefined && chs[it.ch] ? `Kapitel ${it.ch + 1} · ` : ''}`)}<div class="hf-pn">${i + first}</div></div>`).join('');
+  /* einheitlicher Seitenrahmen (Stefan, 26.11.2026, Layout B): Kopfzeile, Aufgaben füllen die Seite, Fußzeile mit Seitenzahl immer ganz unten */
+  const pages = H.items.map((it, i) => `<div class="page hf-p ${it.cls || ''}">${heftFrame(it.html, it.ch !== undefined && chs[it.ch] ? it.ch : undefined, i + first, it.cls?.includes('hilfe') ? 'Zum Nachschauen' : '')}</div>`).join('');
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li><span>${escHtml(e.title)}</span><span class="cv-dots"></span><span>${e.i + first}</span></li>`).join('')}</ol></div>` : '';
   const fach = H.book && SUBJECTS[H.book.fach] && !(H.title || '').includes(SUBJECTS[H.book.fach].name) ? `<div class="cv-fach">${escHtml(SUBJECTS[H.book.fach].name)}</div>` : '';
   const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1>${fach}<div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p></div>`;
-  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.page.hf-p{position:relative}.hf-pn{position:absolute;left:0;right:0;bottom:5mm;text-align:center;font-size:13pt;font-weight:700;color:#222;line-height:1}@media print{.page.hf-p{min-height:296mm}}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
+  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.page.hf-p{display:flex;flex-direction:column}.hf-main{flex:1 1 auto}.hf-main>.ab-grid{flex:1 1 auto;align-content:stretch}@media print{.page.hf-p{min-height:296mm}}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
   const all = cover + (tocOwn && toc ? `<div class="page tocp">${toc}</div>` : '') + pages, druck = HEFT_DRUCK[H.druck] ? H.druck : 'a4';
   const head = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}${css}`;
   if(druck === 'a4') return {title: H.title || 'Mein Arbeitsheft', html:`${head}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}${all}</body></html>`};
@@ -10515,7 +10520,9 @@ const zoneBasis = key => !!zoneToSheet(key)?.topic.startsWith('B:');
 const heftZones = pid => TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones).filter(z => { const t = zoneToSheet(z.key); return t && sheetTopics().some(([, o]) => o.some(([v]) => v === t.topic)); });
 /* Heftseiten bauen. specs: {t, ch, kind:'ueben'|'einstieg'|'kann'|'wdh', o:{Blatt-Optionen}, label, parts:[{t, ch, title}]}
    Ohne kind = ein volles Blatt wie bisher. Jedes Blatt wird neu gewürfelt, auf die Seite eingepasst; Lösungen kommen in it.sol. */
-const HEFT_CSS = `.hf-band{display:flex;align-items:center;gap:3mm;font-size:11pt;font-weight:700;color:#444;margin:-3mm 0 3mm}.hf-band span{background:#222;color:#fff;border-radius:2mm;padding:.6mm 3mm}
+const HEFT_CSS = `.page.hf-p{padding-bottom:9mm}.hf-main.hf-grow{display:flex;flex-direction:column}.hf-head{display:flex;align-items:center;gap:2.5mm;font-size:9.5pt;font-weight:700;color:#555;border-bottom:1px solid #bbb;padding-bottom:1.5mm;margin:-4mm 0 3mm;line-height:1.2}.hf-head .k{background:#222;color:#fff;border-radius:1.5mm;padding:.4mm 2.5mm}
+.hf-foot{margin-top:auto;height:14mm;flex:none;padding-top:2.5mm;border-top:1px solid #bbb;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4mm;font-size:7.5pt;line-height:1.35;color:#777;break-inside:avoid}.hf-foot .r{text-align:right;font-weight:700;font-size:9pt;color:#444}.hf-foot .hf-pn{font-size:12pt;font-weight:700;color:#222;width:9mm;height:9mm;border-radius:50%;border:1.5px solid #222;display:flex;align-items:center;justify-content:center;line-height:1}
+.hf-band{display:flex;align-items:center;gap:3mm;font-size:11pt;font-weight:700;color:#444;margin:-3mm 0 3mm}.hf-band span{background:#222;color:#fff;border-radius:2mm;padding:.6mm 3mm}
 .hf-intro{font-size:13pt;line-height:1.35;margin:0 0 4mm;padding:3mm 4mm;background:#f1ece1;border-radius:3mm}
 .ab-task.ab-bsp{outline:1.8px dashed #777;outline-offset:1.2mm}.ab-bsp-lab{display:inline-block;font-size:10pt;font-weight:700;color:#555;border:1.2px solid #777;border-radius:2mm;padding:0 2mm;margin:0 0 1.5mm}.ab-bsp-sol{margin-top:2mm;font-size:12.5pt;color:#444}
 .ab-stufe{font-size:12pt;font-weight:600;color:#555;margin-left:2mm;white-space:nowrap}
@@ -10524,6 +10531,21 @@ const HEFT_CSS = `.hf-band{display:flex;align-items:center;gap:3mm;font-size:11p
 .hf-story{font-size:15pt;line-height:1.75;margin:0 0 5mm}.page.hf-fillp{display:flex;flex-direction:column}.hf-draw{flex:1 1 auto;min-height:45mm;border:1.5px dashed #888;border-radius:3mm;margin:1mm 0 3mm;padding:3mm 4mm;font-size:12pt;color:#555}.hf-draw .ab-op{width:6mm;height:6mm;vertical-align:-1.5mm;margin-right:1.5mm}.hf-lines{flex:1 1 auto;min-height:24mm;margin:0 0 3mm;background:repeating-linear-gradient(to bottom,transparent 0,transparent 11.5mm,#888 11.5mm,#888 11.8mm)}.hf-rf{border-collapse:collapse;width:100%;font-size:13pt;margin:1mm 0 3mm}.hf-rf td,.hf-rf th{border:1.2px solid #222;padding:2mm 3mm}.hf-rf th{font-size:11pt;background:#f1ece1}.hf-rf td:nth-child(n+2),.hf-rf th:nth-child(n+2){width:22mm;text-align:center;font-size:16pt}
 .abc-p{display:grid;grid-template-columns:repeat(6,1fr);gap:2.5mm}.abc-p div{border:1.4px solid #222;border-radius:2mm;padding:1.5mm;text-align:center;min-height:37mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between}.abc-p b{font-size:22pt;display:block;line-height:1.1}.abc-p b small{font-size:17pt;margin-left:1.5mm;font-weight:600}.abc-p svg{width:20mm;height:20mm}.abc-p .two svg{width:13mm;height:13mm}.abc-p .two span{display:flex;gap:1mm}
 .ein-p{border-collapse:collapse;margin:6mm auto;font-size:15pt}.ein-p td,.ein-p th{border:1.2px solid #222;width:15.5mm;height:13mm;text-align:center}.ein-p th{background:#f1ece1}.ein-p td.q{font-weight:700;background:#faf6ee}`;
+/* Seitenrahmen im Heft: aus Band (Einstieg, Das kann ich schon …) und Fußzeilen der Seite werden Kopf- und Fußzeile.
+   Die gespeicherten Seiten bleiben unverändert (ältere Hefte im Browser bekommen den Rahmen beim Drucken). */
+function heftFrame(html, ch, nr, label = ''){
+  const b = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html').body, band = b.querySelector('.hf-band');
+  if(band){ label = [...band.childNodes].filter(n => !(n.nodeType === 1 && n.tagName === 'SPAN')).map(n => n.textContent).join('').trim() || label; band.remove(); }
+  const fs = [...b.querySelectorAll('.ab-foot')], bp = fs.filter(f => !f.classList.contains('ab-lic')).map(f => f.textContent.trim()).filter(Boolean);
+  fs.forEach(f => f.remove());
+  const kap = ch !== undefined ? `Kapitel ${ch + 1}` : '';
+  if(!label && kap) label = 'Üben';
+  const head = kap || label ? `<div class="hf-head">${kap ? `<span class="k">${kap}</span>` : ''}<span>${escHtml(label)}</span></div>` : '';
+  /* Inhalt in eigener Hülle: nur Seiten mit Aufgabenkästen (oder Mal-/Schreibfeld) werden zur Spalte, die wächst.
+     Sonst bliebe der Abstand zwischen Absätzen doppelt (Ränder fallen in einer Flex-Spalte nicht zusammen). */
+  const grow = b.querySelector(':scope > .ab-grid, :scope > .hf-draw, :scope > .hf-lines');
+  return `${head}<div class="hf-main${grow ? ' hf-grow' : ''}">${b.innerHTML}</div><div class="hf-foot"><div class="l">${bp.map(x => escHtml(x) + '<br>').join('')}Stufenweise · stufenweise.app · CC BY-SA 4.0</div><div class="hf-pn">${nr}</div><div class="r">${kap}</div></div>`;
+}
 const HEFT_LIC = '<p class="ab-foot ab-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p>';
 const kisSym = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#222" stroke-width="2"/>${k === 2 ? '<circle cx="12" cy="12" r="10" fill="#222"/>' : k === 1 ? '<path d="M12 2a10 10 0 0 1 0 20z" fill="#222"/>' : ''}</svg>`;
 const KIS_HTML = `<div class="hf-kis"><h2>Wie gut kannst du das? Kreuze an.</h2>${[[2, 'Das kann ich.'], [1, 'Das kann ich fast.'], [0, 'Das übe ich noch.']].map(([k, t]) => `<div class="hf-kis-row"><span class="kb"></span>${kisSym(k)}<span>${t}</span></div>`).join('')}</div>`;
@@ -10550,6 +10572,7 @@ function heftStufe(t, p){
   if(['B:V1', 'B:V2', 'B:V3'].includes(t.topic)) Object.assign(o, {bsim: third, label:['deutlich', 'ähnlich', 'fein'][third]});
   return o;
 }
+const HEFT_RESERVE = 6;   /* mm, die Kopf- und Fußzeile im Heft mehr brauchen als die Fußzeile eines einzelnen Blatts */
 async function heftPages(pid, specs, prog = () => {}){
   const keep = {...app.sheet}, H = app.heft, items = [];
   const fr = document.createElement('iframe'); fr.setAttribute('aria-hidden', 'true'); fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:820px;height:1200px;visibility:hidden'; document.body.append(fr);
@@ -10562,25 +10585,34 @@ async function heftPages(pid, specs, prog = () => {}){
   const trim = (r, m) => { tasksOf(r).slice(m).forEach(e => e.remove()); r.sol = r.sol.slice(0, m); return r; };
   const counts = (total, cols) => { const c = []; for(let m = total - total % cols; m >= cols; m -= cols) c.push(m); if(!c.length) for(let m = total; m >= 1; m--) c.push(m); else if(cols > 1) c.push(1); return c; };
   const build = (t, o, n) => { set(t, {...o, n}); app.sheetDoc = buildSheet(); return {html: app.sheetDoc.html, title: app.sheetDoc.title}; };
-  const wrap = (inner, cls = '') => `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}<div class="page ${cls}">${inner}</div></body></html>`;
+  /* gemessen wird mit Kopf- und Fußzeile wie im fertigen Heft (heftFrame), aber ohne Strecken der Aufgaben */
+  const wrap = (inner, cls = '') => `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}<div class="page hf-p ${cls}">${heftFrame(inner, 0, 88)}</div></body></html>`;
   const tooLong = async (inner, cls) => (await measure(inner, cls)).over;
+  /* „eng“: läuft über oder müsste verkleinert werden – im Heft lieber eine Reihe weniger, damit alle Aufgaben gleich groß sind (Layout B) */
+  const tight = ms => ms.over || ms.z < .95, tooTight = async (inner, cls) => tight(await measure(inner, cls));
   /* over: läuft über; fill: wie voll die Seite ist (0…1, Inhalt bis zum letzten Element im Verhältnis zur nutzbaren Höhe) */
   const measure = async (inner, cls) => { await load(wrap(inner, cls)); const d = fr.contentDocument, p = d.querySelector('.page'); if(!p) return {over:false, fill:1};
-    const mm = 96/25.4, top = p.getBoundingClientRect().top + 12*mm, last = [...p.querySelectorAll(':scope > *, :scope > .fitz > *')].filter(e => !e.classList.contains('hf-pn') && !e.classList.contains('fitz')).pop();
-    return {over: !!p.dataset.over, fill: p.dataset.fit ? 1 : last ? (last.getBoundingClientRect().bottom - top)/(273*mm) : 0}; };
+    const mm = 96/25.4, top = p.getBoundingClientRect().top + 12*mm, ft = p.querySelector('.hf-foot'), last = [...p.querySelectorAll(':scope > *, :scope > .fitz > *')].filter(e => !e.matches('.hf-pn,.hf-foot,.fitz')).pop();
+    return {over: !!p.dataset.over, z: +p.dataset.fit || 1, fill: p.dataset.fit ? 1 : last ? (last.getBoundingClientRect().bottom - top)/(276*mm - (ft ? ft.getBoundingClientRect().height : 0)) : 0}; };
   const band = (txt, ch) => `<div class="hf-band">${ch !== undefined ? `<span>Kapitel ${ch + 1}</span>` : ''}${txt}</div>`;
-  async function full(t, o){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen */
-    set(t, o); app.sheetDoc = buildSheet();
+  async function full(t, o){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen (mit Platz für Kopf- und Fußzeile) */
+    set(t, o); app.sheetDoc = buildSheet(); if(app.sheetGen) app.sheetGen.reserve = HEFT_RESERVE;
     for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G || !G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
-    return parse(app.sheetDoc.html);
+    const r0 = parse(app.sheetDoc.html);
+    if(!(await tooTight(r0.pg.innerHTML))) return r0;
+    for(const m of counts(tasksOf(r0).length, colsOf(r0)).slice(1)){ const r = trim(parse(app.sheetDoc.html), m); if(!(await tooTight(r.pg.innerHTML))) return r; }   /* notfalls eine Reihe weniger */
+    return r0;
   }
   async function fixed(t, o, n, deco){   /* bis n Aufgaben, so viele ganze Reihen, wie auf die Seite passen.
        Große Aufgaben nur, wenn die Seite damit mindestens zu drei Vierteln voll wird; sonst normale Größe, wenn die voller ist. */
     let best = null, last = null;
     for(const oo of o.gross ? [o, {...o, gross:false}] : [o]){
       const b = build(t, oo, n), r0 = parse(b.html, b.title);
+      let loose = null;   /* erste Anzahl, die ohne Verkleinern passt; sonst die erste, die überhaupt passt */
       for(const m of counts(tasksOf(r0).length, colsOf(r0))){ const r = trim(parse(b.html, b.title), m); deco(r); last = r; const ms = await measure(r.pg.innerHTML);
-        if(!ms.over){ if(!best || ms.fill > best.fill + .1) best = {r, fill: ms.fill}; break; } }
+        if(!ms.over && !loose) loose = {r, fill: ms.fill};
+        if(!tight(ms)){ loose = {r, fill: ms.fill}; break; } }
+      if(loose && (!best || loose.fill > best.fill + .1)) best = loose;
       if(best && best.fill >= .75) break;
     }
     return best ? best.r : last;
@@ -10626,12 +10658,12 @@ async function heftPages(pid, specs, prog = () => {}){
             so.push(...r.sol.map((v, i) => `Kapitel ${x.p.ch + 1}, ${i + 1}: ${v}`)); });
           return {h: h + HEFT_LIC, so}; };
         let L = B, idx = B.map(() => 0), c = compose(L, idx);
-        if(await tooLong(c.h)){ L = B.slice(-1); idx = [0]; c = compose(L, idx); }
+        if(await tooTight(c.h)){ L = B.slice(-1); idx = [0]; c = compose(L, idx); }
         for(let grew = true; grew; ){ grew = false;
           for(const j of L.map((_, j) => j).sort((a, b) => L[a].cs[idx[a]] - L[b].cs[idx[b]])){
             if(idx[j] + 1 >= L[j].cs.length) continue;
             const tryIdx = idx.map((v, q) => q === j ? v + 1 : v), tc = compose(L, tryIdx);
-            if(!(await tooLong(tc.h))){ idx = tryIdx; c = tc; grew = true; }
+            if(!(await tooTight(tc.h))){ idx = tryIdx; c = tc; grew = true; }
           }
         }
         const parts = L.map(x => x.p), inner = c.h, sol = c.so;

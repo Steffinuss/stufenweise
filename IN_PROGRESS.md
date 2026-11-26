@@ -18,6 +18,11 @@ Stand: 26.11.2026
 - Überlauf im Heft (54 statt 48 Seiten, abgeschnittene Seite in der Broschüre) behoben, siehe `CHANGELOG.md`. Menü „Material drucken“.
 - Seiten gleichmäßig gefüllt, Seitenzahl fest unten, Stundenplan nach BP GENT, weitere Unstimmigkeiten (Sätze, Sachaufgaben) behoben. Frage an Stefan: Im BP GENT heißt das Fach „Wirtschaft und Berufsorientierung“ (WBO), Stefan schrieb „WBS“ (Name an der Gemeinschaftsschule) – im Stundenplan steht WBO.
 
+## Heft-Layout B (Stefan, 26.11.2026, gebaut in `entwicklung`)
+
+- Drei Vorschläge als Bilder gezeigt (A: Abstände verteilen, B: Aufgaben strecken, C: Platz zum Rechnen). Stefan: „Ich bin für Layout B. Gerne kannst du noch optimieren, dass es insgesamt weniger große Lücken gibt.“
+- Gebaut: `heftFrame` (Kopf-/Fußzeile aus Band und Fußzeilen der Seite), CSS in `buildHeft` (Seite als Spalte, `.ab-grid` wächst), `PAGE_FIT_JS` lässt Kopf- und Fußzeile unverkleinert, Messen mit Rahmen, keine Verkleinerung im Heft (`tight`), größerer Aufgabenvorrat beim Füllen. Test: `heft_assistent.py` (Layout B: Kopf/Fuß, bis zur Fußzeile gefüllt, nichts verkleinert, Seitenzahl gleich hoch).
+
 ## Backlog K: Fußzeile ohne Namen (gebaut in `entwicklung`, 26.11.2026)
 
 - Kommt mit Backlog J zusammen in die Freigabe (0.38.0). Anleitungsbilder dann neu aufnehmen (zeigen noch die alte Fußzeile).

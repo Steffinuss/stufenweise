@@ -47,7 +47,7 @@ Zuerst den Server starten: `python3 -m http.server 8766` im Repository-Ordner. D
 | `doppelte_zeilen.py` | keine Zeile doppelt in einer Aufgabe (z. B. zweimal „7 = 4 + □“), keine gleichen Aufgaben direkt nacheinander |
 | `legeblaetter.py` | alle Legeblätter als PDF: genau 1 Seite, nichts abgeschnitten (`scroll` ≤ verfügbare Höhe) |
 | `arbeitsheft.py` | Arbeitsheft mit mehreren Blättern |
-| `heft_assistent.py` | Arbeitshefte (Backlog J): Fach, 12/24/36/48 Seiten (gedruckt genau so viele), Vorgriff, Kapitel mit Einstieg/Üben/„Das kann ich schon“, Wiederholung, Hilfen, Lösungsheft, Mathe-Feinstufen, Fortsetzungsgeschichte, neue Deutsch-Formate, Broschürendruck |
+| `heft_assistent.py` | Arbeitshefte (Backlog J): Fach, 12/24/36/48 Seiten (gedruckt genau so viele), Vorgriff, Kapitel mit Einstieg/Üben/„Das kann ich schon“, Wiederholung, Hilfen, Lösungsheft, Mathe-Feinstufen, Fortsetzungsgeschichte, neue Deutsch-Formate, Broschürendruck, Layout B (Kopf- und Fußzeile auf jeder Seite, Seitenzahl gleich hoch, Aufgaben bis zur Fußzeile, keine Seite verkleinert) |
 | `heft_seiten_passen.py` | (lang) Arbeitsheft: für jede Stufe Einstieg, Üben, „Das kann ich schon“ und Wiederholung bauen – keine Seite läuft über, gedruckt genau so viele Blätter, A5-Broschüre ohne abgeschnittene Seiten |
 | `plaene_sinnvoll.py` | Erzeugte Inhalte ergeben Sinn: Stundenplan je Stufe (Fächer nach BP GENT, kein Fach jeden Tag in derselben Stunde), „Stimmt das?“-Sätze eindeutig, Stehendes nicht unter dem Tisch |
 | `tausenderbuch_nachspuren.py` | Tausenderbuch-Seiten wählen, ganzes Buch, Nachspur-Buchstaben |

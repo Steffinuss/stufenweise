@@ -110,11 +110,19 @@ async def main():
         toc = re.sub(r'\s+', ' ', toc)
         print(toc)
         check('Inhalt mit Kapiteln ab Seite 2', 'Kapitel 1:' in toc and re.search(r'Kapitel 1: [^0-9]+ 2 ', toc) is not None, toc)
-        check('Seitenzahlen 2 bis 36, Kapitel in der Fußzeile', '<div class="hf-pn">2</div>' in html and '<div class="hf-pn">36</div>' in html and '<div class="hf-pn">37</div>' not in html and 'Kapitel 1 · Stufenweise' in html)
+        check('Seitenzahlen 2 bis 36, Kapitel in der Fußzeile', '<div class="hf-pn">2</div>' in html and '<div class="hf-pn">36</div>' in html and '<div class="hf-pn">37</div>' not in html and '<div class="r">Kapitel 1</div>' in html)
         doc = await br.new_page(); await doc.emulate_media(media='print'); await doc.set_content(html); await doc.wait_for_timeout(700)
         gaps = await doc.evaluate("[...document.querySelectorAll('.page.hf-p')].map(p => Math.round(p.getBoundingClientRect().bottom - p.querySelector('.hf-pn').getBoundingClientRect().bottom))")
+        lay = await doc.evaluate("""() => [...document.querySelectorAll('.page.hf-p')].map(p => { const f = p.querySelector('.hf-foot'), h = p.querySelector('.hf-head'), mm = 96/25.4;
+          const last = p.querySelector('.hf-main')?.lastElementChild;   /* letztes Element im Inhalt: reicht bis zur Fußzeile */
+          return {t: (p.querySelector('h1')?.textContent || '').slice(0, 30), foot: !!f, head: !!h, fit: p.dataset.fit || '', fill: p.querySelector('.ab-grid') && f && last ? Math.round((f.getBoundingClientRect().top - last.getBoundingClientRect().bottom)/mm) : null}; })""")
         await doc.close()
         check('Seitenzahl auf jeder Seite gleich hoch (Druck)', len(set(gaps)) == 1, str(sorted(set(gaps))))
+        # Layout B (Stefan, 26.11.2026): Kopf- und Fußzeile auf jeder Seite, Aufgaben reichen bis zur Fußzeile, nichts verkleinert
+        check('Layout B: Kopf- und Fußzeile auf jeder Kapitelseite', all(x['foot'] for x in lay) and sum(x['head'] for x in lay) == len(lay), str([i for i, x in enumerate(lay) if not x['head']]))
+        filled = [x['fill'] for x in lay if x['fill'] is not None]
+        check('Layout B: Aufgaben füllen die Seite bis zur Fußzeile', filled and max(filled) <= 8, str([(x['t'], x['fill']) for x in lay if x['fill'] is not None and x['fill'] > 8]))
+        check('Layout B: keine Seite verkleinert', not any(x['fit'] for x in lay), str([x['fit'] for x in lay if x['fit']]))
         check('Einstieg mit Beispiel', html.count('class="ab-bsp-lab"') == 3 and html.count('class="hf-intro"') == 3)
         check('„Das kann ich schon“ mit drei Stufen zum Ankreuzen', html.count('class="hf-kis"') == 3 and all(t in html for t in ['Das kann ich.', 'Das kann ich fast.', 'Das übe ich noch.']))
         loes = await pg.evaluate("buildLoesung().html")
