@@ -290,7 +290,7 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 
 ## O: Voller Speicher wird nicht gemeldet (Prüfung vom 22.11.2026, Empfehlung „Speicher volllaufen lassen verhindern“)
 
-**Status:** dokumentiert 26.11.2026, wartet auf Stefans Entscheidung.
+**Status:** dokumentiert 26.11.2026. **Entschieden (Stefan, 26.11.):** nur **O1 Melden**, als Fehlerbehebung direkt in `main` (0.38.1). O2, O3, O4 nicht (vorerst).
 **Ist-Stand (geprüft 26.11. im Code und in Chrome gemessen):**
 - Alles liegt in `localStorage` unter `stufenweise.data` (Kinder, Protokoll, Lernstand), dazu `stufenweise.settings`, `stufenweise.blatt` und `stufenweise.heft`.
 - `saveData()` hat außen `try { … } catch {}`. Schlägt `localStorage.setItem` fehl, passiert nichts Sichtbares. Die App arbeitet mit dem Stand im Arbeitsspeicher weiter. Nach dem nächsten Neustart fehlt alles seit dem letzten gelungenen Speichern. Gemessen: Speicher aufgefüllt, dann 2000 neue Protokolleinträge und ein umbenanntes Kind → gespeichert blieb der alte Stand (2 712 Zeichen statt 178 767), ohne Meldung. `saveSettings()` und `sheetSave()` schweigen genauso; nur `saveHeft()` meldet „Das Heft ist zu groß zum Merken“.
@@ -309,7 +309,7 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 
 ## P: Safari-Tab auf dem iPad löscht Daten nach 7 Tagen (Prüfung vom 22.11.2026, Empfehlung „iPad nur als App vom Home-Bildschirm nutzen“)
 
-**Status:** dokumentiert 26.11.2026, wartet auf Stefans Entscheidung.
+**Status:** dokumentiert 26.11.2026. **Entschieden (Stefan, 26.11.):** nur **P1 Hinweis im Safari-Tab**, über `entwicklung`/Testversion (auf dem iPad im Safari-Tab ansehen). P2 und P3 nicht (vorerst).
 **Ist-Stand (geprüft 26.11.):**
 - Safari löscht allen Speicher, den eine Website per Skript schreibt (auch `localStorage`), wenn die Website an 7 Tagen, an denen Safari benutzt wird, nicht angetippt wurde (Tracking-Schutz ITP, WebKit 2020). Apps vom Home-Bildschirm sind davon ausgenommen (WebKit, „Home Screen Web Application Domain Exempt From ITP“). Laut WebKit-Entwickler*innen (2024) gilt die Regel für alle Speicherarten. `navigator.storage.persist()` schützt vor dem Aufräumen bei Platzmangel, nach heutigem Wissen aber nicht vor dieser 7-Tage-Regel.
 - Die App ruft `navigator.storage.persist()` beim Start schon auf (still, ohne Ergebnis anzuzeigen).
@@ -329,7 +329,7 @@ Ein gemeinsamer Seitenrahmen für Blatt und Heft (`heftFrame` verallgemeinern) w
 
 ## Q: Raten bei Auswahlaufgaben im Test (Prüfung vom 22.11.2026, Empfehlung „Raten im Test begrenzen“)
 
-**Status:** dokumentiert 26.11.2026, didaktisch – Stefan entscheidet.
+**Status:** dokumentiert 26.11.2026. **Entschieden (Stefan, 26.11.):** nur **Q1** (3 von 3 bei Stufen, die nur aus Auswahlaufgaben bestehen), über `entwicklung`/Testversion. Q2, Q3, Q4 nicht; Basis-Test bleibt bei 2 von 2 oder 2 von 3 je Block.
 **Ist-Stand (geprüft 26.11.; Simulation mit einem Kind, das nur rät, je 600–3 000 Durchläufe):**
 - `cellDecision`: erreicht bei 2 von 2 oder 2 von 3, aber nicht, wenn die Kernaufgabe (die erste Aufgabe, `kern:true`) falsch ist. Wegen dieser Regel liegt der Wert je Stufe bei 3 Bildern bei etwa **19 %** und nicht bei 26 %. Bei 2 Antworten (z. B. „Stimmt das?“ in L6) sind es etwa 26 %.
 - Betroffen sind fast alle Stufen in **Lesen L1–L9**, **Hören P1–P4**, **Uhr U1–U6** und **Größen G1–G4** (3 Antworten, je Stufe 11–26 % „erreicht“, 32–50 % mindestens „teilweise“). Zahlen, Rechnen, Stellenwert und Schreiben fast nicht (Zahlen eintippen).
