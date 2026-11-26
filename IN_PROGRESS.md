@@ -5,4 +5,8 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 26.11.2026 (0.39.0 freigegeben)
 
-Zurzeit nichts in Arbeit. O1 (0.38.1) sowie P1, Q1 und N (0.39.0) sind freigegeben. Als Nächstes im Backlog (nur dokumentiert): L (Lineatur) und M (Arbeitsblätter im Heft-Design).
+In der Testversion, wartet auf Stefans Durchsicht und Freigabe (Einzelheiten in `CHANGELOG.md` unter „Unveröffentlicht“):
+
+- **M** Arbeitsblätter im Design der Arbeitshefte (Layout A), Schwarz-Weiß für alle Blätter, keine Linie über der Fußzeile (auch im Heft).
+
+Danach: **L** Lineatur (Grundstufe Haus, Hauptstufe/Berufsschulstufe eine Linie).

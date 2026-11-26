@@ -4,7 +4,7 @@ Schwarz-Weiß) ohne NaN/undefined; Lösungsblatt hat so viele Einträge wie Aufg
 (grau gestrichelt) steht nur in der ersten Aufgabe jeder Art. Schwarz-Weiß ersetzt Farben durch Muster
 und stellt danach wieder auf Farbe. Die Basis-Legeblätter (Sortierunterlage, Zuordnungsleiste,
 Musterstreifen) bauen sich in allen Varianten. Die Themen stehen im Generator, die Schwarz-Weiß-Option
-erscheint nur bei Basis."""
+erscheint bei allen Blättern (seit Backlog M), bei Legeblättern nur bei Basis."""
 import asyncio
 from playwright.async_api import async_playwright
 from common import URL, launch  # noqa: E402
@@ -57,7 +57,7 @@ async def main():
         ui = await pg.evaluate("""(()=>{ const out = {};
           for(const t of ['B:V1', 'M:plus', 'K:muster', 'K:zehner']){ app.sheet.topic = t; openSheets('none'); out[t] = !!document.querySelector('#sh-bw'); }
           return out; })()""")
-        if ui != {'B:V1': True, 'M:plus': False, 'K:muster': True, 'K:zehner': False}: errs.append(f'Schwarz-Weiß-Option {ui}')
+        if ui != {'B:V1': True, 'M:plus': True, 'K:muster': True, 'K:zehner': False}: errs.append(f'Schwarz-Weiß-Option {ui}')
         print('Schwarz-Weiß-Option sichtbar:', ui)
         # Beispiel je Aufgabenart nur ein Schritt (Stefan, 19.11.): höchstens eine Markierung bzw. Linie je vorgemachter Aufgabe
         ex = await pg.evaluate("""(()=>{ const bad=[]; for(const t of ['B:V1','B:V2','B:V3','B:V4','B:V6','B:V7','B:O2','B:O3','B:O4']) for(let k=0;k<6;k++){ app.sheet.topic=t; app.sheet.n='fill'; app.sheet.bsim=k%3;

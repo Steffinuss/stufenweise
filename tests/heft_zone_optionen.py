@@ -31,7 +31,7 @@ async def main():
         bw, taf = await dialog(a)
         check('Kind mit Tafel und Basis: beide Häkchen', bw == 1 and taf == 1, f'{bw} {taf}')
         bw, taf = await dialog(b)
-        check('Kind ohne Tafel und Basis: keine Häkchen', bw == 0 and taf == 0, f'{bw} {taf}')
+        check('Kind ohne Tafel und Basis: Schwarz-Weiß immer (Backlog M), kein Tafel-Häkchen', bw == 1 and taf == 0, f'{bw} {taf}')
 
         # ohne Häkchen
         await dialog(a)
