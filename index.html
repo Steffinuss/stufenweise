@@ -4981,17 +4981,20 @@ function minimalItem(kern){
 }
 /* L6: Sätze aus Bausteinen */
 const SCENE_OBJ = {Tasse:'steht', Dose:'steht', Kerze:'steht', Glas:'steht', Limo:'steht', Uhr:'liegt', Banane:'liegt', Tomate:'liegt', Ball:'liegt', Apfel:'liegt', Buch:'liegt', Brot:'liegt', Lupe:'liegt', Handy:'liegt', Stift:'liegt', Schere:'liegt'};
-const FACTS = [['Banane','gelb','blau'], ['Tomate','rot','blau'], ['Sonne','heiß','kalt'], ['Eis','kalt','heiß'], ['Baum','grün','blau'], ['Wolke','weiß','grün'], ['Messer','scharf','weich'], ['Nagel','spitz','weich'], ['Pizza','rund','eckig'], ['Ball','rund','eckig'], ['Kiste','eckig','rund'], ['Maus','klein','riesig'], ['Mütze','warm','nass'], ['Haus','groß','winzig'], ['Apfel','rund','eckig'], ['Mond','am Himmel','im Wasser'], ['Fisch','im Wasser','im Baum'], ['Kerze','hell','dunkel'], ['Glas','durchsichtig','weich'], ['Zug','lang','rund']];
+const FACTS = [['Banane','gelb','blau'], ['Tomate','rot','blau'], ['Sonne','heiß','kalt'], ['Eis','kalt','heiß'], ['Baum','grün','blau'], ['Wolke','weiß','grün'], ['Messer','scharf','weich'], ['Nagel','spitz','weich'], ['Pizza','rund','blau'], ['Ball','rund','eckig'], ['Kiste','eckig','rund'], ['Maus','klein','riesig'], ['Mütze','warm','aus Stein'], ['Haus','groß','winzig'], ['Apfel','rund','eckig'], ['Mond','am Himmel','im Wasser'], ['Fisch','im Wasser','im Baum'], ['Kerze','aus Wachs','aus Glas'], ['Glas','durchsichtig','weich'], ['Zug','lang','rund']];
 const TOOLS = [['Hammer','einen Nagel einschlagen'], ['Säge','Holz sägen'], ['Schere','Papier schneiden'], ['Pinsel','malen'], ['Stift','schreiben'], ['Gabel','essen'], ['Tasse','trinken'], ['Lupe','genau hinsehen'], ['Kamera','Fotos machen'], ['Handy','telefonieren'], ['Leiter','nach oben steigen'], ['Lampe','Licht machen'], ['Zange','einen Nagel ziehen'], ['Uhr','die Zeit ablesen'], ['Buch','lesen'], ['Radio','Musik hören'], ['Auto','fahren'], ['Messer','Brot schneiden']];
+/* Was man mit einem Ding AUCH machen kann – darf nie als falscher Satz kommen (Stefan, 26.11.: „Mit dem Messer kann man Papier schneiden“ ist nicht falsch) */
+const TOOL_ALSO = {Messer:['Papier schneiden'], Schere:['Brot schneiden'], Pinsel:['schreiben'], Stift:['malen'], Lupe:['lesen'], Handy:['Fotos machen', 'Musik hören', 'die Zeit ablesen', 'Licht machen', 'schreiben', 'lesen'], Kamera:['Licht machen'], Radio:['die Zeit ablesen'], Auto:['Musik hören', 'Licht machen'], Lampe:['lesen'], Uhr:['Licht machen']};
+const scenePos = o => SCENE_OBJ[o] === 'steht' ? pick(['auf', 'neben']) : pick(['auf', 'unter', 'neben']);   /* eine Kerze steht nicht unter dem Tisch */
 function factSentence(){
   if(Math.random() < .5){ const [n, t, f] = pick(FACTS), yes = Math.random() < .5; return [`${cap(art(n))} ${n} ist ${yes ? t : f}.`, yes, n]; }
-  const [n, a] = pick(TOOLS), yes = Math.random() < .5, other = yes ? a : pick(TOOLS.filter(x => x[0] !== n))[1];
+  const [n, a] = pick(TOOLS), yes = Math.random() < .5, other = yes ? a : pick(TOOLS.filter(x => x[0] !== n && !(TOOL_ALSO[n] || []).includes(x[1])))[1];
   return [`Mit ${artDat(n)} ${n} kann man ${other}.`, yes, n];
 }
 const SENT_YN = Array.from({length:40}, factSentence);
 const ynOpts = yes => yes ? [{h:'<span class="yn ok">✓ ja</span>', a:'ja'}, {h:'<span class="yn no">✗ nein</span>', a:'nein'}] : [{h:'<span class="yn no">✗ nein</span>', a:'nein'}, {h:'<span class="yn ok">✓ ja</span>', a:'ja'}];
 function sceneItem(kern){
-  const o = fresh(Object.keys(SCENE_OBJ)), pos = pick(['auf', 'unter', 'neben']);
+  const o = fresh(Object.keys(SCENE_OBJ)), pos = scenePos(o);
   return choiceRow({kern, text:`${cap(art(o))} ${o} ${SCENE_OBJ[o]} ${pos} dem Tisch.`, prompt:'Lies den Satz. Welches Bild passt?', label:`Satz: ${o} ${pos} dem Tisch`}, [pos, ...['auf', 'unter', 'neben'].filter(p => p !== pos)].map(p => ({h: tableScene(p, o), a:`${o} ${p} dem Tisch`})));
 }
 function ynItem(){ let s, yes, n, t = 0; do { [s, yes, n] = factSentence(); t++; } while(FRESH.used.has(n) && t < 10); FRESH.used.add(n); return mkChoice({layout:'row', text:s, prompt:'Lies den Satz. Stimmt das?', label:`Satz prüfen: ${s}`}, ynOpts(yes)); }
@@ -5072,7 +5075,7 @@ const TEXTS_NEU = [
   {text:'Sara hat sich in den Finger geschnitten. Es blutet ein bisschen. Ihre Lehrerin klebt ein Pflaster darauf. Bald tut es nicht mehr weh.', qs:[['Was ist passiert?', ['Sara hat sich geschnitten.', 'Sara ist hingefallen.', 'Sara hat Fieber.']], ['Wer klebt ein Pflaster darauf?', ['die Lehrerin', 'der Arzt', 'ihr Bruder']], ['Wo hat sich Sara geschnitten?', ['in den Finger', 'ins Knie', 'in die Hand']]]},
   {w:['HS','BSS'], text:'Kevin will Geld sparen. Er bekommt jede Woche 10 Euro Taschengeld. Davon legt er 5 Euro in eine Dose. Er spart für Kopfhörer.', qs:[['Wie viel Taschengeld bekommt Kevin?', ['10 Euro pro Woche', '5 Euro pro Woche', '10 Euro pro Tag']], ['Wie viel spart er jede Woche?', ['5 Euro', '10 Euro', '1 Euro']], ['Wofür spart Kevin?', ['für Kopfhörer', 'für ein Fahrrad', 'für ein Handy']]]},
   {text:'Jana und ihre Mutter gehen in den Wald. Sie sammeln Pilze und Blätter. Ein Reh läuft über den Weg. Jana macht schnell ein Foto.', qs:[['Wohin gehen Jana und ihre Mutter?', ['in den Wald', 'in den Park', 'in die Stadt']], ['Welches Tier läuft über den Weg?', ['ein Reh', 'ein Hund', 'ein Fuchs']], ['Was macht Jana?', ['ein Foto', 'einen Kuchen', 'eine Pause']]]},
-  {text:'Die Klasse 8a pflanzt Bäume. Jeder bekommt eine Schaufel. Sie graben Löcher und setzen kleine Bäume hinein. Zum Schluss gießen sie alles.', qs:[['Was pflanzt die Klasse?', ['Bäume', 'Blumen', 'Salat']], ['Was bekommt jeder?', ['eine Schaufel', 'einen Eimer', 'eine Schere']], ['Was machen sie zum Schluss?', ['Sie gießen alles.', 'Sie essen.', 'Sie fahren nach Hause.']]]},
+  {w:['HS','BSS'], text:'Die Klasse 8a pflanzt Bäume. Jeder bekommt eine Schaufel. Sie graben Löcher und setzen kleine Bäume hinein. Zum Schluss gießen sie alles.', qs:[['Was pflanzt die Klasse?', ['Bäume', 'Blumen', 'Salat']], ['Was bekommt jeder?', ['eine Schaufel', 'einen Eimer', 'eine Schere']], ['Was machen sie zum Schluss?', ['Sie gießen alles.', 'Sie essen.', 'Sie fahren nach Hause.']]]},
   {text:'Lea hört gern Musik. Sie hat Kopfhörer und ein Handy. Ihr Lieblingslied hört sie jeden Morgen im Bus. Dabei singt sie leise mit.', qs:[['Was hört Lea gern?', ['Musik', 'Hörspiele', 'Nachrichten']], ['Wo hört Lea ihr Lieblingslied?', ['im Bus', 'in der Küche', 'beim Sport']], ['Was macht Lea dabei?', ['Sie singt leise mit.', 'Sie tanzt.', 'Sie schläft.']]]},
   {w:['HS','BSS'], text:'Emre muss einen Brief zur Post bringen. Die Briefmarke kostet 95 Cent. Die Post ist neben dem Supermarkt. Sie hat bis 18 Uhr offen.', qs:[['Wohin bringt Emre den Brief?', ['zur Post', 'zur Schule', 'zum Bahnhof']], ['Was kostet die Briefmarke?', ['95 Cent', '9 Euro', '50 Cent']], ['Bis wann hat die Post offen?', ['bis 18 Uhr', 'bis 8 Uhr', 'bis 12 Uhr']]]},
   {text:'Tom hat seinen Schlüssel verloren. Er sucht in seiner Jacke und in seiner Tasche. Dann findet er ihn unter dem Sofa. Tom ist froh.', qs:[['Was hat Tom verloren?', ['seinen Schlüssel', 'sein Handy', 'seine Mütze']], ['Wo findet er ihn?', ['unter dem Sofa', 'in der Jacke', 'in der Tasche']], ['Wie fühlt sich Tom am Ende?', ['froh', 'wütend', 'traurig']]]},
@@ -5114,13 +5117,13 @@ const TEXTS_MID = [
   {t:'Das Fußballspiel', text:'Heute spielt die Schulmannschaft gegen eine andere Schule. Finn ist Torwart. In der ersten Halbzeit hält er zwei Schüsse. Dann schießt die andere Mannschaft doch ein Tor. In der zweiten Halbzeit schießt Ali zwei Tore. Das Spiel endet 2 zu 1. Alle jubeln und umarmen Finn und Ali.', qs:[['Was ist Finn?', ['Torwart', 'Trainer', 'Schiedsrichter']], ['Wie viele Tore schießt Ali?', ['zwei', 'eins', 'drei']], ['Wie endet das Spiel?', ['2 zu 1', '1 zu 2', '0 zu 0']], ['Wer gewinnt?', ['die Schulmannschaft', 'die andere Schule', 'keiner']]]},
   {t:'Die Fahrkarte', text:'Elif will mit dem Zug zu ihrer Tante fahren. Am Bahnhof steht ein Fahrkartenautomat. Sie tippt den Namen der Stadt ein. Die Fahrkarte kostet 8,50 Euro. Elif bezahlt mit einem 10-Euro-Schein. Der Automat gibt ihr 1,50 Euro zurück. Der Zug fährt von Gleis 3 ab.', qs:[['Zu wem fährt Elif?', ['zu ihrer Tante', 'zu ihrer Oma', 'zu ihrer Freundin']], ['Was kostet die Fahrkarte?', ['8,50 Euro', '10 Euro', '1,50 Euro']], ['Wie viel Geld bekommt sie zurück?', ['1,50 Euro', '8,50 Euro', '2 Euro']], ['Von welchem Gleis fährt der Zug?', ['Gleis 3', 'Gleis 8', 'Gleis 10']]]},
   {w:['HS','BSS'], t:'Kochen in der Wohngruppe', text:'Jonas wohnt in einer Wohngruppe. Jeden Abend kocht ein anderer Bewohner. Heute ist Jonas dran. Er macht Reis mit Gemüse. Vorher schaut er im Kühlschrank nach. Es fehlt eine Paprika, also geht er schnell einkaufen. Beim Essen sagen alle, dass es sehr gut schmeckt.', qs:[['Wo wohnt Jonas?', ['in einer Wohngruppe', 'bei seinen Eltern', 'in einem Hotel']], ['Was kocht Jonas?', ['Reis mit Gemüse', 'Nudeln mit Soße', 'Suppe']], ['Was fehlt?', ['eine Paprika', 'der Reis', 'eine Zwiebel']], ['Was sagen die anderen beim Essen?', ['Es schmeckt sehr gut.', 'Es ist zu salzig.', 'Es ist kalt.']]]},
-  {t:'Im Zoo', text:'Die Klasse 7b besucht den Zoo. Zuerst gehen sie zu den Elefanten. Ein Elefant spritzt mit dem Rüssel Wasser. Danach sehen sie die Affen beim Klettern. Um 11 Uhr werden die Pinguine gefüttert. Das wollen alle sehen. Zum Schluss kauft sich jeder ein Eis.', qs:[['Welche Tiere sehen sie zuerst?', ['die Elefanten', 'die Affen', 'die Pinguine']], ['Was macht ein Elefant?', ['Er spritzt Wasser.', 'Er schläft.', 'Er frisst Bananen.']], ['Wann werden die Pinguine gefüttert?', ['um 11 Uhr', 'um 1 Uhr', 'um 12 Uhr']], ['Was machen alle zum Schluss?', ['Sie kaufen ein Eis.', 'Sie füttern die Affen.', 'Sie fahren Bus.']]]},
+  {w:['HS','BSS'], t:'Im Zoo', text:'Die Klasse 7b besucht den Zoo. Zuerst gehen sie zu den Elefanten. Ein Elefant spritzt mit dem Rüssel Wasser. Danach sehen sie die Affen beim Klettern. Um 11 Uhr werden die Pinguine gefüttert. Das wollen alle sehen. Zum Schluss kauft sich jeder ein Eis.', qs:[['Welche Tiere sehen sie zuerst?', ['die Elefanten', 'die Affen', 'die Pinguine']], ['Was macht ein Elefant?', ['Er spritzt Wasser.', 'Er schläft.', 'Er frisst Bananen.']], ['Wann werden die Pinguine gefüttert?', ['um 11 Uhr', 'um 1 Uhr', 'um 12 Uhr']], ['Was machen alle zum Schluss?', ['Sie kaufen ein Eis.', 'Sie füttern die Affen.', 'Sie fahren Bus.']]]},
   {t:'Der Stromausfall', text:'Am Abend geht plötzlich überall das Licht aus. Auch der Fernseher und der Kühlschrank sind still. Es ist ein Stromausfall. Lea sucht eine Taschenlampe. Ihr Vater zündet Kerzen an. Die Familie spielt bei Kerzenlicht Karten. Nach zwei Stunden ist der Strom wieder da.', qs:[['Was passiert am Abend?', ['Der Strom fällt aus.', 'Es gibt ein Gewitter.', 'Der Fernseher ist kaputt.']], ['Was sucht Lea?', ['eine Taschenlampe', 'ihr Handy', 'eine Decke']], ['Was spielt die Familie?', ['Karten', 'Fußball', 'Verstecken']], ['Wann ist der Strom wieder da?', ['nach zwei Stunden', 'am nächsten Morgen', 'nach fünf Minuten']]]},
   {w:['HS','BSS'], t:'Pause in der Werkstatt', text:'In der Schreinerei ist um 10 Uhr Frühstückspause. Alle legen ihr Werkzeug weg. Sie waschen sich die Hände. Dann setzen sie sich an den großen Tisch. Herr König, der Meister, erzählt vom Wochenende. Nach 20 Minuten geht die Arbeit weiter. Emre schleift weiter an seinem Regal.', qs:[['Wann ist Frühstückspause?', ['um 10 Uhr', 'um 12 Uhr', 'um 9 Uhr']], ['Was machen alle vor dem Essen?', ['Sie waschen sich die Hände.', 'Sie fegen den Boden.', 'Sie gehen nach Hause.']], ['Wer ist Herr König?', ['der Meister', 'ein Kunde', 'ein Lehrer']], ['Woran arbeitet Emre?', ['an einem Regal', 'an einem Stuhl', 'an einer Tür']]]},
   {t:'Ein Besuch im Museum', text:'Die Klasse besucht ein Museum über Dinosaurier. Am Eingang steht ein riesiges Skelett. Es ist so groß wie ein Haus. Eine Frau erklärt, dass manche Dinosaurier nur Pflanzen gefressen haben. Die Kinder dürfen einen echten Knochen anfassen. Er ist schwer und kalt. Im Museumsladen kauft Ben eine Postkarte.', qs:[['Worum geht es im Museum?', ['um Dinosaurier', 'um Autos', 'um Bilder']], ['Wie groß ist das Skelett?', ['so groß wie ein Haus', 'so groß wie ein Hund', 'so klein wie eine Maus']], ['Was dürfen die Kinder anfassen?', ['einen echten Knochen', 'das Skelett', 'eine Pflanze']], ['Was kauft Ben?', ['eine Postkarte', 'ein Buch', 'einen Dinosaurier']]]},
   {t:'Die kranke Katze', text:'Die Katze von Marie frisst seit zwei Tagen nichts mehr. Sie liegt nur in ihrem Korb. Marie und ihre Mutter bringen sie zur Tierärztin. Die Tierärztin untersucht die Katze. Sie hat einen kranken Zahn. Der Zahn wird gezogen. Am nächsten Tag frisst die Katze wieder.', qs:[['Was ist mit der Katze los?', ['Sie frisst nichts.', 'Sie miaut laut.', 'Sie ist weggelaufen.']], ['Wohin bringen sie die Katze?', ['zur Tierärztin', 'ins Tierheim', 'zu Oma']], ['Was hat die Katze?', ['einen kranken Zahn', 'Fieber', 'ein verletztes Bein']], ['Wann frisst die Katze wieder?', ['am nächsten Tag', 'nach einer Woche', 'sofort']]]},
   {w:['HS','BSS'], t:'Das Taschengeld', text:'Nina bekommt im Monat 30 Euro Taschengeld. Davon bezahlt sie ihre Handykarte für 10 Euro. Für Süßigkeiten gibt sie ungefähr 5 Euro aus. Den Rest spart sie. Nach drei Monaten hat sie 45 Euro gespart. Davon kauft sie Turnschuhe. Sie ist stolz, weil sie das Geld selbst gespart hat.', qs:[['Wie viel Taschengeld bekommt Nina im Monat?', ['30 Euro', '10 Euro', '45 Euro']], ['Was kostet die Handykarte?', ['10 Euro', '5 Euro', '30 Euro']], ['Wie viel hat Nina nach drei Monaten gespart?', ['45 Euro', '30 Euro', '15 Euro']], ['Was kauft Nina?', ['Turnschuhe', 'ein Handy', 'Süßigkeiten']]]},
-  {t:'Das Schulfest', text:'Beim Schulfest hat jede Klasse einen Stand. Die Klasse 9 verkauft Waffeln. Die Klasse 8 macht ein Dosenwerfen. An einem anderen Stand kann man sich schminken lassen. Auf der Bühne singt der Schulchor. Mehmet spielt Trommel in der Schulband. Am Ende des Tages ist der Schulhof voller Luftballons.', qs:[['Was verkauft die Klasse 9?', ['Waffeln', 'Kuchen', 'Getränke']], ['Was macht die Klasse 8?', ['ein Dosenwerfen', 'Schminken', 'Musik']], ['Was spielt Mehmet?', ['Trommel', 'Gitarre', 'Klavier']], ['Wer singt auf der Bühne?', ['der Schulchor', 'die Lehrer', 'die Eltern']]]},
+  {w:['HS','BSS'], t:'Das Schulfest', text:'Beim Schulfest hat jede Klasse einen Stand. Die Klasse 9 verkauft Waffeln. Die Klasse 8 macht ein Dosenwerfen. An einem anderen Stand kann man sich schminken lassen. Auf der Bühne singt der Schulchor. Mehmet spielt Trommel in der Schulband. Am Ende des Tages ist der Schulhof voller Luftballons.', qs:[['Was verkauft die Klasse 9?', ['Waffeln', 'Kuchen', 'Getränke']], ['Was macht die Klasse 8?', ['ein Dosenwerfen', 'Schminken', 'Musik']], ['Was spielt Mehmet?', ['Trommel', 'Gitarre', 'Klavier']], ['Wer singt auf der Bühne?', ['der Schulchor', 'die Lehrer', 'die Eltern']]]},
   {t:'Im Winter', text:'Im Winter ist es draußen kalt. Paul zieht eine dicke Jacke, eine Mütze und Handschuhe an. Auf dem Schulweg ist die Straße glatt. Paul geht langsam, damit er nicht ausrutscht. In der Schule hängt er seine nassen Sachen an die Heizung. Mittags gibt es eine warme Suppe. Nachmittags baut die Klasse eine Schneeburg.', qs:[['Was zieht Paul an?', ['Jacke, Mütze und Handschuhe', 'nur eine Jacke', 'ein T-Shirt']], ['Warum geht Paul langsam?', ['Die Straße ist glatt.', 'Er ist müde.', 'Er hat Zeit.']], ['Wohin hängt er die nassen Sachen?', ['an die Heizung', 'in den Schrank', 'aufs Fenster']], ['Was baut die Klasse?', ['eine Schneeburg', 'einen Schneemann', 'ein Iglu aus Eis']]]},
   {w:['HS','BSS'], t:'Ein Anruf', text:'Das Telefon in der Schule klingelt. Yusuf geht ran, weil die Sekretärin nicht da ist. Er sagt: „Guten Tag, hier ist die Schule am Park.“ Eine Frau fragt nach Herrn Schmidt. Yusuf schreibt ihren Namen und ihre Telefonnummer auf einen Zettel. Er legt den Zettel auf den Tisch von Herrn Schmidt. Später ruft Herr Schmidt die Frau zurück.', qs:[['Warum geht Yusuf ans Telefon?', ['Die Sekretärin ist nicht da.', 'Er wartet auf einen Anruf.', 'Herr Schmidt bittet ihn darum.']], ['Wie meldet sich Yusuf?', ['Guten Tag, hier ist die Schule am Park.', 'Hallo, wer ist da?', 'Yusuf hier.']], ['Was schreibt Yusuf auf?', ['Name und Telefonnummer', 'die Uhrzeit', 'eine Adresse']], ['Was macht Herr Schmidt später?', ['Er ruft die Frau zurück.', 'Er schreibt einen Brief.', 'Er geht nach Hause.']]]}
 ];
@@ -5267,14 +5270,32 @@ function docPlan(){
   { const mx = work.reduce((a, b) => dur(b) > dur(a) ? b : a); qs.push(['schluss', `An welchem Tag arbeitet ${who} am längsten?`, opt3(WDAYS[mx], others(mx).filter(d => d !== WDAYS[school]), [WDAYS[school]])]); }
   return {title:'Praktikumsplan', html, qs};
 }
+/* Stundenplan (Stefan, 26.11.2026: nicht jeden Tag 1. Stunde Deutsch und 2. Stunde Mathe; Klassen und Fächer passend zur Stufe,
+   Fächer nach Bildungsplan 2022 GENT: Grundstufe Deutsch, Mathe, Sachunterricht, Musik, Kunst/Werken, Sport, Religion;
+   Hauptstufe zusätzlich AES, Technik, WBO (Wirtschaft und Berufsorientierung), BNT, Geschichte) */
+function ttGrid(hs, H){
+  const G = WDAYS.map(() => Array(H).fill(null));
+  const days = shuffle([0, 1, 2, 3, 4]), sportDay = days[0];
+  G[sportDay][H - 2] = G[sportDay][H - 1] = 'Sport';
+  (hs ? ['AES', 'Technik'] : ['Kunst']).forEach((f, k) => { const d = days[k + 1], h = pick([H - 2, 1]); G[d][h] = G[d][h + 1] = f; });
+  const freeIn = (d, hs2) => hs2.filter(h => !G[d][h]);
+  WDAYS.forEach((_, d) => { for(const f of shuffle(['Deutsch', 'Mathe'])){ const c = freeIn(d, [0, 1, 2]); G[d][c.length ? pick(c) : freeIn(d, [...G[d].keys()])[0]] = f; } });
+  const pool = shuffle(hs ? ['WBO', 'WBO', 'BNT', 'BNT', 'Geschichte', 'Musik', 'Religion', 'Kunst', 'Kunst'] : ['Deutsch', 'Sachunterricht', 'Sachunterricht', 'Sachunterricht', 'Musik', 'Religion']);
+  for(const d of shuffle([0, 1, 2, 3, 4])) for(const h of shuffle([...G[d].keys()])) if(!G[d][h]){
+    let k = pool.findIndex(f => !G[d].includes(f)); if(k < 0) k = 0; G[d][h] = pool.splice(k, 1)[0] || 'Deutsch'; }
+  return G;
+}
 function docTimetable(){
-  const F = ['Deutsch', 'Mathe', 'Sachunterricht', 'Kunst', 'Musik'], sportDay = rnd(0, 4), musicDays = shuffle([0, 1, 2, 3, 4].filter(i => i !== sportDay)).slice(0, 2);
-  const plan = WDAYS.map((_, i) => { const r = ['Deutsch', 'Mathe', pick(['Sachunterricht', 'Kunst', 'Deutsch']), pick(['Mathe', 'Sachunterricht', 'Kunst'])]; if(i === sportDay) r[2] = r[3] = 'Sport'; if(musicDays.includes(i)) r[3] = 'Musik'; return r; });
-  const html = dcBox('Stundenplan', `Stundenplan Klasse ${pick(['2a', '3b', '4c', '2b'])}`, dcTable(['Tag', '1. Stunde', '2. Stunde', '3. Stunde', '4. Stunde'], WDAYS.map((d, i) => [d, ...plan[i]])), 'Sport ist in der Turnhalle. Bitte Turnbeutel mitbringen.');
-  const qs = [], others = i => WDAYS.filter((_, j) => j !== i), d2 = rnd(0, 4);
+  const hs = world() !== 'GS', H = hs ? 5 : 4;
+  let G; do G = ttGrid(hs, H); while([...Array(H).keys()].some(h => G.every(r => r[h] === G[0][h])));   /* kein Fach jeden Tag in derselben Stunde */
+  const sportDay = G.findIndex(r => r.join().includes('Sport,Sport'));
+  const cnt = f => G.flat().filter(x => x === f).length;
+  const html = dcBox('Stundenplan', `Stundenplan Klasse ${pick(hs ? ['7a', '8b', '9a', '6b', '8c'] : ['2a', '3b', '4c', '1b'])}`, dcTable(['Tag', ...[...Array(H).keys()].map(h => `${h + 1}. Stunde`)], WDAYS.map((d, i) => [d, ...G[i]])), hs ? 'Sport ist in der Turnhalle. Bitte Turnbeutel mitbringen. AES ist in der Schulküche.' : 'Sport ist in der Turnhalle. Bitte Turnbeutel mitbringen.');
+  const qs = [], others = i => WDAYS.filter((_, j) => j !== i), d2 = rnd(0, 4), subj = [...new Set(G.flat())];
   qs.push(['info', 'An welchem Tag ist Sport?', opt3(WDAYS[sportDay], others(sportDay))]);
-  qs.push(['info', `Was ist am ${WDAYS[d2]} in der 1. Stunde?`, opt3(plan[d2][0], ['Sport', 'Musik', 'Mathe', 'Kunst'])]);
-  qs.push(['info', 'Wie oft ist Musik in der Woche?', opt3('2-mal', ['1-mal', '3-mal', '5-mal'])]);
+  qs.push(['info', `Was ist am ${WDAYS[d2]} in der 1. Stunde?`, opt3(G[d2][0], subj.filter(f => f !== G[d2][0]))]);
+  { const f = hs ? pick(['Musik', 'BNT', 'WBO']) : pick(['Musik', 'Sachunterricht']), c = cnt(f); qs.push(['rechnen', `Wie oft ist ${f} in der Woche?`, opt3(`${c}-mal`, [1, 2, 3, 4, 5].filter(x => x !== c).map(x => `${x}-mal`))]); }
+  if(hs){ const d = G.findIndex(r => r.includes('AES')); qs.push(['info', 'An welchem Tag kocht die Klasse in AES?', opt3(WDAYS[d], others(d))]); }
   qs.push(['schluss', 'An welchem Tag brauchst du deinen Turnbeutel?', opt3(WDAYS[sportDay], others(sportDay))]);
   return {title:'Stundenplan', html, qs};
 }
@@ -5961,7 +5982,7 @@ const R_ITEMS = {
        () => { const p = rnd(3, 6)*10 + rnd(1, 4); return sach(sachPick([['GS', `Die Klasse hat 100 Sticker. ${p} Sticker sind schon verteilt. Wie viele sind noch übrig?`], ['GS', `Ein Buch hat 100 Seiten. Lena hat schon ${p} Seiten gelesen. Wie viele Seiten fehlen noch?`], ['HS BSS', `Du bezahlst ${p} € mit einem 100-€-Schein. Wie viel Rückgeld bekommst du?`], ['BSS', `Im Paket sind 100 Schrauben. Du brauchst ${p} Schrauben. Wie viele bleiben übrig?`]]), 100 - p, `${world() === 'GS' ? 'Rest' : 'Rückgeld'} 100 − ${p}`); }],
   R6: [() => { const a = rnd(2, 5)*100 + rnd(1, 4)*10, b = rnd(1, 3)*100 + rnd(1, 4)*10, c = rnd(5, 9)*100 + rnd(5, 9)*10, d = rnd(1, 4)*100 + rnd(1, 4)*10; return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d}`, {kern:true}); },
        () => { const a = rnd(2, 6)*100 + rnd(5, 9)*10, b = rnd(3, 6)*10, c = rnd(4, 8)*100 + rnd(1, 3)*10, d = rnd(4, 8)*10; return calc2(`${a} + ${b}`, a + b, `${c} − ${d}`, c - d, `${a} + ${b} und ${c} − ${d} (Hunderterübergang)`); },
-       () => { const a = rnd(2, 4)*100 + 50, b = rnd(1, 3)*100 + rnd(1, 9)*10; return sach(sachPick([['', `Ein Fahrrad kostet ${a} €. Ein Helm und ein Schloss kosten zusammen ${b} €. Wie viel kostet alles zusammen?`], ['GS', `In der Bücherei gibt es ${a} Bücher für Kinder und ${b} Bücher für Erwachsene. Wie viele Bücher sind es zusammen?`], ['HS', `Beim Schulfest verdient die Klasse ${a} €, beim Flohmarkt ${b} €. Wie viel Geld ist es zusammen?`], ['BSS', `Die Miete kostet ${a} €. Strom und Internet kosten zusammen ${b} €. Wie viel musst du zusammen bezahlen?`]]), a + b, `Sachaufgabe ${a} + ${b} €`); }],
+       () => { const a = rnd(2, 4)*100 + 50, b = rnd(1, 3)*100 + rnd(1, 9)*10; return sach(sachPick([['', `Paul kauft ein Fahrrad für ${a} € und einen Fahrradanhänger für ${b} €. Wie viel bezahlt er zusammen?`], ['GS', `In der Bücherei gibt es ${a} Bücher für Kinder und ${b} Bücher für Erwachsene. Wie viele Bücher sind es zusammen?`], ['HS', `Beim Schulfest verdient die Klasse ${a} €, beim Flohmarkt ${b} €. Wie viel Geld ist es zusammen?`], ['BSS', `Die Miete kostet ${a} €. Heizung und Wasser kosten zusammen ${b} €. Wie viel musst du zusammen bezahlen?`]]), a + b, `Sachaufgabe ${a} + ${b} €`); }],
   R7: [() => { const a = pick([2, 5, 10]), b = rnd(3, 9), c = pick([2, 5, 10].filter(x => x !== a)), d = rnd(2, 9); return calc2(`${a} · ${b}`, a*b, `${c} · ${d}`, c*d, `${a} · ${b} und ${c} · ${d} (Kernaufgaben)`, {kern:true}); },
        () => { const n = rnd(3, 6), k = pick([2, 5, 10]); return sach(sachPick([['GS', `${n} Schachteln. In jeder Schachtel sind ${k} Stifte. Wie viele Stifte sind es zusammen?`], ['GS', `${n} Kinder haben je ${k} Murmeln. Wie viele Murmeln sind es zusammen?`], ['HS BSS', `${n} Packungen. In jeder Packung sind ${k} Eier. Wie viele Eier sind es zusammen?`], ['BSS', `${n} Kartons. In jedem Karton sind ${k} Flaschen. Wie viele Flaschen sind es zusammen?`]]), n*k, `Sachaufgabe ${n} · ${k}`); },
        () => { const k = pick([2, 5, 10]), n = rnd(3, 8); return calc2(`${n*k} : ${k}`, n, `${k} · ${n}`, k*n, `${n*k} : ${k} und ${k} · ${n}`); }]
@@ -9714,7 +9735,7 @@ const R_SHEETS = {
   L4: {name:'Wörter lesen', cols:2, gens:[() => { const k = fresh(L4_POOL), dis = others(WITH_ICON().filter(x => x[0] !== k[0]), [k], 2); return T_(['lies', 'kreise'], 'Lies das Wort. Kreise das Bild ein.', `<p class="ab-word">${k}</p><p class="ab-row">${shuffle([k, ...dis]).map(x => iconP(x, 17)).join(' ')}</p>`, k); }]},
   L5: {name:'Genau lesen', cols:2, gens:[() => { const k = fresh(MINIMAL.map(s => s[0])), set = MINIMAL.find(s => s[0] === k); return T_(['lies', 'kreise'], 'Kreise das richtige Wort ein.', `${iconP(k, 22)}<p class="ab-row words">${shuffle(set).map(w => `<span>${w}</span>`).join('')}</p>`, k); },
                                           () => { const k = fresh(LONG_POOL), dis = others(LONG_POOL, [k], 2); return T_(['lies', 'kreise'], 'Lies das Wort. Kreise das Bild ein.', `<p class="ab-word">${k}</p><p class="ab-row">${shuffle([k, ...dis]).map(x => iconP(x, 17)).join(' ')}</p>`, k); }]},
-  L6: {name:'Sätze verstehen', cols:1, gens:[() => { const o = fresh(Object.keys(SCENE_OBJ)), pos = pick(['auf', 'unter', 'neben']); return T_(['lies', 'kreise'], 'Lies den Satz. Kreise das passende Bild ein.', `<p class="ab-sent">${cap(art(o))} ${o} ${SCENE_OBJ[o]} ${pos} dem Tisch.</p><p class="ab-row">${shuffle(['auf', 'unter', 'neben']).map(p => `<span class="ab-ic" style="width:32mm">${tableScene(p, o)}</span>`).join(' ')}</p>`, `${o} ${pos} dem Tisch`); },
+  L6: {name:'Sätze verstehen', cols:1, gens:[() => { const o = fresh(Object.keys(SCENE_OBJ)), pos = scenePos(o); return T_(['lies', 'kreise'], 'Lies den Satz. Kreise das passende Bild ein.', `<p class="ab-sent">${cap(art(o))} ${o} ${SCENE_OBJ[o]} ${pos} dem Tisch.</p><p class="ab-row">${shuffle(['auf', 'unter', 'neben']).map(p => `<span class="ab-ic" style="width:32mm">${tableScene(p, o)}</span>`).join(' ')}</p>`, `${o} ${pos} dem Tisch`); },
                                          () => { let s, yes, n, t = 0; do { [s, yes, n] = factSentence(); t++; } while(FRESH.used.has(s) && t < 20); FRESH.used.add(s); return T_(['lies', 'kreuze'], 'Lies den Satz. Stimmt das?', `<p class="ab-sent">${s}</p><p class="ab-row yn">☐ ja <span style="width:12mm"></span> ☐ nein</p>`, yes ? 'ja' : 'nein'); }]},
   L7: {name:'Texte lesen und verstehen', cols:1, gens:[() => { const tx = shuffle(forWorld(TEXTS)).find(t => !FRESH.used.has(t.text)) || pick(forWorld(TEXTS)); FRESH.used.add(tx.text); return T_(['lies', 'kreuze'], 'Lies den Text. Kreuze die richtige Antwort an.', `<p class="ab-text">${tx.text}</p>${tx.qs.map(([q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, tx.qs.map(([q, o]) => `${q} ${o[0]}`).join('; ')); }]},
   L8: {name:'Pläne und Tabellen lesen', cols:1, max:3, gens:[() => { const g = fresh(docKeys()), d = DOCS[g](); return T_(['lies', 'kreuze'], 'Lies genau. Kreuze die richtige Antwort an.', `<div class="ab-doc">${d.html}</div>${d.qs.slice(0, 4).map(([k, q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, `${d.title}: ` + d.qs.slice(0, 4).map(([k, q, o]) => o[0]).join(' · ')); }]},
@@ -10039,7 +10060,7 @@ const PAGE_FIT_JS = `<script>(function(){
       if(h > max){
         box = document.createElement('div'); box.className = 'fitz';
         box.style.cssText = 'display:' + cs.display + ';flex-direction:' + cs.flexDirection + ';align-items:' + cs.alignItems + ';gap:' + cs.gap;
-        while(p.firstChild) box.appendChild(p.firstChild); p.appendChild(box);
+        [].slice.call(p.childNodes).forEach(function(n){ if(!(n.classList && n.classList.contains('hf-pn'))) box.appendChild(n); }); p.insertBefore(box, p.firstChild);   /* Seitenzahl im Heft bleibt unverkleinert unten */
         for(var i = 0; i < 6 && h > max; i++){ z = z*(max - pad)/(h - pad)*0.99; box.style.zoom = z; h = p.getBoundingClientRect().height; }
         if(z < (p.classList.contains('fitlow') ? 0.6 : 0.8)){ while(box.firstChild) p.insertBefore(box.firstChild, box); box.remove(); z = 1; p.dataset.over = Math.ceil((p.getBoundingClientRect().height - pad)/(max - pad)); }
       }
@@ -10320,7 +10341,7 @@ const abSylCard = s => `<span style="display:inline-block;border:1.4px solid #22
 const txNouns = (text, n) => { const ws = text.split(/(?<=[.!?])\s+/).flatMap(s => s.replace(/[.,!?:;„“"]/g, '').split(/\s+/).slice(1)).filter(w => /^[A-ZÄÖÜ][a-zäöüß-]{2,}$/.test(w)); return shuffle([...new Set(ws)]).slice(0, n); };
 const txSents = text => text.split(/(?<=[.!?])\s+/).filter(Boolean);
 R_SHEETS.L4.gens.push(() => { const k = fresh(L4_POOL); return T_(['lies', 'male'], 'Lies das Wort. Male ein Bild dazu.', `<p class="ab-word">${k}</p><div class="ab-draw"></div>`, k); });
-R_SHEETS.L6.gens.push(() => { const o = fresh(Object.keys(SCENE_OBJ)), pos = pick(['auf', 'unter', 'neben']), s = `${cap(art(o))} ${o} ${SCENE_OBJ[o]} ${pos} dem Tisch.`; return T_(['lies', 'male'], 'Lies den Satz. Male ein Bild dazu.', `<p class="ab-sent">${s}</p><div class="ab-draw"></div>`, s); });
+R_SHEETS.L6.gens.push(() => { const o = fresh(Object.keys(SCENE_OBJ)), pos = scenePos(o), s = `${cap(art(o))} ${o} ${SCENE_OBJ[o]} ${pos} dem Tisch.`; return T_(['lies', 'male'], 'Lies den Satz. Male ein Bild dazu.', `<p class="ab-sent">${s}</p><div class="ab-draw"></div>`, s); });
 /* L7: auf schwereren Heftseiten (Feinstufe ab der Mitte) mittlere Texte statt Kurztexte */
 R_SHEETS.L7.gens[0] = () => { const mid = (app.sheet.stufe ?? 0) >= .5, pool = forWorld(mid ? TEXTS_MID : TEXTS), tx = shuffle(pool).find(t => !FRESH.used.has(t.text)) || pick(pool); FRESH.used.add(tx.text);
   return T_(['lies', 'kreuze'], 'Lies den Text. Kreuze die richtige Antwort an.', `${tx.t ? `<p class="ab-sent" style="text-align:left">${tx.t}</p>` : ''}<p class="ab-text">${tx.text}</p>${tx.qs.map(([q, o]) => `<div class="ab-q"><b>${q}</b><div>${shuffle(o).map(x => `<span>☐ ${x}</span>`).join('')}</div></div>`).join('')}`, tx.qs.map(([q, o]) => `${q} ${o[0]}`).join('; '), mid ? 2 : 1); };
@@ -10456,11 +10477,12 @@ function buildHeft(){
   const chs = H.chapters || [], entries = heftEntries(H);
   const tocOwn = entries.length > 8;   /* langes Inhaltsverzeichnis: eigene Seite nach dem Deckblatt */
   const first = heftFirst(H);   /* Heft-Assistent: Seiten wie gedruckt gezählt, Deckblatt = Seite 1 */
-  const pages = H.items.map((it, i) => `<div class="page ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">Seite ${i + first}${it.ch !== undefined && chs[it.ch] ? ` · Kapitel ${it.ch + 1}` : ''} · `)}</div>`).join('');
+  /* Seitenzahl fest unten in der Mitte jeder Seite (Stefan, 26.11.2026: stand sonst je nach Inhalt unterschiedlich hoch) */
+  const pages = H.items.map((it, i) => `<div class="page hf-p ${it.cls || ''}">${it.html.replace('<p class="ab-foot ab-lic">', `<p class="ab-foot ab-lic">${it.ch !== undefined && chs[it.ch] ? `Kapitel ${it.ch + 1} · ` : ''}`)}<div class="hf-pn">${i + first}</div></div>`).join('');
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li><span>${escHtml(e.title)}</span><span class="cv-dots"></span><span>${e.i + first}</span></li>`).join('')}</ol></div>` : '';
   const fach = H.book && SUBJECTS[H.book.fach] && !(H.title || '').includes(SUBJECTS[H.book.fach].name) ? `<div class="cv-fach">${escHtml(SUBJECTS[H.book.fach].name)}</div>` : '';
   const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1>${fach}<div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p></div>`;
-  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
+  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.page.hf-p{position:relative}.hf-pn{position:absolute;left:0;right:0;bottom:5mm;text-align:center;font-size:13pt;font-weight:700;color:#222;line-height:1}@media print{.page.hf-p{min-height:296mm}}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
   const all = cover + (tocOwn && toc ? `<div class="page tocp">${toc}</div>` : '') + pages, druck = HEFT_DRUCK[H.druck] ? H.druck : 'a4';
   const head = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}${css}`;
   if(druck === 'a4') return {title: H.title || 'Mein Arbeitsheft', html:`${head}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}${all}</body></html>`};
@@ -10499,7 +10521,7 @@ const HEFT_CSS = `.hf-band{display:flex;align-items:center;gap:3mm;font-size:11p
 .ab-stufe{font-size:12pt;font-weight:600;color:#555;margin-left:2mm;white-space:nowrap}
 .hf-kis{margin-top:6mm;border:2px solid #222;border-radius:3mm;padding:3mm 5mm;break-inside:avoid}.hf-kis h2{font-size:14pt;margin:0 0 1mm}.hf-kis-row{display:flex;align-items:center;gap:4mm;font-size:14pt;padding:1.5mm 0}.hf-kis-row .kb{width:8mm;height:8mm;border:2px solid #222;border-radius:1.5mm;flex:none}.hf-kis-row svg{width:8mm;height:8mm;flex:none}
 .hf-sub{font-size:14pt;margin:4mm 0 2mm;border-bottom:1.5px solid #999;padding-bottom:1mm}.hf-sub .ab-op{width:6mm;height:6mm;vertical-align:-1mm;margin-right:1.5mm}
-.hf-story{font-size:15pt;line-height:1.75;margin:0 0 5mm}.hf-rf{border-collapse:collapse;width:100%;font-size:13pt;margin:1mm 0 3mm}.hf-rf td,.hf-rf th{border:1.2px solid #222;padding:2mm 3mm}.hf-rf th{font-size:11pt;background:#f1ece1}.hf-rf td:nth-child(n+2),.hf-rf th:nth-child(n+2){width:22mm;text-align:center;font-size:16pt}
+.hf-story{font-size:15pt;line-height:1.75;margin:0 0 5mm}.page.hf-fillp{display:flex;flex-direction:column}.hf-draw{flex:1 1 auto;min-height:45mm;border:1.5px dashed #888;border-radius:3mm;margin:1mm 0 3mm;padding:3mm 4mm;font-size:12pt;color:#555}.hf-draw .ab-op{width:6mm;height:6mm;vertical-align:-1.5mm;margin-right:1.5mm}.hf-lines{flex:1 1 auto;min-height:24mm;margin:0 0 3mm;background:repeating-linear-gradient(to bottom,transparent 0,transparent 11.5mm,#888 11.5mm,#888 11.8mm)}.hf-rf{border-collapse:collapse;width:100%;font-size:13pt;margin:1mm 0 3mm}.hf-rf td,.hf-rf th{border:1.2px solid #222;padding:2mm 3mm}.hf-rf th{font-size:11pt;background:#f1ece1}.hf-rf td:nth-child(n+2),.hf-rf th:nth-child(n+2){width:22mm;text-align:center;font-size:16pt}
 .abc-p{display:grid;grid-template-columns:repeat(6,1fr);gap:2.5mm}.abc-p div{border:1.4px solid #222;border-radius:2mm;padding:1.5mm;text-align:center;min-height:37mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between}.abc-p b{font-size:22pt;display:block;line-height:1.1}.abc-p b small{font-size:17pt;margin-left:1.5mm;font-weight:600}.abc-p svg{width:20mm;height:20mm}.abc-p .two svg{width:13mm;height:13mm}.abc-p .two span{display:flex;gap:1mm}
 .ein-p{border-collapse:collapse;margin:6mm auto;font-size:15pt}.ein-p td,.ein-p th{border:1.2px solid #222;width:15.5mm;height:13mm;text-align:center}.ein-p th{background:#f1ece1}.ein-p td.q{font-weight:700;background:#faf6ee}`;
 const HEFT_LIC = '<p class="ab-foot ab-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p>';
@@ -10533,21 +10555,35 @@ async function heftPages(pid, specs, prog = () => {}){
   const fr = document.createElement('iframe'); fr.setAttribute('aria-hidden', 'true'); fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:820px;height:1200px;visibility:hidden'; document.body.append(fr);
   const load = html => new Promise(r => { fr.onload = () => setTimeout(r, 30); fr.srcdoc = html; });
   const set = (t, {label, ...o} = {}) => Object.assign(app.sheet, {pid, topic:t.topic, zr:t.zr || keep.zr, ue:t.ue || 'egal', n:'fill', sol:true, taf:false, bw:!!H.bw, stufe:null, mat:keep.mat, draw:keep.draw, mstrich:keep.mstrich, bsim:keep.bsim, gross:keep.gross}, o);
-  const parse = html => { const d = new DOMParser().parseFromString(html, 'text/html'), pg = d.querySelector('.page'); pg.querySelector('.ab-meta')?.remove(); return {pg, title: app.sheetDoc.title, sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())}; };
+  const parse = (html, title = app.sheetDoc.title) => { const d = new DOMParser().parseFromString(html, 'text/html'), pg = d.querySelector('.page'); pg.querySelector('.ab-meta')?.remove(); return {pg, title, sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())}; };
+  /* Seiten gleichmäßig füllen (Stefan, 26.11.2026): ein Blatt einmal mit vielen Aufgaben bauen, dann hinten kürzen – nur ganze Reihen */
+  const tasksOf = r => [...r.pg.querySelectorAll('.ab-grid > .ab-task')];
+  const colsOf = r => +(r.pg.querySelector('.ab-grid')?.style.gridTemplateColumns.match(/repeat\((\d+)/)?.[1] || 1);
+  const trim = (r, m) => { tasksOf(r).slice(m).forEach(e => e.remove()); r.sol = r.sol.slice(0, m); return r; };
+  const counts = (total, cols) => { const c = []; for(let m = total - total % cols; m >= cols; m -= cols) c.push(m); if(!c.length) for(let m = total; m >= 1; m--) c.push(m); else if(cols > 1) c.push(1); return c; };
+  const build = (t, o, n) => { set(t, {...o, n}); app.sheetDoc = buildSheet(); return {html: app.sheetDoc.html, title: app.sheetDoc.title}; };
   const wrap = (inner, cls = '') => `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}<div class="page ${cls}">${inner}</div></body></html>`;
-  const tooLong = async (inner, cls) => { await load(wrap(inner, cls)); return !!fr.contentDocument.querySelector('.page')?.dataset.over; };
+  const tooLong = async (inner, cls) => (await measure(inner, cls)).over;
+  /* over: läuft über; fill: wie voll die Seite ist (0…1, Inhalt bis zum letzten Element im Verhältnis zur nutzbaren Höhe) */
+  const measure = async (inner, cls) => { await load(wrap(inner, cls)); const d = fr.contentDocument, p = d.querySelector('.page'); if(!p) return {over:false, fill:1};
+    const mm = 96/25.4, top = p.getBoundingClientRect().top + 12*mm, last = [...p.querySelectorAll(':scope > *, :scope > .fitz > *')].filter(e => !e.classList.contains('hf-pn') && !e.classList.contains('fitz')).pop();
+    return {over: !!p.dataset.over, fill: p.dataset.fit ? 1 : last ? (last.getBoundingClientRect().bottom - top)/(273*mm) : 0}; };
   const band = (txt, ch) => `<div class="hf-band">${ch !== undefined ? `<span>Kapitel ${ch + 1}</span>` : ''}${txt}</div>`;
   async function full(t, o){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen */
     set(t, o); app.sheetDoc = buildSheet();
     for(let i = 0; i < 25; i++){ await load(app.sheetDoc.html); const G = app.sheetGen; if(!G || !G.fill || G.fitted) break; sheetFit(fr, () => {}); if(G.fitted) break; }
     return parse(app.sheetDoc.html);
   }
-  async function fixed(t, o, n, deco){   /* feste Aufgabenzahl, notfalls weniger, bis die Seite passt; passt eine große Aufgabe nicht, normale Größe */
-    let r;
+  async function fixed(t, o, n, deco){   /* bis n Aufgaben, so viele ganze Reihen, wie auf die Seite passen.
+       Große Aufgaben nur, wenn die Seite damit mindestens zu drei Vierteln voll wird; sonst normale Größe, wenn die voller ist. */
+    let best = null, last = null;
     for(const oo of o.gross ? [o, {...o, gross:false}] : [o]){
-      for(let k = n; k >= 1; k--){ set(t, {...oo, n:k}); app.sheetDoc = buildSheet(); r = parse(app.sheetDoc.html); deco(r); if(!(await tooLong(r.pg.innerHTML))) return r; }
+      const b = build(t, oo, n), r0 = parse(b.html, b.title);
+      for(const m of counts(tasksOf(r0).length, colsOf(r0))){ const r = trim(parse(b.html, b.title), m); deco(r); last = r; const ms = await measure(r.pg.innerHTML);
+        if(!ms.over){ if(!best || ms.fill > best.fill + .1) best = {r, fill: ms.fill}; break; } }
+      if(best && best.fill >= .75) break;
     }
-    return r;
+    return best ? best.r : last;
   }
   try{
     for(const [n, s] of specs.entries()){
@@ -10555,17 +10591,17 @@ async function heftPages(pid, specs, prog = () => {}){
       const ch = s.ch, at = ch !== undefined ? {ch} : {};
       if(s.kind === 'story'){
         const S = STORIES[s.key], pt = S.parts[s.part], nr = s.part + 1;
-        if(s.page === 'text'){ items.push({title:`Geschichte Teil ${nr}: ${pt.t}`, kind:'story', html: band(`Geschichte · Teil ${nr}`) + `<div class="ab-top"><h1>${escHtml(S.t)}</h1></div><h2 class="hf-sub">Teil ${nr}: ${escHtml(pt.t)}</h2>${pt.p.map(x => `<p class="hf-story">${escHtml(x)}</p>`).join('')}${HEFT_LIC}`, sol: []}); continue; }
+        if(s.page === 'text'){ items.push({title:`Geschichte Teil ${nr}: ${pt.t}`, kind:'story', html: band(`Geschichte · Teil ${nr}`) + `<div class="ab-top"><h1>${escHtml(S.t)}</h1></div><h2 class="hf-sub">Teil ${nr}: ${escHtml(pt.t)}</h2>${pt.p.map(x => `<p class="hf-story">${escHtml(x)}</p>`).join('')}<div class="hf-draw">${abOp('male')} Male ein Bild zu diesem Teil.</div>${HEFT_LIC}`, cls:'hf-fillp', sol: []}); continue; }
         const mc = pt.q.map(([q, ...o]) => `<div class="ab-q"><b>${escHtml(q)}</b><div>${shuffle(o).map(x => `<span>☐ ${escHtml(x)}</span>`).join('')}</div></div>`).join('');
         const rf = `<table class="hf-rf"><tr><th></th><th>richtig</th><th>falsch</th></tr>${pt.rf.map(([x]) => `<tr><td>${escHtml(x)}</td><td>☐</td><td>☐</td></tr>`).join('')}</table>`;
         const ops = ['lies', 'kreuze', 'schreibe'];
-        items.push({title:`Aufgaben zu Teil ${nr}`, kind:'story', toc:false, html: band(`Geschichte · Teil ${nr}`) + `<div class="ab-top"><h1>Aufgaben zu Teil ${nr}: ${escHtml(pt.t)}</h1></div><div class="ab-legend">${ops.map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div><h2 class="hf-sub">${abOp('kreuze')} Kreuze die richtige Antwort an.</h2>${mc}<h2 class="hf-sub">${abOp('kreuze')} Richtig oder falsch? Kreuze an.</h2>${rf}<h2 class="hf-sub">${abOp('schreibe')} ${escHtml(pt.schreib)}</h2>${lineW(2)}${HEFT_LIC}`,
+        items.push({title:`Aufgaben zu Teil ${nr}`, kind:'story', toc:false, html: band(`Geschichte · Teil ${nr}`) + `<div class="ab-top"><h1>Aufgaben zu Teil ${nr}: ${escHtml(pt.t)}</h1></div><div class="ab-legend">${ops.map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div><h2 class="hf-sub">${abOp('kreuze')} Kreuze die richtige Antwort an.</h2>${mc}<h2 class="hf-sub">${abOp('kreuze')} Richtig oder falsch? Kreuze an.</h2>${rf}<h2 class="hf-sub">${abOp('schreibe')} ${escHtml(pt.schreib)}</h2><div class="hf-lines"></div>${HEFT_LIC}`, cls:'hf-fillp',
           sol: [...pt.q.map(([q, r]) => `${q} ${r}`), ...pt.rf.map(([x, ok]) => `${x} – ${ok ? 'richtig' : 'falsch'}`), `${pt.schreib} – eigene Antwort`]});
         continue;
       }
       if(s.kind === 'einstieg'){
         const demo = s.t.topic.startsWith('B:');   /* Basis-Blätter haben schon ein vorgemachtes Beispiel */
-        const r = await fixed(s.t, {gross:true, stufe:0, mat: s.t.topic.startsWith('M:') ? true : keep.mat, draw:false, mstrich:'gezeigt'}, 4, r => {
+        const r = await fixed(s.t, {gross:true, stufe:0, mat: s.t.topic.startsWith('M:') ? true : keep.mat, draw:false, mstrich:'gezeigt'}, 8, r => {
           const top = r.pg.querySelector('.ab-top'), t1 = r.pg.querySelector('.ab-task');
           top.insertAdjacentHTML('beforebegin', band('Einstieg', ch));
           r.pg.querySelector('.ab-legend')?.insertAdjacentHTML('afterend', `<p class="hf-intro"><b>Das übst du in diesem Kapitel.</b> ${demo ? 'Die erste Aufgabe ist grau vorgemacht.' : 'Die erste Aufgabe ist ein Beispiel. Schaut sie zusammen an.'}</p>`);
@@ -10573,7 +10609,7 @@ async function heftPages(pid, specs, prog = () => {}){
         });
         items.push({title:`Einstieg: ${r.title}`, base: r.title, kind:'einstieg', html: r.pg.innerHTML, sol: r.sol, ...at});
       } else if(s.kind === 'kann'){
-        const r = await fixed(s.t, {gross:false, draw:false, mstrich:'gezeigt'}, 6, r => {
+        const r = await fixed(s.t, {gross:false, draw:false, mstrich:'gezeigt'}, 12, r => {
           const top = r.pg.querySelector('.ab-top'), h1 = r.pg.querySelector('h1');
           top.insertAdjacentHTML('beforebegin', band('Das kann ich schon', ch));
           h1.textContent = `Das kann ich schon: ${r.title}`;
@@ -10581,18 +10617,24 @@ async function heftPages(pid, specs, prog = () => {}){
         });
         items.push({title:`Das kann ich schon: ${r.title}`, base: r.title, kind:'kann', html: r.pg.innerHTML, sol: r.sol, ...at});
       } else if(s.kind === 'wdh'){
-        let inner = '', sol = [], parts = s.parts;
-        /* Aufgaben aus beiden Kapiteln, je 4 … 1; passt selbst je eine nicht, nur das neuere Kapitel (sehr große Aufgaben, z. B. lange Texte) */
-        wdhLoop: for(const ps of [s.parts, s.parts.slice(-1)]) for(let k = 4; k >= 1; k--){
-          parts = ps; inner = band('Wiederholung') + `<div class="ab-top"><h1>Wiederholung</h1></div>`; sol = [];
-          for(const p of ps){
-            set(p.t, {...heftStufe(p.t, .5), label:undefined, n:k, gross:false}); app.sheetDoc = buildSheet(); const r = parse(app.sheetDoc.html);
-            inner += `<h2 class="hf-sub">Kapitel ${p.ch + 1}: ${escHtml(r.title)}</h2>` + [...r.pg.children].filter(e => !e.matches('.ab-top,.ab-foot,.hf-band')).map(e => e.outerHTML).join('');
-            sol.push(...r.sol.map((x, i) => `Kapitel ${p.ch + 1}, ${i + 1}: ${x}`));
+        /* Aufgaben aus beiden Kapiteln: je Kapitel einmal viele Aufgaben bauen, dann reihum ganze Reihen dazunehmen, solange die Seite reicht;
+           passt nicht einmal je eine Reihe, nur das neuere Kapitel (sehr große Aufgaben, z. B. lange Texte) */
+        const B = s.parts.map(p => { const b = build(p.t, {...heftStufe(p.t, .5), gross:false}, 8), r0 = parse(b.html, b.title), cs = counts(tasksOf(r0).length, colsOf(r0)).reverse(); return {p, b, cs}; });
+        const compose = (L, idx) => { let h = band('Wiederholung') + `<div class="ab-top"><h1>Wiederholung</h1></div>`; const so = [];
+          L.forEach((x, j) => { const r = trim(parse(x.b.html, x.b.title), x.cs[idx[j]]);
+            h += `<h2 class="hf-sub">Kapitel ${x.p.ch + 1}: ${escHtml(r.title)}</h2>` + [...r.pg.children].filter(e => !e.matches('.ab-top,.ab-foot,.hf-band')).map(e => e.outerHTML).join('');
+            so.push(...r.sol.map((v, i) => `Kapitel ${x.p.ch + 1}, ${i + 1}: ${v}`)); });
+          return {h: h + HEFT_LIC, so}; };
+        let L = B, idx = B.map(() => 0), c = compose(L, idx);
+        if(await tooLong(c.h)){ L = B.slice(-1); idx = [0]; c = compose(L, idx); }
+        for(let grew = true; grew; ){ grew = false;
+          for(const j of L.map((_, j) => j).sort((a, b) => L[a].cs[idx[a]] - L[b].cs[idx[b]])){
+            if(idx[j] + 1 >= L[j].cs.length) continue;
+            const tryIdx = idx.map((v, q) => q === j ? v + 1 : v), tc = compose(L, tryIdx);
+            if(!(await tooLong(tc.h))){ idx = tryIdx; c = tc; grew = true; }
           }
-          inner += HEFT_LIC;
-          if(!(await tooLong(inner))) break wdhLoop;
         }
+        const parts = L.map(x => x.p), inner = c.h, sol = c.so;
         items.push({title:`Wiederholung: Kapitel ${parts.map(p => p.ch + 1).join(' und ')}`, kind:'wdh', html: inner, sol});
       } else {
         const r = await full(s.t, s.o);

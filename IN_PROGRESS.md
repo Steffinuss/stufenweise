@@ -16,6 +16,7 @@ Stand: 26.11.2026
 ## Rückmeldung Stefan 26.11. (gebaut in `entwicklung`)
 
 - Überlauf im Heft (54 statt 48 Seiten, abgeschnittene Seite in der Broschüre) behoben, siehe `CHANGELOG.md`. Menü „Material drucken“.
+- Seiten gleichmäßig gefüllt, Seitenzahl fest unten, Stundenplan nach BP GENT, weitere Unstimmigkeiten (Sätze, Sachaufgaben) behoben. Frage an Stefan: Im BP GENT heißt das Fach „Wirtschaft und Berufsorientierung“ (WBO), Stefan schrieb „WBS“ (Name an der Gemeinschaftsschule) – im Stundenplan steht WBO.
 
 ## Backlog K: Fußzeile ohne Namen (gebaut in `entwicklung`, 26.11.2026)
 

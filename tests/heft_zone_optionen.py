@@ -58,7 +58,7 @@ async def main():
         keep = await pg.evaluate("[app.sheet.bw, app.sheet.taf]")
         check('Einstellungen der Einzelblätter unverändert', keep == [False, False], str(keep))
         html = await pg.evaluate("buildHeft().html")
-        check('Heft enthält Extraseite', 'page hilfe' in html and 'Hundertertafel zum Nachschauen' in html)
+        check('Heft enthält Extraseite', 'hilfe">' in html and 'Hundertertafel zum Nachschauen' in html)
 
         # Kind ohne Tafel-Blätter: trotz gemerktem Häkchen keine Extraseite
         await pg.evaluate("async pid => { app.heft.taf = true; await heftFromZones(pid, 1); }", b)

@@ -30,6 +30,9 @@ async def main():
         }""")
         print(f"{res['n']} Stufen, {res['items']} Seiten in {res['ms']/1000:.0f} s; stark verkleinert: {res['low']}")
         check('keine Seite läuft über (auch nicht nach Verkleinern)', not res['over'], str(res['over']))
+        lone = await pg.evaluate("""() => app.heft.items.filter(i => ['einstieg', 'kann', 'wdh'].includes(i.kind)).flatMap(i => { const d = new DOMParser().parseFromString(`<div>${i.html}</div>`, 'text/html');
+            return [...d.querySelectorAll('.ab-grid')].map(g => { const c = +(g.style.gridTemplateColumns.match(/repeat\\((\\d+)/)?.[1] || 1), n = g.querySelectorAll(':scope > .ab-task').length; return n > 1 && n % c ? `${i.title} (${n} in ${c} Spalten)` : null; }).filter(Boolean); })""")
+        check('Einstieg, „Das kann ich schon“, Wiederholung: nur ganze Reihen', not lone, str(lone[:5]))
         html = await pg.evaluate("buildHeft().html")
         doc = await br.new_page(); await doc.set_content(html); await doc.wait_for_timeout(1500)
         info = await doc.evaluate("[document.querySelectorAll('.page').length, [...document.querySelectorAll('.page')].filter(p => p.dataset.over).map(p => p.querySelector('h1')?.textContent), [...document.querySelectorAll('.page.fitlow')].map(p => p.querySelector('h1')?.textContent + ' ' + p.dataset.fit)]")
