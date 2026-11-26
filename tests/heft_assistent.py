@@ -44,7 +44,7 @@ async def main():
         # 1. Planung: Seitenzahlen gehen immer genau auf, Förderzone zuerst und mit den meisten Seiten
         res = await pg.evaluate("""pid => { const out = []; for(const fach of ['mix', 'M', 'D']) for(const pages of [12, 24, 36, 48]) for(const vor of ['zone', 'next', 'voll']) for(const taf of [false, true]){
             const P = heftPlan(pid, {...app.heft, fach, pages, vor, taf}), used = P.chapters.filter(c => c.pages);
-            out.push({id:`${fach} ${pages} ${vor} ${taf}`, fach:P.fach, total: 1 + (P.tocOwn ? 1 : 0) + P.wdh + P.helps.length + 2*P.story + used.reduce((s, c) => s + c.pages, 0), N:P.N, wdh:P.wdh, nUsed: used.length,
+            out.push({id:`${fach} ${pages} ${vor} ${taf}`, fach:P.fach, total: 1 + (P.tocOwn ? 1 : 0) + P.wdh + P.helps.length + (P.back ? 1 : 0) + 2*P.story + used.reduce((s, c) => s + c.pages, 0), N:P.N, wdh:P.wdh, nUsed: used.length,
               zoneFirst: P.chapters.findIndex(c => !c.zone) < 0 || P.chapters.slice(P.chapters.findIndex(c => !c.zone)).every(c => !c.zone),
               zoneMore: Math.min(...used.filter(c => c.zone).map(c => c.pages)) >= Math.max(0, ...used.filter(c => !c.zone).map(c => c.pages)),
               nPrev: P.chapters.filter(c => !c.zone).length, keys: P.chapters.map(c => c.key), subj: [...new Set(P.chapters.map(c => keySubj(c.key)))]}); }
@@ -83,9 +83,9 @@ async def main():
         pages = {k: int(v) for k, v in (x.split(':') for x in plan)}
         check('abgewählt: 0 Seiten', pages['W|W3'] == 0)
         check('mehr Seiten für L3', pages['L|L3'] > pages['W|W2'] > pages['L|L4'], str(pages))
-        P = await pg.evaluate("pid => (P => [P.wdh, P.helps, P.tocOwn])(heftPlan(pid))", mia)
-        check('Summe bleibt 36', sum(pages.values()) + 1 + P[0] + len(P[1]) + (1 if P[2] else 0) == 36, f'{sum(pages.values())} {P}')
-        check('Anlauttabelle hinten (Deutsch, Anlaute)', P[1] == ['abc'], str(P[1]))
+        P = await pg.evaluate("pid => (P => [P.wdh, P.helps, P.tocOwn, P.back])(heftPlan(pid))", mia)
+        check('Summe bleibt 36', sum(pages.values()) + 1 + P[0] + len(P[1]) + (1 if P[3] else 0) + (1 if P[2] else 0) == 36, f'{sum(pages.values())} {P}')
+        check('Anlauttabelle als Rückseite (Deutsch, Anlaute)', P[3] == 'abc' and P[1] == [], str(P))
         saved = await pg.evaluate("(h => [h.fach, h.pages, h.vor, h.off, h.adj])(JSON.parse(localStorage.getItem(HEFT_KEY)))")
         check('Einstellungen gemerkt', saved == ['D', 36, 'next', {'W|W3': True}, {'L|L3': 1}], str(saved))
 
@@ -109,8 +109,10 @@ async def main():
         toc = re.sub(r'<[^>]+>', ' ', re.search(r'<div class="cv-toc">.*?</ol>', html).group(0))
         toc = re.sub(r'\s+', ' ', toc)
         print(toc)
-        check('Inhalt mit Kapiteln ab Seite 2', 'Kapitel 1:' in toc and re.search(r'Kapitel 1: [^0-9]+ 2 ', toc) is not None, toc)
-        check('Seitenzahlen 2 bis 36, Kapitel in der Fußzeile', '<div class="hf-pn">2</div>' in html and '<div class="hf-pn">36</div>' in html and '<div class="hf-pn">37</div>' not in html and '<div class="r">Kapitel 1</div>' in html)
+        check('Inhalt mit Kapiteln ab Seite 2, Nachguckseite als Rückseite', re.search(r' 1 [^0-9]+ 2 ', toc) is not None and 'Rückseite' in toc, toc)
+        check('Seitenzahlen 2 bis 35, Rückseite ohne Zahl, Kapitel in der Fußzeile', '<div class="hf-pn">2</div>' in html and '<div class="hf-pn">35</div>' in html and '<div class="hf-pn">36</div>' not in html and html.count('class="page hf-back') == 1 and '<div class="r">Kapitel 1</div>' in html)
+        # Deckblatt C4 (Stefan, 26.11.2026): Farbrand, Titel aus den Kapiteln, Fachbild, Name unten
+        check('Deckblatt: Titel aus den Kapiteln, Farbrand Deutsch, Buchstabenkarten', 'class="cv-title">Lesen und Schreiben<' in html and '--band:#c9414a' in html and 'cv-tiles' in html and 'Dieses Heft gehört' in html, re.search(r'class="cv-title">([^<]*)', html).group(1))
         doc = await br.new_page(); await doc.emulate_media(media='print'); await doc.set_content(html); await doc.wait_for_timeout(700)
         gaps = await doc.evaluate("[...document.querySelectorAll('.page.hf-p')].map(p => Math.round(p.getBoundingClientRect().bottom - p.querySelector('.hf-pn').getBoundingClientRect().bottom))")
         lay = await doc.evaluate("""() => [...document.querySelectorAll('.page.hf-p')].map(p => { const f = p.querySelector('.hf-foot'), h = p.querySelector('.hf-head'), mm = 96/25.4;
@@ -143,8 +145,9 @@ async def main():
         own = 'class="page tocp"' in html
         print('Kapitel:', await pg.evaluate("app.heft.chapters.length"), 'eigene Inhaltsseite:', own)
         check('48 Seiten gedruckt', n == pr == 48, f'{n} Seiten, {pr} gedruckt')
-        tail = await pg.evaluate("app.heft.items.slice(-2).map(i => i.kind + ' ' + i.title)")
-        check('Hilfen hinten: Hundertertafel und Anlauttabelle', tail == ['hilfe Hundertertafel zum Nachschauen', 'hilfe Anlauttabelle'], str(tail))
+        tail = await pg.evaluate("app.heft.items.slice(-2).map(i => i.kind + ' ' + i.title + (i.back ? ' (Rückseite)' : ''))")
+        check('Hilfen hinten: Anlauttabelle, Hundertertafel als Rückseite', tail == ['hilfe Anlauttabelle', 'hilfe Hundertertafel zum Nachschauen (Rückseite)'], str(tail))
+        check('gemischtes Heft: Farbrand halb blau, halb rot', 'linear-gradient(to bottom,#346bc3 0.0% 50.0%,#c9414a 50.0% 100.0%)' in html)
         if own: check('mit Inhaltsseite beginnt Kapitel 1 auf Seite 3', '<div class="hf-pn">3</div>' in html and '<div class="hf-pn">2</div>' not in html)
 
         # 5. Mathe-Feinstufen: mit Bild → selbst zeichnen → im Kopf, Zahlen werden größer
@@ -164,7 +167,7 @@ async def main():
             await pg.evaluate("d => { app.heft.druck = d; saveHeft(); renderHeft(); }", druck); await pg.wait_for_timeout(300)
             doc = await pg.evaluate("(d => ({html: d.html, booklet: d.booklet, sheets: d.sheets}))(buildHeft())")
             first = re.search(r'<div class="bk-side"><div class="bk-slot">(.*?)</div><div class="bk-slot"><div class="page cover"', doc['html'], re.S)
-            check(f'{druck}: Deckblatt rechts auf dem ersten Bogen, letzte Seite links', first is not None and '<div class="hf-pn">24</div>' in first.group(1))
+            check(f'{druck}: Deckblatt rechts auf dem ersten Bogen, Rückseite links', first is not None and 'class="page hf-back' in first.group(1))
             dp = await br.new_page(); await dp.set_content(doc['html']); await dp.wait_for_timeout(800)
             pdf = await dp.pdf(prefer_css_page_size=True, print_background=True); await dp.close()
             n = len(re.findall(rb'/Type\s*/Page[^s]', pdf)); box = re.search(rb'/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)', pdf)
@@ -188,7 +191,7 @@ async def main():
         check('Aufgabenseite: Fragen, richtig/falsch, Schreiben', 'class="hf-rf"' in html and 'Richtig oder falsch?' in html)
         await pg.evaluate("async pid => { app.heft.story = 'aus'; await heftMake(pid); }", ben)
         check('ohne Geschichte', not any(i.startswith('story') for i in await pg.evaluate("app.heft.items.map(i => i.kind || '')")))
-        mid = await pg.evaluate("""() => { const keep = {...app.sheet}; Object.assign(app.sheet, {topic:'L:L7', n:3, stufe:1}); const h1 = buildSheet().html; Object.assign(app.sheet, {stufe:0}); const h0 = buildSheet().html; Object.assign(app.sheet, keep);
+        mid = await pg.evaluate("""() => { const keep = {...app.sheet}; Object.assign(app.sheet, {topic:'L:L7', n:3, stufe:1}); const h1 = Array.from({length: 6}, () => buildSheet().html).join(''); Object.assign(app.sheet, {stufe:0}); const h0 = Array.from({length: 6}, () => buildSheet().html).join(''); Object.assign(app.sheet, keep);
             return [TEXTS_MID.some(t => h1.includes(t.text)), TEXTS_MID.some(t => h0.includes(t.text)), TEXTS.length, TEXTS_MID.length, LONG.length]; }""")
         check('L7: mittlere Texte nur auf schweren Seiten', mid[0] and not mid[1], str(mid))
         check('Textmengen (rund 80/40/40)', mid[2] >= 78 and mid[3] >= 38 and mid[4] >= 40, str(mid[2:]))

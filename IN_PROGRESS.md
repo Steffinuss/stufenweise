@@ -23,6 +23,11 @@ Stand: 26.11.2026
 - Drei Vorschläge als Bilder gezeigt (A: Abstände verteilen, B: Aufgaben strecken, C: Platz zum Rechnen). Stefan: „Ich bin für Layout B. Gerne kannst du noch optimieren, dass es insgesamt weniger große Lücken gibt.“
 - Gebaut: `heftFrame` (Kopf-/Fußzeile aus Band und Fußzeilen der Seite), CSS in `buildHeft` (Seite als Spalte, `.ab-grid` wächst), `PAGE_FIT_JS` lässt Kopf- und Fußzeile unverkleinert, Messen mit Rahmen, keine Verkleinerung im Heft (`tight`), größerer Aufgabenvorrat beim Füllen. Test: `heft_assistent.py` (Layout B: Kopf/Fuß, bis zur Fußzeile gefüllt, nichts verkleinert, Seitenzahl gleich hoch).
 
+## Deckblatt C4 und Rückseite (Stefan, 26.11.2026, gebaut in `entwicklung`)
+
+- Vorschläge A (Rahmen), B (Farbband), C (Stufen); Stefan: C, aber andere Mitte → C1 Lernweg, C2 Kapitelkarten, C3 Fachbild, C4 Fachbild mit Inhalt. Stefan: „Ich finde C4 auch gut. Den farbigen Rand finde ich super … Für das gemischte Heft würde ich halb-halb vorschlagen.“ Dazu Wunsch: Rand auf der Rückseite fortsetzen (Regal), Rückseite als Nachguckseite je nach Thema, Anlauttabelle letzte Zeile voll.
+- Gebaut: `heftSubj`, `heftBand`, `heftTitleAuto`, `heftBild`, `FACH_COL`; Rückseite `it.back` (`heftBackFor`, `backOf` in `heftPlan`, `P.back`), neue Hilfen `zf`, `stw`, `merk`, `form` (nur als Rückseite); Broschüre: Leerseiten vor die Rückseite. Inhalt bleibt auf dem Deckblatt (Stefans Frage nach eigener Inhaltsseite: Empfehlung C4, Stefan einverstanden).
+
 ## Backlog K: Fußzeile ohne Namen (gebaut in `entwicklung`, 26.11.2026)
 
 - Kommt mit Backlog J zusammen in die Freigabe (0.38.0). Anleitungsbilder dann neu aufnehmen (zeigen noch die alte Fußzeile).

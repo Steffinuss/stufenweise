@@ -10473,9 +10473,30 @@ function heftAdd(){
   saveHeft(); toast(`Ins Arbeitsheft übernommen – jetzt ${app.heft.items.length} ${app.heft.items.length === 1 ? 'Seite' : 'Seiten'}.`);
   renderSheets(true);
 }
-const heftEntries = H => { const chs = H.chapters || [], out = []; H.items.forEach((it, i) => { if(it.toc === false) return; if(it.ch !== undefined && chs[it.ch]){ if(!out.some(e => e.ch === it.ch)) out.push({ch: it.ch, title:`Kapitel ${it.ch + 1}: ${chs[it.ch].title}`, i}); } else out.push({title: it.title, i}); }); return out; };
+const heftEntries = H => { const chs = H.chapters || [], out = []; H.items.forEach((it, i) => { if(it.toc === false) return; if(it.ch !== undefined && chs[it.ch]){ if(!out.some(e => e.ch === it.ch)) out.push({ch: it.ch, title:`Kapitel ${it.ch + 1}: ${chs[it.ch].title}`, i}); } else out.push({title: it.title, i, back: !!it.back}); }); return out; };
 const heftTotal = H => 1 + (H.toc && heftEntries(H).length > 8 ? 1 : 0) + H.items.length;
 const heftFirst = H => H.book ? 2 + (H.toc && heftEntries(H).length > 8 ? 1 : 0) : 1;
+/* Deckblatt (Stefan, 26.11.2026, Entwurf C4): Farbrand je Fach (gemischt: halb/halb), Titel aus den Kapiteln, Fachbild, Inhalt, Name unten */
+const heftSubj = H => { const f = H.book?.fach; if(FACH_COL[f]) return [f]; return SUBJ_IDS.filter(x => FACH_COL[x] && (H.chapters || []).some(c => keySubj(c.key) === x)); };
+const heftBand = ss => ss.length > 1 ? `linear-gradient(to bottom,${ss.map((x, i) => `${FACH_COL[x]} ${(i*100/ss.length).toFixed(1)}% ${((i + 1)*100/ss.length).toFixed(1)}%`).join(',')})` : FACH_COL[ss[0]] || '#2b2930';
+function heftTitleAuto(H){
+  const ch = H.chapters || [], ax = ch.map(c => c.key.split('|')[0]), has = (...a) => a.some(x => ax.includes(x));
+  const zr = Math.max(0, ...ch.map(c => +(c.key.match(/^M\|(\d+)/)?.[1] || 0)), ...ch.map(c => zoneToSheet(c.key)?.zr || 0));
+  const join = L => L.length < 2 ? L.join('') : L.slice(0, -1).join(', ') + ' und ' + L.at(-1);
+  const m = has('R', 'S', 'Z') ? 'Rechnen' : has('M', 'H') ? 'Zahlen' : has('U', 'G') ? join([has('U') && 'Uhr', has('G') && 'Geld'].filter(Boolean)) : '';
+  const parts = [m, has('L') && 'Lesen', has('W') && 'Schreiben', !has('L', 'W') && has('P') && 'Hören', has('V', 'O') && 'Basis'].filter(Boolean);
+  const main = parts.length > 1 ? join(parts) : parts[0] ? parts[0] + (['Rechnen', 'Zahlen'].includes(m) && zr ? ` bis ${zr}` : '') : 'Mein Arbeitsheft';
+  const short = t => t.replace(/ bis \d+/g, '').replace(/, mit /g, ' mit ').replace(/^Merkstellen: /, '');
+  const L = ch.map(c => short(c.title));
+  return {main: parts[0] === 'Basis' && parts.length === 1 ? 'Sehen, vergleichen, ordnen' : main, sub: L.length > 4 ? L.slice(0, 3).join(' · ') + ' · …' : L.join(' · ')};
+}
+function heftBild(H, ss){
+  const zr = Math.max(0, ...(H.chapters || []).map(c => zoneToSheet(c.key)?.zr || +(c.key.match(/^M\|(\d+)/)?.[1] || 0)));
+  const one = x => x === 'M' ? (zr > 20 ? `<div class="cv-hze">${abScale(paperHZE(1, 3, 4), 1)}</div>` : zfSvg(8, 3, FACH_COL.M))
+    : x === 'D' ? `<div class="cv-tiles">${['A', 'b', 'C', 'd'].map((l, i) => `<span${i ? '' : ' class="on"'}>${l}</span>`).join('')}</div>`
+    : `<div class="cv-shp">${[['kreis', 'rot'], ['quadrat', 'blau'], ['dreieck', 'gelb']].map(([f, c]) => bShape(f, c, 64)).join('')}</div>`;
+  return ss.length ? `<div class="cv-bild${ss.length > 1 ? ' multi' : ''}">${ss.map(one).join('')}</div>` : `<div class="cv-bild cv-logo">${LOGO_SVG}</div>`;
+}
 function buildHeft(){
   const H = app.heft, kid = kids().find(p => p.id === H.pid), name = kid ? kid.name : '';
   /* Inhalt: Kapitel (Heft-Assistent) mit ihrer ersten Seite, sonst jede Seite einzeln */
@@ -10483,18 +10504,36 @@ function buildHeft(){
   const tocOwn = entries.length > 8;   /* langes Inhaltsverzeichnis: eigene Seite nach dem Deckblatt */
   const first = heftFirst(H);   /* Heft-Assistent: Seiten wie gedruckt gezählt, Deckblatt = Seite 1 */
   /* einheitlicher Seitenrahmen (Stefan, 26.11.2026, Layout B): Kopfzeile, Aufgaben füllen die Seite, Fußzeile mit Seitenzahl immer ganz unten */
-  const pages = H.items.map((it, i) => `<div class="page hf-p ${it.cls || ''}">${heftFrame(it.html, it.ch !== undefined && chs[it.ch] ? it.ch : undefined, i + first, it.cls?.includes('hilfe') ? 'Zum Nachschauen' : '')}</div>`).join('');
-  const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li><span>${escHtml(e.title)}</span><span class="cv-dots"></span><span>${e.i + first}</span></li>`).join('')}</ol></div>` : '';
-  const fach = H.book && SUBJECTS[H.book.fach] && !(H.title || '').includes(SUBJECTS[H.book.fach].name) ? `<div class="cv-fach">${escHtml(SUBJECTS[H.book.fach].name)}</div>` : '';
-  const cover = `<div class="page cover"><div class="cv-logo">${LOGO_SVG}</div><h1 class="cv-title">${escHtml(H.title || 'Mein Arbeitsheft')}</h1>${fach}<div class="cv-name">Name: <span>${escHtml(name)}</span></div>${tocOwn ? '' : toc}<p class="ab-foot ab-lic cv-lic">Stufenweise · stufenweise.app · CC BY-SA 4.0</p></div>`;
-  const css = `.cover{display:flex;flex-direction:column;align-items:center;min-height:290mm;padding-top:28mm}.cv-logo svg{width:46mm;height:46mm}.cv-title{font-size:30pt;margin:10mm 0 14mm;text-align:center;line-height:1.15}.cv-fach{font-size:18pt;margin:-8mm 0 12mm;color:#555}.page.hf-p{display:flex;flex-direction:column}.hf-main{flex:1 1 auto}.hf-main>.ab-grid{flex:1 1 auto;align-content:stretch}@media print{.page.hf-p{min-height:296mm}}.cv-name{display:flex;align-items:flex-end;gap:3mm;font-size:18pt;width:140mm}.cv-name span{flex:1;border-bottom:1.6px solid #333;min-height:11mm;font-size:22pt;padding:0 2mm}.cv-toc{width:140mm;margin-top:22mm}.cv-toc h2{font-size:15pt;margin:0 0 4mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;gap:2mm;padding:1.6mm 0}.cv-dots{flex:1;border-bottom:1.2px dotted #999;margin-bottom:1.2mm}.cv-lic{margin-top:auto}.page.tocp .cv-toc{width:auto;margin-top:0}.page.tocp .cv-toc h2{font-size:20pt;margin-bottom:6mm}`;   /* Vorschau = Druck: keine eigenen Druckmaße mehr (bis 0.30 rutschte das Deckblatt im Druck über) */
-  const all = cover + (tocOwn && toc ? `<div class="page tocp">${toc}</div>` : '') + pages, druck = HEFT_DRUCK[H.druck] ? H.druck : 'a4';
-  const head = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}${css}`;
+  const ss = heftSubj(H), band = heftBand(ss), dflt = !H.title || H.title === 'Mein Arbeitsheft' || Object.values(HEFT_TITLE).includes(H.title);
+  const T = chs.length && dflt ? heftTitleAuto(H) : {main: H.title || 'Mein Arbeitsheft', sub: ''};
+  const LIC = 'Stufenweise · stufenweise.app · CC BY-SA 4.0';
+  /* Rückseite: Nachguckseite, Farbrand rechts – in der Broschüre setzt er den Rand des Deckblatts über den Falz fort */
+  const backPg = it => `<div class="page hf-back ${it.cls || ''}" style="--band:${band}"><div class="hb-kick">Zum Nachschauen</div>${it.html.replace(HEFT_LIC, '')}<div class="hb-foot"><span class="lg">${LOGO_SVG}</span><span>${escHtml(T.main)}</span><span class="lic">${LIC}</span></div></div>`;
+  const pages = H.items.map((it, i) => it.back ? backPg(it) : `<div class="page hf-p ${it.cls || ''}">${heftFrame(it.html, it.ch !== undefined && chs[it.ch] ? it.ch : undefined, i + first, it.cls?.includes('hilfe') ? 'Zum Nachschauen' : '')}</div>`).join('');
+  const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li${e.ch !== undefined ? ' class="ch"' : ''}><span class="nr">${e.ch !== undefined ? e.ch + 1 : ''}</span><span class="t">${escHtml(e.ch !== undefined ? chs[e.ch].title : e.title)}</span><span class="cv-dots"></span><span class="p">${e.back ? 'Rückseite' : e.i + first}</span></li>`).join('')}</ol></div>` : '';
+  const fachName = ss.map(x => SUBJECTS[x].name).join(' und ');
+  const cover = `<div class="page cover" style="--band:${band}"><div class="cv-top">${LOGO_SVG}<span>${escHtml(fachName)}</span></div><h1 class="cv-title">${escHtml(T.main)}</h1>${T.sub ? `<div class="cv-sub">${escHtml(T.sub)}</div>` : ''}<div class="cv-sp0"></div>${heftBild(H, ss)}${tocOwn ? '' : '<div class="cv-sp0"></div>' + toc}<div class="cv-sp"></div><div class="cv-name"><span class="l">Dieses Heft gehört</span><span class="v">${escHtml(name)}</span></div><p class="ab-foot ab-lic cv-lic">${LIC}</p></div>`;
+  const css = `.page.cover,.page.tocp,.page.hf-back{position:relative;display:flex;flex-direction:column;min-height:297mm;padding:18mm 18mm 10mm 26mm}.page.hf-back{padding:16mm 24mm 10mm 12mm;overflow:hidden}@media print{.page.cover,.page.tocp,.page.hf-back{min-height:296mm}}
+.page.cover:before,.page.tocp:before,.page.hf-back:before{content:"";position:absolute;left:0;top:0;bottom:0;width:8mm;background:var(--band)}.page.hf-back:before{left:auto;right:0}
+.cv-top{display:flex;align-items:center;gap:3mm;font-size:11.5pt;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:#555}.cv-top svg{width:13mm;height:13mm}
+.cv-title{font-size:38pt;line-height:1.1;margin:16mm 0 3mm;text-wrap:balance}.cv-sub{font-size:13pt;color:#555;line-height:1.4}.cv-sp0{flex:.5;min-height:8mm}.cv-sp{flex:1}
+.cv-bild{display:flex;flex-direction:column;align-items:center;gap:8mm}.cv-bild.multi{flex-direction:row;justify-content:center;flex-wrap:wrap;gap:8mm 12mm}.cv-bild .hf-zf{width:125mm;height:auto}.cv-bild.multi .hf-zf{width:95mm}.cv-bild.cv-logo svg{width:40mm;height:40mm}
+.cv-tiles{display:flex;gap:5mm}.cv-tiles span{width:24mm;height:24mm;border:2.2px solid #333;border-radius:4mm;display:flex;align-items:center;justify-content:center;font-size:34pt;font-weight:700}.cv-tiles span.on{background:${FACH_COL.D};border-color:${FACH_COL.D};color:#fff}.cv-bild.multi .cv-tiles span{width:18mm;height:18mm;font-size:25pt}
+.cv-shp{display:flex;gap:8mm}.cv-shp svg{width:22mm;height:22mm}.cv-hze{display:flex;justify-content:center}.cv-hze .ab-svg{max-height:none}
+.cv-name{display:flex;align-items:flex-end;gap:4mm;font-size:13pt;color:#444}.cv-name .v{flex:1;border-bottom:1.6px solid #333;min-height:12mm;font-size:24pt;color:#222;padding:0 2mm;font-weight:700}
+.cv-toc h2{font-size:13pt;margin:0 0 2mm}.cv-toc ol{list-style:none;padding:0;margin:0;font-size:12.5pt}.cv-toc li{display:flex;align-items:baseline;gap:2.5mm;padding:1.5mm 0}.cv-toc li.ch{font-weight:700}.cv-toc .nr{width:6mm;flex:none;color:var(--band);font-weight:700}.cv-dots{flex:1;border-bottom:1.2px dotted #999;transform:translateY(-1mm)}.cv-toc .p{font-weight:700}.cv-lic{margin-top:4mm}
+.page.tocp .cv-toc h2{font-size:24pt;margin:4mm 0 8mm}.page.tocp .cv-toc ol{font-size:14pt}.page.tocp .cv-toc li{padding:2.2mm 0}.page.tocp .cv-toc li.ch{margin-top:2mm}
+.hb-kick{font-size:11pt;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:#555;margin-bottom:5mm}.hb-foot{margin-top:auto;display:flex;align-items:center;gap:3mm;font-size:10pt;color:#555;border-top:1px solid #bbb;padding-top:3mm}.hb-foot svg{width:9mm;height:9mm}.hb-foot .lic{margin-left:auto;font-size:8pt;color:#888}`;
+  /* overflow-x:clip: ragt etwas wenige Pixel über die Seite (z. B. „Anfangsbuchstaben schreiben“), verkleinerte Chrome sonst das ganze PDF */
+  const css0 = `.page{overflow-x:clip}.page.hf-p{display:flex;flex-direction:column}.hf-main{flex:1 1 auto}.hf-main>.ab-grid{flex:1 1 auto;align-content:stretch}@media print{.page.hf-p{min-height:296mm}}`;
+  const all = cover + (tocOwn && toc ? `<div class="page tocp" style="--band:${band}">${toc}<div class="cv-sp"></div><p class="ab-foot ab-lic">${LIC}</p></div>` : '') + pages, druck = HEFT_DRUCK[H.druck] ? H.druck : 'a4';
+  const head = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${BB_CSS}${HEFT_CSS}${css}${css0}`;
   if(druck === 'a4') return {title: H.title || 'Mein Arbeitsheft', html:`${head}</style>${PAGE_FIT_JS}</head><body>${B_BW_DEFS}${all}</body></html>`};
   /* Broschüre (Schritt 5): je Bogen quer zwei Heftseiten nebeneinander, so angeordnet, dass gefaltet und in der Mitte geheftet die Reihenfolge stimmt.
      A5-Heft: A4-Bögen quer (Seiten verkleinert auf 71 %); A4-Heft: A3-Bögen quer (Originalgröße). Beidseitig drucken, an der kurzen Kante wenden. */
   const P = [...new DOMParser().parseFromString(`<body>${all}</body>`, 'text/html').body.children].filter(e => e.classList.contains('page')).map(e => e.outerHTML);
-  while(P.length % 4) P.push('<div class="page bk-blank"></div>');
+  const hasBack = H.items.at(-1)?.back;   /* leere Seiten vor die Rückseite, damit sie außen bleibt */
+  while(P.length % 4) P.splice(hasBack ? P.length - 1 : P.length, 0, '<div class="page bk-blank"></div>');
   const n = P.length, sides = [];
   for(let k = 0; k < n/4; k++) sides.push([P[n - 1 - 2*k], P[2*k]], [P[2*k + 1], P[n - 2 - 2*k]]);
   const D = HEFT_DRUCK[druck], [sw, sh] = D.side, z = D.zoom;
@@ -10523,13 +10562,17 @@ const heftZones = pid => TEST_IDS.flatMap(sj => zoneReport(pid, sj).zones).filte
 const HEFT_CSS = `.page.hf-p{padding-bottom:9mm}.hf-main.hf-grow{display:flex;flex-direction:column}.hf-head{display:flex;align-items:center;gap:2.5mm;font-size:9.5pt;font-weight:700;color:#555;border-bottom:1px solid #bbb;padding-bottom:1.5mm;margin:-4mm 0 3mm;line-height:1.2}.hf-head .k{background:#222;color:#fff;border-radius:1.5mm;padding:.4mm 2.5mm}
 .hf-foot{margin-top:auto;height:14mm;flex:none;padding-top:2.5mm;border-top:1px solid #bbb;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4mm;font-size:7.5pt;line-height:1.35;color:#777;break-inside:avoid}.hf-foot .r{text-align:right;font-weight:700;font-size:9pt;color:#444}.hf-foot .hf-pn{font-size:12pt;font-weight:700;color:#222;width:9mm;height:9mm;border-radius:50%;border:1.5px solid #222;display:flex;align-items:center;justify-content:center;line-height:1}
 .hf-band{display:flex;align-items:center;gap:3mm;font-size:11pt;font-weight:700;color:#444;margin:-3mm 0 3mm}.hf-band span{background:#222;color:#fff;border-radius:2mm;padding:.6mm 3mm}
+.hf-nb{display:flex;justify-content:center;margin:2mm 0 6mm}.hf-nb .hf-zf{width:175mm;height:auto}.hf-zs{width:180mm;height:auto}.hf-zp{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;font-size:17pt;font-weight:700;text-align:center}.hf-zp span{border:1.4px solid #222;border-radius:2mm;padding:3mm 0}
+.hf-stw{border-collapse:collapse;margin:2mm auto 3mm;font-size:16pt}.hf-stw th,.hf-stw td{border:1.5px solid #222;width:28mm;height:13mm;text-align:center}.hf-stw th{background:#f1ece1}.hf-stw-k{text-align:center;font-size:12pt;margin:0 0 5mm}
+.hf-merk{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}.hf-merk div{border:1.4px solid #222;border-radius:2mm;padding:2mm;display:flex;flex-direction:column;align-items:center;gap:1mm;font-size:16pt;font-weight:600}.hf-merk svg{width:15mm;height:15mm}.hf-merk u{text-decoration-thickness:.6mm;text-underline-offset:1.2mm}
+.hf-form{display:grid;grid-template-columns:repeat(5,1fr);gap:3mm;margin-bottom:6mm}.hf-form div{border:1.4px solid #222;border-radius:2mm;padding:3mm;display:flex;flex-direction:column;align-items:center;gap:2mm;font-size:14pt}.hf-form svg{width:22mm;height:22mm}
 .hf-intro{font-size:13pt;line-height:1.35;margin:0 0 4mm;padding:3mm 4mm;background:#f1ece1;border-radius:3mm}
 .ab-task.ab-bsp{outline:1.8px dashed #777;outline-offset:1.2mm}.ab-bsp-lab{display:inline-block;font-size:10pt;font-weight:700;color:#555;border:1.2px solid #777;border-radius:2mm;padding:0 2mm;margin:0 0 1.5mm}.ab-bsp-sol{margin-top:2mm;font-size:12.5pt;color:#444}
 .ab-stufe{font-size:12pt;font-weight:600;color:#555;margin-left:2mm;white-space:nowrap}
 .hf-kis{margin-top:6mm;border:2px solid #222;border-radius:3mm;padding:3mm 5mm;break-inside:avoid}.hf-kis h2{font-size:14pt;margin:0 0 1mm}.hf-kis-row{display:flex;align-items:center;gap:4mm;font-size:14pt;padding:1.5mm 0}.hf-kis-row .kb{width:8mm;height:8mm;border:2px solid #222;border-radius:1.5mm;flex:none}.hf-kis-row svg{width:8mm;height:8mm;flex:none}
 .hf-sub{font-size:14pt;margin:4mm 0 2mm;border-bottom:1.5px solid #999;padding-bottom:1mm}.hf-sub .ab-op{width:6mm;height:6mm;vertical-align:-1mm;margin-right:1.5mm}
 .hf-story{font-size:15pt;line-height:1.75;margin:0 0 5mm}.page.hf-fillp{display:flex;flex-direction:column}.hf-draw{flex:1 1 auto;min-height:45mm;border:1.5px dashed #888;border-radius:3mm;margin:1mm 0 3mm;padding:3mm 4mm;font-size:12pt;color:#555}.hf-draw .ab-op{width:6mm;height:6mm;vertical-align:-1.5mm;margin-right:1.5mm}.hf-lines{flex:1 1 auto;min-height:24mm;margin:0 0 3mm;background:repeating-linear-gradient(to bottom,transparent 0,transparent 11.5mm,#888 11.5mm,#888 11.8mm)}.hf-rf{border-collapse:collapse;width:100%;font-size:13pt;margin:1mm 0 3mm}.hf-rf td,.hf-rf th{border:1.2px solid #222;padding:2mm 3mm}.hf-rf th{font-size:11pt;background:#f1ece1}.hf-rf td:nth-child(n+2),.hf-rf th:nth-child(n+2){width:22mm;text-align:center;font-size:16pt}
-.abc-p{display:grid;grid-template-columns:repeat(6,1fr);gap:2.5mm}.abc-p div{border:1.4px solid #222;border-radius:2mm;padding:1.5mm;text-align:center;min-height:37mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between}.abc-p b{font-size:22pt;display:block;line-height:1.1}.abc-p b small{font-size:17pt;margin-left:1.5mm;font-weight:600}.abc-p svg{width:20mm;height:20mm}.abc-p .two svg{width:13mm;height:13mm}.abc-p .two span{display:flex;gap:1mm}
+.abc-p{display:grid;grid-template-columns:repeat(7,1fr);gap:2.5mm}.abc-p div{min-width:0;border:1.4px solid #222;border-radius:2mm;padding:1.5mm 1mm;text-align:center;min-height:37mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between}.abc-p b{font-size:19pt;display:block;line-height:1.1;white-space:nowrap}.abc-p b small{font-size:15pt;margin-left:1mm;font-weight:600}.abc-p svg{width:18mm;height:18mm}.abc-p .two svg{width:10mm;height:10mm}.abc-p .two span{display:flex;gap:.5mm}
 .ein-p{border-collapse:collapse;margin:6mm auto;font-size:15pt}.ein-p td,.ein-p th{border:1.2px solid #222;width:15.5mm;height:13mm;text-align:center}.ein-p th{background:#f1ece1}.ein-p td.q{font-weight:700;background:#faf6ee}`;
 /* Seitenrahmen im Heft: aus Band (Einstieg, Das kann ich schon …) und Fußzeilen der Seite werden Kopf- und Fußzeile.
    Die gespeicherten Seiten bleiben unverändert (ältere Hefte im Browser bekommen den Rahmen beim Drucken). */
@@ -10550,13 +10593,47 @@ const HEFT_LIC = '<p class="ab-foot ab-lic">Stufenweise · stufenweise.app · CC
 const kisSym = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#222" stroke-width="2"/>${k === 2 ? '<circle cx="12" cy="12" r="10" fill="#222"/>' : k === 1 ? '<path d="M12 2a10 10 0 0 1 0 20z" fill="#222"/>' : ''}</svg>`;
 const KIS_HTML = `<div class="hf-kis"><h2>Wie gut kannst du das? Kreuze an.</h2>${[[2, 'Das kann ich.'], [1, 'Das kann ich fast.'], [0, 'Das übe ich noch.']].map(([k, t]) => `<div class="hf-kis-row"><span class="kb"></span>${kisSym(k)}<span>${t}</span></div>`).join('')}</div>`;
 /* Hilfen hinten im Heft (Backlog J, Schritt 2) */
-const abcHelp = () => `<div class="ab-top"><h1>Anlauttabelle</h1></div><div class="abc-p">${ABC.map(L => { const pp = ABC_PIC[L]; return `<div${Array.isArray(pp) ? ' class="two"' : ''}><b>${L}<small>${L.toLowerCase()}</small></b>${!pp ? '' : Array.isArray(pp) ? `<span>${pp.map(w => iconSvg(w, 40)).join('')}</span>` : iconSvg(pp, 50)}</div>`; }).join('')}</div>${HEFT_LIC}`;
+/* Anlauttabelle: 7 Spalten × 5 Reihen; „Pf“ füllt die letzte Reihe (Stefan, 26.11.2026: unterste Zeile war nicht voll) */
+const abcHelp = () => `<div class="ab-top"><h1>Anlauttabelle</h1></div><div class="abc-p">${[...ABC, 'Pf'].map(L => { const pp = ABC_PIC[L] || ({Pf:'Pfanne'})[L]; return `<div${Array.isArray(pp) ? ' class="two"' : ''}><b>${L}<small>${L.toLowerCase()}</small></b>${!pp ? '' : Array.isArray(pp) ? `<span>${pp.map(w => iconSvg(w, 40)).join('')}</span>` : iconSvg(pp, 50)}</div>`; }).join('')}</div>${HEFT_LIC}`;
 const einsHelp = () => { const N = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; return `<div class="ab-top"><h1>Einmaleins-Tafel</h1></div><table class="ein-p"><tr><th>·</th>${N.map(n => `<th>${n}</th>`).join('')}</tr>${N.map(a => `<tr><th>${a}</th>${N.map(b => `<td${a === b ? ' class="q"' : ''}>${a*b}</td>`).join('')}</tr>`).join('')}</table>${HEFT_LIC}`; };
+/* Nachguckseiten für die Rückseite des Hefts (Stefan, 26.11.2026: „je nach Thema Hundertertafel, Anlauttabelle, leeres Zwanzigerfeld, Zahlenstrahl, Merkwörter“) */
+const zfSvg = (on1 = 0, on2 = 0, c1 = '#346bc3', c2 = '#f0a020') => { let s = ''; for(let r = 0; r < 2; r++) for(let i = 0; i < 10; i++){ const on = i < (r ? on2 : on1); s += `<circle cx="${10 + i*20 + (i > 4 ? 6 : 0)}" cy="${10 + r*20}" r="7.2" fill="${on ? (i < 5 ? c1 : c2) : '#fff'}" stroke="#333" stroke-width="1.2"/>`; }
+  return `<svg viewBox="-2 -2 210 44" class="hf-zf" aria-hidden="true"><rect x="-1" y="-1" width="208" height="42" rx="3" fill="none" stroke="#333" stroke-width="1.5"/><line x1="103" y1="-1" x2="103" y2="41" stroke="#333" stroke-width="1.5"/>${s}</svg>`; };
+const hfZsSvg = (zr, step, lab) => { const X = v => 6 + v*188/zr; let s = `<line x1="2" y1="12" x2="198" y2="12" stroke="#222" stroke-width="1"/>`;
+  for(let v = 0; v <= zr; v += step){ const big = v % lab === 0; s += `<line x1="${X(v)}" y1="${big ? 7 : 9}" x2="${X(v)}" y2="${big ? 17 : 15}" stroke="#222" stroke-width="${big ? 1 : .6}"/>`; if(big) s += `<text x="${X(v)}" y="25" font-size="${zr > 100 ? 4.6 : 5.4}" text-anchor="middle" font-weight="700">${v}</text>`; }
+  return `<svg viewBox="0 0 200 28" class="hf-zs" aria-hidden="true">${s}</svg>`; };
+const zfHelp = () => `<div class="ab-top"><h1>Zwanzigerfeld und Zahlenstrahl</h1></div><h2 class="hf-sub">Zwanzigerfeld</h2><div class="hf-nb">${zfSvg()}</div>
+  <h2 class="hf-sub">Zahlenstrahl bis 20</h2><div class="hf-nb">${hfZsSvg(20, 1, 1)}</div>
+  <h2 class="hf-sub">Zehnerfreunde</h2><div class="hf-zp">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(a => `<span>${a} + ${10 - a} = 10</span>`).join('')}</div>${HEFT_LIC}`;
+const stwHelp = () => `<div class="ab-top"><h1>Stellenwerttafel und Zahlenstrahl</h1></div><h2 class="hf-sub">Stellenwerttafel</h2>
+  <table class="hf-stw"><tr><th>T</th><th>H</th><th>Z</th><th>E</th></tr>${'<tr><td></td><td></td><td></td><td></td></tr>'.repeat(5)}</table>
+  <p class="hf-stw-k"><b>T</b> Tausender = 1000 · <b>H</b> Hunderter = 100 · <b>Z</b> Zehner = 10 · <b>E</b> Einer = 1</p>
+  <h2 class="hf-sub">Zahlenstrahl bis 100</h2><div class="hf-nb">${hfZsSvg(100, 1, 10)}</div><h2 class="hf-sub">Zahlenstrahl bis 1000</h2><div class="hf-nb">${hfZsSvg(1000, 10, 100)}</div>${HEFT_LIC}`;
+const merkMark = w => escHtml(w).replace(/(ck|tz|([bdfgklmnprst])\2)/, '<u>$1</u>');
+const merkHelp = () => `<div class="ab-top"><h1>Merkwörter</h1></div><p class="hf-intro">Diese Wörter schreibt man mit doppeltem Mitlaut, <b>ck</b> oder <b>tz</b>. Die Merkstelle ist unterstrichen.</p><div class="hf-merk">${MERK.map(w => `<div>${ICON[w] ? iconSvg(w, 44) : ''}<span>${merkMark(w)}</span></div>`).join('')}</div>${HEFT_LIC}`;
+const formHelp = () => `<div class="ab-top"><h1>Formen und Farben</h1></div><h2 class="hf-sub">Formen</h2><div class="hf-form">${Object.entries(B_FORM).map(([k, n]) => `<div>${bShape(k, 'blau', 64)}<span>${n}</span></div>`).join('')}</div>
+  <h2 class="hf-sub">Farben</h2><div class="hf-form">${Object.entries(B_COL_NAME).map(([k, n]) => `<div>${bShape('kreis', k, 64)}<span>${n}</span></div>`).join('')}</div>${HEFT_LIC}`;
 const HEFT_HELP = {
   taf: {name:'Hundertertafel zum Nachschauen', label:'Ausgefüllte Hundertertafel zum Nachschauen', on: H => !!H.taf, need: c => chTaf(c), html: () => tafHelp()},
   abc: {name:'Anlauttabelle', label:'Anlauttabelle', on: H => H.abc !== false, need: c => /^(L:L[1-5]|W:W[1-4])$/.test(c.t.topic), html: () => abcHelp()},
-  ein: {name:'Einmaleins-Tafel', label:'Einmaleins-Tafel', on: H => H.ein !== false, need: c => c.t.topic === 'M:einmaleins', html: () => einsHelp()}
+  ein: {name:'Einmaleins-Tafel', label:'Einmaleins-Tafel', on: H => H.ein !== false, need: c => c.t.topic === 'M:einmaleins', html: () => einsHelp()},
+  /* nur als Rückseite (kein Häkchen) */
+  zf: {name:'Zwanzigerfeld und Zahlenstrahl', on: () => false, need: () => false, html: () => zfHelp()},
+  stw: {name:'Stellenwerttafel und Zahlenstrahl', on: () => false, need: () => false, html: () => stwHelp()},
+  merk: {name:'Merkwörter', on: () => false, need: () => false, html: () => merkHelp()},
+  form: {name:'Formen und Farben', on: () => false, need: () => false, html: () => formHelp()}
 };
+/* Rückseite: die passende Nachguckseite zum ersten Kapitel (Förderzone), wenn keine angekreuzte Hilfe passt */
+function heftBackFor(c){
+  if(!c) return 'zf';
+  const ax = c.key.split('|')[0], tp = c.t.topic;
+  if(tp === 'M:einmaleins') return 'ein';
+  if(ax === 'V' || ax === 'O' || tp.startsWith('B:')) return 'form';
+  if(['L', 'P', 'W'].includes(ax) || /^[LPW]:/.test(tp)) return /^(L:L[6-9]|W:W[56])$/.test(tp) ? 'merk' : 'abc';
+  const zr = c.t.zr || +(c.key.match(/^M\|(\d+)/)?.[1] || 20);
+  return zr <= 20 ? 'zf' : zr <= 100 ? 'taf' : 'stw';
+}
+const FACH_COL = {M:'#346bc3', D:'#c9414a', B:'#27834b'};
 /* Mathe-Feinstufen (Schritt 3): Übungsseiten eines Kapitels werden schwerer – mit Bild → Bild selbst zeichnen/streichen → im Kopf;
    dazu innerhalb des Zahlenraums von kleinen zu großen Zahlen (app.sheet.stufe 0…1 wählt Aufgaben passender Schwierigkeit) */
 function heftStufe(t, p){
@@ -10728,7 +10805,9 @@ function heftPlan(pid, H = app.heft){
   /* Seiten außerhalb der Kapitel: Deckblatt, eigene Inhaltsseite (mehr als 8 Einträge), Wiederholung nach je zwei Kapiteln, Hilfen hinten */
   const helpsOf = L => Object.keys(HEFT_HELP).filter(k => HEFT_HELP[k].on(H) && L.some(HEFT_HELP[k].need));
   const storyOf = L => H.story !== 'aus' && (fach === 'D' || fach === 'mix') && L.some(c => c.zone && heftStoryOk(c)) ? Math.min(6, Math.floor(N/8)) : 0;   /* Fortsetzungsgeschichte: je Teil 2 Seiten */
-  const extraFor = L => { const w = Math.floor(L.length/2), h = helpsOf(L).length, g = storyOf(L); return 1 + (H.toc && L.length + w + h + g > 8 ? 1 : 0) + w + h + 2*g; };
+  /* Rückseite (Stefan, 26.11.2026): immer eine Nachguckseite; die erste angekreuzte Hilfe wird zur Rückseite, sonst eine passende zum ersten Kapitel */
+  const backOf = L => { const all = helpsOf(L), f = heftBackFor(L.find(c => c.zone) || L[0]); return all.includes(f) ? f : all[0] || f; };
+  const extraFor = L => { const w = Math.floor(L.length/2), h = Math.max(1, helpsOf(L).length), g = storyOf(L); return 1 + (H.toc && L.length + w + h + g > 8 ? 1 : 0) + w + h + 2*g; };
   const extra = () => extraFor(act());
   const rows = zones.map(k => heftRow(k).filter(x => !isOk(m[x]?.status)));
   if(vor === 'next') rows.forEach(r => { for(const k of r) if(add(k, false)) break; });
@@ -10745,8 +10824,8 @@ function heftPlan(pid, H = app.heft){
   for(let n = 0; rest > 0; n++, rest--) pg[ord[n % ord.length]]++;
   for(let n = 0; rest < 0 && n < 99; n++){ const i = pg.indexOf(Math.max(...pg)); if(pg[i] <= 1) break; pg[i]--; rest++; }
   ch.forEach(c => { const i = A.indexOf(c); c.pages = i < 0 ? 0 : pg[i]; c.cut = i < 0 && W(c) > 0; });
-  const helps = helpsOf(A), wdh = Math.floor(A.length/2), story = storyOf(A);
-  return {fach, N, vor, chapters: ch, content: C, wdh, helps, story, storyKey: STORIES[H.story] ? H.story : Object.keys(STORIES)[0], storyAvail: (fach === 'D' || fach === 'mix') && A.some(c => c.zone && heftStoryOk(c)), helpAvail: Object.keys(HEFT_HELP).filter(k => A.some(HEFT_HELP[k].need)), tocOwn: !!H.toc && A.length + wdh + helps.length + story > 8, taf: helps.includes('taf'), bw: A.some(c => c.t.topic.startsWith('B:'))};
+  const all = helpsOf(A), back = A.length ? backOf(A) : null, helps = all.filter(k => k !== back), wdh = Math.floor(A.length/2), story = storyOf(A);
+  return {fach, N, vor, chapters: ch, content: C, wdh, helps, back, story, storyKey: STORIES[H.story] ? H.story : Object.keys(STORIES)[0], storyAvail: (fach === 'D' || fach === 'mix') && A.some(c => c.zone && heftStoryOk(c)), helpAvail: Object.keys(HEFT_HELP).filter(k => A.some(HEFT_HELP[k].need)), tocOwn: !!H.toc && A.length + wdh + helps.length + (back ? 1 : 0) + story > 8, taf: all.includes('taf'), bw: A.some(c => c.t.topic.startsWith('B:'))};
 }
 async function heftMake(pid){
   const kid = data.profiles.find(p => p.id === pid); if(!kid) return;
@@ -10768,6 +10847,7 @@ async function heftMake(pid){
   const items = await heftPages(pid, specs, (i, n) => { const b = btn(); if(b) b.textContent = `Seite ${i} von ${n} …`; });
   H.chapters = used.map((c, ci) => ({key: c.key, label: c.label, zone: c.zone, title: items.find(it => it.ch === ci)?.base || c.label}));
   for(const k of P.helps) items.push({title: HEFT_HELP[k].name, cls:'hilfe', kind:'hilfe', html: HEFT_HELP[k].html()});
+  if(P.back) items.push({title: HEFT_HELP[P.back].name, cls:'hilfe', kind:'hilfe', back: true, html: HEFT_HELP[P.back].html()});   /* Rückseite */
   if(!H.title || Object.values(HEFT_TITLE).includes(H.title) || H.title === 'Mein Arbeitsheft') H.title = HEFT_TITLE[P.fach] || HEFT_TITLE.mix;
   H.items = items; H.pid = pid; H.book = {N: P.N, fach: P.fach};
   saveHeft(); app.sheetMode = 'heft'; renderSheets();
@@ -10785,7 +10865,7 @@ function heftAssistHtml(kid){
     <span class="sh-lab">Wie weit nach vorne</span><select id="hf-vor">${HEFT_VOR.map(([v, n]) => `<option value="${v}" ${v === P.vor ? 'selected' : ''}>${n}</option>`).join('')}</select>
     <span class="sh-lab">Kapitel</span><ol class="hf-plan">${plan}</ol>
     ${P.storyAvail ? `<label class="row">Fortsetzungsgeschichte <select id="hf-story">${[...Object.entries(STORIES).map(([k, g]) => [k, g.t]), ['aus', 'keine']].map(([k, n]) => `<option value="${k}" ${k === (H.story === 'aus' ? 'aus' : P.storyKey) ? 'selected' : ''}>${escHtml(n)}</option>`).join('')}</select></label>` : ''}
-    <span class="note">Jede Stufe ist ein Kapitel: Einstieg mit Beispiel, Übungsseiten (Seite für Seite etwas schwerer), zum Schluss „Das kann ich schon“. Jede Seite hat neue Aufgaben. Dazu kommen Deckblatt${P.tocOwn ? ', eine Seite Inhalt' : ' mit Inhalt'}${P.wdh ? `, ${P.wdh === 1 ? 'eine Wiederholung' : `${P.wdh} Wiederholungen`} (nach je zwei Kapiteln)` : ''}${P.story ? `, ${P.story} Teile der Geschichte (je eine Seite Text und Aufgaben)` : ''}${P.helps.length ? ` und hinten ${P.helps.map(k => HEFT_HELP[k].label).join(', ')}` : ''} – zusammen ${P.N} Seiten. Die Lösungen gibt es als eigenes Heft.${P.chapters.some(c => c.cut) ? ' Für einige Kapitel ist kein Platz mehr: mehr Seiten wählen oder Kapitel abwählen.' : ''}</span>
+    <span class="note">Jede Stufe ist ein Kapitel: Einstieg mit Beispiel, Übungsseiten (Seite für Seite etwas schwerer), zum Schluss „Das kann ich schon“. Jede Seite hat neue Aufgaben. Dazu kommen Deckblatt${P.tocOwn ? ', eine Seite Inhalt' : ' mit Inhalt'}${P.wdh ? `, ${P.wdh === 1 ? 'eine Wiederholung' : `${P.wdh} Wiederholungen`} (nach je zwei Kapiteln)` : ''}${P.story ? `, ${P.story} Teile der Geschichte (je eine Seite Text und Aufgaben)` : ''}${P.helps.length ? `, hinten ${P.helps.map(k => HEFT_HELP[k].label).join(', ')}` : ''}${P.back ? ` und als Rückseite zum Nachschauen: ${HEFT_HELP[P.back].name.replace(' zum Nachschauen', '')}` : ''} – zusammen ${P.N} Seiten. Die Lösungen gibt es als eigenes Heft.${P.chapters.some(c => c.cut) ? ' Für einige Kapitel ist kein Platz mehr: mehr Seiten wählen oder Kapitel abwählen.' : ''}</span>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${P.bw ? `<label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>` : ''}${P.helpAvail.map(k => `<label class="row cb"><input type="checkbox" id="hf-${k}" ${HEFT_HELP[k].on(H) ? 'checked' : ''}> Hinten im Heft: ${HEFT_HELP[k].label}</label>`).join('')}</div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-zone" ${P.chapters.some(c => c.pages) ? '' : 'disabled'}>${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'} (${P.N} Seiten)</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>`;
 }
