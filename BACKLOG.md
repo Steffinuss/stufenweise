@@ -236,3 +236,17 @@ Konzept mit 9 Fragen an Stefan: Dokument „Stufenweise – Arbeitshefte, die au
 **Anlass:** Unten auf Arbeitsblättern, Legeblättern und Hilfeseiten steht „© Stefan Hackl“ (5 Stellen in `index.html`, Klasse `ab-lic`, z. B. `tafHelp`, Legeblätter; dazu seit Backlog J `HEFT_LIC` für Heftseiten und Deckblatt in `buildHeft`). Blätter anderer Lehrkräfte tragen so Stefans Namen; der Name gehört nicht in Hefte und zu Eltern.
 **Vorschlag:** Fußzeile „Stufenweise · stufenweise.app · CC BY-SA 4.0“. Das genügt der Namensnennung der Lizenz; Stefan bleibt als Urheber im Impressum, in `LICENSE`/`LIZENZ-INHALTE.md` und auf GitHub genannt. Impressum und Kopfkommentar in `index.html` unverändert lassen.
 **Größe:** klein. Prüfen: `arbeitsblaetter.py`, `legeblaetter.py` (Fußzeile darf keine Seite verlängern).
+
+## L: Lineatur zum freien Schreiben wählbar (Wunsch Stefan, 26.11.2026)
+
+**Status:** nur dokumentiert, nicht begonnen.
+**Wunsch (Stefan):** „Beim freien Schreiben Arten von Lineatur aussuchen. Standard (dreiteilig → Dach/Erdgeschoss/Keller) Standard für 1./2. Klasse. Dann 2 Linien (3. Klasse) und 1 Linie (Standard 4. Klasse).“
+**Idee:** Auswahl „Lineatur“ mit drei Arten:
+- **Haus mit drei Stockwerken:** Dach, Erdgeschoss, Keller (Oberlänge, Mittelband, Unterlänge). Standard für Klasse 1/2.
+- **Zwei Linien:** Grundlinie und Mittelband. Standard für Klasse 3.
+- **Eine Linie:** Standard für Klasse 4.
+
+Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerkt (`app.sheet`, `SHEET_KEEP`) und gilt auch im Heft.
+**Betrifft (zu klären):** Schreibzeilen auf Arbeitsblättern und im Heft (`.ab-wline`, `.hf-lines`: W6 „Satz zum Bild“, „Satz abschreiben“, Aufgabenseiten der Fortsetzungsgeschichte), evtl. auch Schreiben mit dem Stift an der Tafel.
+**Offene Frage an Stefan:** Welche Stellen meinst du mit „freiem Schreiben“: Blätter und Heft, die Tafel oder beides?
+**Größe:** klein bis mittel. Schreibzeilen mit fester Höhe je Lineatur; prüfen mit `heft_seiten_passen.py` (Seiten dürfen nicht überlaufen).
