@@ -10564,7 +10564,7 @@ function openSheets(pid, zoneKey, lege){
   if(![10, 20, 100, 1000].includes(S.zr)) S.zr = 20;
   if(lege){ app.sheetMode = 'single'; S.topic = lege.topic; if(lege.zr) S.zr = lege.zr; }
   if(zoneKey){ const z = zoneToSheet(zoneKey); if(z){ S.topic = z.topic; if(z.zr) S.zr = z.zr; S.ue = z.ue || 'egal'; } }
-  $('#dlg-sheet').showModal(); renderSheets();
+  $('#dlg-sheet').showModal(); sheetScrollTop = true; renderSheets();
 }
 /* ---------- Arbeitsheft: mehrere Blätter sammeln, mit Titelblatt, ohne Lösungen ---------- */
 const HEFT_KEY = 'stufenweise.heft';
@@ -10986,10 +10986,20 @@ function heftAssistHtml(kid){
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><label class="row cb"><input type="checkbox" id="hf-gross" ${H.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label><label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>${P.helpAvail.map(k => `<label class="row cb"><input type="checkbox" id="hf-${k}" ${HEFT_HELP[k].on(H) ? 'checked' : ''}> Hinten im Heft: ${HEFT_HELP[k].label}</label>`).join('')}</div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-zone" ${P.chapters.some(c => c.pages) ? '' : 'disabled'}>${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'} (${P.N} Seiten)</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>`;
 }
-function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.sheet.pid = pid; $('#dlg-sheet').showModal(); renderSheets(); }
+function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.sheet.pid = pid; $('#dlg-sheet').showModal(); sheetScrollTop = true; renderSheets(); }
+/* Inhalt des Dialogs „Material drucken“ neu zeichnen, ohne nach oben zu springen (Rückmeldung Stefan, 26.11.2026: „+“ und „−“ im
+   Heft-Assistenten scrollten ganz nach oben). Nur beim Öffnen des Dialogs beginnt die Liste oben. */
+var sheetScrollTop = false;
+function sheetBodySet(html){
+  const b = $('#sheet-body'), d = $('#dlg-sheet'), keep = sheetScrollTop ? null : [d.scrollTop, b.scrollTop, b.querySelector('.sheet-form')?.scrollTop || 0];
+  sheetScrollTop = false;
+  b.innerHTML = html;
+  if(!keep) return;
+  d.scrollTop = keep[0]; b.scrollTop = keep[1]; const f = b.querySelector('.sheet-form'); if(f) f.scrollTop = keep[2];
+}
 function renderHeft(){
   const H = app.heft;
-  $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
+  sheetBodySet(`<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Titel <input id="hf-title" value="${escHtml(H.title)}" maxlength="40" style="flex:1;min-width:0"></label>
     <label class="row">Name auf dem Titelblatt <select id="hf-kid">${[['none', 'leer lassen (zum Selbstschreiben)'], ...kids().map(p => [p.id, escHtml(p.name)])].map(([v, n]) => `<option value="${v}" ${v === H.pid ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
     <label class="row cb"><input type="checkbox" id="hf-toc" ${H.toc ? 'checked' : ''}> Inhaltsverzeichnis auf dem Titelblatt</label>
@@ -11000,7 +11010,7 @@ function renderHeft(){
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
     ${H.items.some(it => it.sol?.length) ? `<div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="hf-sol-print">${icon('print')}<span style="display:inline">Lösungsheft drucken</span></button><button class="icon-btn" id="hf-sol-save">${icon('check')}<span style="display:inline">Lösungsheft speichern</span></button></div>` : ''}
     <p class="note">Das Heft hat ein Titelblatt mit Namen. Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Lösungen gibt es als eigenes Lösungsheft für dich. Die Aufgaben bleiben so, wie du sie übernommen hast. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst. Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
-    <iframe id="sh-frame" title="Vorschau Arbeitsheft"></iframe>`;
+    <iframe id="sh-frame" title="Vorschau Arbeitsheft"></iframe>`);
   app.heftDoc = buildHeft();
   const fr = $('#sh-frame'); fr.onload = null;
   const wpx = app.heftDoc.booklet === 'a3' ? 1630 : app.heftDoc.booklet ? 1160 : 830;
@@ -11013,7 +11023,7 @@ function renderSheets(keep){
   const kid = kids().find(p => p.id === S.pid);
   const zones = kid ? TEST_IDS.flatMap(sj => zoneReport(kid.id, sj).zones).filter(z => zoneToSheet(z.key)) : [];
   const sel = (id, opts, cur) => `<select id="${id}">${opts.map(([v, n]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
-  $('#sheet-body').innerHTML = `<div class="sheet-form">${sheetModeSwitch()}
+  sheetBodySet(`<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Kind ${sel('sh-kid', [['none', 'ohne Namen'], ...kids().map(p => [p.id, escHtml(p.name)])], S.pid)}</label>
     ${zones.length ? `<div class="sh-zones"><span class="note">Passend zur Förderzone:</span>${zones.map(z => `<button class="chip-toggle" data-shzone="${z.key}" aria-pressed="${(() => { const t = zoneToSheet(z.key); return t.topic === S.topic && (!t.zr || t.zr === S.zr) && (!t.ue || t.ue === S.ue); })()}">${escHtml(cellLabel(z.key).replace(/ \(.*\)$/, ''))}</button>` + (ZONE_EXTRA[z.key] || []).filter(([t]) => !zones.some(y => zoneToSheet(y.key)?.topic === t) && !zones.some(y => y.key !== z.key && (ZONE_EXTRA[y.key] || []).some(([u]) => u === t) && zones.indexOf(y) < zones.indexOf(z))).map(([t, n]) => `<button class="chip-toggle" data-shtopic="${t}" aria-pressed="${S.topic === t}">${n}</button>`).join('')).join('')}</div>` : ''}
     ${sheetNavHtml()}
@@ -11041,7 +11051,7 @@ function renderSheets(keep){
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-heft">${icon('plus')}<span style="display:inline">Ins Arbeitsheft</span></button></div>
     ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge.</p><details class="note sh-help"><summary>Probleme beim Drucken?</summary>Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</details></div>
-    <iframe id="sh-frame" title="Vorschau Arbeitsblatt"></iframe>`;
+    <iframe id="sh-frame" title="Vorschau Arbeitsblatt"></iframe>`);
   if(!keep || !app.sheetDoc) app.sheetDoc = buildSheet();
   sheetShow();
 }
