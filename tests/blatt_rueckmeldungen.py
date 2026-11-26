@@ -62,6 +62,13 @@ async def main():
           return {w: s && s.getAttribute('width'), h: s && s.getAttribute('height'), n: document.querySelectorAll('.lg-svg').length, quer, over}; })()""")
         await doc.close()
         check('S7 Legeblatt Zehnerfeld: eine Reihe mit 10, quer, passt', r['w'] == '250mm' and r['h'] == '25mm' and r['quer'] and not r['over'], str(r))
+        # S2: Heftseite mit großen Aufgaben darf im fertigen Heft ein wenig (bis 90 %) verkleinert werden, statt überzulaufen
+        res = []
+        for hmm in (300, 360):
+            h = await pg.evaluate("""(hmm) => `<!DOCTYPE html><html><head><style>${HEFT_CSS}</style>${PAGE_FIT_JS}</head><body><div class="page"><div class="ab-grid gross"><div style="height:${hmm}mm"></div></div></div></body></html>`""", hmm)
+            doc = await br.new_page(); await doc.set_content(h); await doc.wait_for_timeout(400)
+            res.append(await doc.evaluate("(() => { const p = document.querySelector('.page'); return [p.dataset.fit || '', p.dataset.over || '']; })()")); await doc.close()
+        check('S2 große Aufgaben: knapp zu lang → leicht verkleinert, viel zu lang → zweites Blatt', res[0][1] == '' and res[0][0] and float(res[0][0]) >= .9 and res[1][1] != '', str(res))
         await br.close()
     print('FEHLER:', ERR) if ERR else print('alles ok')
     if ERR: raise SystemExit(1)

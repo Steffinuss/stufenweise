@@ -10127,14 +10127,16 @@ const PAGE_FIT_JS = `<script>(function(){
       if(box){ while(box.firstChild) p.insertBefore(box.firstChild, box); box.remove(); }
       p.style.minHeight = '0'; delete p.dataset.over;
       var cs = getComputedStyle(p), pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom), z = 1, h = p.getBoundingClientRect().height;
-      if(h > max && p.querySelector('.gross')){ p.dataset.over = Math.ceil((h - pad)/(max - pad)); h = 0; }   /* „Große Aufgaben“ nie verkleinern */
+      /* „Große Aufgaben“ nur ganz wenig verkleinern (bis 90 %): fängt kleine Unterschiede zwischen Browsern ab (Backlog S2: auf dem iPad lief
+         „Das kann ich schon: Längere Texte verstehen“ über, obwohl die Seite beim Bauen gerade noch passte) */
+      var minZ = p.querySelector('.gross') ? 0.9 : p.classList.contains('fitlow') ? 0.6 : 0.8;
       if(h > max){
         box = document.createElement('div'); box.className = 'fitz';
         box.style.cssText = 'display:' + cs.display + ';flex-direction:' + cs.flexDirection + ';align-items:' + cs.alignItems + ';gap:' + cs.gap + ';flex:1 1 auto';
         var head = p.querySelector(':scope > .hf-head');
         [].slice.call(p.childNodes).forEach(function(n){ if(!(n.classList && (n.classList.contains('hf-pn') || n.classList.contains('hf-head') || n.classList.contains('hf-foot')))) box.appendChild(n); }); p.insertBefore(box, head ? head.nextSibling : p.firstChild);   /* Kopf- und Fußzeile im Heft bleiben unverkleinert */
         for(var i = 0; i < 6 && h > max; i++){ z = z*(max - pad)/(h - pad)*0.99; box.style.zoom = z; h = p.getBoundingClientRect().height; }
-        if(z < (p.classList.contains('fitlow') ? 0.6 : 0.8)){ while(box.firstChild) p.insertBefore(box.firstChild, box); box.remove(); z = 1; p.dataset.over = Math.ceil((p.getBoundingClientRect().height - pad)/(max - pad)); }
+        if(z < minZ){ while(box.firstChild) p.insertBefore(box.firstChild, box); box.remove(); z = 1; p.dataset.over = Math.ceil((p.getBoundingClientRect().height - pad)/(max - pad)); }
       }
       p.style.minHeight = ''; p.dataset.fit = z < 1 ? z.toFixed(2) : '';
     });
@@ -10795,7 +10797,8 @@ async function heftPages(pid, specs, prog = () => {}){
   /* over: läuft über; fill: wie voll die Seite ist (0…1, Inhalt bis zum letzten Element im Verhältnis zur nutzbaren Höhe) */
   const measure = async (inner, cls) => { await load(wrap(inner, cls)); const d = fr.contentDocument, p = d.querySelector('.page'); if(!p) return {over:false, fill:1};
     const mm = 96/25.4, top = p.getBoundingClientRect().top + 12*mm, ft = p.querySelector('.hf-foot'), last = [...p.querySelectorAll(':scope > *, :scope > .fitz > *')].filter(e => !e.matches('.hf-pn,.hf-foot,.fitz')).pop();
-    return {over: !!p.dataset.over, z: +p.dataset.fit || 1, fill: p.dataset.fit ? 1 : last ? (last.getBoundingClientRect().bottom - top)/(276*mm - (ft ? ft.getBoundingClientRect().height : 0)) : 0}; };
+    /* große Aufgaben: beim Bauen zählt schon jedes Verkleinern als „zu lang“ (wie bisher); die 90 % im Heft sind nur Puffer für andere Browser */
+    return {over: !!p.dataset.over || (!!p.dataset.fit && !!p.querySelector('.gross')), z: +p.dataset.fit || 1, fill: p.dataset.fit ? 1 : last ? (last.getBoundingClientRect().bottom - top)/(276*mm - (ft ? ft.getBoundingClientRect().height : 0)) : 0}; };
   const band = (txt, ch) => `<div class="hf-band">${ch !== undefined ? `<span>Kapitel ${ch + 1}</span>` : ''}${txt}</div>`;
   async function full(t, o = {}){   /* volles Blatt: so viele Aufgaben, wie auf die Seite passen (mit Platz für Kopf- und Fußzeile) */
     set(t, o); app.sheetDoc = buildSheet(); if(app.sheetGen) app.sheetGen.reserve = HEFT_RESERVE;
