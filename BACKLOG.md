@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 26.11.2026 (0.39.0; als Nächstes L und M)
+Stand: 26.11.2026 (0.40.0; L in Arbeit)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -22,7 +22,7 @@ Stand: 26.11.2026 (0.39.0; als Nächstes L und M)
 | 9 | ~~**J** Arbeitshefte, die aufeinander aufbauen + **K** Fußzeile ohne Namen~~ | groß | freigegeben in 0.38.0 (26.11.2026), siehe `CHANGELOG.md` |
 | 10 | ~~**O1** Voller Speicher melden, **P1** Safari-Tab auf dem iPad, **Q1** Raten im Test~~ | klein | Datensicherheit aus der Prüfung vom 22.11.; O1 freigegeben in 0.38.1, P1 und Q1 in 0.39.0 |
 | 11 | ~~**N** Große Aufgaben im Heft-Assistenten~~ | klein | freigegeben in 0.39.0 (26.11.2026) |
-| 12 | **M** Blätter im Heft-Design, dann **L** Lineatur | klein bis mittel | M gebaut, in der Testversion (26.11.); L danach |
+| 12 | ~~**M** Blätter im Heft-Design~~, dann **L** Lineatur | klein bis mittel | M freigegeben in 0.40.0 (26.11.); L in Arbeit |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -259,7 +259,7 @@ Der Standard richtet sich nach der Klasse/Stufe des Kindes. Die Wahl wird gemerk
 
 ## M: Arbeitsblätter im Design der Arbeitshefte (Wunsch Stefan, 26.11.2026)
 
-**Status:** gebaut in `entwicklung`, in der Testversion (26.11.2026, Stefan: „Bau M in Entwicklung“), wartet auf Stefans Freigabe. Danach L. Bekannt, nicht neu: Große Aufgaben bei L8/L9 und H:HL passen nicht auf ein Blatt (schon in 0.39.0, große Aufgaben werden nie verkleinert).
+**Status:** erledigt, freigegeben in 0.40.0 (26.11.2026). Danach L. Bekannt, nicht neu: Große Aufgaben bei L8/L9 und H:HL passen nicht auf ein Blatt (schon in 0.39.0, große Aufgaben werden nie verkleinert).
 **Wunsch (Stefan):** „Passend zu den Arbeitsheften auch Arbeitsblätter im Design anpassen/aktualisieren.“
 **Idee:** Einzelne Arbeitsblätter („Material drucken“) bekommen das Aussehen der Heftseiten, wie in 0.38.0 eingeführt:
 - Kopfzeile wie im Heft, z. B. Fach und Stufe; Name und Datum bleiben.

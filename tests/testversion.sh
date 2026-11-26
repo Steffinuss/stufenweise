@@ -20,7 +20,9 @@ sed -i 's#<title>Stufenweise</title>#<title>Stufenweise – Testversion</title>#
 { printf '> **Testversion von Stufenweise** – Stand aus [Steffinuss/stufenweise](https://github.com/Steffinuss/stufenweise), Zweig `entwicklung` (%s). Nicht für den Unterricht. Hier nicht direkt arbeiten.\n\n' "$STAND"; cat "$ZIEL/README.md"; } > "$ZIEL/README.tmp" && mv "$ZIEL/README.tmp" "$ZIEL/README.md"
 # Eigene Kennung, damit man die Testversion von der richtigen App unterscheidet: nächste Nebenversion + Stand
 CUR=$(grep -o "APP_VERSION = '[0-9.]*" "$ZIEL/index.html" | grep -o "[0-9.]*$")
-NEXT=$(echo "$CUR" | awk -F. '{print $1"."$2+1".0"}'); HEUTE=$(TZ=Europe/Berlin date +%d.%m.%Y)
+# Vierte Stelle = Zeitpunkt (JJMMTTHHMM): Sonst hätte jede Testversion dieselbe Nummer (z. B. 0.40.0), und „Nach neuer Version suchen“
+# fände eine neuere Testversion erst, wenn sich die Nebenversion ändert (Rückmeldung Stefan, 26.11.2026).
+NEXT=$(echo "$CUR" | awk -F. '{print $1"."$2+1".0"}').$(TZ=Europe/Berlin date +%y%m%d%H%M); HEUTE=$(TZ=Europe/Berlin date +%d.%m.%Y)
 sed -i "s/APP_VERSION = '[^']*'/APP_VERSION = '$NEXT · Testversion $STAND · $HEUTE'/" "$ZIEL/index.html"
 printf '{"version": "%s", "date": "%s"}\n' "$NEXT" "$HEUTE" > "$ZIEL/version.json"
 git -C "$ZIEL" add -A

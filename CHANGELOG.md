@@ -5,6 +5,12 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+## 0.40.0 – 26.11.2026
+
+Freigegeben von Stefan am 26.11.2026 nach Durchsicht der Testversion („Perfekt, kannst du freigeben.“).
+
+- **Testversion: neue Stände werden erkannt** (Rückmeldung Stefan, 26.11.2026): Bisher hatte jede Testversion dieselbe Nummer (z. B. 0.40.0), „Nach neuer Version suchen“ fand einen neueren Stand erst, wenn sich die Nebenversion änderte. `tests/testversion.sh` hängt jetzt den Zeitpunkt als vierte Stelle an (z. B. „0.41.0.2611262110“), in `version.json` und in der Anzeige. Die richtige App ist nicht betroffen.
+
 - **Arbeitsblätter im Design der Arbeitshefte** (Backlog M; Stefan hat am 26.11.2026 aus drei Bild-Vorschlägen „Layout A: wie im Heft“ gewählt): Einzelne Arbeitsblätter haben oben eine schmale Kopfzeile mit Fach und Bereich (z. B. „Mathe · Rechnen“), darunter Titel, Name und Datum wie bisher. Die Aufgabenkästen reichen bis zur Fußzeile. Die Fußzeile steht auf fester Höhe, mit Bildungsplan und Lizenz links und dem Fach rechts; keine Seitenzahl, kein Farbrand. Lösungsblatt („Lösungen“) und Hundertertafel zum Nachschauen haben dieselbe Kopf- und Fußzeile, ihr Aufbau bleibt. Legeblätter bleiben, wie sie sind (Stefan). Umsetzung: `sheetFramed()` mit `heftFrame()` (neu: ohne Seitenzahl, Text rechts), `SHEET_FRAME_CSS`; „Blatt füllen“ misst ohne gestreckte Kästen (`sheetFit` mit `ab-measure`). Heftseiten werden weiter ohne Blatt-Rahmen gebaut (`sheetRaw`), auch bei „Ins Arbeitsheft“. Nebenbei: L8/L9-Blätter („Längere Texte“) laufen ohne große Aufgaben nicht mehr über.
 - **Schwarz-Weiß für alle Blätter** (Backlog M, Stefan: „Ja, so“): Das Häkchen „Schwarz-Weiß-Drucker (Muster statt Farben)“ gibt es jetzt bei allen Arbeitsblättern und im Heft-Assistenten immer. Blaue Plättchen und Zehnerstangen werden schwarz, orange Plättchen schraffiert, grüne Einer bekommen ein Gitter, rote Hunderter Punkte; alle übrigen Farben (Bilder, Uhren, Geld, Markierungen) werden Grau gleicher Helligkeit (`swHtml`, `SW_MAP`, Muster `sw-or`/`sw-gr`/`sw-rot` in `B_BW_DEFS`). Basis-Blätter behalten ihre eigenen Muster.
 - **Keine Linie mehr über der Fußzeile** (Rückmeldung Stefan, 26.11.2026: „unten die Linie überflüssig, so sieht es komisch aus“): Seit die Kästen bis zur Fußzeile reichen, lag die Linie direkt unter den Kästen. Gilt für Heftseiten und Arbeitsblätter.
