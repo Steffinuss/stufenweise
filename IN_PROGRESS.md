@@ -12,4 +12,8 @@ In der Testversion, wartet auf Stefans Durchsicht und Freigabe (Einzelheiten in 
 - Heft-Assistent: Liste springt bei + und − nicht mehr nach oben.
 - **S** Rückmeldungen vom 26.11. abends (S1–S9): große Aufgaben passen, Lochrand, Schwarz-Weiß-Material hellgrau, Kästchen zum Rechnen ab 1000, Zehnerfeld 1 × 10 überall, keine doppelten Aufgaben.
 
+**0.41.0 freigegeben von Stefan (27.11.2026 09:24: „Ich hab alles durchgesehen und will freigeben.“)** – Freigabe im nächsten Chat.
+
+Danach: **U** Arbeitshefte stringenter (U1–U3, Stefan: „super“).
+
 Wartet auf Stefan: **T** Basis-Arbeitsblätter – Konzept mit Bildern und 7 Fragen (Claude-Doc, Link in `BACKLOG.md`); gebaut wird nach seinem OK.

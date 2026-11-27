@@ -407,7 +407,7 @@ Vorschlag: eigenes Konzept-Dokument „Basis-Arbeitsblätter“ wie bei den Arbe
 
 ## U: Arbeitshefte stringenter – einzelne Blätter vs. fertige Hefte (Stefan, 27.11.2026)
 
-**Status:** dokumentiert, Vorschläge an Stefan, gebaut wird erst nach OK.
+**Status:** Stefan 27.11.2026 09:24: „Deine Vorschläge 1–3 finde ich super.“ → U1–U3 bauen (in `entwicklung`, Testversion). Offen: Was passiert mit gemerkten Heften, an die schon einzelne Blätter angehängt sind? (Vorschlag Claude: beim Öffnen als Blattsammlung weiterführen.)
 Stefan: „Wir haben ja immer noch die Möglichkeit, einzelne Arbeitsblätter in ein Arbeitsheft aufzunehmen. Das ist jetzt etwas unklar, da dort beliebige Seitenzahlen möglich werden. Vielleicht sollte es eher ohne Schülername/Test vorgefertigte Arbeitshefte zu gewissen Kompetenzbereichen geben. … Insgesamt ist das so zumindest wenig stringent.“
 Ist-Stand: „Ins Arbeitsheft“ im Blatt-Dialog (`heftAdd`) hängt Seiten an das gemerkte Heft an, auch an ein Heft aus dem Heft-Assistenten. Dann stimmen Kapitel, Inhaltsseite und Seitenzahl nicht mehr; für die Broschüre werden Leerseiten bis zur Vierer-Zahl eingefügt.
 Vorschlag:
