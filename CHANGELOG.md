@@ -5,6 +5,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+## 0.41.0 – 27.11.2026
+
+Freigegeben von Stefan am 27.11.2026 nach Durchsicht der Testversion („Ich hab alles durchgesehen und will freigeben.“). Anleitungsbilder neu aufgenommen.
+
 - **Rückmeldungen zu Arbeitsblättern und Heften** (Backlog S, Stefan 26.11.2026 abends; Entscheidungen von Stefan per Auswahl):
   - **Große Aufgaben passen in die Breite** (S1: „Schriftlich bis 1000“ lief rechts über): Mit großen Aufgaben höchstens 2 Spalten, Hundertertafel- und Basis-Blätter einspaltig. Materialblätter (z. B. leere Hundertertafel) bleiben normal groß, das Lineal bei „Länge messen“ bleibt in echter Größe (1 cm = 1 cm), Stundenpläne passen in die Breite. Das Aufgabenraster wächst nicht mehr über die Seite hinaus; dabei behoben: „Der Größe nach ordnen“ lief auch ohne große Aufgaben 5 mm über.
   - **Heftseite lief über** (S2, „Das kann ich schon: Längere Texte verstehen“, nicht nachstellbar): In Chrome passt jede solche Seite (je 15 Hefte in Grundstufe, HS und BSS, normal und groß geprüft). Seiten mit großen Aufgaben wurden im fertigen Heft bisher nie verkleinert; ein anderer Browser (iPad) mit etwas anderer Schrift ließ sie dann auf ein zweites Blatt laufen. Jetzt dürfen sie im Heft bis 90 % verkleinert werden; beim Bauen bleibt es streng wie bisher.
