@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 27.11.2026 (0.41.0 freigegeben; als Nächstes U, T wartet auf Stefans Antworten)
+Stand: 27.11.2026 (0.42.0 freigegeben mit U; T wartet auf Stefans Antworten)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -24,7 +24,7 @@ Stand: 27.11.2026 (0.41.0 freigegeben; als Nächstes U, T wartet auf Stefans Ant
 | 11 | ~~**N** Große Aufgaben im Heft-Assistenten~~ | klein | freigegeben in 0.39.0 (26.11.2026) |
 | 12 | ~~**M** Blätter im Heft-Design~~, dann ~~**L** Lineatur~~ | klein bis mittel | M freigegeben in 0.40.0 (26.11.); L freigegeben in 0.41.0 (27.11.) |
 | 13 | ~~**S** Rückmeldungen Blätter und Hefte~~ | klein bis mittel | freigegeben in 0.41.0 (27.11.2026) |
-| 14 | **U** Arbeitshefte stringenter (U1–U3) | mittel | gebaut, in der Testversion (27.11.2026) |
+| 14 | ~~**U** Arbeitshefte stringenter (U1–U3)~~ | mittel | freigegeben in 0.42.0 (27.11.2026) |
 | 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | Konzept steht, wartet auf Stefans 7 Antworten |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
@@ -410,7 +410,7 @@ Vorschlag: eigenes Konzept-Dokument „Basis-Arbeitsblätter“ wie bei den Arbe
 
 ## U: Arbeitshefte stringenter – einzelne Blätter vs. fertige Hefte (Stefan, 27.11.2026)
 
-**Status:** gebaut in `entwicklung`, in der Testversion (27.11.2026), wartet auf Stefans Durchsicht. Stefan 27.11.2026 09:24: „Deine Vorschläge 1–3 finde ich super.“ Detailfragen per Auswahl beantwortet, danach „Ja, so bauen“.
+**Status:** erledigt, freigegeben in 0.42.0 (27.11.2026). Stefan 27.11.2026 09:24: „Deine Vorschläge 1–3 finde ich super.“ Detailfragen per Auswahl beantwortet, danach „Ja, so bauen“.
 **Entschieden (Stefan, 27.11.2026):**
 - Alte gemerkte Hefte: **aufteilen** – ein Heft aus dem Assistenten bleibt Heft, angehängte Blätter wandern in die Blattsammlung; ein Heft ganz ohne Assistent wird ganz zur Blattsammlung.
 - U1 Stufenwahl: **ein Bereich, von–bis** (zusammenhängend in Lernreihenfolge); Seiten: **alle Kapitel gleich viele**; Themenwelt: **Auswahl im Assistenten** (vorausgewählt die Einstellung der App).
