@@ -1,7 +1,7 @@
 """Basis, Schritt 2 (0.27.0): Arbeitsblätter und Legeblätter.
 Jedes Basis-Blatt (V1–V7, O2–O4) lässt sich in allen Varianten bauen (Anzahl, Große Aufgaben,
 Schwarz-Weiß) ohne NaN/undefined; Lösungsblatt hat so viele Einträge wie Aufgaben; das Vorgemachte
-(grau gestrichelt) steht nur in der ersten Aufgabe jeder Art. Schwarz-Weiß ersetzt Farben durch Muster
+(grau gestrichelt) steht nur in der ersten Aufgabe, dort ganz (Backlog T: eine Art je Blatt). Schwarz-Weiß ersetzt Farben durch Muster
 und stellt danach wieder auf Farbe. Die Basis-Legeblätter (Sortierunterlage, Zuordnungsleiste,
 Musterstreifen) bauen sich in allen Varianten. Die Themen stehen im Generator, die Schwarz-Weiß-Option
 erscheint bei allen Blättern (seit Backlog M), bei Legeblättern nur bei Basis."""
@@ -59,11 +59,12 @@ async def main():
           return out; })()""")
         if ui != {'B:V1': True, 'M:plus': True, 'K:muster': True, 'K:zehner': False}: errs.append(f'Schwarz-Weiß-Option {ui}')
         print('Schwarz-Weiß-Option sichtbar:', ui)
-        # Beispiel je Aufgabenart nur ein Schritt (Stefan, 19.11.): höchstens eine Markierung bzw. Linie je vorgemachter Aufgabe
-        ex = await pg.evaluate("""(()=>{ const bad=[]; for(const t of ['B:V1','B:V2','B:V3','B:V4','B:V6','B:V7','B:O2','B:O3','B:O4']) for(let k=0;k<6;k++){ app.sheet.topic=t; app.sheet.n='fill'; app.sheet.bsim=k%3;
+        # Beispiel (seit Backlog T, Stefan 27.11.2026): die erste Aufgabe ist ganz vorgemacht, alle anderen ohne Markierung
+        ex = await pg.evaluate("""(()=>{ const bad=[]; for(const k in B_SHEETS) B_SHEETS[k].arts.forEach((a, ai) => { for(let r=0;r<3;r++){ app.sheet.topic='B:'+k; app.sheet.n='fill'; app.sheet.bsim=r; app.sheet.bart={[k]:ai};
           const d=document.createElement('div'); d.innerHTML=buildSheet().html.replace(/^[\\s\\S]*?<body>/,''); const page=d.querySelector('.page'); if(!page) continue;
-          for(const task of page.querySelectorAll('.ab-task, .ab-card, section')){ const n = task.querySelectorAll('.bb-it.weg, .bb-it.ring, .bb-it.grau, .bb-box.ring').length + [...task.querySelectorAll('svg.bb-lines path, svg.bb-vlines path, svg.bb-arcs path')].length; if(n > 1) bad.push(t+': '+n); } }
+          const n = [...page.querySelectorAll('.ab-task')].map(task => task.querySelectorAll('.bb-it.weg, .bb-it.ring, .bb-it.grau, .bb-box.ring').length + [...task.querySelectorAll('svg.bb-lines path, svg.bb-vlines path, svg.bb-arcs path, svg.bb-ordl path')].length);
+          if(!n[0] || n.slice(1).some(x => x)) bad.push(k+' '+a[0]+': '+n.join(',')); } });
           return bad.slice(0,5); })()""")
-        if ex: errs.append(f'mehr als ein Beispiel-Schritt: {ex}')
+        if ex: errs.append(f'Beispiel nicht ganz oder mehrfach vorgemacht: {ex}')
         print('ERR', errs[:10]); await b.close()
 asyncio.run(main())

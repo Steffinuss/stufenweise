@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 27.11.2026 abends (0.42.0 freigegeben mit U; T: Antworten da, wartet auf OK)
+Stand: 27.11.2026 abends (0.42.0 freigegeben mit U; T gebaut in `entwicklung`, wartet auf Freigabe)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -25,7 +25,7 @@ Stand: 27.11.2026 abends (0.42.0 freigegeben mit U; T: Antworten da, wartet auf 
 | 12 | ~~**M** Blätter im Heft-Design~~, dann ~~**L** Lineatur~~ | klein bis mittel | M freigegeben in 0.40.0 (26.11.); L freigegeben in 0.41.0 (27.11.) |
 | 13 | ~~**S** Rückmeldungen Blätter und Hefte~~ | klein bis mittel | freigegeben in 0.41.0 (27.11.2026) |
 | 14 | ~~**U** Arbeitshefte stringenter (U1–U3)~~ | mittel | freigegeben in 0.42.0 (27.11.2026) |
-| 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | Konzept steht, Stefans Antworten da (27.11.); wartet auf sein OK zum Bauen |
+| 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | gebaut in `entwicklung` (27.11. abends, nach Stefans OK), in der Testversion; wartet auf Freigabe |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -400,7 +400,7 @@ Nebenbei gefunden (26.11., Testlauf): Im Lese-Test L8 „Stundenplan“ steht im
 
 ## T: Basis-Arbeitsblätter didaktisch überarbeiten (Stefan, 26.11.2026)
 
-**Status:** Konzept mit Bildern und 7 Fragen (27.11.2026, Claude-Doc „Konzept: Basis-Arbeitsblätter überarbeiten (Backlog T)“, https://claude.ai/artifact/MUbTKabSxyXh9fofA3No2U); **Stefan hat am 27.11. abends alle Fragen beantwortet** (Tabelle „Stefans Entscheidungen“ im Doc und unten); gebaut wird erst nach seinem ausdrücklichen OK.
+**Status:** Konzept mit Bildern und 7 Fragen (27.11.2026, Claude-Doc „Konzept: Basis-Arbeitsblätter überarbeiten (Backlog T)“, https://claude.ai/artifact/MUbTKabSxyXh9fofA3No2U); **Stefan hat am 27.11. abends alle Fragen beantwortet** (Tabelle „Stefans Entscheidungen“ im Doc und unten) und danach „Ja, so bauen“ gesagt. **Gebaut in `entwicklung`** (siehe `CHANGELOG.md`, „Unveröffentlicht“), wartet auf Freigabe.
 
 **Entscheidungen (Stefan, 27.11.2026, per Auswahl im Chat):**
 1. Eine Art je Blatt für alle zehn Blätter: Auswahl „Aufgabe“ im Blatt-Dialog, leichteste vorausgewählt, keine Mischung.
@@ -413,6 +413,7 @@ Nebenbei gefunden (26.11., Testlauf): Im Lese-Test L8 „Stundenplan“ steht im
 8. Beispiel: die erste Aufgabe ist ganz vorgemacht (ersetzt die Regel vom 19.11. „nur erster Schritt“).
 9. O2 Form, O3 Richtung, V3 „Nach Art“ (Gruppe): eine je Blatt, zufällig, groß oben; keine weitere Auswahl.
 10. Arten und Reihenfolge wie in der App (`AXES.V.arts`/`AXES.O.arts`): V1 einkreisen vor verbinden; V3 erst Farbe bei gleichen Dingen, „verschiedene Dinge“ als eigene, spätere Art.
+11. Bastelseite (Nachfrage): darf nie auf der Rückseite bedruckt sein (Hefte werden teils beidseitig gedruckt). Heft-Broschüren: Bastelseite auf einer rechten Seite, Rückseite leer; Einzelblatt und Blattsammlung: Blatt, Leerseite, Bastelseite, Leerseite.
 
 Geplante Arten je Blatt (leicht → schwer): V1 Gleiches Bild einkreisen · Gleiches Bild verbinden · Gleiche Farbe einkreisen · Gleiche Farbe verbinden; V2 Ganz anders · Andere Farbe · Andere Größe · Gehört nicht dazu; V3 Nach Farbe · Nach Größe · Nach Art · Farbe, verschiedene Dinge; V4 Jedem eins · Reicht es?; V5 Wo sind mehr? · Wo sind weniger? · Gleich viele; V6 Das größte · Das kleinste · Ordnen; V7 Was kommt dann? · Längere Muster · Weitermalen; O2 Form finden · Quadrat oder Rechteck; O3 Alle Pfeile nach … · Gleiches Zeichen; O4 Von links nach rechts · Was kommt zuerst?. „Ähnlichkeit“ nur bei Arten, die sie nutzen.
 

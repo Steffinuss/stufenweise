@@ -5,6 +5,4 @@ Arbeitsweise mit zwei Zweigen: `docs/entwicklung.md`.
 
 Stand: 27.11.2026 (0.42.0 freigegeben: U Arbeitshefte stringenter, Broschüre ohne Schriftvergrößerung)
 
-Nichts in Arbeit.
-
-Wartet auf Stefan: **T** Basis-Arbeitsblätter – alle Fragen beantwortet (27.11. abends, Entscheidungen in `BACKLOG.md` und im Claude-Doc); gebaut wird nach seinem ausdrücklichen OK.
+**T** Basis-Arbeitsblätter: eine Aufgabenart je Blatt (Stefans OK 27.11. abends „Ja, so bauen“). Gebaut in `entwicklung`, in der Testversion zum Ansehen; Einzelheiten in `CHANGELOG.md` unter „Unveröffentlicht“, Entscheidungen in `BACKLOG.md`. Wartet auf Stefans Durchsicht und Freigabe.

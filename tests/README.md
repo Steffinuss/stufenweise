@@ -28,7 +28,7 @@ Bei kleinen Änderungen reicht oft ein Teil der Tests (`sh tests/run_all.sh nur 
 | Start, Fehler allgemein | `fehler smoke einstellungen konzentrationsmodus handy` |
 | Üben Mathe (Plus/Minus, Zwanzigerfeld, Zehnerpartner, Material) | `plusminus_ueben feld_ueben antwortfeld springen zehnerpartner_ueben mathe_material runden ueberspringen hinweis_neu gefuehrt` |
 | Üben Deutsch (Lesen, Schreiben, Hören, Satz-Baukasten) | `deutsch_optimierung satz_ziehen tafel_rueckmeldung` |
-| Basis | `basis_grundlagen basis_ueben basis_test basis_blaetter` |
+| Basis | `basis_grundlagen basis_ueben basis_test basis_blaetter basis_eine_art` |
 | Test und Auswertung (Einstufung, Förderzone, Raten) | `test_fortschritt test_nie_haengen test_passt raten basis_test durchsicht_0_21` |
 | Unterricht an der Tafel | `zwanzigerfeld:1180x820 zwanzigerfeld:390x844 zwanzigerfeld_zahl frei_stift satz_ziehen tafel_rueckmeldung` |
 | Materialkiste | `materialkiste` |
@@ -52,7 +52,8 @@ Zuerst den Server starten: `python3 -m http.server 8766 --bind 127.0.0.1` im Rep
 | `arbeitsblaetter.py` | jedes Arbeitsblatt-Thema: passt auf die Seite, genug Aufgaben (`PRÜFEN` = ansehen) |
 | `arbeitsblatt_optionen.py` | Materialbilder „1. Aufgabe vorgegeben, dann selbst zeichnen“, Zehnerpartner, Rechnen über die 10 (Beispiel ausgefüllt), Geld mit Cent, Einmaleins-Reihen |
 | `basis_grundlagen.py` | Basis, Schritt 1: alle Bilder (Gegenstände, Farben, Größen, Formen, Pfeile, Spiegel-Zeichen, Punktbilder, Symbole) und vollständige Stufentexte V1–V8, O1–O5 |
-| `basis_blaetter.py` | Basis, Schritt 2: alle Basis-Arbeitsblätter (V1–V7, O2–O4) in allen Varianten, Lösungen passend, Vorgemachtes nur in der ersten Aufgabe jeder Art, Schwarz-Weiß mit Mustern; Legeblätter Sortierunterlage, Zuordnungsleiste, Musterstreifen |
+| `basis_blaetter.py` | Basis, Schritt 2: alle Basis-Arbeitsblätter (V1–V7, O2–O4) in allen Varianten, Lösungen passend, Vorgemachtes ganz und nur in der ersten Aufgabe, Schwarz-Weiß mit Mustern; Legeblätter Sortierunterlage, Zuordnungsleiste, Musterstreifen |
+| `basis_eine_art.py` | Backlog T: je Basis-Blatt und Art ein Auftrag, Art im Titel, erste Aufgabe ganz vorgemacht, kein „ja/nein“, alles passt (auch groß und schwarz-weiß); V6 „Ordnen“ mit Bastelseite und leeren Rückseiten; Auswahl „Aufgabe“ gemerkt; Heft-Assistent eine Art je Seite, Bastelseite rechts in der Broschüre, Austauschen |
 | `basis_ueben.py` | Basis, Schritt 3: alle Übungs-Generatoren V1–V8, O2–O4 (Lösung richtig, falsche Antwort falsch), jede Aufgabenart mit echten Klicks gelöst (Bild wählen, Sortieren, Verbinden, Reihenfolge, kurz zeigen), Fach für Gast sichtbar, für Kinder erst nach Einschalten, Statistik; Ablauf: Vormachen vor jeder neuen Aufgabenart, bei einer Art bleiben, nach 8 richtigen „Nächste Aufgabe“, nach 3 Fehlern leichter; Ziehen mit der Maus (in die Kiste, zurück in den Vorrat, unter das Bild, auf die Plätze 1, 2, 3) |
 | `basis_test.py` | Basis-Test (Schritt 4): drei Teile (V1–V4, V5–V8, O2–O4), je Stufe Block a mit Vormachen (nicht gewertet, nichts antippbar), Block b nur nach a; Einstufung erreicht / teilweise / nicht, keine Ableitung; Förderzone in empfohlener Reihenfolge, ILEB, Lernstand mit Matrix und Hinweis bei Mathe I / L1, Elterninfo, Lernlandkarte, automatische Sichtbarkeit, „Heute für dich“ mit Basis zuerst, Re-Diagnose, Kurztest, Abbrechen |
 | `blatt_auswahl.py` | Arbeitsblätter: Auswahl Fach → Bereich → Blatt, jedes Blatt genau einmal, Legeblätter beim Fach, zuletzt gewähltes Blatt beim Zurückwechseln, „Zuletzt benutzt“, Kind mit Förderzone stellt das Fach ein, Arbeitsheft über Fächer |

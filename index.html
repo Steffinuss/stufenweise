@@ -9585,6 +9585,8 @@ const AB_OPS = {
   male:   {t:'male an', p:'<path d="M5.5 18.5l1.8-5.6L16.6 3.6l3.8 3.8-9.3 9.3z" fill="none" stroke="#222" stroke-width="1.8" stroke-linejoin="round"/><path d="M7.3 12.9l3.8 3.8" stroke="#222" stroke-width="1.6"/><path d="M2.5 21.5c3-1.5 6 1 9-.5" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>'},
   lege:   {t:'lege / ordne', p:'<rect x="2" y="7" width="8" height="10" rx="1.5" fill="none" stroke="#222" stroke-width="1.6"/><rect x="14" y="7" width="8" height="10" rx="1.5" fill="none" stroke="#222" stroke-width="1.6"/><path d="M10.5 12h3" stroke="#222" stroke-width="1.6"/>'}
 };
+AB_OPS.schneide = {t:'schneide aus', p:'<circle cx="6" cy="17" r="3" fill="none" stroke="#222" stroke-width="1.7"/><circle cx="16" cy="17" r="3" fill="none" stroke="#222" stroke-width="1.7"/><path d="M8 15L17 3M14 15L7 3" stroke="#222" stroke-width="1.7" stroke-linecap="round"/>'};
+AB_OPS.klebe = {t:'klebe auf', p:'<rect x="8" y="2" width="8" height="5" rx="1" fill="none" stroke="#222" stroke-width="1.6"/><path d="M7 7h10l-1 13H8z" fill="none" stroke="#222" stroke-width="1.7" stroke-linejoin="round"/><path d="M3 22h18" stroke="#222" stroke-width="1.6"/>'};
 const abOp = k => `<svg class="ab-op" viewBox="0 0 24 24" aria-label="${AB_OPS[k].t}">${AB_OPS[k].p}</svg>`;
 const T_ = (op, text, body, a, d) => ({ops:[].concat(op), text, body, a, d});
 /* „1. Aufgabe vorgegeben, dann selbst zeichnen“: Bild nur bei der ersten Aufgabe jeder Art, sonst ein leeres Feld.
@@ -10240,10 +10242,10 @@ function zoneToSheet(key){
   return null;
 }
 const sheetRows = () => { const r = app.sheet.rows || (settings.timesRows.length ? settings.timesRows : [2, 5, 10]); return r.length ? [...r].sort((a, b) => a - b) : [2, 5, 10]; };
-app.sheet = {bsim:0, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, taf:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[], stufe:null, lin:'auto'};   /* lin: Lineatur (Backlog L); stufe: nur im Heft (0 leicht … 1 schwer), nicht gemerkt */
+app.sheet = {bsim:0, bart:{}, pid:null, topic:'M:plus', zr:20, n:'fill', sol:true, mat:true, ue:'egal', wop:'both', wzr:1000, lcase:false, htp:'all', gross:false, taf:false, tausch:false, draw:false, gcent:'euro', rows:null, mstrich:'gezeigt', bw:false, recent:[], stufe:null, lin:'auto'};   /* lin: Lineatur (Backlog L); stufe: nur im Heft (0 leicht … 1 schwer), nicht gemerkt */
 /* Grundeinstellungen der Blätter: Das Heft baut damit, nicht mit den Einstellungen des letzten Einzelblatts (Backlog N, Stefan 26.11.2026) */
 const SHEET_BASE = Object.freeze({...app.sheet, recent:undefined});
-const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'taf', 'recent', 'lin'];
+const SHEET_KEY = 'stufenweise.blatt', SHEET_KEEP = ['topic', 'zr', 'n', 'sol', 'mat', 'ue', 'wop', 'wzr', 'lcase', 'gross', 'tausch', 'draw', 'gcent', 'rows', 'bcase', 'kt', 'htp', 'mstrich', 'bw', 'bsim', 'bart', 'taf', 'recent', 'lin'];
 /* Arbeitsblatt-Einstellungen über das Neuladen hinaus merken (nur auf diesem Gerät; das Kind wird nicht gemerkt) */
 try { const m = JSON.parse(localStorage.getItem(SHEET_KEY) || 'null'); if(m && typeof m === 'object') for(const k of SHEET_KEEP) if(k !== 'rows' && k in m && m[k] !== undefined && m[k] !== null && typeof m[k] === typeof app.sheet[k]) app.sheet[k] = m[k]; if(Array.isArray(m?.rows)){ const r = m.rows.filter(n => Number.isInteger(n) && n >= 1 && n <= 10); if(r.length) app.sheet.rows = r; } } catch {}
 function sheetSave(){ try { localStorage.setItem(SHEET_KEY, JSON.stringify(Object.fromEntries(SHEET_KEEP.map(k => [k, app.sheet[k]])))); } catch(e){ storeHint(e); } }
@@ -10300,23 +10302,26 @@ const bbColName = col => B_BW ? 'mit diesem Muster' : B_COL_NAME[col];
 const bbIt = (svg, mark = '') => `<span class="bb-it${mark ? ' ' + mark : ''}">${svg}</span>`;
 const bbRow = (items, cls = '') => `<div class="bb-row ${cls}">${items.join('')}</div>`;
 /* Beispiel (mit Markierungen) und leere Aufgabe; abPick wählt beim Zusammensetzen */
-/* Beispiel je Aufgabenart: nur der erste Schritt ist vorgemacht (eine Zeile, eine Linie, ein Kreis) – Stefan, 19.11. */
-let BB_ONE = false;
-const bbEx = (fn) => { BB_ONE = false; const a = fn(true); BB_ONE = false; return abEx(a, fn(false)); };
-const bbFirst = (ex, c) => ex && c && !BB_ONE ? (BB_ONE = true) : false;
+/* Beispiel: die erste Aufgabe ist ganz vorgemacht – alle Linien, alle Kreise (Stefan, 27.11.2026, Backlog T; ersetzt „nur der erste Schritt“ vom 19.11.) */
+const bbEx = (fn) => abEx(fn(true), fn(false));
+const bbFirst = (ex, c) => !!(ex && c);
+/* je Blatt feste Wahl (gesuchte Form, Richtung, Gruppe, Paar): beim Erzeugen eines Blatts zurückgesetzt (Backlog T) */
+let B_FIX = {};
+const bFix = (k, f) => k in B_FIX ? B_FIX[k] : (B_FIX[k] = f());
 const bKinds = (filter = () => true, withVar = false) => Object.keys(B_OBJ).filter(k => (withVar || !B_OBJ[k].v) && filter(B_OBJ[k]));
 const B_COLS4 = ['rot', 'blau', 'gelb', 'gruen'];
 /* Verbinden links ↔ rechts mit Beispiel-Linien: pairs = [[linksHTML, rechtsHTML]], perm[i] = Zeile rechts für links i */
 function bbMatch(lefts, rights, perm, ex){
   const n = lefts.length;
-  const lines = ex ? `<svg class="bb-lines" viewBox="0 0 100 ${n*100}" preserveAspectRatio="none" style="grid-row:1/${n + 1}">${perm.slice(0, 1).map((j, i) => `<path d="M2 ${i*100 + 50}L98 ${j*100 + 50}" stroke="#888" stroke-width="3" stroke-dasharray="7 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '';
+  const lines = ex ? `<svg class="bb-lines" viewBox="0 0 100 ${n*100}" preserveAspectRatio="none" style="grid-row:1/${n + 1}">${perm.map((j, i) => `<path d="M2 ${i*100 + 50}L98 ${j*100 + 50}" stroke="#888" stroke-width="3" stroke-dasharray="7 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '';
   return `<div class="bb-match">${lefts.map((l, i) => `<div class="l" style="grid-row:${i + 1}">${l}<span class="ab-dot"></span></div>`).join('')}${lines}${rights.map((r, j) => `<div class="r" style="grid-row:${j + 1}"><span class="ab-dot"></span>${r}</div>`).join('')}</div>`;
 }
 /* Oben/unten verbinden (eins zu eins) mit Beispiel-Linien */
-function bbPairs(tops, bottoms, links, ex){
-  const n = tops.length, m = bottoms.length;
-  const lines = ex ? `<svg class="bb-vlines" viewBox="0 0 100 10" preserveAspectRatio="none">${links.slice(0, 1).map(([i, j]) => `<path d="M${100*(i + .5)/n} 0L${100*(j + .5)/m} 10" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '<div class="bb-vgap"></div>';
-  return `<div class="bb-pairs"><div class="bb-prow">${tops.map(t => `<span class="bb-pc">${t}<span class="ab-dot"></span></span>`).join('')}</div>${lines}<div class="bb-prow">${bottoms.map(b => `<span class="bb-pc"><span class="ab-dot"></span>${b}</span>`).join('')}</div></div>`;
+/* Unten zusammengeschoben (mittlere 50 % der Breite), damit nicht schon alles untereinander steht (Stefan, 27.11.2026, T2) */
+function bbPairs(tops, bottoms, links, ex, off = 25){   /* off: linker Rand der unteren Reihe in % (0, 25, 50) */
+  const n = tops.length, m = bottoms.length, X = j => off + 50*(j + .5)/m;
+  const lines = ex ? `<svg class="bb-vlines" viewBox="0 0 100 10" preserveAspectRatio="none">${links.map(([i, j]) => `<path d="M${100*(i + .5)/n} 0L${X(j)} 10" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`).join('')}</svg>` : '<div class="bb-vgap"></div>';
+  return `<div class="bb-pairs"><div class="bb-prow">${tops.map(t => `<span class="bb-pc">${t}<span class="ab-dot"></span></span>`).join('')}</div>${lines}<div class="bb-prow tight" style="margin-left:${off}%">${bottoms.map(b => `<span class="bb-pc"><span class="ab-dot"></span>${b}</span>`).join('')}</div></div>`;
 }
 /* Gegenstände verstreut in einem Kasten (Mengen vergleichen); spread: eng (0) oder weit (1) */
 function bbScatter(kind, col, n, spread = 1){
@@ -10345,81 +10350,115 @@ const bbSimSet = n => { if(!B_SIM) return shuffle(bKinds()).slice(0, n);
   const pool = B_SIM === 1 ? shuffle(bzSubKinds(pick(['werkzeug', 'besteck', 'geschirr']))) : shuffle([...B_FAM[pick(['hammer', 'dreher', 'loeffel'])], ...B_FAM[pick(['schluessel', 'gabel', 'tasse'])]]);
   const fill = shuffle(bKinds(o => o.grp === B_OBJ[pool[0]].grp));
   return [...new Set([...pool, ...fill])].slice(0, n); };
+/* Basis-Blätter (Backlog T, Stefan 27.11.2026): je Blatt genau eine Aufgabenart, gewählt unter „Aufgabe“ (app.sheet.bart[Blatt]).
+   Arten und Reihenfolge wie beim Üben (AXES.V.arts, AXES.O.arts), von leicht nach schwer. Je Art: [Name, Erzeuger, {sim, cols, max, top}].
+   sim: Auswahl „Ähnlichkeit“ wirkt; top: großes Ziel oben auf dem Blatt (gesuchte Form, Richtung, Gruppe – zufällig je Blatt, B_FIX).
+   Auftrag auf dem ganzen Blatt gleich; die erste Aufgabe ist ganz vorgemacht; nichts zum Lesen ankreuzen. */
+const B_V4 = () => bFix('pair', () => pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]));
+const B_DER = {tasse:['die Tasse', 'die'], teller:['den Teller', 'der'], schraube:['die Schraube', 'die']}, B_KEIN = {loeffel:'keinen Löffel', gabel:'keine Gabel', mutter:'keine Mutter'};
+const bbColTask = () => B_BW ? 'Kreise alle Dinge mit diesem Muster ein:' : 'Kreise alle Dinge mit dieser Farbe ein:';
+const bbZiel = (svg, cap = '') => `<div class="bb-ziel">${svg}${cap ? `<b>${cap}</b>` : ''}</div>`;
+/* Treppe zum Aufkleben (V6 „Ordnen“): n Stufen, klein unten links, groß oben rechts; ex = schon aufgeklebt (grau) */
+const bbStairs = (k, sizes, ex) => `<div class="bb-stairs">${sizes.map((s, i) => `<div class="bb-stc"><span class="bb-slot">${ex ? bbIt(bbObj(k, null, s), 'grau') : ''}</span><span class="bb-stb" style="height:${3 + i*7}mm"></span></div>`).join('')}</div>`;
+const bbCutRow = (nr, k, sizes) => `<div class="bb-cutrow" data-nr="${nr}"><span class="bb-cutnr">${nr}</span>${sizes.map(s => `<span class="bb-cut">${bbObj(k, null, s)}</span>`).join('')}</div>`;
 const B_SHEETS = {
-  V1: {name:'Gleiches finden', cols:2, max:10, gens:[
-    () => { const ks = bbSimSet(4), perm = shuffle([0, 1, 2, 3]), rs = []; perm.forEach((j, i) => rs[j] = ks[i]);
-      return T_('verbinde', 'Verbinde gleiche Bilder.', bbEx(ex => bbMatch(ks.map(k => bbIt(bbObj(k))), rs.map(k => bbIt(bbObj(k))), perm, ex)), ks.map(k => B_OBJ[k].name).join(', '), 1); },
-    () => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), others = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
+  V1: {name:'Gleiches finden', cols:2, max:10, arts:[
+    ['Gleiches Bild einkreisen', () => { const ks = bbSimSet(4), k = ks[0], opts = shuffle(ks), ok = opts.indexOf(k);
+      return T_('kreise', 'Kreise das gleiche Bild ein.', bbEx(ex => `<div class="bb-target">${bbIt(bbObj(k))}</div>` + bbRow(opts.map((x, i) => bbIt(bbObj(x), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${B_OBJ[k].name})`, 1); }, {sim:true}],
+    ['Gleiches Bild verbinden', () => { const ks = bbSimSet(4), perm = shuffle([0, 1, 2, 3]), rs = []; perm.forEach((j, i) => rs[j] = ks[i]);
+      return T_('verbinde', 'Verbinde gleiche Bilder.', bbEx(ex => bbMatch(ks.map(k => bbIt(bbObj(k))), rs.map(k => bbIt(bbObj(k))), perm, ex)), ks.map(k => B_OBJ[k].name).join(', '), 1); }, {sim:true}],
+    ['Gleiche Farbe einkreisen', () => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), others = shuffle(B_COLS4.filter(c => c !== col)), k2 = pick(bKinds(o => o !== B_OBJ[k] && o.grp !== 'werkstatt'));
       const opts = shuffle([[k, col, 1], [k, others[0], 0], [k, others[1], 0], [k2, col, 0]]), ok = opts.findIndex(o => o[2]);
-      return T_('kreise', 'Kreise das gleiche Bild ein.', bbEx(ex => `<div class="bb-target">${bbIt(bbObj(k, col))}</div>` + bbRow(opts.map((o, i) => bbIt(bbObj(o[0], o[1]), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${B_OBJ[k].name}, ${B_COL_NAME[col]})`, 2); },
-    () => { const cs = shuffle(B_COLS4).slice(0, 3), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), perm = shuffle([0, 1, 2]), rs = [];
+      return T_('kreise', B_BW ? 'Kreise das gleiche Bild ein. Schau auf das Muster!' : 'Kreise das gleiche Bild ein. Schau auf die Farbe!', bbEx(ex => `<div class="bb-target">${bbIt(bbObj(k, col))}</div>` + bbRow(opts.map((o, i) => bbIt(bbObj(o[0], o[1]), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${B_OBJ[k].name}, ${B_COL_NAME[col]})`, 1); }],
+    ['Gleiche Farbe verbinden', () => { const cs = shuffle(B_COLS4).slice(0, 3), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), perm = shuffle([0, 1, 2]), rs = [];
       perm.forEach((j, i) => rs[j] = [ks[3 + i], cs[i]]);
-      return T_('verbinde', B_BW ? 'Verbinde, was das gleiche Muster hat.' : 'Verbinde, was die gleiche Farbe hat.', bbEx(ex => bbMatch(cs.map((c, i) => bbIt(bbObj(ks[i], c))), rs.map(([k, c]) => bbIt(bbObj(k, c))), perm, ex)), cs.map((c, i) => `${B_OBJ[ks[i]].name} – ${B_OBJ[rs[perm[i]][0]].name} (${B_COL_NAME[c]})`).join(', '), 3); }]},
-  V2: {name:'Was passt nicht?', cols:1, max:8, gens:[
-    () => { const rows = [0, 1].map(() => { const k = bzSimTarget(B_SIM), k2 = bzSimOthers(k, B_SIM, 1)[0], i = rnd(0, 3); return {items:[0, 1, 2, 3].map(j => j === i ? [k2] : [k]), i}; });
-      return T_('streiche', 'Streiche durch, was nicht passt.', bbEx(ex => rows.map((r, ri) => bbRow(r.items.map(([k], j) => bbIt(bbObj(k), ex && ri === 0 && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name})`).join('; '), 1); },
-    () => { const rows = [0, 1].map(() => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), col2 = pick(B_COLS4.filter(c => c !== col)), i = rnd(0, 3), big = Math.random() < .5;
-      return {items:[0, 1, 2, 3].map(j => j === i ? (big ? [k, col, .6] : [k, col2, 1]) : [k, col, 1]), i}; });
-      return T_('streiche', 'Streiche durch, was nicht passt. Schau genau!', bbEx(ex => rows.map((r, ri) => bbRow(r.items.map(([k, c, s], j) => bbIt(bbObj(k, c, s), ex && ri === 0 && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i][0]].name}${r.items[r.i][2] !== 1 ? ', kleiner' : ', andere Farbe'})`).join('; '), 2); },
-    () => { const rows = [0, 1].map(() => { const g = pick(B_SIM ? ['kueche', 'werkstatt'] : ['kueche', 'werkstatt', 'kleidung']), sub = g === 'kueche' ? pick(['besteck', 'geschirr']) : 'werkzeug';
-      const same = B_SIM ? shuffle(bzSubKinds(sub, B_SIM === 2)).slice(0, 3) : shuffle(bKinds(o => o.grp === g)).slice(0, 3), odd = B_SIM === 2 ? pick(bKinds(o => o.grp === g && o.sub && o.sub !== sub)) : pick(bKinds(o => o.grp !== g)), i = rnd(0, 3), items = [...same]; items.splice(i, 0, odd); return {items, i}; });
-      return T_('streiche', 'Was gehört nicht dazu? Streiche durch.', bbEx(ex => rows.map((r, ri) => bbRow(r.items.map((k, j) => bbIt(bbObj(k), ex && ri === 0 && j === r.i ? 'weg' : '')))).join('')), rows.map(r => `${bPos(r.i)} (${B_OBJ[r.items[r.i]].name})`).join('; '), 3); }]},
-  V3: {name:'Sortieren', cols:1, max:6, gens:[
-    () => { if(B_SIM){ /* ähnlich: Untergruppen (alles Besteck), fein: Familien mit Varianten (alle Löffel) */
-        const [a, b] = B_SIM === 1 ? pick([['besteck', 'geschirr'], ['werkzeug', 'kleinteil'], ['geschirr', 'besteck']]) : pick([['loeffel', 'gabel'], ['hammer', 'dreher'], ['dreher', 'schluessel'], ['gabel', 'loeffel']]);
+      return T_('verbinde', B_BW ? 'Verbinde, was das gleiche Muster hat.' : 'Verbinde, was die gleiche Farbe hat.', bbEx(ex => bbMatch(cs.map((c, i) => bbIt(bbObj(ks[i], c))), rs.map(([k, c]) => bbIt(bbObj(k, c))), perm, ex)), cs.map((c, i) => `${B_OBJ[ks[i]].name} – ${B_OBJ[rs[perm[i]][0]].name} (${B_COL_NAME[c]})`).join(', '), 1); }]]},
+  /* V2: eine Bildreihe je Kasten, zwei Kästen nebeneinander (Stefan, T1) */
+  V2: {name:'Was passt nicht?', cols:2, max:12, arts:[
+    ['Ganz anders', () => { const k = bzSimTarget(B_SIM), k2 = bzSimOthers(k, B_SIM, 1)[0], i = rnd(0, 3);
+      return T_('streiche', 'Streiche durch, was nicht passt.', bbEx(ex => bbRow([0, 1, 2, 3].map(j => bbIt(bbObj(j === i ? k2 : k), ex && j === i ? 'weg' : '')))), `${bPos(i)} (${B_OBJ[k2].name})`, 1); }, {sim:true}],
+    ['Andere Farbe', () => { const k = pick(bKinds(o => o.grp !== 'werkstatt')), col = pick(B_COLS4), col2 = pick(B_COLS4.filter(c => c !== col)), i = rnd(0, 3);
+      return T_('streiche', B_BW ? 'Streiche durch, was nicht passt. Schau auf das Muster!' : 'Streiche durch, was nicht passt. Schau auf die Farbe!', bbEx(ex => bbRow([0, 1, 2, 3].map(j => bbIt(bbObj(k, j === i ? col2 : col), ex && j === i ? 'weg' : '')))), `${bPos(i)} (${B_OBJ[k].name}, ${B_COL_NAME[col2]})`, 1); }],
+    ['Andere Größe', () => { const k = pick(bKinds()), i = rnd(0, 3);
+      return T_('streiche', 'Streiche durch, was nicht passt. Schau, wie groß es ist!', bbEx(ex => bbRow([0, 1, 2, 3].map(j => bbIt(bbObj(k, null, j === i ? .55 : 1), ex && j === i ? 'weg' : '')), 'base')), `${bPos(i)} (${B_OBJ[k].name}, kleiner)`, 1); }],
+    ['Gehört nicht dazu', () => { const g = pick(B_SIM ? ['kueche', 'werkstatt'] : ['kueche', 'werkstatt', 'kleidung']), sub = g === 'kueche' ? pick(['besteck', 'geschirr']) : 'werkzeug';
+      const same = B_SIM ? shuffle(bzSubKinds(sub, B_SIM === 2)).slice(0, 3) : shuffle(bKinds(o => o.grp === g)).slice(0, 3), odd = B_SIM === 2 ? pick(bKinds(o => o.grp === g && o.sub && o.sub !== sub)) : pick(bKinds(o => o.grp !== g)), i = rnd(0, 3), items = [...same]; items.splice(i, 0, odd);
+      return T_('streiche', 'Was gehört nicht dazu? Streiche durch.', bbEx(ex => bbRow(items.map((k, j) => bbIt(bbObj(k), ex && j === i ? 'weg' : '')))), `${bPos(i)} (${B_OBJ[odd].name})`, 1); }, {sim:true}]]},
+  V3: {name:'Sortieren', cols:1, max:6, arts:[
+    /* Sortieren beginnt mit Farbe bei gleichen Dingen (Stefan, 17.11.) */
+    ['Nach Farbe', () => { const k = pick(['tasse', 'socke', 'knopf', 'teller', 'muetze']), col = pick(B_COLS4), cs = shuffle([col, col, col, ...shuffle(B_COLS4.filter(c => c !== col)).slice(0, 3)]);
+      return T_('kreise', `${bbColTask()} ${bSwatch(col)}`, bbEx(ex => bbRow(cs.map(c => bbIt(bbObj(k, c), bbFirst(ex, c === col) ? 'ring' : '')), 'wide')), `${B_OBJ[k].name}: Stelle ${cs.map((c, i) => c === col ? i + 1 : 0).filter(Boolean).join(', ')} (${B_COL_NAME[col]})`, 1); }],
+    ['Nach Größe', () => { const k = pick(['tasse', 'apfel', 'schraube', 'stift', 'glas']), big = shuffle([1, 1, 1, 0, 0, 0]), sm = [.55, .68, .8][B_SIM];
+      return T_('kreise', 'Kreise alle großen Dinge ein.', bbEx(ex => bbRow(big.map(b => bbIt(bbObj(k, null, b ? 1 : sm), bbFirst(ex, b) ? 'ring' : '')), 'wide base')), `${B_OBJ[k].name}: Stelle ${big.map((b, i) => b ? i + 1 : 0).filter(Boolean).join(', ')}`, 1); }, {sim:true}],
+    ['Nach Art', () => {
+      if(B_SIM){ /* ähnlich: Untergruppen (alles Besteck), fein: Familien mit Varianten (alle Löffel); je Blatt dieselbe */
+        const [a, b] = bFix('art' + B_SIM, () => B_SIM === 1 ? pick([['besteck', 'geschirr'], ['werkzeug', 'kleinteil'], ['geschirr', 'besteck']]) : pick([['loeffel', 'gabel'], ['hammer', 'dreher'], ['dreher', 'schluessel'], ['gabel', 'loeffel']]));
         const ks = x => B_SIM === 1 ? bzSubKinds(x) : B_FAM[x], take = x => { const p = shuffle(ks(x)); while(p.length < 3) p.push(pick(ks(x))); return p.slice(0, 3); };
-        const inn = take(a), out = take(b), all = shuffle([...inn.map((k, i) => [k, 1, i]), ...out.map((k, i) => [k, 0, i])]);
+        const inn = take(a), out = take(b), all = shuffle([...inn.map(k => [k, 1]), ...out.map(k => [k, 0])]);
         const what = B_SIM === 1 ? {besteck:'alles Besteck', geschirr:'alles Geschirr', werkzeug:'alle Werkzeuge'}[a] : `alle ${BZ_FAMN[a]}`;
-        return T_('kreise', `Kreise ${what} ein.`, bbEx(ex => bbRow(all.map(([k, y]) => bbIt(bbObj(k), bbFirst(ex, y) ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); }
-      const g = pick(['kueche', 'werkstatt', 'kleidung']), g2 = pick(['kueche', 'werkstatt', 'kleidung', 'obst'].filter(x => x !== g)), inn = shuffle(bKinds(o => o.grp === g)).slice(0, 3), out = shuffle(bKinds(o => o.grp === g2)).slice(0, 3), all = shuffle([...inn, ...out]);
-      return T_('kreise', `Kreise alles ein, was zur ${({kueche:'Küche', werkstatt:'Werkstatt', kleidung:'Kleidung'})[g]} gehört.`, bbEx(ex => bbRow(all.map(k => bbIt(bbObj(k), bbFirst(ex, inn.includes(k)) ? 'ring' : '')), 'wide')), inn.map(k => B_OBJ[k].name).join(', '), 1); },
-    () => { const col = pick(B_COLS4), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), cs = shuffle([col, col, col, ...shuffle(B_COLS4.filter(c => c !== col)).slice(0, 3)]);
-      return T_('kreise', `Kreise alle Dinge ${bbColName(col)} ein: ${bSwatch(col)}`, bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, cs[i]), bbFirst(ex, cs[i] === col) ? 'ring' : '')), 'wide')), ks.filter((k, i) => cs[i] === col).map(k => B_OBJ[k].name).join(', '), 2); },
-    () => { const ks = shuffle(bKinds()).slice(0, 6), big = shuffle([1, 1, 1, 0, 0, 0]), sm = [.55, .68, .8][B_SIM];
-      return T_('kreise', 'Kreise alle großen Dinge ein.', bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, null, big[i] ? 1 : sm), bbFirst(ex, big[i]) ? 'ring' : '')), 'wide')), ks.filter((k, i) => big[i]).map(k => B_OBJ[k].name).join(', '), 3); }]},
-  V4: {name:'Eins zu eins zuordnen', cols:1, max:6, gens:[
-    () => { const [a, b] = pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]), n = rnd(3, 5), perm = shuffle([...Array(n).keys()]);
-      return T_('verbinde', `${B_JEDE[a]} bekommt ${B_EIN[b]}. Verbinde.`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(n).fill(bbObj(b)), perm.map((j, i) => [i, j]), ex)), `${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, 1); },
-    () => { const [a, b] = pick([['tasse', 'loeffel'], ['teller', 'gabel'], ['schraube', 'mutter']]), n = rnd(3, 5), m = Math.max(2, n + pick([-1, 0, 1])), k = Math.min(n, m), ok = m >= n;
-      const yn = ex => `<p class="ab-row yn">Reicht es? <span class="bb-cb${ex && ok ? ' x' : ''}"></span> ja <span class="bb-cb${ex && !ok ? ' x' : ''}"></span> nein</p>`;
-      return T_(['verbinde', 'kreuze'], `Verbinde. Bekommt ${B_JEDE[a].replace('J', 'j')} ${B_EIN[b]}?`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(m).fill(bbObj(b)), [...Array(k).keys()].map(i => [i, i]), ex) + yn(false)), `${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}: ${ok ? 'ja' : 'nein'}`, 2); }]},
-  V5: {name:'Mehr, weniger, gleich viel', cols:1, max:6, gens:[
-    () => { const k = pick(['knopf', 'mutter', 'apfel', 'socke', 'stift']), a = rnd(1, 3), b = rnd(6, 9), left = Math.random() < .5, more = Math.random() < .7;
-      const L = left ? b : a, R = left ? a : b, ans = (more ? L > R : L < R) ? 0 : 1;
-      return T_('kreise', more ? 'Kreise ein, wo mehr sind.' : 'Kreise ein, wo weniger sind.', bbEx(ex => `<div class="bb-two">${[L, R].map((n, i) => `<div class="bb-box${ex && i === ans ? ' ring' : ''}">${bbScatter(k, null, n)}</div>`).join('')}</div>`), `${ans ? 'rechts' : 'links'} (${L} gegen ${R})`, 1); },
-    () => { const k = pick(['knopf', 'mutter', 'apfel', 'stift']), eq = Math.random() < .4, a = rnd(4, 7), b = eq ? a : a + pick([-1, 1]), sp = Math.random() < .5;
-      const ans = eq ? 2 : a > b ? 0 : 1;
-      return T_(['kreise', 'kreuze'], 'Wo sind mehr? Kreise ein. Sind es gleich viele? Kreuze an.', bbEx(ex => `<div class="bb-two">${[[a, sp ? 1 : 0], [b, sp ? 0 : 1]].map(([n, s], i) => `<div class="bb-box${ex && i === ans ? ' ring' : ''}">${bbScatter(k, null, n, s)}</div>`).join('')}</div><p class="ab-row yn"><span class="bb-cb${ex && ans === 2 ? ' x' : ''}"></span> gleich viele</p>`), `${['links', 'rechts', 'gleich viele'][ans]} (${a} gegen ${b})`, 2); }]},
-  V6: {name:'Der Größe nach ordnen', cols:2, max:10, gens:[
-    () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle([.5, .75, 1]), big = Math.random() < .6, t = big ? 1 : .5, ok = sizes.indexOf(t);
-      return T_('kreise', big ? 'Kreise das größte ein.' : 'Kreise das kleinste ein.', bbEx(ex => bbRow(sizes.map((s, i) => bbIt(bbObj(k, null, s), ex && i === ok ? 'ring' : '')), 'base')), `${bPos(ok)} (${B_OBJ[k].name})`, 1); },
-    () => { const k = pick(['stift', 'schraube', 'tasse', 'glas']), n = rnd(4, 5), sizes = shuffle([.45, .6, .75, .88, 1].slice(5 - n)), ord = [...sizes].sort((a, b) => a - b).map(s => sizes.indexOf(s));
-      const lines = ex => ex ? `<svg class="bb-arcs" viewBox="0 0 100 20" preserveAspectRatio="none">${ord.slice(1, 2).map((j, x) => { const a = 100*(ord[x] + .5)/n, b2 = 100*(j + .5)/n; return `<path d="M${a} 1Q${(a + b2)/2} ${4 + Math.abs(b2 - a)/5} ${b2} 1" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke" fill="none"/>`; }).join('')}</svg>` : '<div class="bb-arcgap"></div>';
-      return T_('verbinde', 'Verbinde von klein nach groß.', bbEx(ex => `<div class="bb-ord">${bbRow(sizes.map(s => `<span class="bb-pc">${bbObj(k, null, s)}<span class="ab-dot"></span></span>`), 'base even')}${lines(ex)}</div>`), ord.map(bPos).join(' → '), 2); }]},
-  V7: {name:'Muster fortsetzen', cols:1, max:8, gens:[
-    () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 2), cs = shuffle(B_COLS4).slice(0, 2), u = [[fs[0], cs[0]], [fs[1], cs[1]]], seq = [0, 1, 0, 1, 0, 1, 0, 1];
-      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 5 || (ex && i === 5) ? bbIt(bbShape(...u[s]), i >= 5 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(5).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 1); },
-    () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3), u = fs.map((f, i) => [f, cs[i]]), pat = pick([[0, 0, 1], [0, 1, 2], [0, 1, 1]]), seq = [...pat, ...pat, ...pat].slice(0, 9);
-      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < 6 || (ex && i === 6) ? bbIt(bbShape(...u[s]), i >= 6 ? 'grau' : '') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(6).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), 2); },
-    () => { const fs = shuffle(Object.keys(B_FORM).filter(f => f !== 'rechteck')).slice(0, 3), cs = shuffle(B_COLS4).slice(0, 3), u = fs.map((f, i) => [f, cs[i]]), pat = pick([[0, 1], [0, 0, 1], [0, 1, 2]]), seq = [...pat, ...pat, ...pat].slice(0, 7), next = pat[7 % pat.length];
-      const opts = shuffle([...new Set([next, 0, 1, 2])].slice(0, 3)), ok = opts.indexOf(next);
-      return T_('kreise', 'Was kommt als Nächstes? Kreise ein.', bbEx(ex => bbRow([...seq.map(s => bbIt(bbShape(...u[s]))), '<span class="bb-q">?</span>'], 'pat') + bbRow(opts.map((s, i) => bbIt(bbShape(...u[s]), ex && i === ok ? 'ring' : '')), 'opts')), `${bPos(ok)} (${B_FORM[u[next][0]]} ${B_COL_NAME[u[next][1]]})`, 3); }]},
-  O2: {name:'Formen unterscheiden', cols:1, max:6, gens:[
-    () => { const t = pick(['kreis', 'dreieck', 'quadrat']), nt = rnd(2, 4), list = shuffle([...Array(nt).fill(t), ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).flatMap(f => [f, f]).slice(0, 8 - nt)]), cs = list.map(() => pick(B_COLS4)), fl = list.map(() => pick(['voll', 'leer']));
-      return T_('kreise', `Kreise alle ${({kreis:'Kreise', dreieck:'Dreiecke', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')}`, bbEx(ex => bbRow(list.map((f, i) => bbIt(bbShape(f, cs[i], fl[i]), bbFirst(ex, f === t) ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
-    () => { const [t, d] = ['quadrat', 'rechteck'], list = shuffle([t, t, t, d, d, d, 'dreieck', 'stern']);
-      return T_('kreise', `Kreise nur die ${({kreis:'Kreise', quadrat:'Quadrate'})[t]} ein: ${bShape(t, '#fff', 22, 'leer')} Schau genau!`, bbEx(ex => bbRow(list.map(f => bbIt(bbShape(f, 'blau', 'leer'), bbFirst(ex, f === t) ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
-  O3: {name:'Richtung und Spiegelung', cols:1, max:6, gens:[
-    () => { const dirs = Object.keys(B_DIR), t = pick(dirs), list = shuffle([t, t, t, ...Array.from({length:5}, () => pick(dirs.filter(d => d !== t)))]);
-      return T_('kreise', `Kreise alle Pfeile nach ${t} ein: ${bArrow(t, 22)}`, bbEx(ex => bbRow(list.map(d => bbIt(bArrow(d, 64, '#fff'), bbFirst(ex, d === t) ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((d, i) => d === t ? i + 1 : 0).filter(Boolean).join(', '), 1); },
-    () => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), list = shuffle([t, t, ...shuffle([0, 1, 2, 3].filter(l => l !== t)), pick([0, 1, 2, 3].filter(l => l !== t))]);
-      return T_('kreise', 'Kreise alle ein, die genau so aussehen wie im Kasten.', bbEx(ex => `<div class="bb-target">${bbIt(bGlyph(g, t))}</div>` + bbRow(list.map(l => bbIt(bGlyph(g, l), bbFirst(ex, l === t) ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((l, i) => l === t ? i + 1 : 0).filter(Boolean).join(', '), 2); }]},
-  O4: {name:'Von links nach rechts', cols:1, max:6, gens:[
-    () => { const ks = shuffle(bKinds()).slice(0, 6);
-      return T_('verbinde', 'Fang beim grünen Punkt an. Verbinde die Punkte von links nach rechts.', bbEx(ex => `<div class="bb-ord">${bbRow(ks.map((k, i) => `<span class="bb-pc">${bbObj(k)}<span class="ab-dot${i === 0 ? ' start' : ''}"></span></span>`), 'even')}${ex ? `<svg class="bb-ordl" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M${100*.5/6} 5H${100*1.5/6}" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></svg>` : ''}</div>`), ks.map(k => B_OBJ[k].name).join(' → '), 1); },
-    () => { const s = pick(B_SEQ), ord = shuffle([0, 1, 2]), ok = ord.indexOf(0);
-      return T_('kreise', 'Was kommt zuerst? Kreise ein.', bbEx(ex => bbRow(ord.map((j, i) => bbIt(s.pics[j](), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${s.first})`, 2); }]}
+        B_FIX.artTop = bbZiel(bObj(B_SIM === 1 ? B_SUB[a][1] : a, null, 64), B_SIM === 1 ? B_SUB[a][0] : BZ_FAMN[a]);
+        return T_('kreise', `Kreise ${what} ein.`, bbEx(ex => bbRow(all.map(([k, y]) => bbIt(bbObj(k), bbFirst(ex, y) ? 'ring' : '')), 'wide')), all.map(([k, y], i) => y ? `${i + 1} (${B_OBJ[k].name})` : '').filter(Boolean).join(', '), 1); }
+      const g = bFix('grp', () => pick(['kueche', 'werkstatt', 'kleidung'])), g2 = pick(['kueche', 'werkstatt', 'kleidung', 'obst'].filter(x => x !== g)), inn = shuffle(bKinds(o => o.grp === g)).slice(0, 3), out = shuffle(bKinds(o => o.grp === g2)).slice(0, 3), all = shuffle([...inn, ...out]);
+      B_FIX.artTop = bbZiel(bObj({kueche:'teller', werkstatt:'hammer', kleidung:'muetze'}[g], null, 64), B_GRP[g]);
+      return T_('kreise', `Kreise alles ein, was zur ${B_GRP[g]} gehört.`, bbEx(ex => bbRow(all.map(k => bbIt(bbObj(k), bbFirst(ex, inn.includes(k)) ? 'ring' : '')), 'wide')), all.map((k, i) => inn.includes(k) ? `${i + 1} (${B_OBJ[k].name})` : '').filter(Boolean).join(', '), 1); }, {sim:true, top: () => B_FIX.artTop || ''}],
+    ['Farbe, verschiedene Dinge', () => { const col = pick(B_COLS4), ks = shuffle(bKinds(o => o.grp !== 'werkstatt')).slice(0, 6), cs = shuffle([col, col, col, ...shuffle(B_COLS4.filter(c => c !== col)).slice(0, 3)]);
+      return T_('kreise', `${bbColTask()} ${bSwatch(col)}`, bbEx(ex => bbRow(ks.map((k, i) => bbIt(bbObj(k, cs[i]), bbFirst(ex, cs[i] === col) ? 'ring' : '')), 'wide')), ks.filter((k, i) => cs[i] === col).map(k => B_OBJ[k].name).join(', '), 1); }]]},
+  /* V4: Gabeln stehen zusammengeschoben, nicht schon unter den Tellern; je Blatt dasselbe Paar (Stefan, T2) */
+  V4: {name:'Eins zu eins zuordnen', cols:1, max:6, arts:[
+    ['Jedem eins', () => { const [a, b] = B_V4(), n = rnd(3, 5), d = n - 2, off = pick([0, 25, 50]);
+      return T_('verbinde', `${B_JEDE[a]} bekommt ${B_EIN[b]}. Verbinde.`, bbEx(ex => bbPairs(Array(n).fill(bbObj(a)), Array(n).fill(bbObj(b)), [...Array(n).keys()].map(i => [i, i]), ex, off)), `${n}× ${B_OBJ[a].name} – ${B_OBJ[b].name}`, d); }],
+    ['Reicht es?', () => { const [a, b] = B_V4(), n = rnd(3, 5), m = n - 1, [den, rel] = B_DER[a], off = pick([0, 25, 50]);
+      return T_(['verbinde', 'kreise'], `Verbinde. Kreise ${den} ein, ${rel} ${B_KEIN[b]} bekommt.`, bbEx(ex => bbPairs([...Array(n).keys()].map(i => ex && i === n - 1 ? bbIt(bbObj(a), 'ring') : bbObj(a)), Array(m).fill(bbObj(b)), [...Array(m).keys()].map(i => [i, i]), ex, off)), `${n} ${B_OBJ[a].name}, ${m} ${B_OBJ[b].name}: ein${a === 'teller' ? '' : 'e'} ${B_OBJ[a].name} bekommt nichts`, n - 2); }]]},
+  /* V5: mehr, weniger und gleich viele auf getrennten Blättern (Stefan, T3) */
+  V5: {name:'Mehr, weniger, gleich viel', cols:1, max:6, arts:[
+    ['Wo sind mehr?', () => { const k = pick(['knopf', 'mutter', 'apfel', 'socke', 'stift']), a = rnd(1, 3), b = rnd(6, 9), left = Math.random() < .5, L = left ? b : a, R = left ? a : b, ans = L > R ? 0 : 1;
+      return T_('kreise', 'Kreise ein, wo mehr sind.', bbEx(ex => `<div class="bb-two">${[L, R].map((n, i) => `<div class="bb-box${ex && i === ans ? ' ring' : ''}">${bbScatter(k, null, n)}</div>`).join('')}</div>`), `${ans ? 'rechts' : 'links'} (${L} gegen ${R})`, 1); }],
+    ['Wo sind weniger?', () => { const k = pick(['knopf', 'mutter', 'apfel', 'socke', 'stift']), a = rnd(1, 3), b = rnd(6, 9), left = Math.random() < .5, L = left ? b : a, R = left ? a : b, ans = L < R ? 0 : 1;
+      return T_('kreise', 'Kreise ein, wo weniger sind.', bbEx(ex => `<div class="bb-two">${[L, R].map((n, i) => `<div class="bb-box${ex && i === ans ? ' ring' : ''}">${bbScatter(k, null, n)}</div>`).join('')}</div>`), `${ans ? 'rechts' : 'links'} (${L} gegen ${R})`, 1); }],
+    ['Gleich viele', () => { const k = pick(['knopf', 'mutter', 'apfel', 'stift']), a = rnd(3, 6), c = a + pick(a <= 3 ? [1, 2] : [-2, -1, 1, 2]), ns = shuffle([[a, 0], [a, 1], [c, pick([0, 1])]]), ok = ns.map((x, i) => x[0] === a ? i : -1).filter(i => i >= 0);
+      return T_('kreise', 'Kreise die zwei Kästen ein, in denen gleich viele sind.', bbEx(ex => `<div class="bb-three">${ns.map(([n, s], i) => `<div class="bb-box${ex && ok.includes(i) ? ' ring' : ''}">${bbScatter(k, null, n, s)}</div>`).join('')}</div>`), `Kasten ${ok.map(i => i + 1).join(' und ')} (je ${a}; der andere ${c})`, Math.abs(c - a) === 1 ? 2 : 1); }]]},
+  /* V6: das größte, das kleinste, dann ordnen durch Ausschneiden und Aufkleben (Stefan, T4): Teile auf einer Bastelseite mit leerer Rückseite */
+  V6: {name:'Der Größe nach ordnen', cols:2, max:10, arts:[
+    ['Das größte', () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle([.5, .75, 1]), ok = sizes.indexOf(1);
+      return T_('kreise', 'Kreise das größte ein.', bbEx(ex => bbRow(sizes.map((s, i) => bbIt(bbObj(k, null, s), ex && i === ok ? 'ring' : '')), 'base')), `${bPos(ok)} (${B_OBJ[k].name})`, 1); }],
+    ['Das kleinste', () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), sizes = shuffle([.5, .75, 1]), ok = sizes.indexOf(.5);
+      return T_('kreise', 'Kreise das kleinste ein.', bbEx(ex => bbRow(sizes.map((s, i) => bbIt(bbObj(k, null, s), ex && i === ok ? 'ring' : '')), 'base')), `${bPos(ok)} (${B_OBJ[k].name})`, 1); }],
+    ['Ordnen', () => { const k = pick(['stift', 'schraube', 'tasse', 'glas', 'apfel']), n = pick([3, 3, 4]), all = n === 3 ? [.45, .72, 1] : [.4, .6, .8, 1];
+      const g = T_(['schneide', 'klebe'], 'Schneide die Bilder aus. Klebe sie auf die Treppe: das kleinste unten.', bbEx(ex => bbStairs(k, all, ex)), `${B_OBJ[k].name}: vom kleinsten zum größten`, n - 2);
+      g.cut = shuffle(all); g.cutK = k; return g; }, {cols:1, max:3, bastel:true}]]},
+  V7: {name:'Muster fortsetzen', cols:1, max:8, arts:[
+    ['Was kommt dann?', () => { const u = BZ_PAT(), seq = [0, 1, 0, 1, 0, 1, 0], opts = shuffle([0, 1, 2]), ok = opts.indexOf(1);
+      return T_('kreise', 'Was kommt als Nächstes? Kreise ein.', bbEx(ex => bbRow([...seq.map(s => bbIt(bbShape(...u[s]))), '<span class="bb-q">?</span>'], 'pat') + bbRow(opts.map((s, i) => bbIt(bbShape(...u[s]), ex && i === ok ? 'ring' : '')), 'opts')), `${bPos(ok)} (${B_FORM[u[1][0]]} ${B_COL_NAME[u[1][1]]})`, 1); }],
+    ['Längere Muster', () => { const u = BZ_PAT(), pat = pick([[0, 0, 1], [0, 1, 1], [0, 1, 2]]), seq = [...pat, ...pat, ...pat].slice(0, 7), next = pat[7 % pat.length], opts = shuffle([0, 1, 2]), ok = opts.indexOf(next);
+      return T_('kreise', 'Was kommt als Nächstes? Kreise ein.', bbEx(ex => bbRow([...seq.map(s => bbIt(bbShape(...u[s]))), '<span class="bb-q">?</span>'], 'pat') + bbRow(opts.map((s, i) => bbIt(bbShape(...u[s]), ex && i === ok ? 'ring' : '')), 'opts')), `${bPos(ok)} (${B_FORM[u[next][0]]} ${B_COL_NAME[u[next][1]]})`, 1); }],
+    ['Weitermalen', () => { const u = BZ_PAT(), ab = Math.random() < .5, pat = ab ? [0, 1] : pick([[0, 0, 1], [0, 1, 2], [0, 1, 1]]), seq = [...pat, ...pat, ...pat, ...pat].slice(0, ab ? 8 : 9), from = ab ? 5 : 6;
+      return T_('skizze', 'Male das Muster weiter.', bbEx(ex => bbRow(seq.map((s, i) => i < from ? bbIt(bbShape(...u[s])) : ex ? bbIt(bbShape(...u[s]), 'grau') : '<span class="bb-empty"></span>'), 'pat')), seq.slice(from).map(s => `${B_FORM[u[s][0]]} ${B_COL_NAME[u[s][1]]}`).join(', '), ab ? 1 : 2); }]]},
+  /* O2, O3: gesuchte Form bzw. Richtung je Blatt fest (zufällig), groß oben */
+  O2: {name:'Formen unterscheiden', cols:1, max:6, arts:[
+    ['Form finden', () => { const t = bFix('form', () => pick(['kreis', 'dreieck', 'quadrat'])), nt = rnd(2, 4), list = shuffle([...Array(nt).fill(t), ...shuffle(['kreis', 'dreieck', 'quadrat', 'stern'].filter(f => f !== t)).flatMap(f => [f, f]).slice(0, 8 - nt)]), cs = list.map(() => pick(B_COLS4)), fl = list.map(() => pick(['voll', 'leer']));
+      return T_('kreise', `Kreise alle ${BZ_FORMN[t][0]} ein: ${bShape(t, '#fff', 22, 'leer')}`, bbEx(ex => bbRow(list.map((f, i) => bbIt(bbShape(f, cs[i], fl[i]), bbFirst(ex, f === t) ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === t ? i + 1 : 0).filter(Boolean).join(', '), 1); }, {top: () => bbZiel(bShape(B_FIX.form, '#fff', 64, 'leer'))}],
+    ['Quadrat oder Rechteck', () => { const list = shuffle(['quadrat', 'quadrat', 'quadrat', 'rechteck', 'rechteck', 'rechteck', 'dreieck', 'stern']);
+      return T_('kreise', `Kreise nur die Quadrate ein: ${bShape('quadrat', '#fff', 22, 'leer')} Schau genau!`, bbEx(ex => bbRow(list.map(f => bbIt(bbShape(f, 'blau', 'leer'), bbFirst(ex, f === 'quadrat') ? 'ring' : '')), 'wide shapes')), 'Stelle ' + list.map((f, i) => f === 'quadrat' ? i + 1 : 0).filter(Boolean).join(', '), 1); }, {top: () => bbZiel(bShape('quadrat', '#fff', 64, 'leer'))}]]},
+  O3: {name:'Richtung und Spiegelung', cols:1, max:6, arts:[
+    ['Pfeile in eine Richtung', () => { const dirs = Object.keys(B_DIR), t = bFix('dir', () => pick(dirs)), list = shuffle([t, t, t, ...Array.from({length:5}, () => pick(dirs.filter(d => d !== t)))]);
+      return T_('kreise', `Kreise alle Pfeile nach ${t} ein: ${bArrow(t, 22)}`, bbEx(ex => bbRow(list.map(d => bbIt(bArrow(d, 64, '#fff'), bbFirst(ex, d === t) ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((d, i) => d === t ? i + 1 : 0).filter(Boolean).join(', '), 1); }, {top: () => bbZiel(bArrow(B_FIX.dir, 64, '#fff'))}],
+    ['Gleiches Zeichen', () => { const g = pick(Object.keys(B_GLYPH)), t = rnd(0, 3), list = shuffle([t, t, ...shuffle([0, 1, 2, 3].filter(l => l !== t)), pick([0, 1, 2, 3].filter(l => l !== t))]);
+      return T_('kreise', 'Kreise alle ein, die genau so aussehen wie im Kasten.', bbEx(ex => `<div class="bb-target">${bbIt(bGlyph(g, t))}</div>` + bbRow(list.map(l => bbIt(bGlyph(g, l), bbFirst(ex, l === t) ? 'ring' : '')), 'wide')), 'Stelle ' + list.map((l, i) => l === t ? i + 1 : 0).filter(Boolean).join(', '), 1); }]]},
+  O4: {name:'Von links nach rechts', cols:1, max:6, arts:[
+    ['Von links nach rechts', () => { const ks = shuffle(bKinds()).slice(0, 6);
+      return T_('verbinde', 'Fang beim grünen Punkt an. Verbinde die Punkte von links nach rechts.', bbEx(ex => `<div class="bb-ord">${bbRow(ks.map((k, i) => `<span class="bb-pc">${bbObj(k)}<span class="ab-dot${i === 0 ? ' start' : ''}"></span></span>`), 'even')}${ex ? `<svg class="bb-ordl" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M${100*.5/6} 5H${100*5.5/6}" stroke="#888" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></svg>` : ''}</div>`), ks.map(k => B_OBJ[k].name).join(' → '), 1); }],
+    ['Was kommt zuerst?', () => { const s = pick(B_SEQ), ord = shuffle([0, 1, 2]), ok = ord.indexOf(0);
+      return T_('kreise', 'Was kommt zuerst? Kreise ein.', bbEx(ex => bbRow(ord.map((j, i) => bbIt(s.pics[j](), ex && i === ok ? 'ring' : '')))), `${bPos(ok)} (${s.first})`, 1); }]]}
 };
+for(const d of Object.values(B_SHEETS)) d.gens = d.arts.map(a => a[1]);   /* alle Arten (für Tests und ältere Aufrufe) */
+/* gewählte Art eines Basis-Blatts (0 = leichteste) */
+const bArt = (S, key) => { const n = B_SHEETS[key]?.arts.length || 1, v = S?.bart?.[key]; return Number.isInteger(v) && v >= 0 && v < n ? v : 0; };
+/* Blatt-Definition für die gewählte Art: nur diese eine Art, Titel mit der Art (Stefan, Frage 6) */
+function bDef(key, S){
+  const b = B_SHEETS[key]; if(!b) return null;
+  const i = bArt(S, key), [an, gen, o = {}] = b.arts[i];
+  return {...b, name: an === b.name ? b.name : `${b.name}: ${an}`, gens:[gen], cols: o.cols ?? b.cols, grossCols: o.grossCols, max: o.max ?? b.max, top: o.top, bastel: !!o.bastel, sim: !!o.sim, art: i, artName: an};
+}
 SHEET_SETS.B = B_SHEETS; SHEET_INFO.B = {...V_INFO, ...O_INFO};
 /* Hören P1–P4 als Arbeitsblätter (Backlog I, D6): Bilder statt Schrift; P2 spricht die Lehrkraft (Silben stehen in den Lösungen) */
 const abCircles = n => `<span class="ab-sylc">${'<i></i>'.repeat(n)}</span>`;
@@ -10466,43 +10505,49 @@ const BB_CSS = `.lg-sort{display:grid;grid-template-columns:1fr 1fr;gap:6mm;flex
 .bb-row.opts{gap:8mm;margin-top:3mm;padding-top:2.5mm;border-top:1px dashed #bbb}
 .bb-empty{width:11mm;height:11mm;border:.4mm dashed #999;border-radius:1.5mm;display:inline-block}.bb-q{font-size:20pt;font-weight:700;width:11mm;text-align:center}
 .bb-target{display:flex;justify-content:center;padding:1.5mm 4mm;border:.5mm solid #222;border-radius:2mm;margin:0 auto}.bb-target svg{width:15mm;height:15mm}
-.bb-match{display:grid;grid-template-columns:1fr 30mm 1fr;align-items:center;row-gap:3mm;justify-content:center;width:100%}.bb-match .l{grid-column:1;display:flex;justify-content:flex-end;align-items:center;gap:3mm}.bb-match .r{grid-column:3;display:flex;align-items:center;gap:3mm}.bb-match .bb-lines{grid-column:2;width:100%;height:100%;display:block}
+.bb-match{display:grid;grid-template-columns:1fr 30mm 1fr;align-items:center;row-gap:3mm;justify-content:center;width:100%}.bb-match .l{grid-column:1;display:flex;justify-content:flex-end;align-items:center;gap:3mm}.bb-match .r{grid-column:3;display:flex;align-items:center;gap:3mm}.bb-match .bb-lines{grid-column:2;width:100%;height:0;min-height:100%;align-self:stretch;display:block}
 .bb-pairs{display:flex;flex-direction:column;width:100%}.bb-prow{display:flex;justify-content:space-around}.bb-pc{display:inline-flex;flex-direction:column;align-items:center;gap:1.5mm}.bb-pc svg{width:13mm;height:13mm}.bb-vlines{width:100%;height:12mm;display:block}.bb-vgap{height:12mm}
 .bb-ord{width:100%;position:relative}.bb-arcs{width:100%;height:7mm;display:block}.bb-arcgap{height:7mm}.bb-ordl{position:absolute;left:0;right:0;bottom:0;width:100%;height:3mm}.ab-dot.start{background:#2e8b57;width:4.5mm;height:4.5mm}
 .bb-two{display:grid;grid-template-columns:1fr 1fr;gap:8mm;width:100%}.bb-box{position:relative;border:.5mm solid #222;border-radius:3mm;padding:2mm}.bb-box.ring::after{content:'';position:absolute;inset:-2.5mm;border:.6mm dashed #888;border-radius:6mm}.bb-scatter{width:100%;height:30mm;display:block}
 .bb-cb{display:inline-block;width:6mm;height:6mm;border:.45mm solid #222;border-radius:1mm;margin:0 1.5mm 0 4mm;vertical-align:middle;position:relative}.bb-cb.x::after{content:'✕';position:absolute;inset:0;color:#888;font-size:13pt;line-height:6mm;text-align:center}
-.bb-sw{width:8mm;height:5.5mm;vertical-align:middle;margin-left:1mm}.ab-ins svg.b-shape,.ab-ins svg.b-arrow{width:6mm;height:6mm;vertical-align:middle;margin-left:1mm}`;
+.bb-sw{width:8mm;height:5.5mm;vertical-align:middle;margin-left:1mm}.bb-prow.tight{width:50%;margin:0}.ab-grid.gross .bb-match{zoom:.8}
+.bb-three{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm;width:100%}.bb-three .bb-scatter{height:26mm}
+.bb-ziel{display:flex;align-items:center;justify-content:center;gap:5mm;margin:0 auto 3mm;padding:2mm 8mm;border:.6mm solid #222;border-radius:3mm;width:max-content;font-size:16pt}.bb-ziel svg{width:24mm;height:24mm;display:block}
+.ab-grid.gross .bb-stairs{zoom:.7407}.bb-stairs{display:flex;align-items:flex-end;justify-content:center;gap:1.5mm;width:100%;padding-top:1mm}.bb-stc{display:flex;flex-direction:column;align-items:center}.bb-slot{width:24mm;height:24mm;border:.5mm dashed #555;border-radius:2mm;display:flex;align-items:flex-end;justify-content:center;box-sizing:border-box}.bb-slot .bb-it svg{width:21mm;height:21mm}.bb-stb{width:26mm;border:.5mm solid #222;border-bottom-width:.8mm;background:#e6e6e6;display:block;box-sizing:border-box;margin-top:1mm}
+.bb-cuthint{font-size:12pt;margin:0 0 4mm}.bb-cutrow{display:flex;align-items:center;gap:0;margin:0 0 7mm}.bb-cutnr{width:12mm;font-size:18pt;font-weight:700;text-align:center}.bb-cut{width:24mm;height:24mm;border:.45mm dashed #222;display:flex;align-items:flex-end;justify-content:center;box-sizing:border-box;margin-left:-.45mm}.bb-cut svg{width:21mm;height:21mm;display:block}
+.page.leer{min-height:200mm}@media screen{.page.leer{min-height:297mm}}.ab-ins svg.b-shape,.ab-ins svg.b-arrow{width:6mm;height:6mm;vertical-align:middle;margin-left:1mm}`;
 /* Arbeitsblätter im Design der Hefte (Backlog M, Stefan 26.11.2026: Layout A „wie im Heft“; links 20 mm Rand zum Lochen, Backlog S8): schmale Kopfzeile mit Fach und Bereich,
    Titel mit Name und Datum wie bisher, Aufgabenkästen bis zur Fußzeile, Fußzeile auf fester Höhe (Bildungsplan und Lizenz links,
    Fach rechts), keine Seitenzahl, kein Farbrand. Lösungsblatt und Hilfeseite bekommen Kopf- und Fußzeile, behalten aber ihren Aufbau.
    sheetRaw: ohne Rahmen bauen – für Heftseiten (heftPages, heftAdd), die buildHeft selbst einrahmt. */
 let sheetRaw = false;
 const SHEET_FRAME_CSS = `.page.hf-p{display:flex;flex-direction:column;min-height:296mm;overflow-x:clip;padding-left:20mm}.hf-main{flex:1 1 auto}.hf-main>.ab-grid{flex:1 1 auto;align-content:stretch}.page.sol .hf-main ol{margin-top:0}.ab-measure .page.hf-p{min-height:0}.ab-measure .hf-main>.ab-grid{flex:none}`;
-function sheetFramed(inner, help, sol, topic){
+const B_LEER = '<div class="page leer"></div>';   /* Rückseite bleibt leer (Bastelseite) */
+function sheetFramed(inner, help, sol, topic, bastel = ''){
   const pl = sheetPlace(topic), fach = pl ? pl.f.name : '', label = pl ? `${pl.f.name} · ${pl.a.name}` : '';
   const pg = (h, cls, lab) => { const m = /^<div class="page([^"]*)">([^]*)<\/div>$/.exec(h); return m ? `<div class="page hf-p${m[1]}">${heftFrame(m[2], undefined, null, lab, fach)}</div>` : h; };
-  return `<div class="page hf-p">${heftFrame(inner, undefined, null, label, fach)}</div>${help ? pg(help, '', 'Zum Nachschauen') : ''}${sol ? pg(sol, '', 'Lösungen') : ''}`;
+  return `<div class="page hf-p">${heftFrame(inner, undefined, null, label, fach)}</div>${bastel ? B_LEER + pg(bastel, '', 'Zum Ausschneiden') + B_LEER : ''}${help ? pg(help, '', 'Zum Nachschauen') : ''}${sol ? pg(sol, '', 'Lösungen') : ''}`;
 }
 function buildSheet0(limit){
   const S = app.sheet, [sj, key] = S.topic.split(':');
   if(sj === 'K') return legeSheet(key);
-  B_BW = sj === 'B' && !!S.bw; B_SIM = sj === 'B' && [0, 1, 2].includes(S.bsim) ? S.bsim : 0;
-  const def = ({M:M_SHEETS, L:R_SHEETS, U:U_SHEETS, G:G_SHEETS, H:H_SHEETS, W:W_SHEETS, ...SHEET_SETS})[sj]?.[key];
+  const def = sj === 'B' ? bDef(key, S) : ({M:M_SHEETS, L:R_SHEETS, U:U_SHEETS, G:G_SHEETS, H:H_SHEETS, W:W_SHEETS, ...SHEET_SETS})[sj]?.[key];
+  B_BW = sj === 'B' && !!S.bw; B_SIM = sj === 'B' && def?.sim && [0, 1, 2].includes(S.bsim) ? S.bsim : 0;   /* Ähnlichkeit nur bei Arten, die sie nutzen (Backlog T) */
   const name = S.pid && S.pid !== 'none' ? (kids().find(p => p.id === S.pid)?.name || '') : '';
   const sub = sj === 'M' ? (key === 'schriftlich' ? ` bis ${S.wzr}` : key === 'geld' ? ` bis ${S.zr === 1000 ? 100 : S.zr} €` : key === 'einmaleins' ? `: ${sheetRows().length === 10 ? 'alle Reihen' : sheetRows().length === 1 ? sheetRows()[0] + 'er-Reihe' : sheetRows().slice(0, -1).join('er-, ') + 'er- und ' + sheetRows().at(-1) + 'er-Reihe'}` : ['stellenwert', 'zehnerpartner', 'ueber10'].includes(key) ? '' : ` bis ${S.zr}`) + (['plus', 'minus', 'schriftlich'].includes(key) && S.ue !== 'egal' ? (S.ue === 'mit' ? (key === 'schriftlich' ? ', mit Übertrag' : ', mit Zehnerübergang') : (key === 'schriftlich' ? ', ohne Übertrag' : ', ohne Zehnerübergang')) : '') : '';
   const title = sj === 'H' && key === 'HT' && /^\d$/.test(S.htp) ? `Tausenderbuch: Seite ${hPageName(+S.htp)}` : (key === 'schriftlich' ? (S.wop === 'add' ? 'Schriftlich plus' : S.wop === 'sub' ? 'Schriftlich minus' : def.name) : def.name) + sub;
   const fill = S.n === 'fill', cols0 = def.match ? 1 : (typeof def.cols === 'function' ? def.cols(S) : def.cols || 2);
   /* große Aufgaben (135 %): höchstens 2 Spalten, sonst zu breit (Stefan, 26.11.2026: Schriftlich bis 1000); Hundertertafel groß nur einspaltig; Materialblätter bleiben normal groß */
-  const gross = S.gross && !def.mat, cols = !gross ? cols0 : (def.taf || sj === 'B') && cols0 <= 2 ? 1 : Math.min(cols0, 2);
+  const gross = S.gross && !def.mat, cols = !gross ? cols0 : (def.taf || sj === 'B') && cols0 <= 2 ? (def.grossCols || 1) : Math.min(cols0, 2);
   if(limit == null){
-    FRESH.used = new Set();
-    const G = app.sheetGen = {tasks: [], sols: [], ops: [], d: [], gi: [], match: !!def.match, fill, cols};
+    FRESH.used = new Set(); if(sj === 'B') B_FIX = {};
+    const G = app.sheetGen = {tasks: [], sols: [], ops: [], d: [], gi: [], cuts: [], match: !!def.match, fill, cols};
     if(def.match){
       const nb = fill ? 3 : Math.max(1, Math.round(S.n/4));
       for(let i = 0; i < nb; i++){ const g = def.gen(); G.sols.push(g.a); G.ops.push(['verbinde']); G.d.push(0); G.gi.push(0); G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${abOp('verbinde')}</span>Verbinde, was zusammengehört.</div><div class="ab-body"><div class="ab-match">${g.left.map((l, j) => `<div class="l">${l}<span class="ab-dot"></span></div><div></div><div class="r"><span class="ab-dot"></span>${g.right[j]}</div>`).join('')}</div></div></div>`); }
     } else {
       const lvl = typeof S.stufe === 'number', want = fill ? (def.max || 30) : lvl ? Math.max(Math.min(S.n, def.max || S.n), Math.min(def.max || 30, S.n*3)) : Math.min(S.n, def.max || S.n), seen = new Set();
-      const K = g => String(g.k ?? g.a), KT = g => g.text + '|' + g.body.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' '), seenT = new Set();
+      const K = g => String(g.k ?? g.a), KT = g => g.text + '|' + (sj === 'B' ? g.body : g.body.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ')), seenT = new Set();   /* Basis: Bilder vergleichen (Backlog T) */
       for(let i = 0; i < want; i++){
         const gen = () => def.gens[i % def.gens.length](sj === 'M' ? S.zr : null);
         let g, t = 0; do { g = gen(); t++; } while(seen.has(K(g)) && t < 12);
@@ -10512,24 +10557,26 @@ function buildSheet0(limit){
           /* Nie zweimal dieselbe Aufgabe auf einer Seite (Stefan, 26.11.2026: Heft-Einstieg „Ergänzen bis 10“ viermal „9 sind schon drin“).
              Blatt füllen: ist der Vorrat erschöpft, Schluss; feste Zahl oder Feinstufe im Heft: diese Aufgabe auslassen (es gibt genug andere). */
           if(seenT.has(KT(g))){ if(fill && i >= def.gens.length*2) break; continue; } }
-        seen.add(K(g)); seenT.add(KT(g)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length);
+        seen.add(K(g)); seenT.add(KT(g)); G.sols.push(g.a); G.ops.push(g.ops); G.d.push(sheetD(g)); G.gi.push(i % def.gens.length); G.cuts.push(g.cut ? [g.cutK, g.cut] : null);
         G.tasks.push(`<div class="ab-task"><div class="ab-ins"><span class="nr">§NR§</span><span class="ops">${g.ops.map(abOp).join('')}</span><span>${g.text}</span></div><div class="ab-body">${g.body}</div></div>`);
       }
       /* Heft (Mathe-Feinstufen): Aufgaben passender Schwierigkeit zuerst; S.stufe 0 = die leichtesten, 1 = die schwersten je Aufgabenart */
       if(typeof S.stufe === 'number' && G.tasks.length > 2){
         const pct = G.d.map((d, i) => { const grp = G.d.filter((_, j) => G.gi[j] === G.gi[i]); return grp.length < 2 ? .5 : (grp.filter(x => x < d).length + (grp.filter(x => x === d).length - 1)/2)/(grp.length - 1); });   /* Mittelrang: gleich schwere Aufgaben zählen als mittel */
         const ord = G.tasks.map((_, i) => i).sort((x, y) => Math.abs(pct[x] - S.stufe) - Math.abs(pct[y] - S.stufe) || x - y);
-        for(const k of ['tasks', 'sols', 'ops', 'd', 'gi']) G[k] = ord.map(i => G[k][i]);
+        for(const k of ['tasks', 'sols', 'ops', 'd', 'gi', 'cuts']) G[k] = ord.map(i => G[k][i]);
       }
-      if(lvl && !fill) for(const k of ['tasks', 'sols', 'ops', 'd', 'gi']) G[k] = G[k].slice(0, Math.min(S.n, def.max || S.n));   /* nie mehr Aufgaben als gewählt */
+      if(lvl && !fill) for(const k of ['tasks', 'sols', 'ops', 'd', 'gi', 'cuts']) G[k] = G[k].slice(0, Math.min(S.n, def.max || S.n));   /* nie mehr Aufgaben als gewählt */
     }
     G.limit = G.tasks.length;
   }
   const G = app.sheetGen, n = Math.min(limit ?? G.limit, G.tasks.length);
   /* gleiche Aufgabenart zusammen, innerhalb davon von leicht nach schwer */
   const ord = [...Array(n).keys()].sort((x, y) => G.gi[x] - G.gi[y] || G.d[x] - G.d[y] || x - y);
-  const exSeen = new Set(), tasks = ord.map((j, i) => { let h = G.tasks[j].replace('§NR§', i + 1); const ek = G.gi[j] + '|' + (h.match(/§EK:(\w+)§/)?.[1] || ''); h = h.replace(/§EK:\w+§/g, ''); if(!h.includes('§V§')) return h; const ex = !exSeen.has(ek); exSeen.add(ek); return abPick(h, ex); }), sols = ord.map(j => G.sols[j]), used = new Set(G.ops.slice(0, n).flat());
+  const cutRows = [];   /* V6 „Ordnen“: Teile zum Ausschneiden der Aufgaben ohne Beispiel, mit Aufgabennummer (Backlog T) */
+  const exSeen = new Set(), tasks = ord.map((j, i) => { let h = G.tasks[j].replace('§NR§', i + 1); const ek = G.gi[j] + '|' + (h.match(/§EK:(\w+)§/)?.[1] || ''); h = h.replace(/§EK:\w+§/g, ''); if(!h.includes('§V§')) return h; const ex = !exSeen.has(ek); exSeen.add(ek); if(G.cuts?.[j] && !ex) cutRows.push(bbCutRow(i + 1, ...G.cuts[j])); return abPick(h, ex); }), sols = ord.map(j => G.sols[j]), used = new Set(ord.map(j => G.ops[j]).flat());
   const body = abScale(`<div class="ab-grid${gross ? ' gross' : ''}" style="grid-template-columns:repeat(${G.cols},minmax(0,1fr))">${tasks.join('')}</div>`, G.cols, gross ? AB_GROSS : 1, sheetRaw ? 186 : 178);
+  const top = def.top ? def.top() : '';   /* Basis: gesuchte Form, Richtung oder Gruppe groß oben (Backlog T) */
   const legend = `<div class="ab-legend">${def.taf ? `<span class="ab-taf">${TAF_ICON} Hundertertafel</span>` : ''}${[...used].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div>`;
   const head = `<div class="ab-top"><h1>${escHtml(title)}</h1><div class="ab-meta"><div>Name: <span>${name ? escHtml(name) : ''}</span></div><div>Datum: <span></span></div></div></div>`;
   const info = ({L:L_INFO, W:W_INFO, U:U_INFO, G:G_INFO, H:H_INFO, ...SHEET_INFO})[sj]?.[key] || null;
@@ -10538,7 +10585,9 @@ function buildSheet0(limit){
   /* Hundertertafel zum Nachschauen als eigene Seite (Stefan, 23.11.; nur auf Wunsch) */
   const help = def.taf && S.taf ? `<div class="page hilfe">${tafHelp()}</div>` : '';
   const sw = !!S.bw && sj !== 'B';
-  let pageHtml = sheetRaw ? `<div class="page">${head}${legend}${body}${foot}</div>${help}${sol}` : sheetFramed(head + legend + body + foot, help, sol, S.topic);
+  /* Bastelseite immer mit leerer Rückseite: Blatt, leer, Bastelseite, leer (Stefan, 27.11.2026) */
+  const bastel = def.bastel && cutRows.length ? `<div class="page bastel"><div class="ab-top"><h1>Zum Ausschneiden: ${escHtml(title)}</h1></div><div class="ab-legend">${['schneide', 'klebe'].map(k => `<span>${abOp(k)} ${AB_OPS[k].t}</span>`).join('')}</div><p class="bb-cuthint">Schneide die Bilder aus. Die Zahl sagt, auf welche Treppe sie gehören.</p>${cutRows.join('')}</div>` : '';
+  let pageHtml = sheetRaw ? `<div class="page">${head}${legend}${top}${body}${foot}</div>${bastel ? B_LEER + bastel + B_LEER : ''}${help}${sol}` : sheetFramed(head + legend + top + body + foot, help, sol, S.topic, bastel);
   if(sw) pageHtml = swHtml(pageHtml);
   return {title, n, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${SHEET_CSS}${sj === 'B' ? BB_CSS : ''}${sheetRaw ? '' : HEFT_CSS + SHEET_FRAME_CSS}</style>${PAGE_FIT_JS}</head><body>${B_BW || sw ? B_BW_DEFS : ''}${pageHtml}</body></html>`, _bw: B_BW = false, _sim: B_SIM = 0};
 }
@@ -10630,6 +10679,20 @@ function renderSamml(){
   fr.srcdoc = app.sammlDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.3, ((fr.clientWidth || 700) - 30)/830)).toFixed(2)}}}</style></head>`);
 }
 const heftEntries = H => { const chs = H.chapters || [], out = []; H.items.forEach((it, i) => { if(it.toc === false) return; if(it.ch !== undefined && chs[it.ch]){ if(!out.some(e => e.ch === it.ch)) out.push({ch: it.ch, title:`Kapitel ${it.ch + 1}: ${chs[it.ch].title}`, i}); } else out.push({title: it.title, i, back: !!it.back}); }); return out; };
+/* Bastelseiten (Backlog T): Rückseite immer leer. In der Broschüre steht die Bastelseite auf einer rechten Seite (ungerade Seitenzahl),
+   dahinter eine Leerseite; die Leerseiten sind eigene Heftseiten (kind 'leer', auto), damit Seitenzahlen, Inhalt und Lösungsheft stimmen.
+   A4 (jede Seite ein Blatt, einseitig) braucht keine. heftNorm setzt sie bei jeder Änderung neu. */
+const HEFT_LEER = () => ({title:'Leerseite (Rückseite der Bastelseite)', kind:'leer', auto:true, toc:false, html:'', sol:[]});
+function heftNorm(H = app.heft){
+  if(!H?.items?.length) return;
+  const items = H.items.filter(it => !it.auto), before = H.items.map(it => it.kind).join();
+  if(HEFT_DRUCK[H.druck]?.side && items.some(it => it.kind === 'bastel')){
+    const first = heftFirst({...H, items}), out = [];
+    for(const it of items){ if(it.kind === 'bastel'){ if((out.length + first) % 2 === 0) out.push(HEFT_LEER()); out.push(it, HEFT_LEER()); } else out.push(it); }
+    H.items = out;
+  } else H.items = items;
+  if(H.items.map(it => it.kind).join() !== before) saveHeft();
+}
 const heftTotal = H => 1 + (H.toc && heftEntries(H).length > 8 ? 1 : 0) + H.items.length;
 const heftFirst = H => H.book ? 2 + (H.toc && heftEntries(H).length > 8 ? 1 : 0) : 1;
 /* Deckblatt (Stefan, 26.11.2026, Entwurf C4): Farbrand je Fach (gemischt: halb/halb), Titel aus den Kapiteln, Fachbild, Inhalt, Name unten */
@@ -10654,7 +10717,7 @@ function heftBild(H, ss){
   return ss.length ? `<div class="cv-bild${ss.length > 1 ? ' multi' : ''}">${ss.map(one).join('')}</div>` : `<div class="cv-bild cv-logo">${LOGO_SVG}</div>`;
 }
 function buildHeft(){
-  const H = app.heft, kid = heftKid(H), name = kid ? kid.name : '';   /* Heft „für einen Bereich“: Namenszeile leer (Backlog U1) */
+  heftNorm(); const H = app.heft, kid = heftKid(H), name = kid ? kid.name : '';   /* Heft „für einen Bereich“: Namenszeile leer (Backlog U1) */
   /* Inhalt: Kapitel (Heft-Assistent) mit ihrer ersten Seite, sonst jede Seite einzeln */
   const chs = H.chapters || [], entries = heftEntries(H);
   const tocOwn = entries.length > 8;   /* langes Inhaltsverzeichnis: eigene Seite nach dem Deckblatt */
@@ -10665,7 +10728,7 @@ function buildHeft(){
   const LIC = 'Stufenweise · stufenweise.app · CC BY-SA 4.0';
   /* Rückseite: Nachguckseite, Farbrand rechts – in der Broschüre setzt er den Rand des Deckblatts über den Falz fort */
   const backPg = it => `<div class="page hf-back ${it.cls || ''}" style="--band:${band}"><div class="hb-kick">Zum Nachschauen</div>${it.html.replace(HEFT_LIC, '')}<div class="hb-foot"><span class="lg">${LOGO_SVG}</span><span>${escHtml(T.main)}</span><span class="lic">${LIC}</span></div></div>`;
-  const pages = H.items.map((it, i) => it.back ? backPg(it) : `<div class="page hf-p ${it.cls || ''}">${heftFrame(it.html, it.ch !== undefined && chs[it.ch] ? it.ch : undefined, i + first, it.cls?.includes('hilfe') ? 'Zum Nachschauen' : '')}</div>`).join('');
+  const pages = H.items.map((it, i) => it.kind === 'leer' ? '<div class="page leer bk-blank"></div>' : it.back ? backPg(it) : `<div class="page hf-p ${it.cls || ''}">${heftFrame(it.html, it.ch !== undefined && chs[it.ch] ? it.ch : undefined, i + first, it.cls?.includes('hilfe') ? 'Zum Nachschauen' : '')}</div>`).join('');
   const toc = H.toc && H.items.length ? `<div class="cv-toc"><h2>Inhalt</h2><ol>${entries.map(e => `<li${e.ch !== undefined ? ' class="ch"' : ''}><span class="nr">${e.ch !== undefined ? e.ch + 1 : ''}</span><span class="t">${escHtml(e.ch !== undefined ? chs[e.ch].title : e.title)}</span><span class="cv-dots"></span><span class="p">${e.back ? 'Rückseite' : e.i + first}</span></li>`).join('')}</ol></div>` : '';
   const fachName = ss.map(x => SUBJECTS[x].name).join(' und ');
   const cover = `<div class="page cover" style="--band:${band}"><div class="cv-top">${LOGO_SVG}<span>${escHtml(fachName)}</span></div><h1 class="cv-title">${escHtml(T.main)}</h1>${T.sub ? `<div class="cv-sub">${escHtml(T.sub)}</div>` : ''}<div class="cv-sp0"></div>${heftBild(H, ss)}${tocOwn ? '' : '<div class="cv-sp0"></div>' + toc}<div class="cv-sp"></div><div class="cv-name"><span class="l">Dieses Heft gehört</span><span class="v">${escHtml(name)}</span></div><p class="ab-foot ab-lic cv-lic">${LIC}</p></div>`;
@@ -10704,7 +10767,7 @@ const HEFT_DRUCK = {
 };
 /* Lösungsheft für die Lehrkraft (Schritt 2): Lösungen aller Seiten, mit Seitenzahl wie im Heft */
 function buildLoesung(){
-  const H = app.heft, kid = heftKid(H), first = heftFirst(H);
+  heftNorm(); const H = app.heft, kid = heftKid(H), first = heftFirst(H);
   const secs = H.items.map((it, i) => it.sol?.length && it.sol.some(x => x && x !== '–') ? `<section class="ls"><h3>Seite ${i + first} · ${escHtml(it.title)}</h3><ol>${it.sol.map(x => `<li>${escHtml(x)}</li>`).join('')}</ol></section>` : '').join('');
   const css = `@page{size:A4;margin:12mm}.page.rp{width:auto;padding:0;margin:0}@media screen{.page.rp{width:210mm;padding:12mm;margin:6mm auto}}.ls-cols{column-count:2;column-gap:8mm}.ls{break-inside:avoid;margin:0 0 4mm}.ls h3{font-size:11.5pt;margin:0 0 1mm;border-bottom:1px solid #999}.ls ol{margin:0;padding-left:7mm;font-size:10.5pt}.ls li{margin:.4mm 0}`;
   return {title:`Lösungen ${H.title || 'Arbeitsheft'}`, html:`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Lösungen ${escHtml(H.title || 'Arbeitsheft')}</title><style>${SHEET_CSS}${css}</style></head><body><div class="page rp"><div class="ab-top"><h1>Lösungen: ${escHtml(H.title || 'Arbeitsheft')}</h1>${kid ? `<p style="margin:0">${escHtml(kid.name)}</p>` : ''}</div>${secs ? `<div class="ls-cols">${secs}</div>` : '<p>Zu diesen Seiten gibt es keine Lösungen.</p>'}${HEFT_LIC}</div></body></html>`};
@@ -10817,11 +10880,13 @@ async function heftPages(pid, specs, prog = () => {}){
   const G0 = !!H.gross;
   const set = (t, {label, ...o} = {}) => { for(const k of ['kt', 'bcase']) delete app.sheet[k];
     return Object.assign(app.sheet, {...SHEET_BASE, recent: keep.recent, pid, topic:t.topic, zr:t.zr || SHEET_BASE.zr, ue:t.ue || 'egal', n:'fill', sol:true, taf:false, bw:!!H.bw, stufe:null, gross:G0, lin: LIN[H.lin] ? H.lin : 'auto'}, o); };
-  const parse = (html, title = app.sheetDoc.title) => { const d = new DOMParser().parseFromString(html, 'text/html'), pg = d.querySelector('.page'); pg.querySelector('.ab-meta')?.remove(); return {pg, title, sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())}; };
+  const parse = (html, title = app.sheetDoc.title) => { const d = new DOMParser().parseFromString(html, 'text/html'), pg = d.querySelector('.page'); pg.querySelector('.ab-meta')?.remove(); return {pg, title, bas: d.querySelector('.page.bastel'), sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())}; };
   /* Seiten gleichmäßig füllen (Stefan, 26.11.2026): ein Blatt einmal mit vielen Aufgaben bauen, dann hinten kürzen – nur ganze Reihen */
   const tasksOf = r => [...r.pg.querySelectorAll('.ab-grid > .ab-task')];
   const colsOf = r => +(r.pg.querySelector('.ab-grid')?.style.gridTemplateColumns.match(/repeat\((\d+)/)?.[1] || 1);
-  const trim = (r, m) => { tasksOf(r).slice(m).forEach(e => e.remove()); r.sol = r.sol.slice(0, m); return r; };
+  const trim = (r, m) => { tasksOf(r).slice(m).forEach(e => e.remove()); r.sol = r.sol.slice(0, m); r.bas?.querySelectorAll('.bb-cutrow').forEach(e => { if(+e.dataset.nr > m) e.remove(); }); return r; };
+  /* V6 „Ordnen“ (Backlog T): Bastelseite als eigene Heftseite direkt dahinter; leere Rückseiten setzt heftNorm */
+  const bastelOf = (r, at) => r.bas?.querySelector('.bb-cutrow') ? [{title:`Zum Ausschneiden: ${r.title}`, base: r.title, kind:'bastel', toc:false, html: r.bas.innerHTML, sol:[], ...at}] : [];
   const counts = (total, cols) => { const c = []; for(let m = total - total % cols; m >= cols; m -= cols) c.push(m); if(!c.length) for(let m = total; m >= 1; m--) c.push(m); else if(cols > 1) c.push(1); return c; };
   const build = (t, o, n) => { set(t, {...o, n}); app.sheetDoc = buildSheet(); return {html: app.sheetDoc.html, title: app.sheetDoc.title}; };
   /* gemessen wird mit Kopf- und Fußzeile wie im fertigen Heft (heftFrame), aber ohne Strecken der Aufgaben */
@@ -10874,26 +10939,27 @@ async function heftPages(pid, specs, prog = () => {}){
       }
       if(s.kind === 'einstieg'){
         const demo = s.t.topic.startsWith('B:');   /* Basis-Blätter haben schon ein vorgemachtes Beispiel */
-        const r = await fixed(s.t, {gross:true, stufe:0, mat:true, draw:false, mstrich:'gezeigt'}, 8, r => {
+        const r = await fixed(s.t, {gross:true, stufe:0, mat:true, draw:false, mstrich:'gezeigt', ...(s.o || {})}, 8, r => {
           const top = r.pg.querySelector('.ab-top'), t1 = r.pg.querySelector('.ab-task');
           top.insertAdjacentHTML('beforebegin', band('Einstieg', ch));
-          r.pg.querySelector('.ab-legend')?.insertAdjacentHTML('afterend', `<p class="hf-intro"><b>Das übst du in diesem Kapitel.</b> ${demo ? 'Die erste Aufgabe ist grau vorgemacht.' : 'Die erste Aufgabe ist ein Beispiel. Schaut sie zusammen an.'}</p>`);
+          r.pg.querySelector('.ab-legend')?.insertAdjacentHTML('afterend', `<p class="hf-intro"><b>Das übst du in diesem Kapitel.</b> ${demo ? 'Die erste Aufgabe ist grau ganz vorgemacht.' : 'Die erste Aufgabe ist ein Beispiel. Schaut sie zusammen an.'}</p>`);
           if(!demo && t1){ t1.classList.add('ab-bsp'); t1.insertAdjacentHTML('afterbegin', '<span class="ab-bsp-lab">Beispiel</span>'); if(r.sol[0] && r.sol[0] !== '–') t1.insertAdjacentHTML('beforeend', `<div class="ab-bsp-sol">Lösung: <b>${escHtml(r.sol[0])}</b></div>`); }
         });
-        items.push({title:`Einstieg: ${r.title}`, base: r.title, kind:'einstieg', html: r.pg.innerHTML, sol: r.sol, ...at});
+        items.push({title:`Einstieg: ${r.title}`, base: r.title, kind:'einstieg', html: r.pg.innerHTML, sol: r.sol, ...at}, ...bastelOf(r, at));
       } else if(s.kind === 'kann'){
-        const r = await fixed(s.t, {gross:G0, draw:false, mstrich:'gezeigt'}, 12, r => {
+        const r = await fixed(s.t, {gross:G0, draw:false, mstrich:'gezeigt', ...(s.o || {})}, 12, r => {
           const top = r.pg.querySelector('.ab-top'), h1 = r.pg.querySelector('h1');
           top.insertAdjacentHTML('beforebegin', band('Das kann ich schon', ch));
           h1.textContent = `Das kann ich schon: ${r.title}`;
           (r.pg.querySelector('.ab-foot') || r.pg.lastElementChild).insertAdjacentHTML('beforebegin', KIS_HTML);
         });
-        items.push({title:`Das kann ich schon: ${r.title}`, base: r.title, kind:'kann', html: r.pg.innerHTML, sol: r.sol, ...at});
+        items.push({title:`Das kann ich schon: ${r.title}`, base: r.title, kind:'kann', html: r.pg.innerHTML, sol: r.sol, ...at}, ...bastelOf(r, at));
       } else if(s.kind === 'wdh'){
         /* Aufgaben aus beiden Kapiteln: je Kapitel einmal viele Aufgaben bauen, dann reihum ganze Reihen dazunehmen, solange die Seite reicht;
            passt nicht einmal je eine Reihe, nur das neuere Kapitel (sehr große Aufgaben, z. B. lange Texte) */
-        const mkB = g => s.parts.map(p => { const b = build(p.t, {...heftStufe(p.t, .5), gross:g}, 8), r0 = parse(b.html, b.title), cs = counts(tasksOf(r0).length, colsOf(r0)).reverse(); return {p, b, cs}; });
+        const mkB = g => s.parts.map(p => { const b = build(p.t, {...heftStufe(p.t, .5), ...(p.o || {}), gross:g}, 8), r0 = parse(b.html, b.title), cs = counts(tasksOf(r0).length, colsOf(r0)).reverse(); return {p, b, cs}; });
         let B = mkB(G0);
+        if(s.parts.some(p => p.t.topic.startsWith('B:'))) B = B.slice(-1);   /* Basis: auch die Wiederholung nur mit einer Art (Backlog T) */
         const compose = (L, idx) => { let h = band('Wiederholung') + `<div class="ab-top"><h1>Wiederholung</h1></div>`; const so = [];
           L.forEach((x, j) => { const r = trim(parse(x.b.html, x.b.title), x.cs[idx[j]]);
             h += `<h2 class="hf-sub">Kapitel ${x.p.ch + 1}: ${escHtml(r.title)}</h2>` + [...r.pg.children].filter(e => !e.matches('.ab-top,.ab-foot,.hf-band')).map(e => e.outerHTML).join('');
@@ -10914,7 +10980,7 @@ async function heftPages(pid, specs, prog = () => {}){
       } else {
         const r = await full(s.t, s.o);
         if(s.label) r.pg.querySelector('h1')?.insertAdjacentHTML('beforeend', `<small class="ab-stufe">· ${escHtml(s.label)}</small>`);
-        items.push({title: r.title + (s.label ? ` (${s.label})` : ''), base: r.title, ...(s.kind ? {kind: s.kind} : {}), ...(s.kind === 'ueben' ? {spec: {t: s.t, o: s.o || {}, label: s.label}} : {}), html: r.pg.innerHTML, sol: r.sol, ...at});
+        items.push({title: r.title + (s.label ? ` (${s.label})` : ''), base: r.title, ...(s.kind ? {kind: s.kind} : {}), ...(s.kind === 'ueben' ? {spec: {t: s.t, o: s.o || {}, label: s.label}} : {}), html: r.pg.innerHTML, sol: r.sol, ...at}, ...bastelOf(r, at));
       }
     }
     /* Sicherheitsnetz (Stefan, 26.11.: Überlauf selbst beheben): passt eine Seite trotzdem nicht, darf sie bis 60 % verkleinert werden */
@@ -11022,13 +11088,29 @@ async function heftMake(pid){
   const P = heftPlan(pid, H), used = P.chapters.filter(c => c.pages > 0);
   if(!used.length){ toast(bereich ? 'Für diese Stufen gibt es kein passendes Arbeitsblatt.' : `Für ${kid.name} gibt es noch keine Förderzone mit passendem Arbeitsblatt. Zuerst einen Test machen.`); return renderHeft(); }
   /* Kapitel (Schritt 2): Einstieg → Üben, Seite für Seite schwerer (Schritt 3) → „Das kann ich schon“; nach je zwei Kapiteln eine Wiederholung */
-  const specs = [];
+  const specs = [], wdhO = [];
   used.forEach((c, ci) => {
-    const p = c.pages, m = p >= 3 ? p - 2 : p === 2 ? 1 : 1, mat = !!sheetDef(c.t)?.mat;
-    if(p >= 2 && !mat) specs.push({kind:'einstieg', t: c.t, ch: ci});
-    for(let i = 0; i < (mat ? p : m); i++){ const o = heftStufe(c.t, m > 1 && !mat ? i/(m - 1) : .5); specs.push({kind:'ueben', t: c.t, ch: ci, o, label: o.label}); }
-    if(p >= 3 && !mat) specs.push({kind:'kann', t: c.t, ch: ci});
-    if(ci % 2 === 1) specs.push({kind:'wdh', parts:[ci - 1, ci].map(k => ({t: used[k].t, ch: k}))});
+    const p = c.pages, m = p >= 3 ? p - 2 : p === 2 ? 1 : 1, mat = !!sheetDef(c.t)?.mat, bk = c.t.topic.startsWith('B:') ? c.t.topic.slice(2) : null;
+    if(bk && B_SHEETS[bk]){
+      /* Basis (Backlog T, Stefan 27.11.2026): eine Art je Seite. Einstieg = leichteste Art, Übungsseiten der Reihe nach (bei wenigen Seiten die leichteren),
+         innerhalb einer Art mit Ähnlichkeit deutlich → ähnlich → fein; „Das kann ich schon“ und Wiederholung = schwerste geübte Art */
+      const A = B_SHEETS[bk].arts, na = A.length, per = A.map((_, a) => m >= na ? Math.floor(m/na) + (a < m % na ? 1 : 0) : a < m ? 1 : 0);
+      /* eine Art mit Bastelseite braucht zwei Heftseiten: dafür eine Übungsseite weniger, damit das Heft seinen Umfang behält */
+      const bas = a => A[a][2]?.bastel ? 1 : 0, lastA = () => per.reduce((x, k, a) => k ? a : x, 0);
+      for(let a = 0; a < na; a++) if(bas(a) && per[a] > 1){ for(let x = per[a] - 1, b = 0; x > 0; b = (b + 1) % na) if(!bas(b)){ per[b]++; x--; } per[a] = 1; }   /* Bastel-Art höchstens eine Übungsseite */
+      for(let g = 0; g < 20 && per.reduce((t, k, a) => t + k*(1 + bas(a)), 0) + (p >= 3 ? bas(lastA()) : 0) > m; g++){
+        const a = per.map((k, a) => [k, a]).filter(([k]) => k > 0).sort((x, y) => y[0] - x[0] || bas(x[1]) - bas(y[1]) || y[1] - x[1])[0]?.[1]; if(a === undefined) break; per[a]--; }
+      const bo = (a, q) => { const o = {bart:{[bk]: a}}, sim = A[a][2]?.sim; if(sim){ const third = q < 1/3 ? 0 : q < 2/3 ? 1 : 2; Object.assign(o, {bsim: third, label: BZ_SIM[third]}); } return o; };
+      if(p >= 2) specs.push({kind:'einstieg', t: c.t, ch: ci, o: bo(0, 0)});
+      let last = 0, lq = 0; per.forEach((k, a) => { for(let j = 0; j < k; j++){ const q = k > 1 ? j/(k - 1) : 0, o = bo(a, q); specs.push({kind:'ueben', t: c.t, ch: ci, o, label: o.label}); last = a; lq = q; } });
+      if(p >= 3) specs.push({kind:'kann', t: c.t, ch: ci, o: bo(last, lq)});
+      wdhO[ci] = bo(A[last][2]?.bastel && last ? last - 1 : last, .5);   /* Wiederholung ohne Bastelseite */
+    } else {
+      if(p >= 2 && !mat) specs.push({kind:'einstieg', t: c.t, ch: ci});
+      for(let i = 0; i < (mat ? p : m); i++){ const o = heftStufe(c.t, m > 1 && !mat ? i/(m - 1) : .5); specs.push({kind:'ueben', t: c.t, ch: ci, o, label: o.label}); }
+      if(p >= 3 && !mat) specs.push({kind:'kann', t: c.t, ch: ci});
+    }
+    if(ci % 2 === 1) specs.push({kind:'wdh', parts:[ci - 1, ci].map(k => ({t: used[k].t, ch: k, ...(wdhO[k] ? {o: wdhO[k]} : {})}))});
   });
   /* Fortsetzungsgeschichte gleichmäßig verteilt: je Teil eine Seite Text, eine Seite Aufgaben (nicht direkt nach einem Einstieg) */
   for(let k = P.story; k >= 1; k--){ let pos = Math.round(k*specs.length/(P.story + 1)); while(pos < specs.length && specs[pos - 1]?.kind === 'einstieg') pos++; specs.splice(pos, 0, {kind:'story', key: P.storyKey, part: k - 1, page:'text'}, {kind:'story', key: P.storyKey, part: k - 1, page:'aufg'}); }
@@ -11078,9 +11160,15 @@ async function heftSwapNew(i){
   const sp = it.spec || {t: zoneToSheet(H.chapters?.[it.ch]?.key || '') || null, o: {}};
   if(!sp.t){ toast('Für diese Seite fehlt der Bauplan. Bitte „Anderes Blatt wählen“.'); app.heftSwapMenu = null; return renderHeft(); }
   toast('Neue Aufgaben für die Seite …');
-  const [n] = await heftPages(heftWeg(H) === 'bereich' ? 'none' : H.pid, [{kind:'ueben', t: sp.t, ch: it.ch, o: sp.o, label: sp.label}]);
-  if(n){ H.items[i] = n; saveHeft(); toast(`Seite ${i + heftFirst(H)}: neue Aufgaben.`); }
+  const [n, ...bas] = await heftPages(heftWeg(H) === 'bereich' ? 'none' : H.pid, [{kind:'ueben', t: sp.t, ch: it.ch, o: sp.o, label: sp.label}]);
+  if(n){ heftPut(i, n, bas); toast(`Seite ${i + heftFirst(H)}: neue Aufgaben.`); }
   app.heftSwapMenu = null; if(app.sheetMode === 'heft') renderHeft();
+}
+/* Seite i ersetzen; ihre Bastelseite (mit Leerseiten) fällt weg, eine neue kommt direkt dahinter (Backlog T) */
+function heftPut(i, n, bas = []){
+  const H = app.heft; let j = i + 1; while(H.items[j]?.auto) j++;
+  const drop = H.items[j]?.kind === 'bastel' ? j + 1 - i : 1;
+  H.items.splice(i, drop, n, ...bas); heftNorm(H); saveHeft();
 }
 function heftSwapOpen(i){
   const H = app.heft, it = H.items[i], S = app.sheet, t = it?.spec?.t || zoneToSheet(H.chapters?.[it?.ch]?.key || '');
@@ -11096,11 +11184,14 @@ function heftSwapOther(){
   if(doc.lege){ toast('Legeblätter passen nicht ins Heft. Bitte ein anderes Blatt wählen.'); return; }
   const S = app.sheet, sol0 = S.sol; sheetRaw = true; S.sol = true;   /* dieselben Aufgaben ohne Blatt-Rahmen, mit Lösungen fürs Lösungsheft */
   try { const G = app.sheetGen; doc = buildSheet(G ? G.limit : undefined); } finally { sheetRaw = false; S.sol = sol0; }
-  const d = new DOMParser().parseFromString(doc.html, 'text/html'), pgs = [...d.body.querySelectorAll('.page:not(.sol)')];
+  const d = new DOMParser().parseFromString(doc.html, 'text/html'), pgs = [...d.body.querySelectorAll('.page:not(.sol):not(.leer):not(.bastel)')], bas = d.body.querySelector('.page.bastel');
   if(pgs.length !== 1){ toast('Dieses Blatt hat mehrere Seiten und passt nicht an eine Stelle im Heft. Bitte ein Blatt mit einer Seite wählen.'); return; }
   const pg = pgs[0]; pg.querySelector('.ab-meta')?.remove(); sheetUsed();
-  H.items[i] = {title: doc.title, base: doc.title, kind:'ueben', ch: old.ch, eigen: true, spec: {t: {topic: S.topic, zr: S.zr, ue: S.ue}, o: {}}, html: pg.innerHTML, cls: pg.className.replace(/^page\s*/, ''), sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())};
-  saveHeft(); app.heftSwap = null; app.sheetMode = 'heft'; sheetScrollTop = true; renderSheets();
+  bas?.querySelector('.hf-head')?.remove(); bas?.querySelector('.hf-foot')?.remove();
+  const inner = e => e.querySelector('.hf-main')?.innerHTML ?? e.innerHTML;
+  heftPut(i, {title: doc.title, base: doc.title, kind:'ueben', ch: old.ch, eigen: true, spec: {t: {topic: S.topic, zr: S.zr, ue: S.ue}, o: S.topic.startsWith('B:') ? {bart: {...S.bart}, bsim: S.bsim} : {}}, html: pg.innerHTML, cls: pg.className.replace(/^page\s*/, ''), sol: [...d.querySelectorAll('.page.sol ol > li')].map(li => li.textContent.trim())},
+    bas ? [{title:`Zum Ausschneiden: ${doc.title}`, base: doc.title, kind:'bastel', toc:false, ch: old.ch, html: inner(bas), sol:[]}] : []);
+  app.heftSwap = null; app.sheetMode = 'heft'; sheetScrollTop = true; renderSheets();
   toast(`Seite ${i + heftFirst(H)} ausgetauscht.`);
 }
 /* Inhalt des Dialogs „Material drucken“ neu zeichnen, ohne nach oben zu springen (Rückmeldung Stefan, 26.11.2026: „+“ und „−“ im
@@ -11114,7 +11205,7 @@ function sheetBodySet(html){
   d.scrollTop = keep[0]; b.scrollTop = keep[1]; const f = b.querySelector('.sheet-form'); if(f) f.scrollTop = keep[2];
 }
 function renderHeft(){
-  const H = app.heft, weg = heftWeg(H), kid = heftKid(H), first = heftFirst(H);
+  heftNorm(); const H = app.heft, weg = heftWeg(H), kid = heftKid(H), first = heftFirst(H);
   const swapRow = i => `<li class="hf-swap"><span>Seite ${i + first} austauschen:</span><button class="icon-btn" data-hf-swapnew="${i}">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn" data-hf-swapother="${i}">Anderes Blatt wählen</button><button class="icon-btn" data-hf-swapx aria-label="Abbrechen">✕</button></li>`;
   sheetBodySet(`<div class="sheet-form">${sheetModeSwitch()}
     <label class="row">Titel <input id="hf-title" value="${escHtml(H.title)}" maxlength="40" style="flex:1;min-width:0"></label>
@@ -11169,7 +11260,7 @@ function renderSheets(keep){
     <label class="row cb"><input type="checkbox" id="sh-gross" ${S.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label>
     ${H_SHEETS[key]?.taf && S.topic.startsWith('H:') ? `<label class="row cb"><input type="checkbox" id="sh-taf" ${S.taf ? 'checked' : ''}> Ausgefüllte Hundertertafel als Extraseite zum Nachschauen</label>` : ''}
     ${sheetHasLines(S.topic) ? `<label class="row">Lineatur ${linSelect('sh-lin', S.lin, S.pid)}</label>` : ''}
-    <label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>${['B:V1', 'B:V2', 'B:V3'].includes(S.topic) ? `<label class="row">Ähnlichkeit <select id="sh-bsim">${BZ_SIM.map((t, i) => `<option value="${i}" ${(S.bsim || 0) === i ? 'selected' : ''}>${['deutlich (andere Gruppe)', 'ähnlich (gleiche Gruppe)', 'fein (Varianten)'][i]}</option>`).join('')}</select></label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Die erste Aufgabe jeder Art ist grau gestrichelt vorgemacht. Erkläre den Auftrag daran.</p>` : ''}
+    <label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>${S.topic.startsWith('B:') && B_SHEETS[key] ? `<label class="row">Aufgabe ${sel('sh-bart', B_SHEETS[key].arts.map(([n], i) => [i, `${i + 1}. ${escHtml(n)}`]), bArt(S, key))}</label>` : ''}${S.topic.startsWith('B:') && bDef(key, S)?.sim ? `<label class="row">Ähnlichkeit <select id="sh-bsim">${BZ_SIM.map((t, i) => `<option value="${i}" ${(S.bsim || 0) === i ? 'selected' : ''}>${['deutlich (andere Gruppe)', 'ähnlich (gleiche Gruppe)', 'fein (Varianten)'][i]}</option>`).join('')}</select></label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Jedes Blatt hat nur eine Aufgabenart, unter „Aufgabe“ von leicht nach schwer. Die erste Aufgabe ist grau gestrichelt ganz vorgemacht. Erkläre den Auftrag daran.${bDef(key, S)?.bastel ? ' Zu diesem Blatt gehört eine Bastelseite zum Ausschneiden; ihre Rückseite bleibt leer, deshalb liegt vor und hinter ihr je eine leere Seite.' : ''}</p>` : ''}
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-samml">${icon('plus')}<span style="display:inline">Zur Blattsammlung</span></button></div>
     ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge.</p><details class="note sh-help"><summary>Probleme beim Drucken?</summary>Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</details></div>
@@ -11245,6 +11336,7 @@ function sheetChange(e){
   if(t.id === 'sh-bw') S.bw = t.checked;
   if(t.id === 'sh-lin') S.lin = t.value;
   if(t.id === 'sh-bsim') S.bsim = +t.value || 0;
+  if(t.id === 'sh-bart' && S.topic.startsWith('B:')) S.bart = {...(S.bart || {}), [S.topic.slice(2)]: +t.value || 0};   /* je Blatt gemerkt (Backlog T) */
   if(t.id === 'sh-tausch') S.tausch = t.checked;
   if(t.id === 'sh-n') S.n = t.value === 'fill' ? 'fill' : +t.value;
   if(t.id === 'sh-sol') S.sol = t.checked;
