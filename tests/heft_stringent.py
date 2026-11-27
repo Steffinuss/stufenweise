@@ -110,6 +110,10 @@ async def main():
         check('Namenszeile auf dem Deckblatt leer', name and name.group(1) == '', name and name.group(1))
         n = await pdf_pages(br, html)
         check('Gedruckt genau 12 Seiten', n == 12, n)
+        # Rückmeldung Stefan 27.11. 12:39: Broschüre lief auf Handy und altem iPad über (Safari vergrößert kleine Schrift selbst)
+        bk = await pg.evaluate("(() => { const d = app.heft.druck; app.heft.druck = 'a5'; try { return buildHeft().html; } finally { app.heft.druck = d; } })()")
+        check('Broschüre: keine automatische Schriftvergrößerung', 'text-size-adjust:100%' in bk and 'bk-side' in bk)
+        check('Blattsammlung: keine automatische Schriftvergrößerung', 'text-size-adjust:100%' in await pg.evaluate("buildSamml().html"))
         check('Lösungsheft', 'ls' in await pg.evaluate("buildLoesung().html"))
         # Themenwelt wirkt (Lineatur „passend zur Stufe“: Grundstufe Haus, sonst eine Linie)
         for welt, lin in [('GS', 'lin-haus'), ('HS', 'lin-eins')]:
