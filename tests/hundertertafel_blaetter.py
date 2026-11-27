@@ -44,13 +44,13 @@ async def main():
             await pg.evaluate(f"app.sheet.topic='{t}'; renderSheets()"); await pg.wait_for_timeout(200)
             if await pg.locator('#sh-taf').count(): errs.append(f'Häkchen bei {t}')
 
-        # Heft: Blatt und Extraseite
-        await pg.evaluate("app.heft.items=[]; app.sheet.topic='H:H5'; app.sheet.taf=true; renderSheets()"); await pg.wait_for_timeout(300)
-        await pg.evaluate("heftAdd()"); await pg.wait_for_timeout(200)
-        items = await pg.evaluate("app.heft.items.map(i=>i.title+' | '+(i.cls||''))")
-        print('Heft', items)
-        if len(items) != 2 or 'Nachschauen' not in items[1] or 'hilfe' not in items[1]: errs.append(f'Heft: {items}')
-        await pg.evaluate("app.heft.items=[]; saveHeft(); app.sheet.taf=false; sheetSave()")
+        # Blattsammlung: Blatt mit Extraseite (Backlog U2: statt „Ins Arbeitsheft“)
+        await pg.evaluate("app.samml.items=[]; app.sheet.topic='H:H5'; app.sheet.taf=true; renderSheets()"); await pg.wait_for_timeout(300)
+        await pg.evaluate("sammlAdd()"); await pg.wait_for_timeout(200)
+        items = await pg.evaluate("app.samml.items.map(i=>i.title+' | '+(i.html.match(/class=\"page[^\"]*/g)||[]).join(','))")
+        print('Blattsammlung', items)
+        if len(items) != 1 or 'hilfe' not in items[0] or 'Nachschauen' not in await pg.evaluate("app.samml.items[0].html"): errs.append(f'Blattsammlung: {items}')
+        await pg.evaluate("app.samml.items=[]; saveSamml(); app.sheet.taf=false; sheetSave()")
 
         print('Fehler:', errs or 'keine')
         await b.close()

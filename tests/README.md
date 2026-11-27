@@ -33,7 +33,7 @@ Bei kleinen Änderungen reicht oft ein Teil der Tests (`sh tests/run_all.sh nur 
 | Unterricht an der Tafel | `zwanzigerfeld:1180x820 zwanzigerfeld:390x844 zwanzigerfeld_zahl frei_stift satz_ziehen tafel_rueckmeldung` |
 | Materialkiste | `materialkiste` |
 | Arbeitsblätter (Layout, Optionen, Lineatur, Schwarz-Weiß, keine doppelten Aufgaben) | `blatt_layout keine_doppelten blatt_rueckmeldungen blatt_auswahl arbeitsblatt_optionen grosse_aufgaben hundertertafel_blaetter lineatur druck_seiten legeblaetter tausenderbuch_nachspuren` (lang: `arbeitsblaetter`) |
-| Arbeitshefte, Heft-Assistent | `heft_assistent heft_gross heft_zone_optionen heft_scroll arbeitsheft lineatur plaene_sinnvoll` (lang: `heft_seiten_passen heft_seiten_gross`) |
+| Arbeitshefte, Heft-Assistent, Blattsammlung | `heft_stringent heft_assistent heft_gross heft_zone_optionen heft_scroll arbeitsheft lineatur plaene_sinnvoll` (lang: `heft_seiten_passen heft_seiten_gross`) |
 | Lernstand, Berichte, Wochenübersicht | `lernort_material wochenuebersicht drittes_fach` |
 | Daten: Speichern, Fenster, Sicherung, Umzug, Safari | `mehrere_fenster speicher_voll qr_umzug safari_tab update_hinweis` |
 | Alle Aufgabentypen, Robustheit | (lang) `sweep zufallsklicks kinder_sim` |
@@ -67,7 +67,7 @@ Zuerst den Server starten: `python3 -m http.server 8766 --bind 127.0.0.1` im Rep
 | `grosse_aufgaben.py` | „Große Aufgaben“: nichts zu breit, alles größer; Minus „Umtausch schon im Bild zeigen“: Bild stimmt, Tausch reicht zum Wegstreichen |
 | `doppelte_zeilen.py` | keine Zeile doppelt in einer Aufgabe (z. B. zweimal „7 = 4 + □“), keine gleichen Aufgaben direkt nacheinander |
 | `legeblaetter.py` | alle Legeblätter als PDF: genau 1 Seite, nichts abgeschnitten (`scroll` ≤ verfügbare Höhe) |
-| `arbeitsheft.py` | Arbeitsheft mit mehreren Blättern |
+| `arbeitsheft.py` | Blattsammlung mit mehreren Blättern (früher „Ins Arbeitsheft“) |
 | `heft_assistent.py` | Arbeitshefte (Backlog J): Fach, 12/24/36/48 Seiten (gedruckt genau so viele), Vorgriff, Kapitel mit Einstieg/Üben/„Das kann ich schon“, Wiederholung, Hilfen, Lösungsheft, Mathe-Feinstufen, Fortsetzungsgeschichte, neue Deutsch-Formate, Broschürendruck, Layout B (Kopf- und Fußzeile auf jeder Seite, Seitenzahl gleich hoch, Aufgaben bis zur Fußzeile, keine Seite verkleinert), Deckblatt (Titel aus Kapiteln, Farbrand, Fachbild), Rückseite als Nachguckseite |
 | `heft_seiten_passen.py` | (lang) Arbeitsheft: für jede Stufe Einstieg, Üben, „Das kann ich schon“ und Wiederholung bauen – keine Seite läuft über, gedruckt genau so viele Blätter, A5-Broschüre ohne abgeschnittene Seiten |
 | `plaene_sinnvoll.py` | Erzeugte Inhalte ergeben Sinn: Stundenplan je Stufe (Fächer nach BP GENT, kein Fach jeden Tag in derselben Stunde), „Stimmt das?“-Sätze eindeutig, Stehendes nicht unter dem Tisch |
@@ -89,6 +89,7 @@ Zuerst den Server starten: `python3 -m http.server 8766 --bind 127.0.0.1` im Rep
 | `lineatur.py` | Lineatur (Backlog L): Haus, zwei Linien, eine Linie; Standard nach Themenwelt; Auswahl bei Blättern mit Schreibzeilen und im Heft; Deckblatt-Zwanzigerfeld zeilenweise |
 | `heft_gross.py` | „Große Aufgaben“ im Heft-Assistenten (Backlog N); Heft nimmt Grundeinstellungen statt der des letzten Einzelblatts |
 | `heft_scroll.py` | Heft-Assistent: „+“ und „−“ springen nicht nach oben (iPad und Handy) |
+| `heft_stringent.py` | Backlog U: Heft „für einen Bereich“ (Stufen von–bis, gleich viele Seiten, Themenwelt, leere Namenszeile), Blattsammlung (Lösung hinter jedem Blatt), Übungsseite austauschen, Umstellung alter Hefte |
 | `heft_seiten_gross.py` | (lang) wie `heft_seiten_passen.py`, mit großen Aufgaben |
 | `heft_zone_optionen.py` | Heft zur Förderzone: Schwarz-Weiß, Hundertertafel als Extraseite |
 | `hundertertafel_blaetter.py` | Hundertertafel-Blätter H1–H6: Tafel im Titel, Extraseite auf Wunsch |

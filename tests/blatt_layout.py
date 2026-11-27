@@ -3,7 +3,7 @@
   keine Seitenzahl, kein Farbrand; Lösungsblatt und Hilfeseite mit Kopf- und Fußzeile; keine Linie über der Fußzeile (Stefan).
 - Jedes Blatt (alle Themen, auch Schwarz-Weiß und große Aufgaben) passt genau auf seine Seiten.
 - Schwarz-Weiß: im Blatt keine bunten Farben mehr, Plättchen schwarz bzw. schraffiert; Legeblätter bleiben, wie sie sind.
-- Heft: Seiten aus „Ins Arbeitsheft“ und aus dem Heft-Assistenten haben genau einen Rahmen."""
+- Heft: eine ausgetauschte Seite (Backlog U3) hat genau einen Rahmen; die Blattsammlung (U2) nimmt das Blatt mit Rahmen."""
 import asyncio, re
 from common import URL, launch
 from playwright.async_api import async_playwright
@@ -100,14 +100,17 @@ async def main():
         check('Legeblätter ohne neuen Rahmen', 'class="hf-foot' not in html and 'class="hf-head' not in html)
 
         # Heft: genau ein Rahmen je Seite
-        await pg.evaluate("app.heft = {title:'Mein Arbeitsheft', pid:'none', items:[], toc:true}; saveHeft()")
+        await pg.evaluate("app.heft = {title:'Mein Arbeitsheft', pid:'none', weg:'bereich', items:[{title:'x', kind:'ueben', ch:0, html:''}], toc:true, book:{N:12, fach:'M'}, chapters:[{key:'M|20|I', label:'x', zone:true, title:'Zählen'}]}; saveHeft()")
         await pg.evaluate(BUILD, ['M:plus', 20, {}])
-        await pg.evaluate("heftAdd()")
+        await pg.evaluate("app.heftSwap = 0; app.sheetMode = 'single'; heftSwapOther()")
         it = await pg.evaluate("app.heft.items[0].html")
-        check('Ins Arbeitsheft: Seite ohne Blatt-Rahmen', 'hf-foot' not in it and 'hf-head' not in it and 'ab-grid' in it)
+        check('Ausgetauschte Heftseite ohne Blatt-Rahmen', 'hf-foot' not in it and 'hf-head' not in it and 'ab-grid' in it)
         n_t = await pg.evaluate("(app.sheetDoc.html.match(/class=\"ab-task/g) || []).length")
         n_h = it.count('class="ab-task')
-        check('Ins Arbeitsheft: dieselben Aufgaben', n_t == n_h, f'{n_t} / {n_h}')
+        check('Ausgetauschte Heftseite: dieselben Aufgaben', n_t == n_h, f'{n_t} / {n_h}')
+        await pg.evaluate("app.samml.items = []; sammlAdd()")
+        sm = await pg.evaluate("app.samml.items[0].html")
+        check('Blattsammlung: Blatt mit Rahmen und denselben Aufgaben', sm.count('class="hf-foot') == 1 and sm.count('class="ab-task') == n_t, sm.count('class="hf-foot'))
         html = await pg.evaluate("buildHeft().html")
         pages, foots = html.count('class="page'), html.count('class="hf-foot"')
         check('Heft: eine Fußzeile je Aufgabenseite', foots == 1, f'{foots} Fußzeilen, {pages} Seiten')

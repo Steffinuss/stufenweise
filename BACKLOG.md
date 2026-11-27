@@ -24,7 +24,7 @@ Stand: 27.11.2026 (0.41.0 freigegeben; als Nächstes U, T wartet auf Stefans Ant
 | 11 | ~~**N** Große Aufgaben im Heft-Assistenten~~ | klein | freigegeben in 0.39.0 (26.11.2026) |
 | 12 | ~~**M** Blätter im Heft-Design~~, dann ~~**L** Lineatur~~ | klein bis mittel | M freigegeben in 0.40.0 (26.11.); L freigegeben in 0.41.0 (27.11.) |
 | 13 | ~~**S** Rückmeldungen Blätter und Hefte~~ | klein bis mittel | freigegeben in 0.41.0 (27.11.2026) |
-| 14 | **U** Arbeitshefte stringenter (U1–U3) | mittel | Stefan: „super“; Detailfragen vor dem Bau |
+| 14 | **U** Arbeitshefte stringenter (U1–U3) | mittel | gebaut, in der Testversion (27.11.2026) |
 | 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | Konzept steht, wartet auf Stefans 7 Antworten |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
@@ -410,7 +410,12 @@ Vorschlag: eigenes Konzept-Dokument „Basis-Arbeitsblätter“ wie bei den Arbe
 
 ## U: Arbeitshefte stringenter – einzelne Blätter vs. fertige Hefte (Stefan, 27.11.2026)
 
-**Status:** Stefan 27.11.2026 09:24: „Deine Vorschläge 1–3 finde ich super.“ → U1–U3 bauen (in `entwicklung`, Testversion). Offen: Was passiert mit gemerkten Heften, an die schon einzelne Blätter angehängt sind? (Vorschlag Claude: beim Öffnen als Blattsammlung weiterführen.)
+**Status:** gebaut in `entwicklung`, in der Testversion (27.11.2026), wartet auf Stefans Durchsicht. Stefan 27.11.2026 09:24: „Deine Vorschläge 1–3 finde ich super.“ Detailfragen per Auswahl beantwortet, danach „Ja, so bauen“.
+**Entschieden (Stefan, 27.11.2026):**
+- Alte gemerkte Hefte: **aufteilen** – ein Heft aus dem Assistenten bleibt Heft, angehängte Blätter wandern in die Blattsammlung; ein Heft ganz ohne Assistent wird ganz zur Blattsammlung.
+- U1 Stufenwahl: **ein Bereich, von–bis** (zusammenhängend in Lernreihenfolge); Seiten: **alle Kapitel gleich viele**; Themenwelt: **Auswahl im Assistenten** (vorausgewählt die Einstellung der App).
+- U2 Lösungen: **hinter jedem Blatt**.
+- U3: **nur Übungsseiten** austauschen (neue Aufgaben oder anderes Blatt); ↑ ↓ ✕ fallen im Heft weg (bleiben in der Blattsammlung).
 Stefan: „Wir haben ja immer noch die Möglichkeit, einzelne Arbeitsblätter in ein Arbeitsheft aufzunehmen. Das ist jetzt etwas unklar, da dort beliebige Seitenzahlen möglich werden. Vielleicht sollte es eher ohne Schülername/Test vorgefertigte Arbeitshefte zu gewissen Kompetenzbereichen geben. … Insgesamt ist das so zumindest wenig stringent.“
 Ist-Stand: „Ins Arbeitsheft“ im Blatt-Dialog (`heftAdd`) hängt Seiten an das gemerkte Heft an, auch an ein Heft aus dem Heft-Assistenten. Dann stimmen Kapitel, Inhaltsseite und Seitenzahl nicht mehr; für die Broschüre werden Leerseiten bis zur Vierer-Zahl eingefügt.
 Vorschlag:
