@@ -4,7 +4,7 @@ Geplante Entwicklungsaufgaben für Stufenweise. Begonnenes steht in `IN_PROGRESS
 
 Regeln (Stand 17.11.2026): Der Funktionsumfang von `main` ist eingefroren, weil die App an Schulen genutzt wird. Neues entsteht nur im Zweig `entwicklung`, wird in der Testversion gezeigt und erst nach Stefans OK freigegeben (`docs/entwicklung.md`). Didaktische Entscheidungen trifft Stefan.
 
-Stand: 27.11.2026 (0.42.0 freigegeben mit U; T wartet auf Stefans Antworten)
+Stand: 27.11.2026 abends (0.42.0 freigegeben mit U; T: Antworten da, wartet auf OK)
 
 ## Vorgeschlagene Reihenfolge
 
@@ -25,7 +25,7 @@ Stand: 27.11.2026 (0.42.0 freigegeben mit U; T wartet auf Stefans Antworten)
 | 12 | ~~**M** Blätter im Heft-Design~~, dann ~~**L** Lineatur~~ | klein bis mittel | M freigegeben in 0.40.0 (26.11.); L freigegeben in 0.41.0 (27.11.) |
 | 13 | ~~**S** Rückmeldungen Blätter und Hefte~~ | klein bis mittel | freigegeben in 0.41.0 (27.11.2026) |
 | 14 | ~~**U** Arbeitshefte stringenter (U1–U3)~~ | mittel | freigegeben in 0.42.0 (27.11.2026) |
-| 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | Konzept steht, wartet auf Stefans 7 Antworten |
+| 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | Konzept steht, Stefans Antworten da (27.11.); wartet auf sein OK zum Bauen |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -400,7 +400,23 @@ Nebenbei gefunden (26.11., Testlauf): Im Lese-Test L8 „Stundenplan“ steht im
 
 ## T: Basis-Arbeitsblätter didaktisch überarbeiten (Stefan, 26.11.2026)
 
-**Status:** Konzept mit Bildern und 7 Fragen steht (27.11.2026, Claude-Doc „Konzept: Basis-Arbeitsblätter überarbeiten (Backlog T)“, https://claude.ai/artifact/MUbTKabSxyXh9fofA3No2U); wartet auf Stefans Antworten, gebaut wird erst nach OK. Kern: eine Aufgabenart je Blatt (Auswahl „Aufgabe“), eine Bildreihe je Kasten, Beispiel ganz vorgemacht, nichts zum Lesen ankreuzen; neuer Aufbau für V2, V4, V5, V6. Stefan: „Bei den Basis-Arbeitsblättern scheint mir didaktisch noch am meisten der Wurm drin zu sein … Vielleicht müssen wir uns extra nochmal darum kümmern.“
+**Status:** Konzept mit Bildern und 7 Fragen (27.11.2026, Claude-Doc „Konzept: Basis-Arbeitsblätter überarbeiten (Backlog T)“, https://claude.ai/artifact/MUbTKabSxyXh9fofA3No2U); **Stefan hat am 27.11. abends alle Fragen beantwortet** (Tabelle „Stefans Entscheidungen“ im Doc und unten); gebaut wird erst nach seinem ausdrücklichen OK.
+
+**Entscheidungen (Stefan, 27.11.2026, per Auswahl im Chat):**
+1. Eine Art je Blatt für alle zehn Blätter: Auswahl „Aufgabe“ im Blatt-Dialog, leichteste vorausgewählt, keine Mischung.
+2. V2: eine Reihe mit 4 Bildern je Kasten, 2 Kästen nebeneinander.
+3. V4: Gabeln zusammengeschoben unter den Tellern, Beispiel ganz verbunden; „Reicht es?“ = den Teller ohne Gabel einkreisen (es fehlt immer genau eine Gabel), kein ja/nein.
+4. V5: drei Arten „Wo sind mehr?“, „Wo sind weniger?“, „Gleich viele“; „Gleich viele“ = drei Kästen, die zwei mit gleich vielen (anders verteilt) einkreisen.
+5. V6 „Ordnen“: **ausschneiden und aufkleben** (nicht mit der Treppe verbinden); die Dinge zum Ausschneiden auf einer **eigenen Bastelseite hinter dem Blatt**.
+6. Die Art steht im Titel („Der Größe nach ordnen: Das größte“), keine graue Zeile.
+7. Heft-Assistent: eine Art je Seite; Einstieg = leichteste Art, Übungsseiten der Reihe nach (V1–V3 innerhalb der Art deutlich → ähnlich → fein), bei wenigen Seiten die leichteren zuerst; „Das kann ich schon“ und Wiederholung = schwerste geübte Art.
+8. Beispiel: die erste Aufgabe ist ganz vorgemacht (ersetzt die Regel vom 19.11. „nur erster Schritt“).
+9. O2 Form, O3 Richtung, V3 „Nach Art“ (Gruppe): eine je Blatt, zufällig, groß oben; keine weitere Auswahl.
+10. Arten und Reihenfolge wie in der App (`AXES.V.arts`/`AXES.O.arts`): V1 einkreisen vor verbinden; V3 erst Farbe bei gleichen Dingen, „verschiedene Dinge“ als eigene, spätere Art.
+
+Geplante Arten je Blatt (leicht → schwer): V1 Gleiches Bild einkreisen · Gleiches Bild verbinden · Gleiche Farbe einkreisen · Gleiche Farbe verbinden; V2 Ganz anders · Andere Farbe · Andere Größe · Gehört nicht dazu; V3 Nach Farbe · Nach Größe · Nach Art · Farbe, verschiedene Dinge; V4 Jedem eins · Reicht es?; V5 Wo sind mehr? · Wo sind weniger? · Gleich viele; V6 Das größte · Das kleinste · Ordnen; V7 Was kommt dann? · Längere Muster · Weitermalen; O2 Form finden · Quadrat oder Rechteck; O3 Alle Pfeile nach … · Gleiches Zeichen; O4 Von links nach rechts · Was kommt zuerst?. „Ähnlichkeit“ nur bei Arten, die sie nutzen.
+
+Beim Prüfen im Code gefunden (wird mit T erledigt): V2 „Andere Farbe/Größe“ wechselt heute zufällig innerhalb einer Art; V3 „Nach Art“, O2 und O3 wechseln Gruppe, Form bzw. Richtung von Aufgabe zu Aufgabe; „Andere Größe“ (V2) und „Gleiches Bild einkreisen“ (V1) gibt es auf Papier noch nicht. Doppelte-Aufgaben-Prüfung (`KT` vergleicht nur Text) erkennt bei Bildaufgaben nichts – mit einer Art je Blatt muss sie den Bildinhalt vergleichen, sonst bleiben Blätter halb leer. Kern: eine Aufgabenart je Blatt (Auswahl „Aufgabe“), eine Bildreihe je Kasten, Beispiel ganz vorgemacht, nichts zum Lesen ankreuzen; neuer Aufbau für V2, V4, V5, V6. Stefan: „Bei den Basis-Arbeitsblättern scheint mir didaktisch noch am meisten der Wurm drin zu sein … Vielleicht müssen wir uns extra nochmal darum kümmern.“
 Rückmeldungen:
 - **T1 V2 Was passt nicht?** Lieber nur eine Bildreihe je eingerahmter Aufgabe (heute zwei Reihen in einem Kasten).
 - **T2 V4 Eins zu eins zuordnen:** Das Beispiel verbindet quer (erster Teller mit dritter Gabel); der Sinn fehlt. Gabeln stehen schon unter den Tellern.
