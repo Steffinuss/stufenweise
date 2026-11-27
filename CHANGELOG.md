@@ -5,6 +5,8 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+- **Seitenliste im Heft-Assistenten ausblendbar** (Stefan 27.11.2026, 17:54: „Detailauswahl im Heftassistenten ausblendbar machen und standardmäßig ausgeblendet“; danach „Ja, so bauen“): Die Liste der Kapitel und Seiten mit „Austauschen“ steht jetzt in der aufklappbaren Zeile „Seiten im Heft (n) – zum Austauschen aufklappen“ (`details.hf-pages`), anfangs zu. Auf/zu gilt, solange der Dialog offen ist (`app.heftListOpen`, z. B. nach einem Austausch); beim nächsten Öffnen (`openSheets`, `openHeftZone`) ist sie wieder zu. Test: `heft_stringent.py`.
+
 ## 0.42.0 – 27.11.2026
 
 Freigegeben von Stefan am 27.11.2026 nach Durchsicht der Testversion („Kannst du alles freigeben ist jetzt super“), auch der Broschüre-Fix auf dem iPad. Anleitungsbilder neu aufgenommen.

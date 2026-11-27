@@ -776,7 +776,7 @@ button.brand{background:none;box-shadow:none;border:0;padding:4px 0 2px;min-heig
 #sheet-body{display:grid;grid-template-columns:320px 1fr;gap:14px;flex:1;min-height:0}
 .sh-mode{display:flex}.sh-mode button{flex:1 1 auto;min-width:0;padding:6px;font-size:14px;line-height:1.2}.sh-mode button small{font-size:12px}.hf-zone{display:flex;flex-direction:column;gap:6px;background:#fff;border:1.5px solid var(--line);border-left:5px solid #27834b;border-radius:12px;padding:10px 12px}
 .hf-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:14px}.hf-list li{display:flex;align-items:center;gap:4px}.hf-list li span{flex:1;min-width:0}.hf-list .icon-btn{min-height:34px;min-width:34px;padding:2px 6px}
-.hf-list li.hf-ch{list-style:none;margin:6px 0 0 -22px;font-weight:700}.hf-list li.hf-swap{list-style:none;flex-wrap:wrap;gap:6px;background:#f6f2ea;border-radius:10px;padding:6px 8px}.hf-list li.hf-swap span{flex:1 1 100%}.hf-swapbar{border-left-color:#e8890c}.hf-seg button{flex:1;min-width:0;padding-left:6px;padding-right:6px}
+.hf-list li.hf-ch{list-style:none;margin:6px 0 0 -22px;font-weight:700}.hf-pages{margin:8px 0}.hf-pages>summary{cursor:pointer;font-weight:700;padding:8px 0;min-height:44px}.hf-list li.hf-swap{list-style:none;flex-wrap:wrap;gap:6px;background:#f6f2ea;border-radius:10px;padding:6px 8px}.hf-list li.hf-swap span{flex:1 1 100%}.hf-swapbar{border-left-color:#e8890c}.hf-seg button{flex:1;min-width:0;padding-left:6px;padding-right:6px}
 .hf-plan{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:14px}.hf-plan li{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.hf-plan li label{flex:1;min-width:180px;display:flex;align-items:center;gap:6px}.hf-plan li.hf-off label span{color:var(--muted)}
 .hf-plan .icon-btn{min-height:34px;min-width:34px;padding:2px 6px}.hf-tag{font-size:12px;border-radius:10px;padding:2px 8px;background:var(--soft)}.hf-tag.z{background:#e3f1e8;color:#1f6b3d;font-weight:700}.hf-n{font-size:13px;min-width:70px;text-align:right}
 .sh-nav{display:flex;flex-direction:column;gap:6px}.sh-lab{font-size:12px;font-weight:700;color:var(--muted);margin-top:4px}
@@ -10573,6 +10573,7 @@ function sheetFit0(fr, show){
   G.checking = 1; G.limit = fit; app.sheetDoc = buildSheet(fit); show();
 }
 function openSheets(pid, zoneKey, lege){
+  app.heftListOpen = false;
   const S = app.sheet;
   S.pid = pid ?? (data.current || 'none');
   if(!sheetTopics().some(([, o]) => o.some(x => x[0] === S.topic))) S.topic = 'M:plus'; /* gemerktes Thema gibt es nicht (mehr) */
@@ -11070,7 +11071,7 @@ function heftAssistHtml(kid){
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><label class="row cb"><input type="checkbox" id="hf-gross" ${H.gross ? 'checked' : ''}> Große Aufgaben (mehr Platz zum Schreiben und Streichen)</label><label class="row cb"><input type="checkbox" id="hf-bw" ${H.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>${P.helpAvail.map(k => `<label class="row cb"><input type="checkbox" id="hf-${k}" ${HEFT_HELP[k].on(H) ? 'checked' : ''}> Hinten im Heft: ${HEFT_HELP[k].label}</label>`).join('')}</div>
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-zone" ${P.chapters.some(c => c.pages) ? '' : 'disabled'}>${icon('target')}<span style="display:inline">${H.items.length ? 'Heft neu erstellen' : 'Heft erstellen'} (${P.N} Seiten)</span></button></div>${H.items.length ? `<span class="note">Ersetzt die ${H.items.length} vorhandenen Seiten.</span>` : ''}</div>`;
 }
-function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.heft.weg = 'kind'; app.heftSwap = null; app.sheet.pid = pid; $('#dlg-sheet').showModal(); sheetScrollTop = true; renderSheets(); }
+function openHeftZone(pid){ app.sheetMode = 'heft'; app.heft.pid = pid; app.heft.weg = 'kind'; app.heftSwap = null; app.heftListOpen = false; app.sheet.pid = pid; $('#dlg-sheet').showModal(); sheetScrollTop = true; renderSheets(); }
 /* Übungsseite austauschen (Backlog U3, Stefan 27.11.2026) */
 async function heftSwapNew(i){
   const H = app.heft, it = H.items[i]; if(!it || it.kind !== 'ueben') return;
@@ -11121,8 +11122,8 @@ function renderHeft(){
     <div class="seg hf-seg sh-weg" role="group" aria-label="Heft für"><button data-hfweg="kind" aria-pressed="${weg === 'kind'}">Für ein Kind</button><button data-hfweg="bereich" aria-pressed="${weg === 'bereich'}">Für einen Bereich</button></div>
     ${weg === 'bereich' ? heftAssistHtml(null) : !kids().length ? `<p class="note">Noch keine Kinder angelegt. Mit „Für einen Bereich“ geht es ohne Kind und ohne Test.</p>`
       : `<label class="row">Kind <select id="hf-kid">${[['none', 'bitte wählen'], ...kids().map(p => [p.id, escHtml(p.name)])].map(([v, n]) => `<option value="${v}" ${v === (kid ? kid.id : 'none') ? 'selected' : ''}>${n}</option>`).join('')}</select></label>${kid ? heftAssistHtml(kid) : `<p class="note">Wähle ein Kind – dann stellt Stufenweise das Heft passend zu seiner Förderzone zusammen.</p>`}`}
-    ${H.items.length ? `<ol class="hf-list">${H.items.map((it, i) => `${it.ch !== undefined && H.chapters?.[it.ch] && H.items.findIndex(x => x.ch === it.ch) === i ? `<li class="hf-ch">Kapitel ${it.ch + 1}: ${escHtml(H.chapters[it.ch].title)}</li>` : ''}<li value="${i + first}"><span>${escHtml(it.title)}</span>${it.kind === 'ueben' ? `<button class="icon-btn" data-hf-swap="${i}" aria-expanded="${app.heftSwapMenu === i}">${icon('random')}<span style="display:inline">Austauschen</span></button>` : ''}</li>${app.heftSwapMenu === i ? swapRow(i) : ''}`).join('')}</ol>
-      <p class="note">Übungsseiten lassen sich austauschen: neue Aufgaben oder ein anderes Blatt an dieselbe Stelle. Die Seitenzahl bleibt.</p>` : ''}
+    ${H.items.length ? `<details class="hf-pages" ${app.heftListOpen ? 'open' : ''}><summary>Seiten im Heft (${H.items.length}) – zum Austauschen aufklappen</summary><ol class="hf-list">${H.items.map((it, i) => `${it.ch !== undefined && H.chapters?.[it.ch] && H.items.findIndex(x => x.ch === it.ch) === i ? `<li class="hf-ch">Kapitel ${it.ch + 1}: ${escHtml(H.chapters[it.ch].title)}</li>` : ''}<li value="${i + first}"><span>${escHtml(it.title)}</span>${it.kind === 'ueben' ? `<button class="icon-btn" data-hf-swap="${i}" aria-expanded="${app.heftSwapMenu === i}">${icon('random')}<span style="display:inline">Austauschen</span></button>` : ''}</li>${app.heftSwapMenu === i ? swapRow(i) : ''}`).join('')}</ol>
+      <p class="note">Übungsseiten lassen sich austauschen: neue Aufgaben oder ein anderes Blatt an dieselbe Stelle. Die Seitenzahl bleibt.</p></details>` : ''}
     <label class="row">Drucken als <select id="hf-druck">${Object.entries(HEFT_DRUCK).map(([k, d]) => `<option value="${k}" ${k === (H.druck || 'a4') ? 'selected' : ''}>${d.name}</option>`).join('')}</select></label>
     ${H.druck && H.druck !== 'a4' && H.items.length ? `<p class="note hf-bk-note"><b>Als Heft drucken:</b> beidseitig, an der kurzen Kante wenden${H.druck === 'a3' ? ', Papier A3' : ', Papier A4'}. Dann die Bögen zusammen in der Mitte falten und heften. ${(() => { const n = heftTotal(H), b = Math.ceil(n/4); return `${b} ${b === 1 ? 'Bogen' : 'Bögen'}${n % 4 ? `, ${4 - n % 4} Seite${4 - n % 4 === 1 ? '' : 'n'} bleib${4 - n % 4 === 1 ? 't' : 'en'} leer` : ''}.`; })()}</p>` : ''}
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
@@ -11185,6 +11186,7 @@ function sheetEvents(e){
   const S = app.sheet, H = app.heft;
   const md = e.target.closest('[data-shmode]'); if(md){ app.sheetMode = md.dataset.shmode; app.heftSwap = null; app.heftSwapMenu = null; return renderSheets(true); }
   if(e.target.closest('#sh-samml')) return sammlAdd();
+  const hp = e.target.closest('.hf-pages > summary'); if(hp){ app.heftListOpen = !hp.parentElement.open; return; }   /* Seitenliste im Heft: anfangs zu (Stefan 27.11.2026), auf/zu gilt, solange der Dialog offen ist */
   /* Blattsammlung (U2) */
   const smu = e.target.closest('[data-sm-up]'), smd = e.target.closest('[data-sm-down]'), smx = e.target.closest('[data-sm-del]'), L = app.samml.items;
   if(smu || smd){ const i = +(smu || smd).dataset[smu ? 'smUp' : 'smDown'], j = smu ? i - 1 : i + 1; [L[i], L[j]] = [L[j], L[i]]; saveSamml(); return renderSamml(); }

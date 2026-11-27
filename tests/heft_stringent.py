@@ -128,6 +128,10 @@ async def main():
         await pg.evaluate("Object.assign(app.heft, {bfach:'M', ber:'M|20', von:'M|20|I', bis:'M|20|II', pages:12, off:{}, adj:{}}); renderHeft()"); await pg.wait_for_timeout(300)
         await pg.click('#hf-zone'); await pg.wait_for_function("app.heft.book && app.heft.book.fach === 'M' && !document.querySelector('#hf-zone')?.disabled", timeout=120000); await pg.wait_for_timeout(500)
         check('Heft: kein ↑ ↓ ✕ mehr', await pg.locator('[data-hf-up],[data-hf-down],[data-hf-del]').count() == 0)
+        # Stefan 27.11. 17:54: Seitenliste ausblendbar, anfangs zu
+        check('Seitenliste anfangs zu', await pg.evaluate("!document.querySelector('.hf-pages').open") and not await pg.locator('[data-hf-swap]').first.is_visible())
+        await pg.click('.hf-pages > summary'); await pg.wait_for_timeout(300)
+        check('Seitenliste aufklappbar', await pg.evaluate("document.querySelector('.hf-pages').open"))
         info = await pg.evaluate("({n: app.heft.items.length, u: app.heft.items.map((it, i) => it.kind === 'ueben' ? i : -1).filter(i => i >= 0), b: document.querySelectorAll('[data-hf-swap]').length})")
         check('Austauschen nur bei Übungsseiten', info['b'] == len(info['u']) and info['b'] > 0, info)
         i = info['u'][0]
@@ -151,6 +155,9 @@ async def main():
         nh = it['html'].count('class="ab-task')
         check('Dieselben Aufgaben wie in der Vorschau, mit Lösungen', nh == nt and len(it['sol']) == nt, f"{nh} / {nt} / {len(it['sol'])}")
         check('Seitenzahl bleibt', await pg.evaluate("app.heft.items.length") == info['n'])
+        check('Seitenliste bleibt nach dem Austausch offen', await pg.evaluate("document.querySelector('.hf-pages')?.open === true"))
+        await pg.evaluate("openSheets('none'); app.sheetMode = 'heft'; renderSheets()"); await pg.wait_for_timeout(400)
+        check('Beim nächsten Öffnen wieder zu', await pg.evaluate("document.querySelector('.hf-pages')?.open === false"))
         html = await pg.evaluate("buildHeft().html")
         check('Ausgetauschte Seite mit Heft-Rahmen', html.count('class="hf-foot"') >= info['n'] - 2)
         check('Ausgetauschte Seite ohne Namenszeile', 'Name:' not in html)
