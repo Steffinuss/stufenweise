@@ -404,3 +404,13 @@ Rückmeldungen:
 - **T3 V5 Mehr, weniger, gleich viel:** nicht alle drei auf einem Blatt – Kinder, die nicht lesen, schaffen den Wechsel nicht, und man sitzt nicht ständig daneben.
 - **T4 V6 Der Größe nach ordnen:** unklar, wie das Kind es machen soll.
 Vorschlag: eigenes Konzept-Dokument „Basis-Arbeitsblätter“ wie bei den Arbeitsheften – je Blatt V1–V8, O2–O4: Ziel, was das Kind tut (ohne Lesen), Aufbau, Beispiel, Varianten; dazu Bild-Vorschläge zum Ansehen. Grundsätze aus Stefans Entscheidungen zum Basis-Test (nicht mischen, vor jeder neuen Art unübersehbar vormachen, eine Art je Blatt bzw. Kasten).
+
+## U: Arbeitshefte stringenter – einzelne Blätter vs. fertige Hefte (Stefan, 27.11.2026)
+
+**Status:** dokumentiert, Vorschläge an Stefan, gebaut wird erst nach OK.
+Stefan: „Wir haben ja immer noch die Möglichkeit, einzelne Arbeitsblätter in ein Arbeitsheft aufzunehmen. Das ist jetzt etwas unklar, da dort beliebige Seitenzahlen möglich werden. Vielleicht sollte es eher ohne Schülername/Test vorgefertigte Arbeitshefte zu gewissen Kompetenzbereichen geben. … Insgesamt ist das so zumindest wenig stringent.“
+Ist-Stand: „Ins Arbeitsheft“ im Blatt-Dialog (`heftAdd`) hängt Seiten an das gemerkte Heft an, auch an ein Heft aus dem Heft-Assistenten. Dann stimmen Kapitel, Inhaltsseite und Seitenzahl nicht mehr; für die Broschüre werden Leerseiten bis zur Vierer-Zahl eingefügt.
+Vorschlag:
+- **U1 Hefte nur noch über den Assistenten**, mit zwei Wegen: „für ein Kind“ (wie heute, Förderzone) und **„für einen Bereich“** ohne Kind und Test: Bereich und Stufen wählen (z. B. Mathe „Zahlen bis 20“ Stufe I–III, Deutsch L4–L6), Umfang 12/24/36/48, Namenszeile auf dem Deckblatt leer. Gleicher Kapitelaufbau (Einstieg, Üben, „Das kann ich schon“), gleiche Optionen (groß, Lineatur, Schwarz-Weiß, Druck).
+- **U2 „Ins Arbeitsheft“ wird „Zur Blattsammlung“:** beliebig viele lose Blätter sammeln und zusammen drucken (A4 einseitig, mit Lösungen), ohne Deckblatt, Kapitel und Broschüre. Kein Mischen mit Heften mehr.
+- **U3 Seite im Heft austauschen** statt anhängen: im Assistenten bei einem Kapitel „andere Aufgaben“ oder ein Blatt aus dem Generator an die Stelle einer Übungsseite setzen; Seitenzahl bleibt.
