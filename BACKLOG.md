@@ -26,6 +26,7 @@ Stand: 28.11.2026 (0.43.0 freigegeben mit T und aufklappbarer Seitenliste)
 | 13 | ~~**S** Rückmeldungen Blätter und Hefte~~ | klein bis mittel | freigegeben in 0.41.0 (27.11.2026) |
 | 14 | ~~**U** Arbeitshefte stringenter (U1–U3)~~ | mittel | freigegeben in 0.42.0 (27.11.2026) |
 | 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | **erledigt** in 0.43.0 (28.11.2026) |
+| 16 | **V** Drucken auf iPad und iPhone | klein | Stefan 28.11.: am iPad/iPhone fällt das Drucken aus; Entscheidungen da, wartet auf OK |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -439,3 +440,18 @@ Vorschlag:
 - **U1 Hefte nur noch über den Assistenten**, mit zwei Wegen: „für ein Kind“ (wie heute, Förderzone) und **„für einen Bereich“** ohne Kind und Test: Bereich und Stufen wählen (z. B. Mathe „Zahlen bis 20“ Stufe I–III, Deutsch L4–L6), Umfang 12/24/36/48, Namenszeile auf dem Deckblatt leer. Gleicher Kapitelaufbau (Einstieg, Üben, „Das kann ich schon“), gleiche Optionen (groß, Lineatur, Schwarz-Weiß, Druck).
 - **U2 „Ins Arbeitsheft“ wird „Zur Blattsammlung“:** beliebig viele lose Blätter sammeln und zusammen drucken (A4 einseitig, mit Lösungen), ohne Deckblatt, Kapitel und Broschüre. Kein Mischen mit Heften mehr.
 - **U3 Seite im Heft austauschen** statt anhängen: im Assistenten bei einem Kapitel „andere Aufgaben“ oder ein Blatt aus dem Generator an die Stelle einer Übungsseite setzen; Seitenzahl bleibt.
+
+## V: Drucken auf iPad und iPhone (Stefan, 28.11.2026, mit Bildschirmfoto)
+
+Beobachtung (Stefan, 08:50): Am Computer mit Chrome druckt alles sauber. Auf iPad und iPhone:
+- **Home-Bildschirm-App:** „Drucken“ tut nichts. iOS öffnet aus Web-Apps im Vollbild keinen Druckdialog; `print()` wirft keinen Fehler, deshalb kommt auch der Hinweis „Drucken geht hier nicht direkt“ nicht.
+- **Safari:** erst die Meldung „Diese Website wurde für das automatische Drucken gesperrt“ (Ignorieren/Erlauben). Nach „Erlauben“ geht es, je Adresse (stufenweise.app und test.stufenweise.app getrennt).
+- **Kopf- und Fußzeile:** Safari druckt sie auf iPad/iPhone immer; unsere Seiten sind genau A4 ohne Rand (`@page{margin:0}`), deshalb rutscht Inhalt auf eine zweite Seite. Bisher nur ein Satz in der Heft-Notiz.
+
+**Entscheidungen (Stefan, 28.11.2026, per Auswahl):**
+1. **Hinweis:** Kasten direkt am Druck-Knopf, **nur auf iPad/iPhone** (Erkennung wie `safariTab()`): in Safari beim ersten Mal „Erlauben“ tippen; Kopf- und Fußzeile lassen sich nicht abschalten → im Druckdialog die Skalierung verkleinern, bis jede Seite auf ein Blatt passt; das sauberste Ergebnis gibt es am Computer. Am Computer kein Kasten.
+2. **Keine automatische Verkleinerung** auf iOS – nur informieren (Seiten bleiben genau A4).
+3. **Home-Bildschirm-App:** Der Knopf heißt dort **„Teilen und drucken“** und gibt das Dokument als Datei an das Teilen-Menü von iOS (`navigator.share` mit Datei); dort „Drucken“ wählen. Gilt für Einzelblatt, Blattsammlung, Heft, Lösungsheft und Berichte. Klappt das Teilen nicht, Hinweis auf „Als Datei speichern“ → in „Dateien“ öffnen → Teilen → Drucken. Muss am iPad in der Testversion (als App vom Home-Bildschirm) erprobt werden.
+
+**Status:** Entscheidungen da; gebaut wird erst nach Stefans ausdrücklichem OK, dann in `entwicklung`.
+
