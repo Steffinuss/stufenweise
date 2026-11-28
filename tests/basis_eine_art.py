@@ -3,7 +3,8 @@
   ganzen Blatt nur ein Auftragssatz, nichts zum Lesen ankreuzen (kein „ja/nein“, kein „gleich viele“ zum Ankreuzen),
   die Art steht im Titel, die erste Aufgabe ist ganz vorgemacht (und nur sie).
 - Alles passt auf die Seite, auch mit großen Aufgaben und in Schwarz-Weiß.
-- V6 „Ordnen“: Bastelseite mit leerer Rückseite (Blatt, leer, Bastelseite, leer); Schneideteile so groß wie die Felder der Treppe.
+- V6 „Ordnen“: Bastelseite mit leerer Rückseite (Blatt, leer, Bastelseite, leer); Schneideteile so groß wie die Felder der Treppe,
+  jedes mit eigener Schnittlinie, Schere und Aufgabennummer (Stefan, 28.11.).
 - „Ähnlichkeit“ nur bei Arten, die sie nutzen; die gewählte Art wird je Blatt gemerkt.
 - Heft-Assistent: eine Art je Seite (Einstieg leichteste, „Das kann ich schon“ schwerste geübte); Bastelseite in der Broschüre
   auf einer rechten Seite mit leerer Rückseite; A4 ohne Leerseiten; Austauschen nimmt die Bastelseite mit.
@@ -33,7 +34,7 @@ INFO = """() => { const ps = [...document.querySelectorAll('.page')], main = ps[
   return {pages: ps.map(p => p.className.replace(/^page\\s*/, '') || 'page'), tasks: tasks.length, texts: [...texts], marked,
     yesno: /\\bja\\b|\\bnein\\b|bb-cb|☐/.test(main.innerHTML.replace(/<svg[^]*?<\\/svg>/g, '')),
     over: ps.filter(p => p.dataset.over).length, leerEmpty: ps.filter(p => p.classList.contains('leer')).every(p => !p.textContent.trim() && !p.querySelector('svg,img')),
-    cutRows: document.querySelectorAll('.page.bastel .bb-cutrow').length, slot: sz('.bb-slot'), cut: sz('.bb-cut'), ziel: !!main.querySelector('.bb-ziel')}; }"""
+    cutRows: document.querySelectorAll('.page.bastel .bb-cutrow').length, cutOk: [...document.querySelectorAll('.page.bastel .bb-cut')].every(c => c.querySelector('svg.bb-sc') && c.querySelector('.bb-cutno')?.textContent === c.closest('.bb-cutrow').dataset.nr && c.getBoundingClientRect().width > 20), slot: sz('.bb-slot'), cut: sz('.bb-cut'), ziel: !!main.querySelector('.bb-ziel')}; }"""
 
 async def main():
     async with async_playwright() as p:
@@ -66,7 +67,7 @@ async def main():
                     if i['tasks'] < 2: bad.append(f'{tag}: nur {i["tasks"]} Aufgaben')
                     want = ['hf-p'] + (['leer', 'hf-p bastel', 'leer'] if bastel else []) + ['hf-p sol']
                     if i['pages'] != want: bad.append(f'{tag}: Seiten {i["pages"]}')
-                    if bastel and (i['cutRows'] != i['tasks'] - 1 or not i['leerEmpty'] or abs((i['slot'] or 0) - (i['cut'] or 0)) > .3):
+                    if bastel and (not i['cutOk'] or i['cutRows'] != i['tasks'] - 1 or not i['leerEmpty'] or abs((i['slot'] or 0) - (i['cut'] or 0)) > .3):
                         bad.append(f'{tag}: Bastelseite {i["cutRows"]} Reihen bei {i["tasks"]} Aufgaben, leer {i["leerEmpty"]}, Feld {i["slot"]} mm, Teil {i["cut"]} mm')
                     if i['over'] or pp != len(i['pages']): badfit.append(f'{tag}: PDF {pp} Seiten, {len(i["pages"])} erwartet, über {i["over"]}')
         check(f'{n} Blätter: eine Art, ein Auftrag, Titel, ganz vorgemacht, kein ja/nein', not bad, '; '.join(bad[:6]))
