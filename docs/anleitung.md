@@ -311,6 +311,14 @@ Jedes Mal entstehen neue Aufgaben. Jedes Blatt trägt unten den Hinweis „Stufe
 
 Alle Materialbilder auf einem Blatt haben dieselbe Größe, Hunderter liegen in Fünferreihen. Neu ist das Thema **Zahlen mit Material zeichnen**: Die Kinder zeichnen Zahlen in der Kurzschreibweise □ Hunderter, | Zehner, • Einer und lesen gezeichnete Zahlen ab. Wählst du eine Förderzone aus dem Rechnen, passt das Blatt genau dazu, zum Beispiel „Plus bis 20, mit Zehnerübergang“ für R3.
 
+### Drucken auf iPad und iPhone
+
+Am Computer (zum Beispiel mit Chrome) drucken Blätter, Blattsammlung und Hefte am saubersten. Auf iPad und iPhone steht unter den Druck-Knöpfen ein Hinweiskasten:
+
+- **In Safari** meldet Safari beim ersten Drucken „Diese Website wurde für das automatische Drucken gesperrt“. Dann auf **Erlauben** tippen.
+- **Kopf- und Fußzeile:** Safari druckt oben und unten immer Datum und Adresse; auf iPad und iPhone lässt sich das nicht abschalten. Rutscht dadurch eine Seite auf zwei Blätter, im Druckdialog die Skalierung verkleinern (etwa 90 %). Legeblätter für echtes Material nicht verkleinern, sondern am Computer drucken.
+- **Als App vom Home-Bildschirm** kann Stufenweise den Druckdialog nicht selbst öffnen. Deshalb heißen die Knöpfe dort **Teilen und drucken**: Das Blatt oder Heft geht als Datei an das Teilen-Menü, dort auf **Drucken** tippen. Fehlt „Drucken“, „Als Datei speichern“ wählen, die Datei in „Dateien“ öffnen und dort Teilen → Drucken.
+
 ### Basis: Grundlagen vor dem Zählen
 
 **Üben in der App:** Oben in der Fachwahl steht **Basis** an erster Stelle, vor Mathe und Deutsch. Links wählst du die Stufe: unter „Vergleichen“ Gleiches, passt nicht, Sortieren, Zuordnen, Mengen, Größe, Muster, Blick; unter „Orientieren“ Formen, Richtung, Reihe.

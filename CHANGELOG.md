@@ -5,6 +5,7 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+- **Drucken auf iPad und iPhone** (Backlog V, Stefan 28.11.2026, Entscheidungen per Auswahl, danach „Ja, so bauen“): Nur auf iPad/iPhone steht unter den Druck-Knöpfen (Einzelblatt, Blattsammlung, Heft, Bericht) ein Hinweiskasten (`printHint`, `.note.print-ios`): in Safari beim ersten Mal „Erlauben“, Kopf- und Fußzeile lassen sich nicht abschalten → im Druckdialog die Skalierung verkleinern, Legeblätter nicht, am saubersten am Computer. Keine automatische Verkleinerung (Stefans Wahl). In der **App vom Home-Bildschirm** heißen die Knöpfe „Teilen und drucken“ (`prLabel`) und geben das Dokument als HTML-Datei ans Teilen-Menü (`shareDoc`, `navigator.share`); geht Teilen nicht, Hinweis auf „Als Datei speichern“. Erkennung `iosDevice`/`iosApp` (für Tests `window.STUFENWEISE_IOS`). Der Satz „Auf dem iPad lässt sich die Fußzeile nicht abschalten …“ in den Notizen entfällt (steht jetzt im Kasten). Anleitung: Abschnitt „Drucken auf iPad und iPhone“. Test `drucken_ios.py`.
 ## 0.43.0 – 28.11.2026
 
 Freigegeben von Stefan am 28.11.2026 nach Durchsicht der Testversion („Super gib alles frei“): Basis-Arbeitsblätter mit einer Aufgabenart je Blatt (Backlog T) und aufklappbare Seitenliste im Heft-Assistenten. Anleitung ergänzt (Basis-Blätter: Aufgabe, Bastelseite; Basis im Arbeitsheft), Anleitungsbilder neu aufgenommen.

@@ -26,7 +26,7 @@ Stand: 28.11.2026 (0.43.0 freigegeben mit T und aufklappbarer Seitenliste)
 | 13 | ~~**S** Rückmeldungen Blätter und Hefte~~ | klein bis mittel | freigegeben in 0.41.0 (27.11.2026) |
 | 14 | ~~**U** Arbeitshefte stringenter (U1–U3)~~ | mittel | freigegeben in 0.42.0 (27.11.2026) |
 | 15 | **T** Basis-Arbeitsblätter überarbeiten | mittel | **erledigt** in 0.43.0 (28.11.2026) |
-| 16 | **V** Drucken auf iPad und iPhone | klein | Stefan 28.11.: am iPad/iPhone fällt das Drucken aus; Entscheidungen da, wartet auf OK |
+| 16 | **V** Drucken auf iPad und iPhone | klein | Stefan 28.11.: gebaut in `entwicklung` nach OK, in der Testversion; am iPad prüfen |
 
 Alternative: B zuerst als schneller Gewinn, während Stefan den Basis-Test ausprobiert.
 
@@ -453,5 +453,5 @@ Beobachtung (Stefan, 08:50): Am Computer mit Chrome druckt alles sauber. Auf iPa
 2. **Keine automatische Verkleinerung** auf iOS – nur informieren (Seiten bleiben genau A4).
 3. **Home-Bildschirm-App:** Der Knopf heißt dort **„Teilen und drucken“** und gibt das Dokument als Datei an das Teilen-Menü von iOS (`navigator.share` mit Datei); dort „Drucken“ wählen. Gilt für Einzelblatt, Blattsammlung, Heft, Lösungsheft und Berichte. Klappt das Teilen nicht, Hinweis auf „Als Datei speichern“ → in „Dateien“ öffnen → Teilen → Drucken. Muss am iPad in der Testversion (als App vom Home-Bildschirm) erprobt werden.
 
-**Status:** Entscheidungen da; gebaut wird erst nach Stefans ausdrücklichem OK, dann in `entwicklung`.
+**Status:** Stefan 28.11. „Ja, so bauen“ → gebaut in `entwicklung` (Test `drucken_ios.py`), in der Testversion. Wartet auf Stefans Prüfung am iPad (Safari und App vom Home-Bildschirm), besonders ob im Teilen-Menü „Drucken“ erscheint.
 

@@ -190,7 +190,7 @@ legend{font-weight:700;padding:0;float:left;margin-bottom:2px;font-size:17px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px}
 .row.cb{justify-content:flex-start}
 .row input[type=checkbox]{width:22px;height:22px;flex:none;margin:0;accent-color:var(--dark)}
-.note{font-size:14px;color:var(--muted);margin:-4px 0 0;line-height:1.4}
+.note{font-size:14px;color:var(--muted);margin:-4px 0 0;line-height:1.4}.note.print-ios{margin:10px 0 0;padding:10px 12px;border-left:4px solid var(--accent,#3a6ea5);background:rgba(58,110,165,.08);border-radius:6px;color:inherit}
 .help-step{display:flex;gap:14px;margin:14px 0}
 .help-step svg{flex:none;width:30px;height:30px;color:var(--ink)}
 .help-step h3{font-size:18px;margin:0 0 3px}
@@ -3739,6 +3739,26 @@ function backupStateUpdate(){ const sn = document.getElementById('safari-note-se
    iOS/iPadOS (false = Tab, true = Home-Bildschirm); iPadOS meldet sich oft als „Macintosh“ mit Touch. */
 function safariTab(){ try { const ua = navigator.userAgent || '', ios = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   return ios && navigator.standalone === false && !matchMedia('(display-mode: standalone)').matches; } catch { return false; } }
+/* Drucken auf iPad/iPhone (Backlog V, Stefan 28.11.2026): Safari druckt Kopf- und Fußzeile immer und fragt beim ersten Mal nach;
+   die App vom Home-Bildschirm öffnet gar keinen Druckdialog – dort gibt der Knopf das Dokument ans Teilen-Menü („Teilen und drucken“).
+   Für Tests: window.STUFENWEISE_IOS = 'safari' | 'app'. */
+function iosDevice(){ try { if(window.STUFENWEISE_IOS) return true; const ua = navigator.userAgent || ''; return /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1); } catch { return false; } }
+function iosApp(){ try { if(window.STUFENWEISE_IOS) return window.STUFENWEISE_IOS === 'app'; return iosDevice() && (navigator.standalone === true || matchMedia('(display-mode: standalone)').matches); } catch { return false; } }
+function prLabel(t){ return `<span style="display:inline">${iosApp() ? (t === 'Drucken' ? 'Teilen und drucken' : t.replace(/ drucken$/, ' teilen und drucken')) : t}</span>`; }
+function printHint(){
+  if(!iosDevice()) return '';
+  const fit = 'Safari druckt oben und unten immer eine Kopf- und Fußzeile (Datum, Adresse); sie lässt sich auf iPad und iPhone nicht abschalten. Rutscht dadurch eine Seite auf zwei Blätter, im Druckdialog die Skalierung verkleinern (etwa 90 %). Legeblätter für echtes Material dabei nicht verkleinern.';
+  return `<div class="note print-ios"><b>Drucken auf iPad und iPhone:</b> ${iosApp() ? 'Die App vom Home-Bildschirm kann den Druckdialog nicht direkt öffnen. Tippe auf „Teilen und drucken“ und im Teilen-Menü auf „Drucken“. Fehlt dort „Drucken“: „Als Datei speichern“, die Datei in „Dateien“ öffnen, dann Teilen → Drucken. ' : 'Beim ersten Drucken meldet Safari „Diese Website wurde für das automatische Drucken gesperrt“ – dann auf „Erlauben“ tippen. '}${fit} Am saubersten druckt ein Computer (zum Beispiel mit Chrome).</div>`;
+}
+async function shareDoc(name, html){
+  const fn = name.replace(/[\\/:*?"<>|]/g, '') + '.html';
+  try {
+    const file = new File([html], fn, {type:'text/html'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:name}); return true; }
+  } catch(err){ if(err?.name === 'AbortError') return true; }
+  toast('Teilen geht hier nicht – bitte „Als Datei speichern“, die Datei in „Dateien“ öffnen und dort Teilen → Drucken.');
+  return false;
+}
 function safariNoteHtml(home){
   if(!safariTab()) return '';
   const move = data.profiles.length ? ' Die App vom Home-Bildschirm hat einen eigenen Speicher. So ziehen die Kinder mit um: hier unter Einstellungen → Daten sichern „Sicherung speichern“, in der App „Sicherung laden“.' : '';
@@ -10673,7 +10693,7 @@ function renderSamml(){
   sheetBodySet(`<div class="sheet-form">${sheetModeSwitch()}
     ${L.length ? `<ol class="hf-list sm-list">${L.map((it, i) => `<li><span>${escHtml(it.title)}${it.sol ? '' : ' <small>(ohne Lösung)</small>'}</span><button class="icon-btn" data-sm-up="${i}" ${i ? '' : 'disabled'} aria-label="nach oben">↑</button><button class="icon-btn" data-sm-down="${i}" ${i < L.length - 1 ? '' : 'disabled'} aria-label="nach unten">↓</button><button class="icon-btn" data-sm-del="${i}" aria-label="Blatt entfernen">✕</button></li>`).join('')}</ol>`
       : `<p class="note"><b>Noch leer.</b> Stell unter „Einzelblatt“ ein Blatt zusammen und tippe auf „Zur Blattsammlung“. Das geht mit beliebig vielen Blättern, auch für verschiedene Kinder.</p>`}
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="sm-print" ${L.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Alle drucken</span></button><button class="icon-btn" id="sm-save" ${L.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${L.length ? `<button class="icon-btn" id="sm-clear">Sammlung leeren</button>` : ''}</div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="sm-print" ${L.length ? '' : 'disabled'}>${icon('print')}${prLabel('Alle drucken')}</button><button class="icon-btn" id="sm-save" ${L.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${L.length ? `<button class="icon-btn" id="sm-clear">Sammlung leeren</button>` : ''}</div>${printHint()}
     <p class="note">Die Blätter werden so gedruckt, wie du sie gesammelt hast: mit Name und Datum, jedes mit seinem Lösungsblatt direkt dahinter (wenn beim Blatt „Lösungsblatt anhängen“ an war). Kein Deckblatt, keine Seitenzahlen – ein Heft mit Kapiteln stellt der Heft-Assistent unter „Arbeitsheft“ zusammen. Die Sammlung wird auf diesem Gerät gemerkt, bis du sie leerst.</p></div>
     <iframe id="sh-frame" title="Vorschau Blattsammlung"></iframe>`);
   app.sammlDoc = buildSamml();
@@ -11219,9 +11239,9 @@ function renderHeft(){
       <p class="note">Übungsseiten lassen sich austauschen: neue Aufgaben oder ein anderes Blatt an dieselbe Stelle. Die Seitenzahl bleibt.</p></details>` : ''}
     <label class="row">Drucken als <select id="hf-druck">${Object.entries(HEFT_DRUCK).map(([k, d]) => `<option value="${k}" ${k === (H.druck || 'a4') ? 'selected' : ''}>${d.name}</option>`).join('')}</select></label>
     ${H.druck && H.druck !== 'a4' && H.items.length ? `<p class="note hf-bk-note"><b>Als Heft drucken:</b> beidseitig, an der kurzen Kante wenden${H.druck === 'a3' ? ', Papier A3' : ', Papier A4'}. Dann die Bögen zusammen in der Mitte falten und heften. ${(() => { const n = heftTotal(H), b = Math.ceil(n/4); return `${b} ${b === 1 ? 'Bogen' : 'Bögen'}${n % 4 ? `, ${4 - n % 4} Seite${4 - n % 4 === 1 ? '' : 'n'} bleib${4 - n % 4 === 1 ? 't' : 'en'} leer` : ''}.`; })()}</p>` : ''}
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}<span style="display:inline">Heft drucken</span></button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>
-    ${H.items.some(it => it.sol?.length) ? `<div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="hf-sol-print">${icon('print')}<span style="display:inline">Lösungsheft drucken</span></button><button class="icon-btn" id="hf-sol-save">${icon('check')}<span style="display:inline">Lösungsheft speichern</span></button></div>` : ''}
-    <p class="note">Das Heft hat ein Titelblatt (mit dem Namen des Kindes oder einer leeren Namenszeile). Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Lösungen gibt es als eigenes Lösungsheft für dich. Einzelne Blätter sammelst du unter „Blattsammlung“. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst. Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</p></div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="hf-print" ${H.items.length ? '' : 'disabled'}>${icon('print')}${prLabel('Heft drucken')}</button><button class="icon-btn" id="hf-save" ${H.items.length ? '' : 'disabled'}>${icon('check')}<span style="display:inline">Als Datei speichern</span></button>${H.items.length ? `<button class="icon-btn" id="hf-clear">Heft leeren</button>` : ''}</div>${printHint()}
+    ${H.items.some(it => it.sol?.length) ? `<div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="hf-sol-print">${icon('print')}${prLabel('Lösungsheft drucken')}</button><button class="icon-btn" id="hf-sol-save">${icon('check')}<span style="display:inline">Lösungsheft speichern</span></button></div>` : ''}
+    <p class="note">Das Heft hat ein Titelblatt (mit dem Namen des Kindes oder einer leeren Namenszeile). Auf den Seiten stehen keine Namenszeilen und keine Lösungen, dafür Seitenzahlen. Die Lösungen gibt es als eigenes Lösungsheft für dich. Einzelne Blätter sammelst du unter „Blattsammlung“. Das Heft wird auf diesem Gerät gemerkt, bis du es leerst. Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten.</p></div>
     <iframe id="sh-frame" title="Vorschau Arbeitsheft"></iframe>`);
   app.heftDoc = buildHeft();
   const fr = $('#sh-frame'); fr.onload = null;
@@ -11264,8 +11284,8 @@ function renderSheets(keep){
     ${sheetHasLines(S.topic) ? `<label class="row">Lineatur ${linSelect('sh-lin', S.lin, S.pid)}</label>` : ''}
     <label class="row cb"><input type="checkbox" id="sh-bw" ${S.bw ? 'checked' : ''}> Schwarz-Weiß-Drucker (Muster statt Farben)</label>${S.topic.startsWith('B:') && B_SHEETS[key] ? `<label class="row">Aufgabe ${sel('sh-bart', B_SHEETS[key].arts.map(([n], i) => [i, `${i + 1}. ${escHtml(n)}`]), bArt(S, key))}</label>` : ''}${S.topic.startsWith('B:') && bDef(key, S)?.sim ? `<label class="row">Ähnlichkeit <select id="sh-bsim">${BZ_SIM.map((t, i) => `<option value="${i}" ${(S.bsim || 0) === i ? 'selected' : ''}>${['deutlich (andere Gruppe)', 'ähnlich (gleiche Gruppe)', 'fein (Varianten)'][i]}</option>`).join('')}</select></label>` : ''}${S.topic.startsWith('B:') ? `<p class="note">Jedes Blatt hat nur eine Aufgabenart, unter „Aufgabe“ von leicht nach schwer. Die erste Aufgabe ist grau gestrichelt ganz vorgemacht. Erkläre den Auftrag daran.${bDef(key, S)?.bastel ? ' Zu diesem Blatt gehört eine Bastelseite zum Ausschneiden; ihre Rückseite bleibt leer, deshalb liegt vor und hinter ihr je eine leere Seite.' : ''}</p>` : ''}
     <label class="row cb"><input type="checkbox" id="sh-sol" ${S.sol ? 'checked' : ''}> Lösungsblatt anhängen</label>`}
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-samml">${icon('plus')}<span style="display:inline">Zur Blattsammlung</span></button></div>
-    ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge.</p><details class="note sh-help"><summary>Probleme beim Drucken?</summary>Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten. Auf dem iPad lässt sich die Fußzeile nicht abschalten – für saubere Blätter am Computer drucken.</details></div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn" id="sh-new">${icon('random')}<span style="display:inline">Neue Aufgaben</span></button><button class="icon-btn primary" id="sh-print">${icon('print')}${prLabel('Drucken')}</button><button class="icon-btn" id="sh-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button><button class="icon-btn" id="sh-samml">${icon('plus')}<span style="display:inline">Zur Blattsammlung</span></button></div>${printHint()}
+    ${LD ? `<p class="note"><b>Legeblatt:</b> Auf dieses Blatt legen die Kinder echtes Material – Wendeplättchen, Einerwürfel, Zehnerstangen, Buchstabenkarten. Damit alles passt, in Originalgröße drucken (100 %, nicht „An Seite anpassen“). Unten auf dem Blatt ist ein 5-cm-Strich zur Kontrolle.${LD.name.includes('quer') ? ' Dieses Blatt ist im Querformat.' : ''}</p>` : ''}<p class="note">Jedes Mal entstehen neue Aufgaben. Die Symbole oben auf dem Blatt erklären die Arbeitsaufträge.</p><details class="note sh-help"><summary>Probleme beim Drucken?</summary>Falls „Drucken“ hier nichts tut: „Als Datei speichern“, die Datei im Browser öffnen und dort drucken (Strg+P). Stehen beim Drucken oben und unten Datum und Internetadresse: im Druckdialog „Kopf- und Fußzeilen“ ausschalten.</details></div>
     <iframe id="sh-frame" title="Vorschau Arbeitsblatt"></iframe>`);
   if(!keep || !app.sheetDoc) app.sheetDoc = buildSheet();
   sheetShow();
@@ -11285,6 +11305,14 @@ function sheetEvents(e){
   if(smu || smd){ const i = +(smu || smd).dataset[smu ? 'smUp' : 'smDown'], j = smu ? i - 1 : i + 1; [L[i], L[j]] = [L[j], L[i]]; saveSamml(); return renderSamml(); }
   if(smx){ L.splice(+smx.dataset.smDel, 1); saveSamml(); return renderSamml(); }
   if(e.target.closest('#sm-clear')){ const b = e.target.closest('#sm-clear'); if(!b.dataset.sure){ b.dataset.sure = '1'; b.textContent = 'Wirklich leeren?'; return; } app.samml.items = []; saveSamml(); return renderSamml(); }
+  /* Home-Bildschirm-App auf iPad/iPhone: Teilen statt Drucken (Backlog V) */
+  const shareId = iosApp() && ['sh-print', 'sm-print', 'hf-print', 'hf-sol-print'].find(id => e.target.closest('#' + id));
+  if(shareId){
+    if(shareId === 'sh-print'){ sheetUsed(); return shareDoc(`Arbeitsblatt ${app.sheetDoc.title}`, app.sheetDoc.html); }
+    if(shareId === 'sm-print') return shareDoc('Blattsammlung', (app.sammlDoc || buildSamml()).html);
+    if(shareId === 'hf-print'){ const doc = app.heftDoc || buildHeft(); return shareDoc(`Arbeitsheft ${doc.title}`, doc.html); }
+    const doc = buildLoesung(); return shareDoc(doc.title, doc.html);
+  }
   if(e.target.closest('#sm-print')){ let ok = false; try{ const w = $('#sh-frame').contentWindow; w.focus(); w.print(); ok = true; }catch{} if(!ok) toast('Drucken geht hier nicht direkt – bitte „Als Datei speichern“ und die Datei im Browser drucken.'); return; }
   if(e.target.closest('#sm-save')){ const doc = app.sammlDoc || buildSamml(); return saveFile('Blattsammlung.html', doc.html); }
   /* Heft für ein Kind oder für einen Bereich (U1) */
@@ -11562,7 +11590,7 @@ function openReport(pid){ app.report.pid = pid; $('#dlg-report').showModal(); re
 function renderReport(){
   const R = app.report;
   $('#report-body').innerHTML = `<div class="sheet-form"><div class="seg" role="group" aria-label="Art" style="flex-direction:column;align-items:stretch">${[['teacher', 'Lernstandsbericht (ILEB)'], ['week', 'Wochenübersicht (letzte 7 Tage)'], ['parents', 'Elterninfo (einfache Sprache)'], ['map', 'Lernlandkarte (Kind)']].map(([k, n]) => `<button data-rk="${k}" aria-pressed="${R.kind === k}">${n}</button>`).join('')}</div>
-    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="rp-print">${icon('print')}<span style="display:inline">Drucken</span></button><button class="icon-btn" id="rp-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button></div>
+    <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="icon-btn primary" id="rp-print">${icon('print')}${prLabel('Drucken')}</button><button class="icon-btn" id="rp-save">${icon('check')}<span style="display:inline">Als Datei speichern</span></button></div>${printHint()}
     <p class="note">Falls „Drucken“ hier nichts tut: als Datei speichern und im Browser drucken. Die Elterninfo nutzt die Ich-kann-Sätze der Lernlandkarte.</p></div><iframe id="rp-frame" title="Vorschau Bericht"></iframe>`;
   app.reportDoc = buildReport(R.pid, R.kind);
   const fr = $('#rp-frame'); fr.srcdoc = app.reportDoc.html.replace('</head>', `<style>@media screen{html{zoom:${Math.min(1, Math.max(.4, ((fr.clientWidth || 700) - 30)/830)).toFixed(2)}}}</style></head>`);
@@ -11934,6 +11962,7 @@ $('#btn-sheet').addEventListener('click', () => requireTeacher(() => openSheets(
 $('#dlg-sheet').addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target === $('#dlg-sheet')) return $('#dlg-sheet').close(); sheetEvents(e); });
 $('#dlg-sheet').addEventListener('change', sheetChange);
 $('#dlg-report').addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target === $('#dlg-report')) return $('#dlg-report').close(); const k = e.target.closest('[data-rk]'); if(k){ app.report.kind = k.dataset.rk; return renderReport(); }
+  if(e.target.closest('#rp-print') && iosApp()) return shareDoc(app.reportDoc.title, app.reportDoc.html);   /* Backlog V */
   if(e.target.closest('#rp-print')){ try{ const w = $('#rp-frame').contentWindow; w.focus(); w.print(); }catch{ toast('Drucken geht hier nicht direkt – bitte als Datei speichern.'); } return; }
   if(e.target.closest('#rp-save')) saveFile(`${app.reportDoc.title}.html`.replace(/[\\/:*?"<>|]/g, ''), app.reportDoc.html); });
 $('#btn-home').addEventListener('click', goHome);
