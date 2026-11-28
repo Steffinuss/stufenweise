@@ -5,6 +5,10 @@ Versionen: Hauptversion.Nebenversion.Korrektur (Korrektur = Fehlerbehebung, Nebe
 
 ## Unveröffentlicht (Zweig `entwicklung`, Testversion)
 
+## 0.43.0 – 28.11.2026
+
+Freigegeben von Stefan am 28.11.2026 nach Durchsicht der Testversion („Super gib alles frei“): Basis-Arbeitsblätter mit einer Aufgabenart je Blatt (Backlog T) und aufklappbare Seitenliste im Heft-Assistenten. Anleitung ergänzt (Basis-Blätter: Aufgabe, Bastelseite; Basis im Arbeitsheft), Anleitungsbilder neu aufgenommen.
+
 - **Seitenliste im Heft-Assistenten ausblendbar** (Stefan 27.11.2026, 17:54: „Detailauswahl im Heftassistenten ausblendbar machen und standardmäßig ausgeblendet“; danach „Ja, so bauen“): Die Liste der Kapitel und Seiten mit „Austauschen“ steht jetzt in der aufklappbaren Zeile „Seiten im Heft (n) – zum Austauschen aufklappen“ (`details.hf-pages`), anfangs zu. Auf/zu gilt, solange der Dialog offen ist (`app.heftListOpen`, z. B. nach einem Austausch); beim nächsten Öffnen (`openSheets`, `openHeftZone`) ist sie wieder zu. Test: `heft_stringent.py`.
 - **Basis-Arbeitsblätter: eine Aufgabenart je Blatt** (Backlog T, Stefan 27.11.2026, alle Entscheidungen per Auswahl, danach „Ja, so bauen“; Konzept im Claude-Doc „Konzept: Basis-Arbeitsblätter überarbeiten (Backlog T)“):
   - Neue Auswahl **„Aufgabe“** im Blatt-Dialog bei allen zehn Basis-Blättern, Arten von leicht nach schwer wie in der App (V1 einkreisen vor verbinden, V3 erst Farbe bei gleichen Dingen). Je Blatt gemerkt (`app.sheet.bart`, in `SHEET_KEEP`). Keine Mischung mehr: auf dem ganzen Blatt ein Auftragssatz. Die Art steht im Titel („Der Größe nach ordnen: Das größte“). „Ähnlichkeit“ erscheint nur bei Arten, die sie nutzen.
